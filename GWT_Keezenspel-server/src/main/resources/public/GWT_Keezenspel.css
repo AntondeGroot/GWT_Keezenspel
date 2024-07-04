@@ -32,3 +32,19 @@ h1 {
 #closeButton {
   margin: 15px 6px 6px;
 }
+
+#circle {
+  width: 400px;
+  height: 400px;
+  background-color: darkred;
+  border-radius: 50%;
+  display: inline-block;
+  text-align: center;
+  line-height: 40px;
+  margin: 2px;
+}
+
+#circle:hover {
+  background-color: darkgray;
+}
+
