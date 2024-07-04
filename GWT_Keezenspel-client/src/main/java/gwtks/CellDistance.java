@@ -26,7 +26,7 @@ public class CellDistance {
         double y = 2 * Math.tan(Math.toRadians(90 - 180.0 / nrPlayers));
 
         Point midPoint = new Point(boardSize / 2, boardSize / 2);
-        Point startPoint =  new Point(midPoint.getX() + 2*getCellDistance(nrPlayers, boardSize), midPoint.getY() + 2*getCellDistance(nrPlayers, boardSize));
+        Point startPoint =  new Point(midPoint.getX() + 2*getCellDistance(nrPlayers, boardSize), midPoint.getY() + y*getCellDistance(nrPlayers, boardSize));
         //midPoint.getY() + y);
         GWT.log("y value = "+y);
 
