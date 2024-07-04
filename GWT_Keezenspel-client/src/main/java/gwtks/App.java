@@ -1,5 +1,7 @@
 package gwtks;
 
+import com.google.gwt.canvas.client.Canvas;
+import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -7,15 +9,10 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -35,6 +32,7 @@ public class App implements EntryPoint {
 	private final GreetingServiceAsync greetingService = GWT.create(GreetingService.class);
 
 	private final MovingServiceAsync movingService = GWT.create(MovingService.class);
+	private Canvas canvas;
 
 	/**
 	 * This is the entry point method.
@@ -44,6 +42,30 @@ public class App implements EntryPoint {
 		final TextBox nameField = new TextBox();
 		nameField.setText("1");
 		final Label errorLabel = new Label();
+
+		// Create a Canvas for the Parcheesi board
+		canvas = Canvas.createIfSupported();
+		if (canvas == null) {
+			RootPanel.get().add(new Label("Canvas is not supported in your browser."));
+			return;
+		}
+
+		int canvasSize = 600;
+		canvas.setWidth(canvasSize + "px");
+		canvas.setHeight(canvasSize + "px");
+		canvas.setCoordinateSpaceWidth(canvasSize);
+		canvas.setCoordinateSpaceHeight(canvasSize);
+
+		VerticalPanel mainPanel = new VerticalPanel();
+
+		// Initialize the board (this is a very simplified version)
+		// Add board and other components to the main panel
+		Board board = new Board();
+		board.createBoard(4,600);
+		canvas = board.drawBoard(canvas, 4, 600);
+		mainPanel.add(canvas);
+		// Add the main panel to the RootPanel
+		RootPanel.get("boardContainer").add(mainPanel);
 
 		// We can add style names to widgets
 		sendButton.addStyleName("sendButton");
@@ -57,34 +79,6 @@ public class App implements EntryPoint {
 		// Focus the cursor on the name field when the app loads
 		nameField.setFocus(true);
 		nameField.selectAll();
-
-		// Create the popup dialog box
-//		final DialogBox dialogBox = new DialogBox();
-//		dialogBox.setText("Remote Procedure Call");
-//		dialogBox.setAnimationEnabled(true);
-//		final Button closeButton = new Button("Close");
-//		// We can set the id of a widget by accessing its Element
-//		closeButton.getElement().setId("closeButton");
-//		final Label textToServerLabel = new Label();
-//		final HTML serverResponseLabel = new HTML();
-//		VerticalPanel dialogVPanel = new VerticalPanel();
-//		dialogVPanel.addStyleName("dialogVPanel");
-//		dialogVPanel.add(new HTML("<b>Sending name to the server:</b>"));
-//		dialogVPanel.add(textToServerLabel);
-//		dialogVPanel.add(new HTML("<br><b>Server replies:</b>"));
-//		dialogVPanel.add(serverResponseLabel);
-//		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-//		dialogVPanel.add(closeButton);
-//		dialogBox.setWidget(dialogVPanel);
-
-		// Add a handler to close the DialogBox
-//		closeButton.addClickHandler(new ClickHandler() {
-//			public void onClick(ClickEvent event) {
-//				dialogBox.hide();
-//				sendButton.setEnabled(true);
-//				sendButton.setFocus(true);
-//			}
-//		});
 
 		// Create a handler for the sendButton and nameField
 		class MyHandler implements ClickHandler, KeyUpHandler {
@@ -111,15 +105,7 @@ public class App implements EntryPoint {
 				// First, we validate the input.
 				errorLabel.setText("");
 				String textToServer = nameField.getText();
-//				if (!FieldVerifier.isValidName(textToServer)) {
-//					errorLabel.setText("Please enter at least four characters");
-//					return;
-//				}
 
-				// Then, we send the input to the server.
-//				sendButton.setEnabled(false);
-//				textToServerLabel.setText(textToServer);
-//				serverResponseLabel.setText("");
 				MoveMessage moveMessage = new MoveMessage();
 				moveMessage.setUserId(Integer.parseInt(nameField.getText()));
 
@@ -133,31 +119,8 @@ public class App implements EntryPoint {
 
 				greetingService.greetServer(textToServer,
 						new AsyncCallback<GreetingResponse>() {
-							public void onFailure(Throwable caught) {
-//								// Show the RPC error message to the user
-//								dialogBox
-//										.setText("Remote Procedure Call - Failure");
-//								serverResponseLabel
-//										.addStyleName("serverResponseLabelError");
-//								serverResponseLabel.setHTML(SERVER_ERROR);
-//								dialogBox.center();
-//								closeButton.setFocus(true);
-							}
-
-							public void onSuccess(GreetingResponse result) {
-//								dialogBox.setText("Remote Procedure Call");
-//								serverResponseLabel
-//										.removeStyleName("serverResponseLabelError");
-//								serverResponseLabel.setHTML(new SafeHtmlBuilder()
-//										.appendEscaped(result.getGreeting())
-//										.appendHtmlConstant("<br><br>I am running ")
-//										.appendEscaped(result.getServerInfo())
-//										.appendHtmlConstant(".<br><br>It looks like you are using:<br>")
-//										.appendEscaped(result.getUserAgent())
-//										.toSafeHtml());
-//								dialogBox.center();
-//								closeButton.setFocus(true);
-							}
+							public void onFailure(Throwable caught) {}
+							public void onSuccess(GreetingResponse result) {}
 						});
 			}
 		}
@@ -166,5 +129,38 @@ public class App implements EntryPoint {
 		MyHandler handler = new MyHandler();
 		sendButton.addClickHandler(handler);
 		nameField.addKeyUpHandler(handler);
+	}
+
+
+
+
+
+//	private void drawBoard() {
+//		canvas.setHeight("600px");
+//		canvas.setWidth("600px");
+//		Context2d context = canvas.getContext2d();
+//
+//		//context.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
+//		context.clearRect(0, 0, 600, 600);
+//		int boardSize = 600;
+//		int cellSize = 40;
+//
+//		drawCircle(context, 0, 0, 10);
+//		drawCircle(context, 600, 0, 10);
+//		for (int row = 0; row < boardSize; row++) {
+//			for (int col = 0; col < boardSize; col++) {
+//				drawCircle(context, col * cellSize + cellSize / 2, row * cellSize + cellSize / 2, cellSize / 2 - 2);
+//			}
+//		}
+//	}
+//
+	private void drawCircle(Context2d context, double x, double y, double radius) {
+		context.beginPath();
+		context.arc(x, y, radius, 0, 2 * Math.PI);
+		context.setFillStyle("#D3D3D3");
+		context.fill();
+		context.setStrokeStyle("#000000");
+		context.stroke();
+		context.closePath();
 	}
 }
