@@ -33,8 +33,8 @@ public class Board implements IsSerializable {
 
 		List<TileMapping> tempMappings = new ArrayList<>();
 		for (TileMapping mapping : mappings) {
-			for (int k = 2; k <= 4; k++) {
-				tempMappings.add(new TileMapping(k, mapping.getTileNr(), mapping.getPosition().rotate(new Point(300,300), 90*(k-1))));
+			for (int k = 2; k <= nrPlayers; k++) {
+				tempMappings.add(new TileMapping(k, mapping.getTileNr(), mapping.getPosition().rotate(new Point(300,300), 360.0/nrPlayers*(k-1))));
 			}
 		}
 
