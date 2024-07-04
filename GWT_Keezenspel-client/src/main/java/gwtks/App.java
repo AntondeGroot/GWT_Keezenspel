@@ -32,16 +32,17 @@ public class App implements EntryPoint {
 	/**
 	 * Create a remote service proxy to talk to the server-side Greeting service.
 	 */
-	private final GreetingServiceAsync greetingService = GWT
-			.create(GreetingService.class);
+	private final GreetingServiceAsync greetingService = GWT.create(GreetingService.class);
+
+	private final MovingServiceAsync movingService = GWT.create(MovingService.class);
 
 	/**
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		final Button sendButton = new Button("Send");
+		final Button sendButton = new Button("Next Player");
 		final TextBox nameField = new TextBox();
-		nameField.setText("GWT User");
+		nameField.setText("1");
 		final Label errorLabel = new Label();
 
 		// We can add style names to widgets
@@ -58,32 +59,32 @@ public class App implements EntryPoint {
 		nameField.selectAll();
 
 		// Create the popup dialog box
-		final DialogBox dialogBox = new DialogBox();
-		dialogBox.setText("Remote Procedure Call");
-		dialogBox.setAnimationEnabled(true);
-		final Button closeButton = new Button("Close");
-		// We can set the id of a widget by accessing its Element
-		closeButton.getElement().setId("closeButton");
-		final Label textToServerLabel = new Label();
-		final HTML serverResponseLabel = new HTML();
-		VerticalPanel dialogVPanel = new VerticalPanel();
-		dialogVPanel.addStyleName("dialogVPanel");
-		dialogVPanel.add(new HTML("<b>Sending name to the server:</b>"));
-		dialogVPanel.add(textToServerLabel);
-		dialogVPanel.add(new HTML("<br><b>Server replies:</b>"));
-		dialogVPanel.add(serverResponseLabel);
-		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-		dialogVPanel.add(closeButton);
-		dialogBox.setWidget(dialogVPanel);
+//		final DialogBox dialogBox = new DialogBox();
+//		dialogBox.setText("Remote Procedure Call");
+//		dialogBox.setAnimationEnabled(true);
+//		final Button closeButton = new Button("Close");
+//		// We can set the id of a widget by accessing its Element
+//		closeButton.getElement().setId("closeButton");
+//		final Label textToServerLabel = new Label();
+//		final HTML serverResponseLabel = new HTML();
+//		VerticalPanel dialogVPanel = new VerticalPanel();
+//		dialogVPanel.addStyleName("dialogVPanel");
+//		dialogVPanel.add(new HTML("<b>Sending name to the server:</b>"));
+//		dialogVPanel.add(textToServerLabel);
+//		dialogVPanel.add(new HTML("<br><b>Server replies:</b>"));
+//		dialogVPanel.add(serverResponseLabel);
+//		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
+//		dialogVPanel.add(closeButton);
+//		dialogBox.setWidget(dialogVPanel);
 
 		// Add a handler to close the DialogBox
-		closeButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				dialogBox.hide();
-				sendButton.setEnabled(true);
-				sendButton.setFocus(true);
-			}
-		});
+//		closeButton.addClickHandler(new ClickHandler() {
+//			public void onClick(ClickEvent event) {
+//				dialogBox.hide();
+//				sendButton.setEnabled(true);
+//				sendButton.setFocus(true);
+//			}
+//		});
 
 		// Create a handler for the sendButton and nameField
 		class MyHandler implements ClickHandler, KeyUpHandler {
@@ -110,41 +111,52 @@ public class App implements EntryPoint {
 				// First, we validate the input.
 				errorLabel.setText("");
 				String textToServer = nameField.getText();
-				if (!FieldVerifier.isValidName(textToServer)) {
-					errorLabel.setText("Please enter at least four characters");
-					return;
-				}
+//				if (!FieldVerifier.isValidName(textToServer)) {
+//					errorLabel.setText("Please enter at least four characters");
+//					return;
+//				}
 
 				// Then, we send the input to the server.
-				sendButton.setEnabled(false);
-				textToServerLabel.setText(textToServer);
-				serverResponseLabel.setText("");
+//				sendButton.setEnabled(false);
+//				textToServerLabel.setText(textToServer);
+//				serverResponseLabel.setText("");
+				MoveMessage moveMessage = new MoveMessage();
+				moveMessage.setUserId(Integer.parseInt(nameField.getText()));
+
+				movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
+					public void onFailure(Throwable caught) {}
+					public void onSuccess(MoveResponse result) {
+						nameField.setText(String.valueOf(result.getNextUserId()));
+
+					}
+				} );
+
 				greetingService.greetServer(textToServer,
 						new AsyncCallback<GreetingResponse>() {
 							public void onFailure(Throwable caught) {
-								// Show the RPC error message to the user
-								dialogBox
-										.setText("Remote Procedure Call - Failure");
-								serverResponseLabel
-										.addStyleName("serverResponseLabelError");
-								serverResponseLabel.setHTML(SERVER_ERROR);
-								dialogBox.center();
-								closeButton.setFocus(true);
+//								// Show the RPC error message to the user
+//								dialogBox
+//										.setText("Remote Procedure Call - Failure");
+//								serverResponseLabel
+//										.addStyleName("serverResponseLabelError");
+//								serverResponseLabel.setHTML(SERVER_ERROR);
+//								dialogBox.center();
+//								closeButton.setFocus(true);
 							}
 
 							public void onSuccess(GreetingResponse result) {
-								dialogBox.setText("Remote Procedure Call");
-								serverResponseLabel
-										.removeStyleName("serverResponseLabelError");
-								serverResponseLabel.setHTML(new SafeHtmlBuilder()
-										.appendEscaped(result.getGreeting())
-										.appendHtmlConstant("<br><br>I am running ")
-										.appendEscaped(result.getServerInfo())
-										.appendHtmlConstant(".<br><br>It looks like you are using:<br>")
-										.appendEscaped(result.getUserAgent())
-										.toSafeHtml());
-								dialogBox.center();
-								closeButton.setFocus(true);
+//								dialogBox.setText("Remote Procedure Call");
+//								serverResponseLabel
+//										.removeStyleName("serverResponseLabelError");
+//								serverResponseLabel.setHTML(new SafeHtmlBuilder()
+//										.appendEscaped(result.getGreeting())
+//										.appendHtmlConstant("<br><br>I am running ")
+//										.appendEscaped(result.getServerInfo())
+//										.appendHtmlConstant(".<br><br>It looks like you are using:<br>")
+//										.appendEscaped(result.getUserAgent())
+//										.toSafeHtml());
+//								dialogBox.center();
+//								closeButton.setFocus(true);
 							}
 						});
 			}
