@@ -86,7 +86,7 @@ public class Board implements IsSerializable {
 		//context.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
 		context.clearRect(0, 0, 600, 600);
 		double cellSize = 40.0;
-
+		Pawn pawn = new Pawn();
 		for (TileMapping mapping : mappings) {
 			drawCircle(context, mapping.getPosition().getX(), mapping.getPosition().getY(), cellDistance/2);
 		}

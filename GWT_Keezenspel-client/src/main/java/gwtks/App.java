@@ -66,8 +66,13 @@ public class App implements EntryPoint {
 		board.createBoard(nrPlayers,600);
 		canvas = board.drawBoard(canvas);
 		mainPanel.add(canvas);
+
+
 		// Add the main panel to the RootPanel
 		RootPanel.get("boardContainer").add(mainPanel);
+
+		Pawn pawn = new Pawn();
+		pawn.drawPawns(canvas);;
 
 		// We can add style names to widgets
 		sendButton.addStyleName("sendButton");
