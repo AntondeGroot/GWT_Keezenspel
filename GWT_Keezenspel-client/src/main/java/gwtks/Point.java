@@ -10,6 +10,9 @@ public class Point {
     }
 
     public Point(Point p){
+        if(p == null){
+            p = new Point(0,0);
+        }
         this.x = p.x;
         this.y = p.y;
     }

@@ -22,12 +22,13 @@ public class Board implements IsSerializable {
 		cellDistance = CellDistance.getCellDistance(nrPlayers, boardSize);
 		Point startPoint = CellDistance.getStartPoint(nrPlayers, boardSize);
 
+		// create normal tiles
 		for (int j = -9; j < 7; j++) {
 			// for construction purposes it is easier to take one boardsection that consists only of 90 degrees angles
 			// for game purposes it is easier that the starting point is position 0 and the last position is 15
 			// therefore the construction goes from the last userId, from position 7 til 15 and then starts with userId 1 position 0 to 6
 			// then all the tiles are rotated based on the number of players, where the userId is updated based on the rotation.
-			int userId = (j < 0) ? nrPlayers - 1 : 1;
+			int userId = (j < 0) ? nrPlayers - 1 : 0;
 			int tileNr = (j < 0) ? j + 16 : j;
 			mappings.add(new TileMapping(userId, tileNr, new Point(startPoint)));
 
@@ -43,6 +44,27 @@ public class Board implements IsSerializable {
 			}
 		}
 
+		// create finish tiles
+		Point point = new Point(getPosition(nrPlayers-1,15));
+		for (int i = 1; i <= 4; i++) {
+			point.setY(point.getY() - cellDistance);
+			mappings.add(new TileMapping(0, 15+i, new Point(point)));
+		}
+
+		// create nest tiles
+		// they will be assigned negative values to distinguish them from the playing field
+		// they will be assigned different negative values to distinguish them from each other so that 2 pawns cannot end up on the same nest tile
+		point = new Point(getPosition(0,1));
+		point.setX(point.getX() - 1.5*cellDistance);
+		mappings.add(new TileMapping(0, -1, new Point(point)));
+		point.setX(point.getX() - cellDistance);
+		mappings.add(new TileMapping(0, -2, new Point(point)));
+		point.setY(point.getY() - cellDistance);
+		mappings.add(new TileMapping(0, -3, new Point(point)));
+		point.setX(point.getX() + cellDistance);
+		mappings.add(new TileMapping(0, -4, new Point(point)));
+
+		// to create the tiles for other players rotate all tiles
 		List<TileMapping> tempMappings = new ArrayList<>();
 		for (TileMapping mapping : mappings) {
 			for (int k = 1; k < nrPlayers; k++) {
