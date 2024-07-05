@@ -6,10 +6,13 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Board implements IsSerializable {
+
     private static List<TileMapping> mappings = new ArrayList<>();
+
 	private double cellDistance;
 
     public void createBoard(int nrPlayers, double boardSize) {
@@ -19,33 +22,41 @@ public class Board implements IsSerializable {
 		cellDistance = CellDistance.getCellDistance(nrPlayers, boardSize);
 		Point startPoint = CellDistance.getStartPoint(nrPlayers, boardSize);
 
-			for (int j = 0; j < 16; j++) {
-				mappings.add(new TileMapping(1, j, new Point(startPoint)));
-				GWT.log(startPoint.toString());
-				if( j < 6){
-					startPoint.setY((int) (startPoint.getY()+cellDistance));
-				} else if (j<10) {
-					startPoint.setX(startPoint.getX()-cellDistance);
-				}else {
-					startPoint.setY(startPoint.getY()-cellDistance);
-				}
+		for (int j = -9; j < 7; j++) {
+			// for construction purposes it is easier to take one boardsection that consists only of 90 degrees angles
+			// for game purposes it is easier that the starting point is position 0 and the last position is 15
+			// therefore the construction goes from the last userId, from position 7 til 15 and then starts with userId 1 position 0 to 6
+			// then all the tiles are rotated based on the number of players, where the userId is updated based on the rotation.
+			int userId = (j < 0) ? nrPlayers - 1 : 1;
+			int tileNr = (j < 0) ? j + 16 : j;
+			mappings.add(new TileMapping(userId, tileNr, new Point(startPoint)));
+
+			if( j < -3){
+				// move downwards for 6 tiles
+				startPoint.setY(startPoint.getY() + cellDistance);
+			} else if (j<1) {
+				// move to the left of the screen for 4 tiles
+				startPoint.setX(startPoint.getX() - cellDistance);
+			}else {
+				// move upwards for 5 tiles
+				startPoint.setY(startPoint.getY() - cellDistance);
 			}
+		}
 
 		List<TileMapping> tempMappings = new ArrayList<>();
 		for (TileMapping mapping : mappings) {
-			for (int k = 2; k <= nrPlayers; k++) {
-				tempMappings.add(new TileMapping(k, mapping.getTileNr(), mapping.getPosition().rotate(new Point(300,300), 360.0/nrPlayers*(k-1))));
+			for (int k = 1; k < nrPlayers; k++) {
+				tempMappings.add(new TileMapping(k, mapping.getTileNr(), mapping.getPosition().rotate(new Point(300,300), 360.0/nrPlayers*k)));
 			}
 		}
 
         mappings.addAll(tempMappings);
-		mappings.add(new TileMapping(1,1,new Point(300,300)));
 		for (TileMapping mapping : mappings) {
 			GWT.log(mapping.toString());
 		}
     }
 
-	public Canvas drawBoard(Canvas canvas, int nrPlayers, double boardSize) {
+	public Canvas drawBoard(Canvas canvas) {
 		canvas.setHeight("600px");
 		canvas.setWidth("600px");
 		Context2d context = canvas.getContext2d();
@@ -80,4 +91,8 @@ public class Board implements IsSerializable {
 		}
 		return null;
     }
+
+	public static List<TileMapping> getMappings() {
+		return mappings;
+	}
 }
