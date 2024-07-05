@@ -2,11 +2,9 @@ package gwtks;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class Board implements IsSerializable {
@@ -66,16 +64,15 @@ public class Board implements IsSerializable {
 
 		// to create the tiles for other players rotate all tiles
 		List<TileMapping> tempMappings = new ArrayList<>();
+		int userId = 0;
 		for (TileMapping mapping : mappings) {
 			for (int k = 1; k < nrPlayers; k++) {
-				tempMappings.add(new TileMapping(k, mapping.getTileNr(), mapping.getPosition().rotate(new Point(300,300), 360.0/nrPlayers*k)));
+				userId = (mapping.getUserId()+k)%nrPlayers;
+				tempMappings.add(new TileMapping(userId, mapping.getTileNr(), mapping.getPosition().rotate(new Point(300,300), 360.0/nrPlayers*k)));
 			}
 		}
 
         mappings.addAll(tempMappings);
-		for (TileMapping mapping : mappings) {
-			GWT.log(mapping.toString());
-		}
     }
 
 	public Canvas drawBoard(Canvas canvas) {
@@ -86,19 +83,26 @@ public class Board implements IsSerializable {
 		//context.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
 		context.clearRect(0, 0, 600, 600);
 		double cellSize = 40.0;
-		Pawn pawn = new Pawn();
+		String color = "";
+		int tileNr = 0;
 		for (TileMapping mapping : mappings) {
-			drawCircle(context, mapping.getPosition().getX(), mapping.getPosition().getY(), cellDistance/2);
+			color = "#D3D3D3";
+			tileNr = mapping.getTileNr();
+			// only player tiles get a color
+			if (tileNr <= 0 || tileNr >= 16) {
+				color = Players.getColor(mapping.getUserId());
+			}
+
+			drawCircle(context, mapping.getPosition().getX(), mapping.getPosition().getY(), cellDistance/2, color);
 		}
 
-		GWT.log(mappings.toString());
 		return canvas;
 	}
 
-	private void drawCircle(Context2d context, double x, double y, double radius) {
+	private void drawCircle(Context2d context, double x, double y, double radius, String color) {
 		context.beginPath();
 		context.arc(x, y, radius, 0, 2 * Math.PI);
-		context.setFillStyle("#D3D3D3");
+		context.setFillStyle(color);
 		context.fill();
 		context.setStrokeStyle("#000000");
 		context.stroke();
