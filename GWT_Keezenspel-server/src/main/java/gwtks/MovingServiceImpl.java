@@ -18,7 +18,7 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
 //        }
 //        GameState gameState = new GameState();
         MoveResponse response = new MoveResponse();
-        response.setNextUserId(input.getUserId()+100);
+        response.setNextPlayerId(input.getPlayerId()+100);
 
         return response;
     }

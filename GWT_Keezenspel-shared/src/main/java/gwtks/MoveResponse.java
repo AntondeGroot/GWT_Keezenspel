@@ -4,19 +4,19 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 @SuppressWarnings("serial")
 public class MoveResponse implements IsSerializable {
-    private Integer nextUserId;
+    private Integer nextPlayerId;
     private Integer pawnId1;
     private Integer pawnId2;
     //private Animate movement of pawn 1
     //private animate movement of pawn 2
     private MoveType moveType;
 
-    public Integer getNextUserId() {
-        return nextUserId;
+    public Integer getNextPlayerId() {
+        return nextPlayerId;
     }
 
-    public void setNextUserId(Integer nextUserId) {
-        this.nextUserId = nextUserId;
+    public void setNextPlayerId(Integer nextPlayerId) {
+        this.nextPlayerId = nextPlayerId;
     }
 
     public Integer getPawnId1() {

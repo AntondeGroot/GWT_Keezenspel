@@ -3,19 +3,19 @@ package gwtks;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class MoveMessage implements IsSerializable {
-        private Integer userId;
+        private Integer playerId;
         private Integer pawnId1;
         private Integer pawnId2;
         private MoveType moveType;
         private Integer stepsPawn1;
         private Integer stepsPawn2;
 
-        public Integer getUserId() {
-            return userId;
+        public Integer getPlayerId() {
+            return playerId;
         }
 
-        public void setUserId(Integer userId) {
-            this.userId = userId;
+        public void setPlayerId(Integer playerId) {
+            this.playerId = playerId;
         }
 
         public Integer getPawnId1() {

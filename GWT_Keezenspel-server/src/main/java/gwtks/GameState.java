@@ -5,7 +5,7 @@ import java.util.List;
 public class GameState {
 
     private static List<Pawn> pawns;
-    private static int userId;
+    private static int playerId;
     private int numberOfPlayers = 4;
 
     public GameState() {
@@ -20,12 +20,12 @@ public class GameState {
     }
 
     public Integer nextTurn(){
-        userId = (userId + 1) % numberOfPlayers;
-        return userId;
+        playerId = (playerId + 1) % numberOfPlayers;
+        return playerId;
     }
 
-    public int getUserId(){
-        return userId;
+    public int getPlayerId(){
+        return playerId;
     }
 
     public List<Pawn> getPawns() {

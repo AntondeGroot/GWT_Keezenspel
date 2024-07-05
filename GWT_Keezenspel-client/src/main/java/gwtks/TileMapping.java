@@ -1,18 +1,18 @@
 package gwtks;
 
 public class TileMapping {
-    private int userId;
+    private int playerId;
     private int tileNr;
     private Point position;
 
-    public TileMapping(int userId, int tileNr, Point position) {
-        this.userId = userId;
+    public TileMapping(int playerId, int tileNr, Point position) {
+        this.playerId = playerId;
         this.tileNr = tileNr;
         this.position = position;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getPlayerId() {
+        return playerId;
     }
 
     public int getTileNr() {
@@ -26,7 +26,7 @@ public class TileMapping {
     @Override
     public String toString() {
         return "Mapping{" +
-                "userId='" + userId + '\'' +
+                "playerId='" + playerId + '\'' +
                 ", tileNr=" + tileNr +
                 ", position=" + position +
                 '}';
