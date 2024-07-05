@@ -1,10 +1,10 @@
 package gwtks;
 
 public class Pawn {
-    private int userId;
+    private int playerId;
     private long pawnId;
 
-    public Pawn(int userId) {
-        this.userId = userId;
+    public Pawn(int playerId) {
+        this.playerId = playerId;
     }
 }

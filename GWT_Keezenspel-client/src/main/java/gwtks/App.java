@@ -40,6 +40,9 @@ public class App implements EntryPoint {
 	public void onModuleLoad() {
 		final Button sendButton = new Button("Next Player");
 		final TextBox nameField = new TextBox();
+		final TextBox playerIdField = new TextBox();
+		final TextBox pawnIdField = new TextBox();
+		final TextBox stepsField = new TextBox();
 		nameField.setText("1");
 		final Label errorLabel = new Label();
 
@@ -79,7 +82,9 @@ public class App implements EntryPoint {
 
 		// Add the nameField and sendButton to the RootPanel
 		// Use RootPanel.get() to get the entire body element
-		RootPanel.get("nameFieldContainer").add(nameField);
+		RootPanel.get("playerIdFieldContainer").add(playerIdField);
+		RootPanel.get("pawnIdFieldContainer").add(pawnIdField);
+		RootPanel.get("stepsFieldContainer").add(stepsField);
 		RootPanel.get("sendButtonContainer").add(sendButton);
 		RootPanel.get("errorLabelContainer").add(errorLabel);
 
@@ -114,12 +119,12 @@ public class App implements EntryPoint {
 				String textToServer = nameField.getText();
 
 				MoveMessage moveMessage = new MoveMessage();
-				moveMessage.setUserId(Integer.parseInt(nameField.getText()));
+				moveMessage.setPlayerId(Integer.parseInt(nameField.getText()));
 
 				movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
 					public void onFailure(Throwable caught) {}
 					public void onSuccess(MoveResponse result) {
-						nameField.setText(String.valueOf(result.getNextUserId()));
+						nameField.setText(String.valueOf(result.getNextPlayerId()));
 
 					}
 				} );

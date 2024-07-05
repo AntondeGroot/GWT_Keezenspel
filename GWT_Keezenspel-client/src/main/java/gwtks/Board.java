@@ -24,11 +24,11 @@ public class Board implements IsSerializable {
 		for (int j = -9; j < 7; j++) {
 			// for construction purposes it is easier to take one boardsection that consists only of 90 degrees angles
 			// for game purposes it is easier that the starting point is position 0 and the last position is 15
-			// therefore the construction goes from the last userId, from position 7 til 15 and then starts with userId 1 position 0 to 6
-			// then all the tiles are rotated based on the number of players, where the userId is updated based on the rotation.
-			int userId = (j < 0) ? nrPlayers - 1 : 0;
+			// therefore the construction goes from the last playerId, from position 7 til 15 and then starts with playerId 1 position 0 to 6
+			// then all the tiles are rotated based on the number of players, where the playerId is updated based on the rotation.
+			int playerId = (j < 0) ? nrPlayers - 1 : 0;
 			int tileNr = (j < 0) ? j + 16 : j;
-			mappings.add(new TileMapping(userId, tileNr, new Point(startPoint)));
+			mappings.add(new TileMapping(playerId, tileNr, new Point(startPoint)));
 
 			if( j < -3){
 				// move downwards for 6 tiles
@@ -64,11 +64,11 @@ public class Board implements IsSerializable {
 
 		// to create the tiles for other players rotate all tiles
 		List<TileMapping> tempMappings = new ArrayList<>();
-		int userId = 0;
+		int playerId = 0;
 		for (TileMapping mapping : mappings) {
 			for (int k = 1; k < nrPlayers; k++) {
-				userId = (mapping.getUserId()+k)%nrPlayers;
-				tempMappings.add(new TileMapping(userId, mapping.getTileNr(), mapping.getPosition().rotate(new Point(300,300), 360.0/nrPlayers*k)));
+				playerId = (mapping.getPlayerId()+k)%nrPlayers;
+				tempMappings.add(new TileMapping(playerId, mapping.getTileNr(), mapping.getPosition().rotate(new Point(300,300), 360.0/nrPlayers*k)));
 			}
 		}
 
@@ -90,7 +90,7 @@ public class Board implements IsSerializable {
 			tileNr = mapping.getTileNr();
 			// only player tiles get a color
 			if (tileNr <= 0 || tileNr >= 16) {
-				color = Players.getColor(mapping.getUserId());
+				color = Players.getColor(mapping.getPlayerId());
 			}
 
 			drawCircle(context, mapping.getPosition().getX(), mapping.getPosition().getY(), cellDistance/2, color);
@@ -109,9 +109,9 @@ public class Board implements IsSerializable {
 		context.closePath();
 	}
 
-    public static Point getPosition(int userId, int tileNr) {
+    public static Point getPosition(int playerId, int tileNr) {
 		for (TileMapping mapping : mappings) {
-			if (mapping.getUserId() == userId && mapping.getTileNr() == tileNr) {
+			if (mapping.getPlayerId() == playerId && mapping.getTileNr() == tileNr) {
 				return mapping.getPosition();
 			}
 		}
