@@ -13,44 +13,65 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.user.client.ui.RootPanel;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Pawn implements IsSerializable {
+    private int playerId;
+    private PawnId pawnId;
+    private Point currentPosition;
+    private Point nestTilePosition;
 
-    public Image getImage(){
-
-        String imagePath = "/pawn.png";
-        Image image = new Image(imagePath);
-        return image;
+    public Pawn(PawnId pawnId, Point nestTilePosition) {
+        this.playerId = pawnId.getPlayerId();
+        this.pawnId = pawnId;
+        this.nestTilePosition = new Point(nestTilePosition);
+        this.currentPosition = new Point(nestTilePosition);
     }
-    public void drawPawns(Canvas canvas){
-        Context2d context = canvas.getContext2d();
 
-        List<TileMapping> mappings = Board.getMappings();
-        int i =0;
-        for (TileMapping mapping : mappings) {
-            if(mapping.getTileNr() < 0){
+    public PawnId getPawnId() {
+        return pawnId;
+    }
 
-                drawPawn(context, mapping.getPosition(),i);
-                i++;
-            }
+    public void setPawnId(PawnId pawnId) {
+        this.pawnId = pawnId;
+    }
+
+    public int getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
+    }
+
+    public Point getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public void setCurrentPosition(Point currentPosition) {
+        if(currentPosition != null) {
+            this.currentPosition = currentPosition;
         }
     }
 
-    private void drawPawn(Context2d context, Point point, int i){
-        // Load an image and draw it to the canvas
-        Image image = new Image("/pawn.png");
-        image.addLoadHandler(new LoadHandler() {
-            @Override
-            public void onLoad(LoadEvent event) {
-                int desiredWidth = 40;
-                int desiredHeight = 40;
-                // Draw the image on the canvas once it's loaded
-                context.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
-            }
-        });
+    public Point getNestTilePosition() {
+        return nestTilePosition;
+    }
 
-        // the image widget has to be added to the Rootpanel for it to trigger the OnLoad event
-        image.setVisible(false); // Hide the image widget
-        RootPanel.get().add(image);
+    public void setNestTilePosition(Point nestTilePosition) {
+        this.nestTilePosition = nestTilePosition;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pawn pawn = (Pawn) o;
+        return playerId == pawn.playerId && Objects.equals(nestTilePosition, pawn.nestTilePosition);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(playerId, nestTilePosition);
     }
 }
