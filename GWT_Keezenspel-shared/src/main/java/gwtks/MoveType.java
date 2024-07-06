@@ -1,5 +1,7 @@
 package gwtks;
 
-public enum MoveType {
+import com.google.gwt.user.client.rpc.IsSerializable;
+
+public enum MoveType implements IsSerializable {
     MOVE, SPLIT, SWITCH
 }

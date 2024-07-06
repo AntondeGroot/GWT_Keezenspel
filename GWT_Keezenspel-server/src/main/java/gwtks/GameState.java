@@ -1,31 +1,32 @@
 package gwtks;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameState {
 
     private static List<Pawn> pawns;
-    private static int playerId;
-    private int numberOfPlayers = 4;
+    private static int playerIdTurn;
+    private int numberOfPlayers = 8;
 
     public GameState() {
-            player:
-            for (int i = 0; i < numberOfPlayers; i++) {
-                pawns:
-                for (int j = 0; j < 4; j++) {
-                    pawns.add(new Pawn(i));
+        if(pawns == null || pawns.isEmpty()){
+            pawns = new ArrayList<Pawn>();
+            for (int playerId = 0; playerId < numberOfPlayers; playerId++) {
+                for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
+                    pawns.add(new Pawn(playerId,pawnNr));
                 }
-
+            }
         }
     }
 
     public Integer nextTurn(){
-        playerId = (playerId + 1) % numberOfPlayers;
-        return playerId;
+        playerIdTurn = (playerIdTurn + 1) % numberOfPlayers;
+        return playerIdTurn;
     }
 
-    public int getPlayerId(){
-        return playerId;
+    public int getPlayerIdTurn(){
+        return playerIdTurn;
     }
 
     public List<Pawn> getPawns() {

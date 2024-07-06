@@ -2,20 +2,26 @@ package gwtks;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
+import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.rpc.IsSerializable;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.RootPanel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Board implements IsSerializable {
 
-    private static List<TileMapping> mappings = new ArrayList<>();
+    private static List<TileMapping> tiles = new ArrayList<>();
+	private static List<Pawn> pawns = new ArrayList<>();
 
 	private double cellDistance;
 
     public void createBoard(int nrPlayers, double boardSize) {
 		// Clear the mappings list before creating a new board
-		mappings.clear();
+		tiles.clear();
 
 		cellDistance = CellDistance.getCellDistance(nrPlayers, boardSize);
 		Point startPoint = CellDistance.getStartPoint(nrPlayers, boardSize);
@@ -28,7 +34,7 @@ public class Board implements IsSerializable {
 			// then all the tiles are rotated based on the number of players, where the playerId is updated based on the rotation.
 			int playerId = (j < 0) ? nrPlayers - 1 : 0;
 			int tileNr = (j < 0) ? j + 16 : j;
-			mappings.add(new TileMapping(playerId, tileNr, new Point(startPoint)));
+			tiles.add(new TileMapping(playerId, tileNr, new Point(startPoint)));
 
 			if( j < -3){
 				// move downwards for 6 tiles
@@ -46,7 +52,7 @@ public class Board implements IsSerializable {
 		Point point = new Point(getPosition(nrPlayers-1,15));
 		for (int i = 1; i <= 4; i++) {
 			point.setY(point.getY() - cellDistance);
-			mappings.add(new TileMapping(0, 15+i, new Point(point)));
+			tiles.add(new TileMapping(0, 15+i, new Point(point)));
 		}
 
 		// create nest tiles
@@ -54,25 +60,37 @@ public class Board implements IsSerializable {
 		// they will be assigned different negative values to distinguish them from each other so that 2 pawns cannot end up on the same nest tile
 		point = new Point(getPosition(0,1));
 		point.setX(point.getX() - 1.5*cellDistance);
-		mappings.add(new TileMapping(0, -1, new Point(point)));
+		tiles.add(new TileMapping(0, -1, new Point(point)));
 		point.setX(point.getX() - cellDistance);
-		mappings.add(new TileMapping(0, -2, new Point(point)));
+		tiles.add(new TileMapping(0, -2, new Point(point)));
 		point.setY(point.getY() - cellDistance);
-		mappings.add(new TileMapping(0, -3, new Point(point)));
+		tiles.add(new TileMapping(0, -3, new Point(point)));
 		point.setX(point.getX() + cellDistance);
-		mappings.add(new TileMapping(0, -4, new Point(point)));
+		tiles.add(new TileMapping(0, -4, new Point(point)));
 
 		// to create the tiles for other players rotate all tiles
-		List<TileMapping> tempMappings = new ArrayList<>();
+		List<TileMapping> tempTiles = new ArrayList<>();
 		int playerId = 0;
-		for (TileMapping mapping : mappings) {
+		for (TileMapping tile : tiles) {
 			for (int k = 1; k < nrPlayers; k++) {
-				playerId = (mapping.getPlayerId()+k)%nrPlayers;
-				tempMappings.add(new TileMapping(playerId, mapping.getTileNr(), mapping.getPosition().rotate(new Point(300,300), 360.0/nrPlayers*k)));
+				playerId = (tile.getPlayerId()+k)%nrPlayers;
+				tempTiles.add(new TileMapping(playerId, tile.getTileNr(), tile.getPosition().rotate(new Point(300,300), 360.0/nrPlayers*k)));
 			}
 		}
 
-        mappings.addAll(tempMappings);
+        tiles.addAll(tempTiles);
+
+		// create pawns
+		int pawnNr = 0;
+		for (int i = 0; i < nrPlayers; i++) {
+			pawnNr = 0;
+			for (TileMapping tile : tiles) {
+				if(tile.getPlayerId() == i && tile.getTileNr() < 0){//nest tiles are negative
+					pawns.add(new Pawn(new PawnId(i,pawnNr), tile.getPosition()));
+					pawnNr++;
+				}
+			}
+		}
     }
 
 	public Canvas drawBoard(Canvas canvas) {
@@ -85,7 +103,7 @@ public class Board implements IsSerializable {
 		double cellSize = 40.0;
 		String color = "";
 		int tileNr = 0;
-		for (TileMapping mapping : mappings) {
+		for (TileMapping mapping : tiles) {
 			color = "#D3D3D3";
 			tileNr = mapping.getTileNr();
 			// only player tiles get a color
@@ -109,16 +127,72 @@ public class Board implements IsSerializable {
 		context.closePath();
 	}
 
-    public static Point getPosition(int playerId, int tileNr) {
-		for (TileMapping mapping : mappings) {
+	public static Point getPosition(int playerId, int tileNr) {
+		for (TileMapping mapping : tiles) {
 			if (mapping.getPlayerId() == playerId && mapping.getTileNr() == tileNr) {
+				return mapping.getPosition();
+			}
+		}
+		return null;
+	}
+
+    public static Point getPosition(TileId tileId) {
+		for (TileMapping mapping : tiles) {
+			if (mapping.getPlayerId() == tileId.getPlayerId() && mapping.getTileNr() == tileId.getTileNr()) {
 				return mapping.getPosition();
 			}
 		}
 		return null;
     }
 
-	public static List<TileMapping> getMappings() {
-		return mappings;
+	public static Point getTile(int playerId, int tileNr){
+		for (TileMapping mapping : tiles) {
+			if (mapping.getPlayerId() == playerId && mapping.getTileNr() == tileNr) {
+				return mapping.getPosition();
+			}
+		}
+		return null;
+	}
+
+	public static List<TileMapping> getTiles() {
+		return tiles;
+	}
+
+	public static List<Pawn> getPawns() {return pawns;}
+
+	public static Pawn getPawn(PawnId pawnId) {
+		for (Pawn pawn : pawns) {
+			if(pawn.getPawnId() == pawnId){
+				return pawn;
+			}
+		}
+		return null;
+	}
+
+	public void drawPawns(Canvas canvas){
+		Context2d context = canvas.getContext2d();
+
+		List<TileMapping> mappings = Board.getTiles();
+		for(Pawn pawn : pawns){
+			drawPawn(context, pawn.getCurrentPosition());
+		}
+	}
+
+	private void drawPawn(Context2d context, Point point){
+		// Load an image and draw it to the canvas
+		Image image = new Image("/pawn.png");
+		image.addLoadHandler(new LoadHandler() {
+			@Override
+			public void onLoad(LoadEvent event) {
+				int desiredWidth = 40;
+				int desiredHeight = 40;
+				// Draw the image on the canvas once it's loaded
+				context.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
+			}
+		});
+
+		// the image widget has to be added to the Rootpanel for it to trigger the OnLoad event
+		image.setVisible(false); // Hide the image widget
+		RootPanel.get().add(image);
 	}
 }
