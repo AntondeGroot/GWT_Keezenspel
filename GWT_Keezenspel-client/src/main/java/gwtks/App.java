@@ -6,15 +6,10 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
-
-import java.util.List;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -91,32 +86,29 @@ public class App implements EntryPoint {
 //		nameField.selectAll();
 
 		// Create a handler for the sendButton and nameField
-		class MyHandler implements ClickHandler, KeyUpHandler {
+		class MyHandler implements ClickHandler {
 			/**
 			 * Fired when the user clicks on the sendButton.
 			 */
 			public void onClick(ClickEvent event) {
-				sendNameToServer();
+				sendMoveToServer();
 			}
 
 			/**
-			 * Fired when the user types in the nameField.
+			 * Send the MoveMessage to the server and wait for a response.
 			 */
-			public void onKeyUp(KeyUpEvent event) {
-				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					sendNameToServer();
-				}
-			}
-
-			/**
-			 * Send the name from the nameField to the server and wait for a response.
-			 */
-			private void sendNameToServer() {
+			private void sendMoveToServer() {
 				// First, we validate the input.
 				errorLabel.setText("");
 
 				MoveMessage moveMessage = new MoveMessage();
-				moveMessage.setPawnId1(new PawnId(0,0));
+				int playerId = Integer.parseInt(playerIdField.getText());
+				int pawnNr = Integer.parseInt(pawnIdField.getText());
+				PawnId selectedPawnId = new PawnId(playerId,pawnNr);
+				Pawn pawn = Board.getPawn(selectedPawnId);
+
+				moveMessage.setPawnId1(selectedPawnId);
+				moveMessage.setTileId(Board.getPawns().get(0).getCurrentTileId());
 				moveMessage.setStepsPawn1(Integer.parseInt(stepsField.getText()));
 
 				movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
