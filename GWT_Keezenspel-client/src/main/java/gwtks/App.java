@@ -34,7 +34,8 @@ public class App implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		final Button sendButton = new Button("Next Player");
+		final Button sendButton = new Button("Make Move");
+		final Button pawnOnTheBoardButton = new Button("King/Ace");
 
 		final TextBox playerIdField = new TextBox();
 		final TextBox pawnIdField = new TextBox();
@@ -72,6 +73,7 @@ public class App implements EntryPoint {
 
 		// We can add style names to widgets
 		sendButton.addStyleName("sendButton");
+		pawnOnTheBoardButton.addStyleName("sendButton");
 
 		// Add the nameField and sendButton to the RootPanel
 		// Use RootPanel.get() to get the entire body element
@@ -79,6 +81,7 @@ public class App implements EntryPoint {
 		RootPanel.get("pawnIdFieldContainer").add(pawnIdField);
 		RootPanel.get("stepsFieldContainer").add(stepsField);
 		RootPanel.get("sendButtonContainer").add(sendButton);
+		RootPanel.get("pawnOnTheBoardButtonContainer").add(pawnOnTheBoardButton);
 		RootPanel.get("errorLabelContainer").add(errorLabel);
 
 		// Focus the cursor on the name field when the app loads
@@ -108,7 +111,9 @@ public class App implements EntryPoint {
 				Pawn pawn = Board.getPawn(selectedPawnId);
 
 				moveMessage.setPawnId1(selectedPawnId);
-				moveMessage.setTileId(Board.getPawns().get(0).getCurrentTileId());
+				moveMessage.setMoveType(MoveType.MOVE);
+				moveMessage.setTileId(pawn.getCurrentTileId());
+//				moveMessage.setTileId(Board.getPawns().get(0).getCurrentTileId());
 				moveMessage.setStepsPawn1(Integer.parseInt(stepsField.getText()));
 
 				movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
@@ -123,8 +128,48 @@ public class App implements EntryPoint {
 			}
 		}
 
-		// Add a handler to send the name to the server
+		// Create a handler for the sendButton and nameField
+		class MyKingHandler implements ClickHandler {
+			/**
+			 * Fired when the user clicks on the sendButton.
+			 */
+			public void onClick(ClickEvent event) {
+				sendOnboardMessageToServer();
+			}
+
+			/**
+			 * Send the MoveMessage to the server and wait for a response.
+			 */
+			private void sendOnboardMessageToServer() {
+				// First, we validate the input.
+				errorLabel.setText("");
+
+				MoveMessage moveMessage = new MoveMessage();
+				int playerId = Integer.parseInt(playerIdField.getText());
+				int pawnNr = Integer.parseInt(pawnIdField.getText());
+				PawnId selectedPawnId = new PawnId(playerId,pawnNr);
+
+				moveMessage.setPawnId1(selectedPawnId);
+				moveMessage.setMoveType(MoveType.ONBOARD);
+
+				movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
+					public void onFailure(Throwable caught) {}
+					public void onSuccess(MoveResponse result) {
+						Context2d context = canvas.getContext2d();
+						context.clearRect(0, 0, context.getCanvas().getWidth(), context.getCanvas().getHeight());
+						Canvas canvas1 = board.drawBoard(canvas);
+						MoveController.movePawn(canvas, result);
+					}
+				} );
+			}
+		}
+
+		// Add a handler to send the MOVE to the server
 		MyHandler handler = new MyHandler();
 		sendButton.addClickHandler(handler);
+
+		// Add a handler to send the name to the server
+		MyKingHandler kingHandler = new MyKingHandler();
+		pawnOnTheBoardButton.addClickHandler(kingHandler);
 	}
 }

@@ -44,7 +44,7 @@ public class MoveMessage implements IsSerializable {
         }
 
         public Integer getStepsPawn1() {
-                return stepsPawn1;
+                return stepsPawn1 == null ? 0 : stepsPawn1;
         }
 
         public void setStepsPawn1(Integer stepsPawn1) {
@@ -52,7 +52,7 @@ public class MoveMessage implements IsSerializable {
         }
 
         public Integer getStepsPawn2() {
-                return stepsPawn2;
+                return stepsPawn2 == null ? 0 : stepsPawn2;
         }
 
         public void setStepsPawn2(Integer stepsPawn2) {
