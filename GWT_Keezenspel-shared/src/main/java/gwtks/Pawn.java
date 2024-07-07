@@ -5,10 +5,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.Objects;
 
 public class Pawn implements IsSerializable {
-    private final PawnId pawnId;
+    private PawnId pawnId;
     private TileId currentTileId;
-    private final TileId nestTileId;
-    private final int playerId;
+    private TileId nestTileId;
+    private int playerId;
 
     public Pawn(PawnId pawnId, TileId nestTileId) {
         this.playerId = pawnId.getPlayerId();
@@ -21,8 +21,16 @@ public class Pawn implements IsSerializable {
         return pawnId;
     }
 
+    public void setPawnId(PawnId pawnId) {
+        this.pawnId = pawnId;
+    }
+
     public int getPlayerId() {
         return playerId;
+    }
+
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
     }
 
     public TileId getCurrentTileId() {

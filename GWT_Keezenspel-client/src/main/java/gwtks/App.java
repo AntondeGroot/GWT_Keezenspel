@@ -113,6 +113,7 @@ public class App implements EntryPoint {
 				moveMessage.setPawnId1(selectedPawnId);
 				moveMessage.setMoveType(MoveType.MOVE);
 				moveMessage.setTileId(pawn.getCurrentTileId());
+//				moveMessage.setTileId(Board.getPawns().get(0).getCurrentTileId());
 				moveMessage.setStepsPawn1(Integer.parseInt(stepsField.getText()));
 
 				movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
