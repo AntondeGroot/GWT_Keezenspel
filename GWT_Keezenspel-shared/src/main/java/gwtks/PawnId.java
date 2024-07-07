@@ -44,4 +44,9 @@ public class PawnId implements IsSerializable {
     public int hashCode() {
         return Objects.hash(playerId, pawnNr);
     }
+
+    @Override
+    public String toString() {
+        return "PawnId{" + playerId +"," + pawnNr +'}';
+    }
 }

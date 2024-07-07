@@ -31,7 +31,7 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
         // send instructions for clients to update
         MoveResponse response = new MoveResponse();
         response.setNextPlayerId(0);
-//        response.setPawnId1(new PawnId(0,0));
+        response.setPawnId1(new PawnId(0,0));
         // fake data
         List<TileId> move = new ArrayList<>();
         move.add(new TileId(0,0));
