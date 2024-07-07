@@ -2,6 +2,8 @@ package gwtks;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
+import java.util.Objects;
+
 
 public class TileId implements IsSerializable {
     private int playerId;
@@ -13,6 +15,11 @@ public class TileId implements IsSerializable {
     }
 
     public TileId() {
+    }
+
+    public TileId(TileId other){
+        this.playerId = other.playerId;
+        this.tileNr = other.tileNr;
     }
 
     public int getPlayerId() {
@@ -34,5 +41,19 @@ public class TileId implements IsSerializable {
     @Override
     public String toString() {
         return "TileId{" + playerId +"," + tileNr + '}';
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TileId tileId = (TileId) o;
+        return playerId == tileId.playerId && tileNr == tileId.tileNr;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(playerId, tileNr);
     }
 }

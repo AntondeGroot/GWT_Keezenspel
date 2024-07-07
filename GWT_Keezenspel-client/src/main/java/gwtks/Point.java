@@ -5,16 +5,16 @@ public class Point {
     private double y;
 
     public Point(double x, double y) {
-        this.x = x;
-        this.y = y;
+        this.x = roundedValue(x);
+        this.y = roundedValue(y);
     }
 
     public Point(Point p){
         if(p == null){
             p = new Point(0,0);
         }
-        this.x = p.x;
-        this.y = p.y;
+        this.x = roundedValue(p.x);
+        this.y = roundedValue(p.y);
     }
 
     public double getX() {
@@ -35,10 +35,7 @@ public class Point {
 
     @Override
     public String toString() {
-        return "Point{" +
-                "x=" + x +
-                ", y=" + y +
-                '}';
+        return "(" + x +", " + y +')';
     }
 
     public Point rotate(Point center, double angleDegrees) {
@@ -58,5 +55,9 @@ public class Point {
         double finalY = rotatedY + center.y;
 
         return new Point(finalX, finalY);
+    }
+
+    public double roundedValue(double value) {
+        return Math.round(value * 10.0) / 10.0;
     }
 }

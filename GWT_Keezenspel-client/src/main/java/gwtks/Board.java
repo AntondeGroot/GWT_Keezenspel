@@ -2,6 +2,7 @@ package gwtks;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
@@ -86,7 +87,7 @@ public class Board implements IsSerializable {
 			pawnNr = 0;
 			for (TileMapping tile : tiles) {
 				if(tile.getPlayerId() == i && tile.getTileNr() < 0){//nest tiles are negative
-					pawns.add(new Pawn(new PawnId(i,pawnNr), tile.getPosition()));
+					pawns.add(new Pawn(new PawnId(i,pawnNr), tile.getTileId()));
 					pawnNr++;
 				}
 			}
@@ -162,7 +163,7 @@ public class Board implements IsSerializable {
 
 	public static Pawn getPawn(PawnId pawnId) {
 		for (Pawn pawn : pawns) {
-			if(pawn.getPawnId() == pawnId){
+			if(pawn.getPawnId().equals(pawnId)){
 				return pawn;
 			}
 		}
@@ -171,14 +172,25 @@ public class Board implements IsSerializable {
 
 	public void drawPawns(Canvas canvas){
 		Context2d context = canvas.getContext2d();
+//		context.clearRect(0, 0, context.getCanvas().getWidth(), context.getCanvas().getHeight());
 
-		List<TileMapping> mappings = Board.getTiles();
+
+
+		GWT.log("number of pawns to be drawn: "+ pawns.size());
 		for(Pawn pawn : pawns){
-			drawPawn(context, pawn.getCurrentPosition());
+			drawPawn(context, pawn);
 		}
 	}
 
-	private void drawPawn(Context2d context, Point point){
+	public static void movePawn(Pawn pawn, TileId tileId) {
+		for (Pawn pawn1 : pawns) {
+			if(pawn1.equals(pawn)){
+				pawn1.setCurrentTileId(tileId);
+			}
+		}
+	}
+
+	private void drawPawn(Context2d context, Pawn pawn){
 		// Load an image and draw it to the canvas
 		Image image = new Image("/pawn.png");
 		image.addLoadHandler(new LoadHandler() {
@@ -186,7 +198,15 @@ public class Board implements IsSerializable {
 			public void onLoad(LoadEvent event) {
 				int desiredWidth = 40;
 				int desiredHeight = 40;
+				Point point = new Point(0,0);
 				// Draw the image on the canvas once it's loaded
+
+				for (TileMapping mapping : tiles) {
+					if(mapping.getTileId().equals(pawn.getCurrentTileId())){
+						point = mapping.getPosition();
+						GWT.log("drew pawn "+pawn.getPawnId()+"," + pawn.getCurrentTileId());
+					}
+				}
 				context.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
 			}
 		});

@@ -73,7 +73,6 @@ public class App implements EntryPoint {
 		// Add the main panel to the RootPanel
 		RootPanel.get("boardContainer").add(mainPanel);
 
-
 		board.drawPawns(canvas);;
 
 		// We can add style names to widgets
@@ -123,16 +122,10 @@ public class App implements EntryPoint {
 				movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
 					public void onFailure(Throwable caught) {}
 					public void onSuccess(MoveResponse result) {
-						GWT.log(result.toString());
-						List<TileId> tiles = result.getMovePawn1();
-						for (TileId tileId : tiles) {
-							GWT.log(tileId.toString());
-							List<Pawn> pawns = Board.getPawns();
-							for (Pawn pawn : pawns) {
-                            	pawn.setCurrentPosition(new Point(300,300));
-							}
-							board.drawPawns(canvas);
-						}
+						Context2d context = canvas.getContext2d();
+						context.clearRect(0, 0, context.getCanvas().getWidth(), context.getCanvas().getHeight());
+						Canvas canvas1 = board.drawBoard(canvas);
+						MoveController.movePawn(canvas, result);
 					}
 				} );
 			}
