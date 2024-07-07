@@ -6,9 +6,18 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class MoveMessage implements IsSerializable {
         private PawnId pawnId1;
         private PawnId pawnId2;
+        private TileId tileId; // should be removed as this should be stored in the backend not frontend
         private MoveType moveType;
         private Integer stepsPawn1;
         private Integer stepsPawn2;
+
+        public TileId getTileId() {
+                return tileId;
+        }
+
+        public void setTileId(TileId tileId) {
+                this.tileId = tileId;
+        }
 
         public PawnId getPawnId1() {
                 return pawnId1;

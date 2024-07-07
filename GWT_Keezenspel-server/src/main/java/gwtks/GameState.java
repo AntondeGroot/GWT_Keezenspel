@@ -8,6 +8,7 @@ public class GameState {
     private static List<Pawn> pawns;
     private static int playerIdTurn;
     private int numberOfPlayers = 8;
+    private static final List<TileId> tiles = new ArrayList<>();
 
     public GameState() {
         if(pawns == null || pawns.isEmpty()){
