@@ -16,6 +16,8 @@ public class MoveController {
         List<TileId> movePawn2 = moveResponse.getMovePawn2();
         Pawn pawn = null;
 
+        if(movePawn1 == null){return;}
+
         for (TileId tileId : movePawn1) {
             GWT.log("made a step");
             pawn = Board.getPawn(pawnId1);

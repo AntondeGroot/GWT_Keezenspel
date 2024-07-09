@@ -204,7 +204,6 @@ public class Board implements IsSerializable {
 				for (TileMapping mapping : tiles) {
 					if(mapping.getTileId().equals(pawn.getCurrentTileId())){
 						point = mapping.getPosition();
-						GWT.log("drew pawn "+pawn.getPawnId()+"," + pawn.getCurrentTileId());
 					}
 				}
 				context.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
