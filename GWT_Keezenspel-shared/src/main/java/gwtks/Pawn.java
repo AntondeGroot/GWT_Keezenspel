@@ -62,6 +62,6 @@ public class Pawn implements IsSerializable {
 
     @Override
     public String toString() {
-        return "Pawn{" + pawnId +" - "+ currentTileId +'}';
+        return "Pawn{" + pawnId +" - currently on "+ currentTileId +'}';
     }
 }
