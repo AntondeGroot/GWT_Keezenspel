@@ -1,7 +1,5 @@
 package gwtks;
 
-import com.google.gwt.core.client.GWT;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +51,18 @@ public class GameState {
         return (pawnId.getPlayerId() == tileId.getPlayerId() && tileId.getTileNr() > 15);
     }
 
-    private static boolean isPawnClosedIn(PawnId pawnId, TileId tileId){
+    private static boolean isPawnClosedInFromBehind(PawnId pawnId, TileId tileId){
+        int tileNr = tileId.getTileNr();
+        while (tileNr > 15){
+            if(!canMoveToTile(pawnId, new TileId(pawnId.getPlayerId(), tileNr-1))){
+                return true;
+            }
+            tileNr--;
+        }
+        return false;
+    }
+
+    private static boolean isPawnTightlyClosedIn(PawnId pawnId, TileId tileId){
 
         if(tileId.getTileNr() == 19
                 && !canMoveToTile(pawnId,new TileId(pawnId.getPlayerId(), 18))){
@@ -110,8 +119,14 @@ public class GameState {
 
         int next = 0;
         int playerIdOfTile = moveMessage.getTileId().getPlayerId();
-        System.out.println("movemessage = "+moveMessage);
-         if (moveMessage.getTileId() != null) {
+        System.out.println("moveMessage = "+moveMessage);
+
+        // You cannot move from nest tiles
+        if(tileId.getTileNr() < 0){
+            return;
+        }
+
+        if (moveMessage.getTileId() != null) {
             next = moveMessage.getTileId().getTileNr() + moveMessage.getStepsPawn1();
         }
 
@@ -177,95 +192,60 @@ public class GameState {
         }
 
         // pawn is already on finish tile OR close to it
-        if (isPawnOnFinish(pawnId1, tileId) || (next > 15 && isPawnOnLastSection(playerId, playerIdOfTile))){
-
-            // check if there is a pawn in front of you
-            // check if there is a pawn behind you
-            if (isPawnClosedIn(pawnId1, tileId)){
+        if (isPawnOnFinish(pawnId1, tileId)){
+            // moving is not possible when the pawn is directly between two other pawns
+            if (isPawnTightlyClosedIn(pawnId1, tileId)){
                 return;
             }
 
-            System.out.println("pawn is near by the finish zone");
-            int direction = 1;
-            int stepsTaken = 1;
-            int nextTileNr = 0;
-            int endPosition = tileId.getTileNr();
-            int remainingSteps = 0;
-
-            if (nrSteps<0){
-                direction = -1;
-                nrSteps = - nrSteps;
-            }
-
-            for (int i = 0; i < nrSteps; i++) {
-                // 16 en 19 blocked
-                //start on 17
-                // check next 18: possible goto 18
-                // check next 19: not possible go to 17
-                if(direction > 0){
-                    if(!canMoveToTile(pawnId1, new TileId(playerIdOfTile, endPosition+1))) {
-                        direction = - direction;
-                    }
-                }else{
-                    if(!canMoveToTile(pawnId1, new TileId(playerIdOfTile, endPosition-1))) {
-                        direction = - direction;
-                    }
-                }
-
-//                if(!canMoveToTile(pawnId1, new TileId(playerIdOfTile, nextTileNr))) {
-//                    direction = - direction;
-//                }
-
-                if(direction > 0){
-                    endPosition++;
-                }else{
-                    endPosition--;
-                }
-
-
-                if(endPosition < 16){
-                    playerIdOfTile = previousPlayerId(playerId);
-                }
-            }
-            // it is now in its final section but it wants to overshoot
-            // reverse course
-
-
-//            if (next > 19){
-//                next = 19 - (next % 19);
-//            }
-
-//            if (next < 16) {
-//                // you can move out of your finish tiles
-//                playerIdOfTile = previousPlayerId(playerId);
-//            } else {
-//                // you are still in your finish tiles
-//                playerIdOfTile = playerId;
-//            }
-            TileId nextTileId = new TileId(playerIdOfTile, endPosition);
-
-            if(canMoveToTile(pawnId1, nextTileId)){
-                response.setPawnId1(pawnId1);
-                storeToResponse(response, playerIdOfTile, next );
-                movePawn(new Pawn(pawnId1,new TileId(playerIdOfTile,next)));
-            }
+            TileId nextTileId = moveAndCheckEveryTile(pawnId1, tileId, nrSteps);
+            response.setPawnId1(pawnId1);
+            storeToResponse(response, nextTileId.getPlayerId(), nextTileId.getTileNr() );
+            movePawn(new Pawn(pawnId1,nextTileId));
             return;
         }
+
+        if((next > 15 && isPawnOnLastSection(playerId, playerIdOfTile))){
+            TileId nextTileId = moveAndCheckEveryTile(pawnId1, tileId, nrSteps);
+            response.setPawnId1(pawnId1);
+            storeToResponse(response, nextTileId.getPlayerId(), nextTileId.getTileNr() );
+            movePawn(new Pawn(pawnId1,nextTileId));
+            return;
+        }
+    }
+
+    public static TileId moveAndCheckEveryTile(PawnId pawnId, TileId tileId, int nrSteps){
+        int direction = 1;
+        int tileNrToCheck = tileId.getTileNr();
+
+        if (nrSteps<0){
+            direction = -1;
+            nrSteps = - nrSteps;
+        }
+
+        for (int i = 0; i < nrSteps; i++) {
+            tileNrToCheck = tileNrToCheck + direction;
+
+            if(!canMoveToTile(pawnId, new TileId(pawnId.getPlayerId(), tileNrToCheck))) {
+                direction = - direction;
+                tileNrToCheck = tileNrToCheck + 2*direction;
+            }
+        }
+
+        if(tileNrToCheck <= 15){// when back on the last section, change the playerId of the section
+            return new TileId(previousPlayerId(pawnId.getPlayerId()), tileNrToCheck);
+        }
+
+        return new TileId(pawnId.getPlayerId(), tileNrToCheck);
+
     }
 
     public static void processOnBoard(MoveMessage moveMessage, MoveResponse response) {
         // get the data
         PawnId pawnId1 = moveMessage.getPawnId1();
         int playerId = pawnId1.getPlayerId();
-        PawnId pawnId2 = moveMessage.getPawnId2();
-        MoveType moveType = moveMessage.getMoveType();
-        int stepsPawn1 = moveMessage.getStepsPawn1();
-        int stepsPawn2 = moveMessage.getStepsPawn2();
         TileId currentTileId = getPawn(pawnId1).getCurrentTileId();
         TileId targetTileId = new TileId(playerId,0);
-
-        // check if pawn in on the Nest
-        // check if start tile is empty
 
         if(!canMoveToTile(pawnId1, targetTileId)){
             return;
@@ -278,25 +258,11 @@ public class GameState {
 
         // if start is occupied by other player, kill that pawn
 
-        // return response
         List<TileId> move = new ArrayList<>();
         move.add(targetTileId);
-
         response.setMovePawn1(move);
         response.setPawnId1(moveMessage.getPawnId1());
         movePawn(new Pawn(pawnId1,targetTileId));
-    }
-
-    public static boolean playerTileIsBlocked(PawnId selectedPawnId, TileId tileId){
-        int tileNr = tileId.getTileNr();
-        int tilePlayerId = tileId.getPlayerId();
-
-        for (Pawn pawn : pawns) {
-            if (tileId.equals(pawn.getCurrentTileId()) && !pawn.getPawnId().equals(selectedPawnId)  ){
-                return true;
-            }
-        }
-        return false;
     }
 
     public static void movePawn(Pawn selectedPawn){

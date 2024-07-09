@@ -120,7 +120,6 @@ class GameStateOnMoveOnBoardTest {
     void PawnMovesForward_EndsOnStart(){
         // GIVEN
         Pawn pawn1 = createPawnAndPlaceOnBoard(1, new TileId(1,15));
-        //Pawn pawn2 = createPawnAndPlaceOnBoard(0, new TileId(1,0));
 
         // WHEN
         createMoveMessage(pawn1,1);
@@ -132,6 +131,23 @@ class GameStateOnMoveOnBoardTest {
         // THEN Gamestate is correct
         assertEquals(new TileId(2,0), GameState.getPawn(pawn1).getCurrentTileId());
     }
+    @Test
+    void PawnDoesntMoveWhenOnNestTile(){
+        // GIVEN
+        Pawn pawn1 = createPawnAndPlaceOnBoard(1, new TileId(1,-2));
+
+        // WHEN
+        createMoveMessage(pawn1,10);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN response message is correct
+        assertNull(moveResponse.getMovePawn1());  // moves the pawn to the correct tile
+        assertNull(moveResponse.getPawnId1());                          // moves the correct pawn
+        // THEN Gamestate is correct
+        assertEquals(new TileId(1,-2), GameState.getPawn(pawn1).getCurrentTileId());
+    }
+
+
 
     private void createMoveMessage(Pawn pawn, int steps){
         moveMessage.setPawnId1(pawn.getPawnId());
