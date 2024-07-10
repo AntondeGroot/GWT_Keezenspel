@@ -66,6 +66,7 @@ public class App implements EntryPoint {
 		Board board = new Board();
 		board.createBoard(nrPlayers,600);
 		canvas = board.drawBoard(canvas);
+		canvas.setStyleName("canvas");
 		mainPanel.add(canvas);
 
 		// Add the main panel to the RootPanel
