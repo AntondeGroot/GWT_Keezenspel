@@ -172,10 +172,6 @@ public class Board implements IsSerializable {
 
 	public void drawPawns(Canvas canvas){
 		Context2d context = canvas.getContext2d();
-//		context.clearRect(0, 0, context.getCanvas().getWidth(), context.getCanvas().getHeight());
-
-
-
 		GWT.log("number of pawns to be drawn: "+ pawns.size());
 		for(Pawn pawn : pawns){
 			drawPawn(context, pawn);

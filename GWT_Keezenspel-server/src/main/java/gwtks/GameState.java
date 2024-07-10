@@ -90,6 +90,10 @@ public class GameState {
         }
         Pawn pawn = getPawn(nextTileId);
         if(pawn != null) {
+            if(pawn.getPawnId().equals(selectedPawnId)){
+                return true;
+            }
+
             if (pawn.getPlayerId() == selectedPawnId.getPlayerId()) {
                 return false;
             }
