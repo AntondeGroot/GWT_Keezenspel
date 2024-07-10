@@ -84,23 +84,27 @@ public class GameState {
         return false;
     }
 
-    private static void storeToResponse(MoveResponse response, int playerIdOfTile, int next){
-        List<TileId> move = new ArrayList<>();
-        move.add(new TileId(playerIdOfTile, next));
-        response.setMovePawn1(move);
-    }
-
     private static boolean canMoveToTile(PawnId selectedPawnId, TileId nextTileId){
         if(nextTileId.getTileNr() > 19){
             return false;
         }
+        Pawn pawn = getPawn(nextTileId);
+        if(pawn != null) {
+            if (pawn.getPlayerId() == selectedPawnId.getPlayerId()) {
+                return false;
+            }
+            if (pawn.getPlayerId() == nextTileId.getPlayerId() && nextTileId.getTileNr() == 0){
+                return false;
+            }
+        }
+        return true;
+    }
 
-        for (Pawn pawn : pawns) {
-            if (pawn.getPawnId().equals(selectedPawnId)) {continue;}
-
-            if (pawn.getCurrentTileId().equals(nextTileId)){
-                // you can't beat a player off their own tiles or pass them
-                return !(pawn.getPawnId().getPlayerId() == nextTileId.getPlayerId());
+    private static boolean canMoveToTileBecauseSamePawn(PawnId selectedPawnId, TileId nextTileId){
+        Pawn pawn = getPawn(nextTileId);
+        if(pawn != null) {
+            if (pawn.getPlayerId() == selectedPawnId.getPlayerId()) {
+                return false;
             }
         }
         return true;
@@ -136,20 +140,22 @@ public class GameState {
 
          // regular route
         if (next > 15 && !isPawnOnLastSection(playerId, playerIdOfTile) && !isPawnOnFinish(pawnId1, tileId) ) {
-            // check if you can pass || otherwise turn back
+            // check
+            if(!canMoveToTileBecauseSamePawn(pawnId1, new TileId(playerId+1, 0))&&next==16){
+                return;
+            }
+
             if (canMoveToTile(pawnId1, new TileId(playerIdOfTile+1,0))) {
-                next = next % 16; // account for tile 0
+                next = next % 16;
                 playerIdOfTile++;
                 playerIdOfTile = playerIdOfTile % nrPlayers;
             }else { // or turn back
-                next = (15 - next%15); // you don't pass 0
+                next = (15 - next%15);
             }
 
             TileId nextTileId = new TileId(playerIdOfTile, next);
             if(canMoveToTile(pawnId1, nextTileId)){
-                response.setPawnId1(pawnId1);
-                storeToResponse(response, playerIdOfTile, next );
-                movePawn(new Pawn(pawnId1,new TileId(playerIdOfTile,next)));
+                processMove(pawnId1, new TileId(playerIdOfTile,next), response);
             }
             return;
         }
@@ -162,15 +168,11 @@ public class GameState {
 
             // in case you end up on your own pawn
             if(!canMoveToTile(pawnId1,nextTileId)){
-                nextTileId.setTileNr(nextTileId.getTileNr() - 2*direction);
+                return;
             }
 
             if(canMoveToTile(pawnId1, nextTileId)){
-                response.setPawnId1(pawnId1);
-                storeToResponse(response, playerIdOfTile, next );
-                movePawn(new Pawn(pawnId1,new TileId(playerIdOfTile,next)));
-            }else{
-
+                processMove(pawnId1, new TileId(playerIdOfTile,next), response);
             }
 
             return;
@@ -178,7 +180,6 @@ public class GameState {
 
         // you go negative
         if(next < 0){
-            System.out.println("pawn is going negative");
             // check if you can pass || otherwise turn back i.e. forward
             if (canMoveToTile(pawnId1, new TileId(playerIdOfTile,0))) {
                 next = 16 + next;
@@ -189,18 +190,14 @@ public class GameState {
 
             TileId nextTileId = new TileId(playerIdOfTile, next);
             if(canMoveToTile(pawnId1, nextTileId)){
-                response.setPawnId1(pawnId1);
-                storeToResponse(response, playerIdOfTile, next );
-                movePawn(new Pawn(pawnId1,new TileId(playerIdOfTile,next)));
+                processMove(pawnId1, new TileId(playerIdOfTile,next), response);
             }
             return;
         }
 
         if(next == 0){
             if (canMoveToTile(pawnId1, new TileId(playerIdOfTile,0))) {
-                response.setPawnId1(pawnId1);
-                storeToResponse(response, playerIdOfTile, next );
-                movePawn(new Pawn(pawnId1,new TileId(playerIdOfTile,next)));
+                processMove(pawnId1, new TileId(playerIdOfTile,0), response);
             }
         }
 
@@ -211,18 +208,14 @@ public class GameState {
                 return;
             }
 
-            TileId nextTileId = moveAndCheckEveryTile(pawnId1, tileId, nrSteps);
-            response.setPawnId1(pawnId1);
-            storeToResponse(response, nextTileId.getPlayerId(), nextTileId.getTileNr() );
-            movePawn(new Pawn(pawnId1,nextTileId));
+            TileId targetTileId = moveAndCheckEveryTile(pawnId1, tileId, nrSteps);
+            processMove(pawnId1, targetTileId, response);
             return;
         }
 
         if((next > 15 && isPawnOnLastSection(playerId, playerIdOfTile))){
-            TileId nextTileId = moveAndCheckEveryTile(pawnId1, tileId, nrSteps);
-            response.setPawnId1(pawnId1);
-            storeToResponse(response, nextTileId.getPlayerId(), nextTileId.getTileNr() );
-            movePawn(new Pawn(pawnId1,nextTileId));
+            TileId targetTileId = moveAndCheckEveryTile(pawnId1, tileId, nrSteps);
+            processMove(pawnId1, targetTileId, response);
             return;
         }
     }
@@ -307,6 +300,8 @@ public class GameState {
         moveResponse.setPawnId1(pawn1.getPawnId());
         moveResponse.setPawnId2(pawn2.getPawnId());
 
+        System.out.println("switching pawns: " + moveResponse);
+
         TileId tileId1 = new TileId(pawn1.getCurrentTileId());
         TileId tileId2 = new TileId(pawn2.getCurrentTileId());
         // switch in gamestate
@@ -339,6 +334,29 @@ public class GameState {
         movePawn(new Pawn(pawnId1,targetTileId));
     }
 
+    public static void processMove(PawnId pawnId, TileId targetTileId, MoveResponse response){
+        // check for kills
+        Pawn pawn = getPawn(targetTileId);
+        if(pawn != null){
+            if(pawn.getPlayerId() != pawnId.getPlayerId()){
+                response.setPawnId1(pawnId);
+                response.setPawnId2(pawn.getPawnId());
+                List<TileId> move2 = new ArrayList<>();
+                move2.add(pawn.getNestTileId());
+                response.setMovePawn2(move2);
+
+                movePawn(new Pawn(pawn.getPawnId(),pawn.getNestTileId()));
+            }
+        }
+
+        List<TileId> move = new ArrayList<>();
+        move.add(targetTileId);
+        response.setPawnId1(pawnId);
+        response.setMovePawn1(move);
+//        storeToResponse(response, targetTileId.getPlayerId(), targetTileId.getTileNr() );
+        movePawn(new Pawn(pawnId,targetTileId));
+    }
+
     public static void movePawn(Pawn selectedPawn){
         // set a pawn's location without triggering any validation
         // public for testing purposes
@@ -367,6 +385,14 @@ public class GameState {
     public static Pawn getPawn(PawnId selectedPawnId){
         for (Pawn pawn : pawns) {
             if (pawn.getPawnId().equals(selectedPawnId)){
+                return pawn;
+            }
+        }
+        return null;
+    }
+    public static Pawn getPawn(TileId selectedTileId){
+        for (Pawn pawn : pawns) {
+            if (pawn.getCurrentTileId().equals(selectedTileId)){
                 return pawn;
             }
         }
