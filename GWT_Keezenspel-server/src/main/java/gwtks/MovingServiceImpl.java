@@ -27,6 +27,8 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
                 break;
             case ONBOARD : GameState.processOnBoard(message, response);
                 break;
+            case SWITCH: GameState.processOnSwitch(message,response);
+                break;
             default:
                 break;
         }

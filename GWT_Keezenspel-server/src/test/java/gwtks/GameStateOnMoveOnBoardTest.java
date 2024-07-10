@@ -8,8 +8,8 @@ import static gwtks.GameStateUtil.createPawnAndPlaceOnBoard;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameStateOnMoveOnBoardTest {
-    MoveMessage moveMessage = new MoveMessage();
-    MoveResponse moveResponse = new MoveResponse();
+    private MoveMessage moveMessage = new MoveMessage();
+    private MoveResponse moveResponse = new MoveResponse();
 
     @BeforeEach
     void setUp() {
@@ -146,8 +146,6 @@ class GameStateOnMoveOnBoardTest {
         // THEN Gamestate is correct
         assertEquals(new TileId(1,-2), GameState.getPawn(pawn1).getCurrentTileId());
     }
-
-
 
     private void createMoveMessage(Pawn pawn, int steps){
         moveMessage.setPawnId1(pawn.getPawnId());
