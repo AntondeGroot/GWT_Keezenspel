@@ -4,12 +4,21 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 @SuppressWarnings("serial")
 public class MoveMessage implements IsSerializable {
+        private int playerId;
         private PawnId pawnId1;
         private PawnId pawnId2;
         private TileId tileId; // should be removed as this should be stored in the backend not frontend
         private MoveType moveType;
         private Integer stepsPawn1;
         private Integer stepsPawn2;
+
+        public int getPlayerId() {
+                return playerId;
+        }
+
+        public void setPlayerId(int playerId) {
+                this.playerId = playerId;
+        }
 
         public TileId getTileId() {
                 return tileId;

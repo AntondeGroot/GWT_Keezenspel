@@ -108,18 +108,22 @@ public class GameState {
 
     public static void processOnMove(MoveMessage moveMessage, MoveResponse response){
         // get the data
+
         PawnId pawnId1 = moveMessage.getPawnId1();
         int playerId = pawnId1.getPlayerId();
-        PawnId pawnId2 = moveMessage.getPawnId2();
-        MoveType moveType = moveMessage.getMoveType();
-        int stepsPawn1 = moveMessage.getStepsPawn1();
-        int stepsPawn2 = moveMessage.getStepsPawn2();
         TileId tileId = moveMessage.getTileId();
         int nrSteps = moveMessage.getStepsPawn1();
 
         int next = 0;
         int playerIdOfTile = moveMessage.getTileId().getPlayerId();
         System.out.println("moveMessage = "+moveMessage);
+        int direction = 1;
+        int tileNrToCheck = tileId.getTileNr();
+
+        if (nrSteps<0){
+            direction = -1;
+            nrSteps = - nrSteps;
+        }
 
         // You cannot move from nest tiles
         if(tileId.getTileNr() < 0){
@@ -155,11 +159,20 @@ public class GameState {
             System.out.println("normal route");
             // check if you can kill an opponent
             TileId nextTileId = new TileId(playerIdOfTile, next);
+
+            // in case you end up on your own pawn
+            if(!canMoveToTile(pawnId1,nextTileId)){
+                nextTileId.setTileNr(nextTileId.getTileNr() - 2*direction);
+            }
+
             if(canMoveToTile(pawnId1, nextTileId)){
                 response.setPawnId1(pawnId1);
                 storeToResponse(response, playerIdOfTile, next );
                 movePawn(new Pawn(pawnId1,new TileId(playerIdOfTile,next)));
+            }else{
+
             }
+
             return;
         }
 
@@ -238,6 +251,67 @@ public class GameState {
 
         return new TileId(pawnId.getPlayerId(), tileNrToCheck);
 
+    }
+
+    public static void processOnSwitch(MoveMessage moveMessage, MoveResponse moveResponse){
+        int selectedPawnPlayerId1 = moveMessage.getPawnId1().getPlayerId();
+        int selectedPawnPlayerId2 = moveMessage.getPawnId2().getPlayerId();
+        int playerId = moveMessage.getPlayerId();
+
+        // You can't switch with yourself
+        if(selectedPawnPlayerId1 == selectedPawnPlayerId2){
+            return;
+        }
+        if((selectedPawnPlayerId1 != playerId) && (selectedPawnPlayerId2 != playerId)){
+            return;
+        }
+
+        // assume the player always controls pawn1
+        MoveMessage newMoveMessage = new MoveMessage();
+        if(playerId != selectedPawnPlayerId1){
+            newMoveMessage.setPlayerId(moveMessage.getPlayerId());
+            newMoveMessage.setPawnId1(moveMessage.getPawnId1());
+            newMoveMessage.setPawnId2(moveMessage.getPawnId2());
+            newMoveMessage.setMoveType(moveMessage.getMoveType());
+        }else{
+            newMoveMessage = moveMessage;
+        }
+
+        PawnId pawnId1 = newMoveMessage.getPawnId1();
+        PawnId pawnId2 = newMoveMessage.getPawnId2();
+        Pawn pawn1 = getPawn(pawnId1);
+        Pawn pawn2 = getPawn(pawnId2);
+
+        // player 1 cannot move from EndTile or from NestTile
+        // player 2 cannot move from endtile or from nesttile
+        int tileNr1 = pawn1.getCurrentTileId().getTileNr();
+        int tileNr2 = pawn2.getCurrentTileId().getTileNr();
+        int tilePlayerId2 = pawn2.getCurrentTileId().getPlayerId();
+        if(tileNr1 < 0 || tileNr2 < 0 || tileNr1 > 15 || tileNr2 > 15){
+            return;
+        }
+
+        // player1 can move from starttile
+        // player2 cannot be taken from starttile
+        if(tilePlayerId2 == pawn2.getPlayerId() && tileNr2 == 0){
+            return;
+        }
+
+        List<TileId> move1 = new ArrayList<>();
+        List<TileId> move2 = new ArrayList<>();
+
+        move1.add(pawn2.getCurrentTileId());
+        move2.add(pawn1.getCurrentTileId());
+        moveResponse.setMovePawn1(move1);
+        moveResponse.setMovePawn2(move2);
+        moveResponse.setPawnId1(pawn1.getPawnId());
+        moveResponse.setPawnId2(pawn2.getPawnId());
+
+        TileId tileId1 = new TileId(pawn1.getCurrentTileId());
+        TileId tileId2 = new TileId(pawn2.getCurrentTileId());
+        // switch in gamestate
+        movePawn(new Pawn(pawnId1,tileId2));
+        movePawn(new Pawn(pawnId2,tileId1));
     }
 
     public static void processOnBoard(MoveMessage moveMessage, MoveResponse response) {

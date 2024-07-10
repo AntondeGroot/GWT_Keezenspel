@@ -24,9 +24,8 @@ public class App implements EntryPoint {
 			+ "connection and try again.";
 
 	/**
-	 * Create a remote service proxy to talk to the server-side Greeting service.
+	 * Create a remote service proxy to talk to the server-side Moving service.
 	 */
-
 	private final MovingServiceAsync movingService = GWT.create(MovingService.class);
 	private Canvas canvas;
 
@@ -35,10 +34,13 @@ public class App implements EntryPoint {
 	 */
 	public void onModuleLoad() {
 		final Button sendButton = new Button("Make Move");
+		final Button swapButton = new Button("Swap");
 		final Button pawnOnTheBoardButton = new Button("King/Ace");
 
 		final TextBox playerIdField = new TextBox();
 		final TextBox pawnIdField = new TextBox();
+		final TextBox playerId2Field = new TextBox();
+		final TextBox pawnId2Field = new TextBox();
 		final TextBox stepsField = new TextBox();
 		final Label errorLabel = new Label();
 
@@ -83,6 +85,10 @@ public class App implements EntryPoint {
 		RootPanel.get("sendButtonContainer").add(sendButton);
 		RootPanel.get("pawnOnTheBoardButtonContainer").add(pawnOnTheBoardButton);
 		RootPanel.get("errorLabelContainer").add(errorLabel);
+
+		RootPanel.get("playerId2FieldContainer").add(playerId2Field);
+		RootPanel.get("pawnId2FieldContainer").add(pawnId2Field);
+		RootPanel.get("swapButtonContainer").add(swapButton);
 
 		// Focus the cursor on the name field when the app loads
 //		nameField.setFocus(true);
@@ -147,20 +153,64 @@ public class App implements EntryPoint {
 				MoveMessage moveMessage = new MoveMessage();
 				int playerId = Integer.parseInt(playerIdField.getText());
 				int pawnNr = Integer.parseInt(pawnIdField.getText());
-				PawnId selectedPawnId = new PawnId(playerId,pawnNr);
+				PawnId selectedPawnId = new PawnId(playerId, pawnNr);
 
 				moveMessage.setPawnId1(selectedPawnId);
 				moveMessage.setMoveType(MoveType.ONBOARD);
 
 				movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
-					public void onFailure(Throwable caught) {}
+					public void onFailure(Throwable caught) {
+					}
+
 					public void onSuccess(MoveResponse result) {
 						Context2d context = canvas.getContext2d();
 						context.clearRect(0, 0, context.getCanvas().getWidth(), context.getCanvas().getHeight());
 						Canvas canvas1 = board.drawBoard(canvas);
 						MoveController.movePawn(canvas, result);
 					}
-				} );
+				});
+			}
+		}
+
+		// Create a handler for the sendButton and nameField
+		class MySwapHandler implements ClickHandler {
+			/**
+			 * Fired when the user clicks on the sendButton.
+			 */
+			public void onClick(ClickEvent event) {
+				sendOnboardMessageToServer();
+			}
+
+			/**
+			 * Send the MoveMessage to the server and wait for a response.
+			 */
+			private void sendOnboardMessageToServer() {
+				// First, we validate the input.
+				errorLabel.setText("");
+
+				MoveMessage moveMessage = new MoveMessage();
+				int playerId = Integer.parseInt(playerIdField.getText());
+				int pawnNr = Integer.parseInt(pawnIdField.getText());
+				PawnId selectedPawnId = new PawnId(playerId, pawnNr);
+				int playerId2 = Integer.parseInt(playerId2Field.getText());
+				int pawnNr2 = Integer.parseInt(pawnId2Field.getText());
+				PawnId selectedPawnId2 = new PawnId(playerId2, pawnNr2);
+
+				moveMessage.setPawnId1(selectedPawnId);
+				moveMessage.setPawnId2(selectedPawnId2);
+				moveMessage.setMoveType(MoveType.SWITCH);
+
+				movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
+					public void onFailure(Throwable caught) {
+					}
+
+					public void onSuccess(MoveResponse result) {
+						Context2d context = canvas.getContext2d();
+						context.clearRect(0, 0, context.getCanvas().getWidth(), context.getCanvas().getHeight());
+						Canvas canvas1 = board.drawBoard(canvas);
+						MoveController.movePawn(canvas, result);
+					}
+				});
 			}
 		}
 
@@ -171,5 +221,9 @@ public class App implements EntryPoint {
 		// Add a handler to send the name to the server
 		MyKingHandler kingHandler = new MyKingHandler();
 		pawnOnTheBoardButton.addClickHandler(kingHandler);
+
+		// Add a handler to send the name to the server
+		MySwapHandler swapHandler = new MySwapHandler();
+		pawnOnTheBoardButton.addClickHandler(swapHandler);
 	}
 }
