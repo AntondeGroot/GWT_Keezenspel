@@ -25,7 +25,7 @@ class MoveControllerTest {
         moveResponse.setMovePawn1(moves);
 
         // WHEN
-        MoveController.movePawn(null, moveResponse);
+        MoveController.movePawn(moveResponse);
 
         // THEN
         Pawn pawn = Board.getPawn(pawnId);

@@ -3,6 +3,8 @@ package gwtks;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.CanvasElement;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
@@ -10,12 +12,15 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.RootPanel;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Board implements IsSerializable {
 
     private static List<TileMapping> tiles = new ArrayList<>();
+	private static List<PawnAnimationMapping> animationMappings = new ArrayList<>();
 	private static List<Pawn> pawns = new ArrayList<>();
 
 	private double cellDistance;
@@ -94,16 +99,12 @@ public class Board implements IsSerializable {
 		}
     }
 
-	public Canvas drawBoard(Canvas canvas) {
-		canvas.setHeight("600px");
-		canvas.setWidth("600px");
-		Context2d context = canvas.getContext2d();
-
-		//context.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
-		context.clearRect(0, 0, 600, 600);
+	public void drawBoard(Context2d context) {
+		GWT.log("drawing board");
 		double cellSize = 40.0;
 		String color = "";
 		int tileNr = 0;
+
 		for (TileMapping mapping : tiles) {
 			color = "#D3D3D3";
 			tileNr = mapping.getTileNr();
@@ -111,11 +112,10 @@ public class Board implements IsSerializable {
 			if (tileNr <= 0 || tileNr >= 16) {
 				color = Players.getColor(mapping.getPlayerId());
 			}
-
+			GWT.log("drawing tile " + mapping.getPlayerId() + " " + tileNr + ", "+mapping.getPosition());
 			drawCircle(context, mapping.getPosition().getX(), mapping.getPosition().getY(), cellDistance/2, color);
 		}
-
-		return canvas;
+		context.save();
 	}
 
 	private void drawCircle(Context2d context, double x, double y, double radius, String color) {
@@ -170,44 +170,87 @@ public class Board implements IsSerializable {
 		return null;
 	}
 
-	public void drawPawns(Canvas canvas){
-		Context2d context = canvas.getContext2d();
-		GWT.log("number of pawns to be drawn: "+ pawns.size());
+	public void drawPawns(Context2d context){
 		for(Pawn pawn : pawns){
-			drawPawn(context, pawn);
+//			// if it is in the animation
+			if (shouldBeAnimated(pawn)) {
+				Iterator<PawnAnimationMapping> iterator = animationMappings.iterator();
+				while (iterator.hasNext()) {
+					PawnAnimationMapping animationMappings1 = iterator.next();
+					GWT.log(" anton");
+					if (pawn.equals(animationMappings1.getPawn())) {
+						if (animationMappings1.getPoints().isEmpty()) {
+							iterator.remove(); // Remove the current element safely
+						} else {
+							ArrayDeque<Point> points = animationMappings1.getPoints();
+							if (!points.isEmpty()) {
+								Point p = points.getFirst();
+								drawPawnAnimated(context, pawn, p);
+								GWT.log("should animate pawn " + pawn + ", " + p + " size " + points.size());
+								points.removeFirst(); // Remove the first element safely
+							}
+						}
+					}
+				}
+			}else{
+				drawPawn(context, pawn);
+			}
+			// if not animated
+
 		}
 	}
 
 	public static void movePawn(Pawn pawn, TileId tileId) {
 		for (Pawn pawn1 : pawns) {
 			if(pawn1.equals(pawn)){
+				GWT.log("move from "+pawn1.getCurrentTileId()+" to "+tileId);
+				animationMappings.add(new PawnAnimationMapping(pawn1,pawn1.getCurrentTileId(), tileId));
 				pawn1.setCurrentTileId(tileId);
 			}
 		}
 	}
 
+	public boolean shouldBeAnimated(Pawn pawn) {
+		if(animationMappings.isEmpty()){
+			return false;
+		}
+
+		for (PawnAnimationMapping animationMappings1 : animationMappings) {
+			if (pawn.equals(animationMappings1.getPawn())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private void drawPawn(Context2d context, Pawn pawn){
 		// Load an image and draw it to the canvas
 		Image image = new Image("/pawn.png");
-		image.addLoadHandler(new LoadHandler() {
-			@Override
-			public void onLoad(LoadEvent event) {
-				int desiredWidth = 40;
-				int desiredHeight = 40;
-				Point point = new Point(0,0);
-				// Draw the image on the canvas once it's loaded
 
-				for (TileMapping mapping : tiles) {
-					if(mapping.getTileId().equals(pawn.getCurrentTileId())){
-						point = mapping.getPosition();
-					}
-				}
-				context.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
+		int desiredWidth = 40;
+		int desiredHeight = 40;
+		Point point = new Point(0,0);
+		// Draw the image on the canvas once it's loaded
+
+		for (TileMapping mapping : tiles) {
+			if(mapping.getTileId().equals(pawn.getCurrentTileId())){
+				point = mapping.getPosition();
 			}
-		});
+		}
+		context.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
 
-		// the image widget has to be added to the Rootpanel for it to trigger the OnLoad event
-		image.setVisible(false); // Hide the image widget
-		RootPanel.get().add(image);
+		// do no use a onload: the image widget has to be added to the Rootpanel for it to trigger the OnLoad event
+//		image.setVisible(false); // Hide the image widget
+//		RootPanel.get().add(image);
+	}
+
+	private void drawPawnAnimated(Context2d context, Pawn pawn, Point point){
+		// Load an image and draw it to the canvas
+		Image image = new Image("/pawn.png");
+
+		int desiredWidth = 40;
+		int desiredHeight = 40;
+
+		context.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
 	}
 }

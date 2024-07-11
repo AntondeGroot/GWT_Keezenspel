@@ -42,21 +42,36 @@
     </noscript>
 
     <h1>Keezenspel</h1>
-    <div id="boardContainer"> </div>
+    <div class="canvasWrapper">
+      <canvas id="canvasBoard" width="600" height="600"></canvas>
+      <canvas id="canvasSteps" width="600" height="600"></canvas>
+      <canvas id="canvasPawns" width="600" height="600"></canvas>
+    </div>
     <table align="center">
       <tr>
         <td colspan="3" style="font-weight:bold;">PlayerId:                 PawnId                     steps </td>
       </tr>
       <tr>
-        <td id="playerIdFieldContainer">playerId</td>
-        <td id="pawnIdFieldContainer">pawnId</td>
+        <td><label for="playerId">PlayerId:</label>
+            <input type="text" id="playerId" name="playerId" value = 0>
+        </td>
+        <td><label for="pawnId">PawnId:</label>
+          <input type="text" id="pawnId" name="pawnId" value = 0>
+        </td>
+        <td><label for="stepsNr">Steps:</label>
+          <input type="text" id="stepsNr" name="stepsNr" value = 0>
+        </td>
         <td id="stepsFieldContainer">steps</td>
         <td id="sendButtonContainer"></td>
         <td id="pawnOnTheBoardButtonContainer"></td>
       </tr>
       <tr>
-        <td id="playerId2FieldContainer">playerId2</td>
-        <td id="pawnId2FieldContainer">pawnId</td>
+        <td><label for="playerId2">PlayerId2:</label>
+          <input type="text" id="playerId2" name="playerId2" value = 0>
+        </td>
+        <td><label for="pawnId2">PawnId2:</label>
+          <input type="text" id="pawnId2" name="pawnId2" value = 0>
+        </td>
         <td id="swapButtonContainer"></td>
       </tr>>
       <tr>
@@ -64,4 +79,6 @@
       </tr>
     </table>
   </body>
+  <img id="pawn" src ="pawn.png">
+  <img id="cards" src ="card-deck.png">
 </html>
