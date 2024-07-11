@@ -7,7 +7,7 @@ import java.util.List;
 
 public class MoveController {
 
-    public static void movePawn(Canvas canvas, MoveResponse moveResponse) {
+    public static void movePawn(MoveResponse moveResponse) {
         GWT.log(moveResponse.toString());
 
         PawnId pawnId1 = moveResponse.getPawnId1();
@@ -23,13 +23,11 @@ public class MoveController {
             pawn = Board.getPawn(pawnId1);
             GWT.log("selected pawn is "+ pawn + " pawnId"+pawnId1);
             if(pawn != null) {
+                Board board = new Board();
+                Board.movePawn(pawn, tileId);
                 pawn.setCurrentTileId(tileId);
             }
-            Board board = new Board();
-            Board.movePawn(pawn, tileId);
-            if(canvas!=null){
-                board.drawPawns(canvas);
-            }
+
             GWT.log(Board.getPawns().toString());
         }
 

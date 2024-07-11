@@ -10,9 +10,21 @@ h1 {
   text-align: center;
 }
 
-.canvas{
+canvas{
   border: 5px solid darkred;
   border-radius: 50px;
+}
+
+.canvasWrapper {
+  position: relative;
+  width: 600px;
+  height: 600px;
+}
+
+.canvasWrapper canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .sendButton {
