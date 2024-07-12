@@ -390,6 +390,7 @@ public class GameState {
         // if start is occupied by other player, kill that pawn
 
         LinkedList<TileId> move = new LinkedList<>();
+        move.add(currentTileId);
         move.add(targetTileId);
         response.setMovePawn1(move);
         response.setPawnId1(moveMessage.getPawnId1());

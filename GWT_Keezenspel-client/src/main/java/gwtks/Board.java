@@ -12,7 +12,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.RootPanel;
 
-import java.util.ArrayDeque;
+import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -182,7 +182,7 @@ public class Board implements IsSerializable {
 						if (animationMappings1.getPoints().isEmpty()) {
 							iterator.remove(); // Remove the current element safely
 						} else {
-							ArrayDeque<Point> points = animationMappings1.getPoints();
+							LinkedList<Point> points = animationMappings1.getPoints();
 							if (!points.isEmpty()) {
 								Point p = points.getFirst();
 								drawPawnAnimated(context, pawn, p);
@@ -200,12 +200,11 @@ public class Board implements IsSerializable {
 		}
 	}
 
-	public static void movePawn(Pawn pawn, TileId tileId) {
+	public static void movePawn(Pawn pawn, LinkedList<TileId> movePawn) {
 		for (Pawn pawn1 : pawns) {
 			if(pawn1.equals(pawn)){
-				GWT.log("move from "+pawn1.getCurrentTileId()+" to "+tileId);
-				animationMappings.add(new PawnAnimationMapping(pawn1,pawn1.getCurrentTileId(), tileId));
-				pawn1.setCurrentTileId(tileId);
+				animationMappings.add(new PawnAnimationMapping(pawn1, movePawn));
+				pawn1.setCurrentTileId(movePawn.getLast());
 			}
 		}
 	}

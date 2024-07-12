@@ -1,32 +1,41 @@
 package gwtks;
 
-import java.util.ArrayDeque;
+import com.google.gwt.core.client.GWT;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class PawnAnimationMapping {
     private Pawn pawn;
-    private ArrayDeque<Point> points;
+    private LinkedList<Point> points = new LinkedList<>();
 
-    public PawnAnimationMapping(Pawn pawn, TileId tileIdFrom, TileId tileIdTo) {
+    public PawnAnimationMapping(Pawn pawn, LinkedList<TileId> tileIdList) {
         this.pawn = pawn;
         Point pointFrom = new Point(0,0);
         Point pointTo = new Point(0,0);
+        ArrayList<Point> tempResult = new ArrayList<Point>();
 
-        for (TileMapping mapping : Board.getTiles()) {
-            if(mapping.getTileId().equals(tileIdFrom)){
-                pointFrom = mapping.getPosition();
-            }
-        }
-        for (TileMapping mapping : Board.getTiles()) {
-            if(mapping.getTileId().equals(tileIdTo)){
-                pointTo = mapping.getPosition();
-            }
-        }
+        for (int i = 0; i < tileIdList.size()-1 ; i++) {
+            pointFrom = convertTileIdToPoint(tileIdList.get(i));
+            pointTo = convertTileIdToPoint(tileIdList.get(i+1));
 
-        points = drawLine(pointFrom,pointTo);
+            tempResult.addAll(drawLine(pointFrom,pointTo));
+        }
+        GWT.log("positions for drawing a line is: "+tempResult.toString());
+        points.addAll(tempResult);
     }
 
-    public ArrayDeque<Point> drawLine(Point point1, Point point2) {
-        ArrayDeque<Point> points = new ArrayDeque<>();
+    private Point convertTileIdToPoint(TileId tileId){
+        for (TileMapping mapping : Board.getTiles()) {
+            if(mapping.getTileId().equals(tileId)){
+                return mapping.getPosition();
+            }
+        }
+        return new Point(0,0);
+    }
+
+    public LinkedList<Point> drawLine(Point point1, Point point2) {
+        LinkedList<Point> points = new LinkedList<>();
 
         // Calculate the distance between start and end points
         double distance = Math.sqrt(Math.pow(point2.getX() - point1.getX(), 2) + Math.pow(point2.getY() - point1.getY(), 2));
@@ -56,7 +65,7 @@ public class PawnAnimationMapping {
         return pawn;
     }
 
-    public ArrayDeque<Point> getPoints() {
+    public LinkedList<Point> getPoints() {
         return points;
     }
 
