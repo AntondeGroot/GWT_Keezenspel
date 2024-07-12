@@ -162,6 +162,64 @@ public class PawnMovementList {
         // response message is correct
         assertEquals(expectedMovement, moveResponse.getMovePawn1());
     }
+    @Test
+    void pawnMovesBackwardsOverCorners15_13_7_1() {
+        // GIVEN
+        Pawn pawn1 = createPawnAndPlaceOnBoard(1,new TileId(1,16));
+
+        // WHEN
+        createMoveMessage(pawn1,-12);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN
+        LinkedList<TileId> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new TileId(1,16));
+        expectedMovement.add(new TileId(0,15));
+        expectedMovement.add(new TileId(0,13));
+        expectedMovement.add(new TileId(0,7));
+        expectedMovement.add(new TileId(0,4));
+
+        // response message is correct
+        assertEquals(expectedMovement, moveResponse.getMovePawn1());
+    }
+    @Test
+    void pawnMovesBackwardsOverCorners13_7() {
+        // GIVEN
+        Pawn pawn1 = createPawnAndPlaceOnBoard(0,new TileId(0,14));
+
+        // WHEN
+        createMoveMessage(pawn1,-8);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN
+        LinkedList<TileId> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new TileId(0,14));
+        expectedMovement.add(new TileId(0,13));
+        expectedMovement.add(new TileId(0,7));
+        expectedMovement.add(new TileId(0,6));
+
+
+        // response message is correct
+        assertEquals(expectedMovement, moveResponse.getMovePawn1());
+    }
+    @Test
+    void pawnMovesBackwardsOverCorners7() {
+        // GIVEN
+        Pawn pawn1 = createPawnAndPlaceOnBoard(0,new TileId(0,8));
+
+        // WHEN
+        createMoveMessage(pawn1,-4);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN
+        LinkedList<TileId> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new TileId(0,8));
+        expectedMovement.add(new TileId(0,7));
+        expectedMovement.add(new TileId(0,4));
+
+        // response message is correct
+        assertEquals(expectedMovement, moveResponse.getMovePawn1());
+    }
 
     private void createMoveMessage(Pawn pawn, int steps){
         moveMessage.setPawnId1(pawn.getPawnId());
