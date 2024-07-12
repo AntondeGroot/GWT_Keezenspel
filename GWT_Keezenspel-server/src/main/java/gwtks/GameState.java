@@ -179,10 +179,23 @@ public class GameState {
             if(!canMoveToTile(pawnId1,nextTileId)){
                 return;
             }
-            if(next > 1 && currentTileId.getTileNr() < 1){moves.add(new TileId(playerIdOfTile, 1));}
-            if(next > 7 && currentTileId.getTileNr() < 7){moves.add(new TileId(playerIdOfTile, 7));}
-            if(next > 13 && currentTileId.getTileNr() < 13){moves.add(new TileId(playerIdOfTile, 13));}
-            moves.add(nextTileId);
+            if(nrSteps >0) {
+                if (next > 1 && currentTileId.getTileNr() < 1) {
+                    moves.add(new TileId(playerIdOfTile, 1));
+                }
+                if (next > 7 && currentTileId.getTileNr() < 7) {
+                    moves.add(new TileId(playerIdOfTile, 7));
+                }
+                if (next > 13 && currentTileId.getTileNr() < 13) {
+                    moves.add(new TileId(playerIdOfTile, 13));
+                }
+            }else{
+                if(next < 13 && currentTileId.getTileNr() > 13){moves.add(new TileId(playerIdOfTile, 13));}
+                if(next < 7 && currentTileId.getTileNr() > 7){moves.add(new TileId(playerIdOfTile, 7));}
+                if(next < 1 && currentTileId.getTileNr() > 1){moves.add(new TileId(playerIdOfTile, 1));}
+            }
+
+                moves.add(nextTileId);
             response.setMovePawn1(moves);
 
             processMove(pawnId1, new TileId(playerIdOfTile,next), response);
@@ -229,14 +242,19 @@ public class GameState {
             if (isPawnTightlyClosedIn(pawnId1, currentTileId)){
                 return;
             }
+
             TileId targetTileId = moveAndCheckEveryTile(pawnId1, currentTileId, nrSteps);
-            int tileHighestTileNr = checkHighestTileNrYouCanMoveTo(pawnId1,currentTileId,nrSteps);
-            if(tileHighestTileNr > targetTileId.getTileNr()){
-                moves.add(new TileId(playerIdOfTile, tileHighestTileNr));
-                if(targetTileId.getTileNr() < 15){moves.add(new TileId(targetTileId.getPlayerId(), 15));}
-                if(targetTileId.getTileNr() < 13){moves.add(new TileId(targetTileId.getPlayerId(), 13));}
-                if(targetTileId.getTileNr() < 7){moves.add(new TileId(targetTileId.getPlayerId(), 7));}
+            int tileHighestTileNr = 0;
+            if(nrSteps > 0){
+                tileHighestTileNr = checkHighestTileNrYouCanMoveTo(pawnId1, currentTileId, nrSteps);
+                if (tileHighestTileNr > targetTileId.getTileNr()) {
+                    moves.add(new TileId(playerIdOfTile, tileHighestTileNr));
+                }
             }
+            if (targetTileId.getTileNr() < 15) {moves.add(new TileId(targetTileId.getPlayerId(), 15));}
+            if (targetTileId.getTileNr() < 13) {moves.add(new TileId(targetTileId.getPlayerId(), 13));}
+            if (targetTileId.getTileNr() < 7) {moves.add(new TileId(targetTileId.getPlayerId(), 7));}
+
             moves.add(targetTileId);
             response.setMovePawn1(moves);
             processMove(pawnId1, targetTileId, response);
