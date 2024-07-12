@@ -42,7 +42,7 @@ class GameStateOnBoardTest {
 
         // THEN
         // response message is correct
-        assertEquals(new TileId(0,0), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tileNr
+        assertEquals(new TileId(0,0), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tileNr
         assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());                          // moves the correct pawn
         // GameState is correct
         assertEquals(new TileId(0,0) ,GameState.getPawn(pawn1).getCurrentTileId());

@@ -2,6 +2,7 @@ package gwtks;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ class MoveControllerTest {
         Board board = new Board();
         board.createBoard(2,300);
 
-        List<TileId> moves = new ArrayList<>();
+        LinkedList<TileId> moves = new LinkedList<>();
         moves.add(new TileId(0,2));
         MoveResponse moveResponse = new MoveResponse();
         moveResponse.setPawnId1(pawnId);

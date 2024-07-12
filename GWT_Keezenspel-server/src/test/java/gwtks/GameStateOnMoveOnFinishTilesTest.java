@@ -37,7 +37,7 @@ class GameStateOnMoveOnFinishTilesTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(new TileId(1,17), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tile
+        assertEquals(new TileId(1,17), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
         assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(1,17), GameState.getPawn(pawn1).getCurrentTileId());
@@ -52,7 +52,7 @@ class GameStateOnMoveOnFinishTilesTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(new TileId(1,19), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tile
+        assertEquals(new TileId(1,19), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
         assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(1,19), GameState.getPawn(pawn1).getCurrentTileId());
@@ -67,7 +67,22 @@ class GameStateOnMoveOnFinishTilesTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(new TileId(1,17), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tile
+        assertEquals(new TileId(1,17), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
+        assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());                          // moves the correct pawn
+        // THEN Gamestate is correct
+        assertEquals(new TileId(1,17), GameState.getPawn(pawn1).getCurrentTileId());
+    }
+    @Test
+    void moveBackwardsOnFinishTiles_NegativeSteps_NotEndposition(){
+        // GIVEN
+        Pawn pawn1 = createPawnAndPlaceOnBoard(1, new TileId(1,18));
+
+        // WHEN
+        createMoveMessage(pawn1,-1);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN response message is correct
+        assertEquals(new TileId(1,17), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
         assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(1,17), GameState.getPawn(pawn1).getCurrentTileId());
@@ -82,7 +97,7 @@ class GameStateOnMoveOnFinishTilesTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(new TileId(1,17), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tile
+        assertEquals(new TileId(1,17), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
         assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(1,17), GameState.getPawn(pawn1).getCurrentTileId());
@@ -98,7 +113,7 @@ class GameStateOnMoveOnFinishTilesTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(new TileId(0,15), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tile
+        assertEquals(new TileId(0,15), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
         assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(0,15), GameState.getPawn(pawn1).getCurrentTileId());
@@ -113,7 +128,7 @@ class GameStateOnMoveOnFinishTilesTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(new TileId(0,15), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tile
+        assertEquals(new TileId(0,15), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
         assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(0,15), GameState.getPawn(pawn1).getCurrentTileId());
@@ -129,7 +144,7 @@ class GameStateOnMoveOnFinishTilesTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(new TileId(1,18), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tile
+        assertEquals(new TileId(1,18), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
         assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(1,18), GameState.getPawn(pawn1).getCurrentTileId());
@@ -146,7 +161,7 @@ class GameStateOnMoveOnFinishTilesTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(new TileId(1,18), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tile
+        assertEquals(new TileId(1,18), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
         assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(1,18), GameState.getPawn(pawn1).getCurrentTileId());
