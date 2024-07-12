@@ -3,6 +3,7 @@ package gwtks;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.canvas.client.Canvas;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class MoveController {
@@ -12,8 +13,8 @@ public class MoveController {
 
         PawnId pawnId1 = moveResponse.getPawnId1();
         PawnId pawnId2 = moveResponse.getPawnId2();
-        List<TileId> movePawn1 = moveResponse.getMovePawn1();
-        List<TileId> movePawn2 = moveResponse.getMovePawn2();
+        LinkedList<TileId> movePawn1 = moveResponse.getMovePawn1();
+        LinkedList<TileId> movePawn2 = moveResponse.getMovePawn2();
         Pawn pawn = null;
 
         if(movePawn1 == null){return;}

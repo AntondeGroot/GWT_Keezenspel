@@ -38,8 +38,8 @@ class GameStateOnKillTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(new TileId(0,10), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tile
-        assertEquals(pawn2.getNestTileId(), moveResponse.getMovePawn2().get(0));                          // moves the correct pawn
+        assertEquals(new TileId(0,10), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
+        assertEquals(pawn2.getNestTileId(), moveResponse.getMovePawn2().getLast());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(0,10), GameState.getPawn(pawn1).getCurrentTileId());
         assertEquals(pawn2.getNestTileId(), GameState.getPawn(pawn2).getCurrentTileId());
@@ -55,8 +55,8 @@ class GameStateOnKillTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(new TileId(0,10), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tile
-        assertEquals(pawn2.getNestTileId(), moveResponse.getMovePawn2().get(0));                          // moves the correct pawn
+        assertEquals(new TileId(0,10), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
+        assertEquals(pawn2.getNestTileId(), moveResponse.getMovePawn2().getLast());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(0,10), GameState.getPawn(pawn1).getCurrentTileId());
         assertEquals(pawn2.getNestTileId(), GameState.getPawn(pawn2).getCurrentTileId());
@@ -72,8 +72,8 @@ class GameStateOnKillTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(new TileId(1,0), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tile
-        assertEquals(pawn2.getNestTileId(), moveResponse.getMovePawn2().get(0));                          // moves the correct pawn
+        assertEquals(new TileId(1,0), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
+        assertEquals(pawn2.getNestTileId(), moveResponse.getMovePawn2().getLast());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(1,0), GameState.getPawn(pawn1).getCurrentTileId());
         assertEquals(pawn2.getNestTileId(), GameState.getPawn(pawn2).getCurrentTileId());
@@ -89,8 +89,8 @@ class GameStateOnKillTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(new TileId(1,0), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tile
-        assertEquals(pawn2.getNestTileId(), moveResponse.getMovePawn2().get(0));                          // moves the correct pawn
+        assertEquals(new TileId(1,0), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
+        assertEquals(pawn2.getNestTileId(), moveResponse.getMovePawn2().getLast());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(1,0), GameState.getPawn(pawn1).getCurrentTileId());
         assertEquals(pawn2.getNestTileId(), GameState.getPawn(pawn2).getCurrentTileId());
@@ -106,8 +106,8 @@ class GameStateOnKillTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(new TileId(1,5), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tile
-        assertEquals(pawn2.getNestTileId(), moveResponse.getMovePawn2().get(0));                          // moves the correct pawn
+        assertEquals(new TileId(1,5), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
+        assertEquals(pawn2.getNestTileId(), moveResponse.getMovePawn2().getLast());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(1,5), GameState.getPawn(pawn1).getCurrentTileId());
         assertEquals(pawn2.getNestTileId(), GameState.getPawn(pawn2).getCurrentTileId());
@@ -123,8 +123,8 @@ class GameStateOnKillTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(new TileId(0,9), moveResponse.getMovePawn1().get(0));  // moves the pawn to the correct tile
-        assertEquals(pawn2.getNestTileId(), moveResponse.getMovePawn2().get(0));                          // moves the correct pawn
+        assertEquals(new TileId(0,9), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
+        assertEquals(pawn2.getNestTileId(), moveResponse.getMovePawn2().getLast());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(0,9), GameState.getPawn(pawn1).getCurrentTileId());
         assertEquals(pawn2.getNestTileId(), GameState.getPawn(pawn2).getCurrentTileId());

@@ -40,8 +40,8 @@ class GameStateOnSwitchTest {
         GameState.processOnSwitch(moveMessage, moveResponse);
 
         // THEN: response message is correct
-        assertEquals(tileId2, moveResponse.getMovePawn1().get(0));
-        assertEquals(tileId1, moveResponse.getMovePawn2().get(0));
+        assertEquals(tileId2, moveResponse.getMovePawn1().getLast());
+        assertEquals(tileId1, moveResponse.getMovePawn2().getLast());
         // THEN: GameState is correct
         assertEquals(tileId2, GameState.getPawn(pawn1).getCurrentTileId());
         assertEquals(tileId1, GameState.getPawn(pawn2).getCurrentTileId());
@@ -61,8 +61,8 @@ class GameStateOnSwitchTest {
         GameState.processOnSwitch(moveMessage, moveResponse);
 
         // THEN: response message is correct
-        assertEquals(tileId2, moveResponse.getMovePawn1().get(0));
-        assertEquals(tileId1, moveResponse.getMovePawn2().get(0));
+        assertEquals(tileId2, moveResponse.getMovePawn1().getLast());
+        assertEquals(tileId1, moveResponse.getMovePawn2().getLast());
         // THEN: GameState is correct
         assertEquals(tileId2, GameState.getPawn(pawn1).getCurrentTileId());
         assertEquals(tileId1, GameState.getPawn(pawn2).getCurrentTileId());
@@ -162,8 +162,8 @@ class GameStateOnSwitchTest {
         GameState.processOnSwitch(moveMessage, moveResponse);
 
         // THEN: response message is correct
-        assertEquals(tileId2, moveResponse.getMovePawn1().get(0));
-        assertEquals(tileId1, moveResponse.getMovePawn2().get(0));
+        assertEquals(tileId2, moveResponse.getMovePawn1().getLast());
+        assertEquals(tileId1, moveResponse.getMovePawn2().getLast());
         // THEN: GameState is correct
         assertEquals(tileId2, GameState.getPawn(pawn1).getCurrentTileId());
         assertEquals(tileId1, GameState.getPawn(pawn2).getCurrentTileId());

@@ -2,6 +2,9 @@ package gwtks;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
+import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @SuppressWarnings("serial")
@@ -9,10 +12,12 @@ public class MoveResponse implements IsSerializable {
     private Integer nextPlayerId;
     private PawnId pawnId1;
     private PawnId pawnId2;
-    private List<TileId> movePawn1;
-    private List<TileId> movePawn2;
+    // deque is not supported by GWT
+    private LinkedList<TileId> movePawn1;
+    private LinkedList<TileId> movePawn2;
 
     public Integer getNextPlayerId() {
+        ArrayList<Integer> test = new ArrayList<>();
         return nextPlayerId;
     }
 
@@ -36,19 +41,19 @@ public class MoveResponse implements IsSerializable {
         this.pawnId2 = pawnId2;
     }
 
-    public List<TileId> getMovePawn1() {
+    public LinkedList<TileId> getMovePawn1() {
         return movePawn1;
     }
 
-    public void setMovePawn1(List<TileId> movePawn1) {
+    public void setMovePawn1(LinkedList<TileId> movePawn1) {
         this.movePawn1 = movePawn1;
     }
 
-    public List<TileId> getMovePawn2() {
+    public LinkedList<TileId> getMovePawn2() {
         return movePawn2;
     }
 
-    public void setMovePawn2(List<TileId> movePawn2) {
+    public void setMovePawn2(LinkedList<TileId> movePawn2) {
         this.movePawn2 = movePawn2;
     }
 
