@@ -20,6 +20,9 @@ public class Application
   public static void main(String[] args) {
     SpringApplication.run(Application.class,
                           args);
+    for (int i = 0; i < 8; i++) {
+      ImageProcessing.create(i);
+    }
   }
 
   @Override
