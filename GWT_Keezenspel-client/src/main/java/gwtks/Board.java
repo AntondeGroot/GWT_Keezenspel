@@ -110,7 +110,7 @@ public class Board implements IsSerializable {
 			tileNr = mapping.getTileNr();
 			// only player tiles get a color
 			if (tileNr <= 0 || tileNr >= 16) {
-				color = Players.getColor(mapping.getPlayerId());
+				color = PlayerColors.getHexColor(mapping.getPlayerId());
 			}
 			GWT.log("drawing tile " + mapping.getPlayerId() + " " + tileNr + ", "+mapping.getPosition());
 			drawCircle(context, mapping.getPosition().getX(), mapping.getPosition().getY(), cellDistance/2, color);
@@ -224,7 +224,8 @@ public class Board implements IsSerializable {
 
 	private void drawPawn(Context2d context, Pawn pawn){
 		// Load an image and draw it to the canvas
-		Image image = new Image("/pawn.png");
+		int playerId = pawn.getPlayerId();
+		Image image = new Image("/pawn"+playerId+".png");
 
 		int desiredWidth = 40;
 		int desiredHeight = 40;
@@ -245,7 +246,8 @@ public class Board implements IsSerializable {
 
 	private void drawPawnAnimated(Context2d context, Pawn pawn, Point point){
 		// Load an image and draw it to the canvas
-		Image image = new Image("/pawn.png");
+		int playerId = pawn.getPlayerId();
+		Image image = new Image("/pawn"+playerId+".png");
 
 		int desiredWidth = 40;
 		int desiredHeight = 40;
