@@ -90,8 +90,6 @@ public class App implements EntryPoint {
 		ctxPawns.clearRect(0,0, 600, 600);
 		game.update();
 		game.draw();
-//		Board board = new Board();
-//		board.drawPawns(ctxPawns);
 
 		AnimationScheduler.AnimationCallback animationCallback = new AnimationScheduler.AnimationCallback() {
 			@Override

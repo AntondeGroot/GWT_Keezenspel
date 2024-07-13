@@ -15,6 +15,7 @@ public class MoveResponse implements IsSerializable {
     // deque is not supported by GWT
     private LinkedList<TileId> movePawn1;
     private LinkedList<TileId> movePawn2;
+    private MoveType moveType;
 
     public Integer getNextPlayerId() {
         ArrayList<Integer> test = new ArrayList<>();
@@ -55,6 +56,14 @@ public class MoveResponse implements IsSerializable {
 
     public void setMovePawn2(LinkedList<TileId> movePawn2) {
         this.movePawn2 = movePawn2;
+    }
+
+    public MoveType getMoveType() {
+        return moveType;
+    }
+
+    public void setMoveType(MoveType moveType) {
+        this.moveType = moveType;
     }
 
     @Override

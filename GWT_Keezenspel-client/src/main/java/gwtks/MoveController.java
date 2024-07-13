@@ -15,20 +15,25 @@ public class MoveController {
         PawnId pawnId2 = moveResponse.getPawnId2();
         LinkedList<TileId> movePawn1 = moveResponse.getMovePawn1();
         LinkedList<TileId> movePawn2 = moveResponse.getMovePawn2();
+        MoveType moveType = moveResponse.getMoveType();
         Pawn pawn1 = null;
+        Pawn pawn2 = null;
 
         if(movePawn1 == null){return;}
 
-        for (TileId tileId : movePawn1) {
-            GWT.log("made a step");
+        if(pawnId1 != null) {
             pawn1 = Board.getPawn(pawnId1);
-            GWT.log("selected pawn is "+ pawn1 + " pawnId"+pawnId1);
-            if(pawn1 != null) {
-                Board board = new Board();
-                Board.movePawn(pawn1, movePawn1);
-                pawn1.setCurrentTileId(tileId);
-            }
+            Board.movePawn(pawn1, movePawn1, false);
+            GWT.log(Board.getPawns().toString());
+        }
 
+        if(pawnId2 != null){
+            pawn2 = Board.getPawn(pawnId2);
+            if(moveType == MoveType.MOVE || moveType == MoveType.ONBOARD){
+                Board.movePawn(pawn2, movePawn2, true);
+            }else{
+                Board.movePawn(pawn2, movePawn2, false);
+            }
             GWT.log(Board.getPawns().toString());
         }
 
