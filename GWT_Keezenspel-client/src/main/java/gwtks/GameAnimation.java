@@ -5,13 +5,13 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 
-public class Game {
+public class GameAnimation {
     private Context2d ctxPawns;
     private Context2d ctxBoard;
     private Board board;
     private boolean isInitialized = false;
 
-    public Game() {
+    public GameAnimation() {
         Document document = Document.get();
 
         ctxPawns = ((CanvasElement) document.getElementById("canvasPawns")).getContext2d();
