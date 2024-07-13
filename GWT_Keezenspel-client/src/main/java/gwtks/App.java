@@ -84,6 +84,8 @@ public class App implements EntryPoint {
 		// Start the game
 		game = new Game();
 		animate();
+
+		CardsDeck.drawCards();
 	}
 
 	public void animate(){
