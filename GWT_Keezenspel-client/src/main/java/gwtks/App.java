@@ -7,9 +7,15 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.EventListener;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
+import gwtks.handlers.CanvasHandler;
 import gwtks.handlers.KingHandler;
 import gwtks.handlers.SendHandler;
 import gwtks.handlers.SwapHandler;
@@ -69,6 +75,9 @@ public class App implements EntryPoint {
 		RootPanel.get("errorLabelContainer").add(errorLabel);
 		RootPanel.get("swapButtonContainer").add(swapButton);
 
+		CanvasHandler canvasHandler = new CanvasHandler();
+		canvasHandler.addHandler();
+
 		// Add a handler to send the MOVE to the server
 		SendHandler handler = new SendHandler();
 		sendButton.addClickHandler(handler);
@@ -101,4 +110,6 @@ public class App implements EntryPoint {
 		};
 		AnimationScheduler.get().requestAnimationFrame(animationCallback);
 	};
+
+
 }
