@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import static gwtks.GameStateUtil.createPawnAndPlaceOnBoard;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PawnMovementList {
+public class PawnMovementListTest {
     MoveMessage moveMessage = new MoveMessage();
     MoveResponse moveResponse = new MoveResponse();
 
