@@ -4,6 +4,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedList;
+
 import static gwtks.GameStateUtil.createPawnAndPlaceOnBoard;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -54,9 +56,14 @@ class GameStateOnKillTest {
         createMoveMessage(pawn1,-1);
         GameState.processOnMove(moveMessage, moveResponse);
 
+        // THEN
+        LinkedList<TileId> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new TileId(0,10));
+        expectedMovement.add(pawn2.getNestTileId());
+
         // THEN response message is correct
         assertEquals(new TileId(0,10), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
-        assertEquals(pawn2.getNestTileId(), moveResponse.getMovePawn2().getLast());                          // moves the correct pawn
+        assertEquals(expectedMovement, moveResponse.getMovePawn2());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(0,10), GameState.getPawn(pawn1).getCurrentTileId());
         assertEquals(pawn2.getNestTileId(), GameState.getPawn(pawn2).getCurrentTileId());

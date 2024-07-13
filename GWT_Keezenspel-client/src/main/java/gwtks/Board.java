@@ -172,38 +172,43 @@ public class Board implements IsSerializable {
 
 	public void drawPawns(Context2d context){
 		for(Pawn pawn : pawns){
-//			// if it is in the animation
 			if (shouldBeAnimated(pawn)) {
 				Iterator<PawnAnimationMapping> iterator = animationMappings.iterator();
 				while (iterator.hasNext()) {
 					PawnAnimationMapping animationMappings1 = iterator.next();
-					GWT.log(" anton");
-					if (pawn.equals(animationMappings1.getPawn())) {
-						if (animationMappings1.getPoints().isEmpty()) {
-							iterator.remove(); // Remove the current element safely
-						} else {
-							LinkedList<Point> points = animationMappings1.getPoints();
-							if (!points.isEmpty()) {
-								Point p = points.getFirst();
-								drawPawnAnimated(context, pawn, p);
-								GWT.log("should animate pawn " + pawn + ", " + p + " size " + points.size());
-								points.removeFirst(); // Remove the first element safely
+					// only animate the killing of a pawn after all other moves of other pawns were animated
+					if(!animationMappings1.isAnimateLast()) {
+						if (pawn.equals(animationMappings1.getPawn())) {
+							if (animationMappings1.getPoints().isEmpty()) {
+								iterator.remove(); // Remove the current element safely
+							} else {
+								LinkedList<Point> points = animationMappings1.getPoints();
+								if (!points.isEmpty()) {
+									Point p = points.getFirst();
+									drawPawnAnimated(context, pawn, p);
+									points.removeFirst(); // Remove the first element safely
+								}
 							}
+						}
+					}else{
+						// draw the pawn that is about to be killed statically
+						drawPawnAnimated(context, animationMappings1.getPawn(), animationMappings1.getPoints().getFirst());
+						// if no other pawns to be drawn, start drawing this one.
+						if (animationMappings.size() == 1){
+							animationMappings1.setAnimateLast(false);
 						}
 					}
 				}
 			}else{
 				drawPawn(context, pawn);
 			}
-			// if not animated
-
 		}
 	}
 
-	public static void movePawn(Pawn pawn, LinkedList<TileId> movePawn) {
+	public static void movePawn(Pawn pawn, LinkedList<TileId> movePawn, boolean animateLast) {
 		for (Pawn pawn1 : pawns) {
 			if(pawn1.equals(pawn)){
-				animationMappings.add(new PawnAnimationMapping(pawn1, movePawn));
+				animationMappings.add(new PawnAnimationMapping(pawn1, movePawn, animateLast));
 				pawn1.setCurrentTileId(movePawn.getLast());
 			}
 		}

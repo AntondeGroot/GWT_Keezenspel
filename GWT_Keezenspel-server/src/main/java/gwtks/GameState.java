@@ -126,6 +126,7 @@ public class GameState {
         int direction = 1;
         int tileNrToCheck = currentTileId.getTileNr();
         LinkedList<TileId> moves = new LinkedList<>();
+        response.setMoveType(MoveType.MOVE);
 
         // You cannot move from nest tiles
         if(currentTileId.getTileNr() < 0){
@@ -330,6 +331,7 @@ public class GameState {
         int selectedPawnPlayerId1 = moveMessage.getPawnId1().getPlayerId();
         int selectedPawnPlayerId2 = moveMessage.getPawnId2().getPlayerId();
         int playerId = moveMessage.getPlayerId();
+        moveResponse.setMoveType(MoveType.SWITCH);
 
         // You can't switch with yourself
         if(selectedPawnPlayerId1 == selectedPawnPlayerId2){
@@ -373,14 +375,16 @@ public class GameState {
         LinkedList<TileId> move1 = new LinkedList<>();
         LinkedList<TileId> move2 = new LinkedList<>();
 
+        move1.add(pawn1.getCurrentTileId());
         move1.add(pawn2.getCurrentTileId());
+
+        move2.add(pawn2.getCurrentTileId());
         move2.add(pawn1.getCurrentTileId());
+
         moveResponse.setMovePawn1(move1);
         moveResponse.setMovePawn2(move2);
         moveResponse.setPawnId1(pawn1.getPawnId());
         moveResponse.setPawnId2(pawn2.getPawnId());
-
-        System.out.println("switching pawns: " + moveResponse);
 
         TileId tileId1 = new TileId(pawn1.getCurrentTileId());
         TileId tileId2 = new TileId(pawn2.getCurrentTileId());
@@ -395,24 +399,25 @@ public class GameState {
         int playerId = pawnId1.getPlayerId();
         TileId currentTileId = getPawn(pawnId1).getCurrentTileId();
         TileId targetTileId = new TileId(playerId,0);
+        response.setMoveType(MoveType.ONBOARD);
 
+        // when occupied by own pawn
         if(!canMoveToTile(pawnId1, targetTileId)){
             return;
         }
 
+        // when pawn not in the nest
         if(currentTileId.getTileNr() >= 0 ){
-            // when not in nest
             return;
         }
-
-        // if start is occupied by other player, kill that pawn
 
         LinkedList<TileId> move = new LinkedList<>();
         move.add(currentTileId);
         move.add(targetTileId);
-        response.setMovePawn1(move);
+
         response.setPawnId1(moveMessage.getPawnId1());
-        movePawn(new Pawn(pawnId1,targetTileId));
+        response.setMovePawn1(move);
+        processMove(pawnId1, targetTileId, response);
     }
 
     public static void processMove(PawnId pawnId, TileId targetTileId, MoveResponse response){
@@ -423,6 +428,7 @@ public class GameState {
                 response.setPawnId1(pawnId);
                 response.setPawnId2(pawn.getPawnId());
                 LinkedList<TileId> move2 = new LinkedList<>();
+                move2.add(targetTileId);
                 move2.add(pawn.getNestTileId());
                 response.setMovePawn2(move2);
 

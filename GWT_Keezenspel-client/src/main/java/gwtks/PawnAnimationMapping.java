@@ -8,9 +8,11 @@ import java.util.LinkedList;
 public class PawnAnimationMapping {
     private Pawn pawn;
     private LinkedList<Point> points = new LinkedList<>();
+    private boolean animateLast;
 
-    public PawnAnimationMapping(Pawn pawn, LinkedList<TileId> tileIdList) {
+    public PawnAnimationMapping(Pawn pawn, LinkedList<TileId> tileIdList, boolean animateLast) {
         this.pawn = pawn;
+        this.animateLast = animateLast;
         Point pointFrom = new Point(0,0);
         Point pointTo = new Point(0,0);
         ArrayList<Point> tempResult = new ArrayList<Point>();
@@ -59,6 +61,14 @@ public class PawnAnimationMapping {
         points.add(point2);
 
         return points;
+    }
+
+    public boolean isAnimateLast() {
+        return animateLast;
+    }
+
+    public void setAnimateLast(boolean animateLast) {
+        this.animateLast = animateLast;
     }
 
     public Pawn getPawn() {

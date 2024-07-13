@@ -21,7 +21,6 @@ public class Game {
     }
 
     public void update(){
-        board.drawPawns(ctxPawns);
     }
 
     public void draw(){
