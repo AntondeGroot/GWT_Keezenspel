@@ -11,6 +11,7 @@ import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.RootPanel;
+import gwtks.util.PawnRect;
 
 import java.util.LinkedList;
 import java.util.ArrayList;
@@ -256,7 +257,7 @@ public class Board implements IsSerializable {
 
 		int desiredWidth = 40;
 		int desiredHeight = 40;
-
-		context.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
+		double[] xywh = PawnRect.getRect(point);
+		context.drawImage(ImageElement.as(image.getElement()),xywh[0],xywh[1],xywh[2],xywh[3] );
 	}
 }

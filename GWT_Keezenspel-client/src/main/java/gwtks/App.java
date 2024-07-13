@@ -7,18 +7,10 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.EventListener;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
-import gwtks.handlers.CanvasHandler;
-import gwtks.handlers.KingHandler;
-import gwtks.handlers.SendHandler;
-import gwtks.handlers.SwapHandler;
+import gwtks.handlers.*;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -36,7 +28,7 @@ public class App implements EntryPoint {
 	 * Create a remote service proxy to talk to the server-side Moving service.
 	 */
 	private final MovingServiceAsync movingService = GWT.create(MovingService.class);
-	private Game game;
+	private GameAnimation gameAnimation;
     private Context2d ctxPawns;
 	private Context2d ctxBoard;
 
@@ -75,8 +67,6 @@ public class App implements EntryPoint {
 		RootPanel.get("errorLabelContainer").add(errorLabel);
 		RootPanel.get("swapButtonContainer").add(swapButton);
 
-		CanvasHandler canvasHandler = new CanvasHandler();
-		canvasHandler.addHandler();
 
 		// Add a handler to send the MOVE to the server
 		SendHandler handler = new SendHandler();
@@ -91,16 +81,18 @@ public class App implements EntryPoint {
 		swapButton.addClickHandler(swapHandler);
 
 		// Start the game
-		game = new Game();
+		gameAnimation = new GameAnimation();
 		animate();
 
 		CardsDeck.drawCards();
+
+		CanvasClickHandler.addClickHandler();
 	}
 
 	public void animate(){
 		ctxPawns.clearRect(0,0, 600, 600);
-		game.update();
-		game.draw();
+		gameAnimation.update();
+		gameAnimation.draw();
 
 		AnimationScheduler.AnimationCallback animationCallback = new AnimationScheduler.AnimationCallback() {
 			@Override
