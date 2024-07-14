@@ -10,6 +10,7 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
+import gwtks.animations.GameAnimation;
 import gwtks.handlers.*;
 
 /**
