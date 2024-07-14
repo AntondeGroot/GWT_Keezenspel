@@ -39,7 +39,7 @@ public class CanvasClickHandler {
         int canvasTop = canvas.getAbsoluteTop();
         int canvasLeft = canvas.getAbsoluteLeft();
         int x = event.getClientX() - canvasLeft;
-        int y = event.getClientY() - canvasTop + 30; // Todo why is it 100 too much?
+        int y = event.getClientY() - canvasTop + 30;
 
         if(y>600){
             handleOnCardsDeckClick(x,y);
@@ -50,6 +50,51 @@ public class CanvasClickHandler {
 
     private static void handleOnCardsDeckClick(int x, int y){
         GWT.log("Clicked on CardsDeck : "+x+","+y);
+        int padding = 10;
+        int start = 0;
+        int end = 0;
+        int cardNr = -1;
+
+        //TODO: make it independent on hard coded values
+        for (int i = 0; i < 5; i++) {
+            start = (100+padding)*i;
+            end = start + 100;
+            if(start < x && end > x){
+                cardNr = i;
+                break;
+            }
+        }
+        GWT.log("cardNr = "+cardNr);
+        if(cardNr > -1){
+            Document document = Document.get();
+            InputElement nrSteps = (InputElement) document.getElementById("stepsNr");
+            nrSteps.setValue("");
+            InputElement moveType = (InputElement) document.getElementById("moveType");
+            moveType.setValue("");
+            GWT.log("anton test");
+
+            Card card = CardsDeck.pickCard(cardNr);
+            if(card == null){return;}
+
+            int cardValue = card.getCard() + 1; // go from spriteNr to face value of card
+            if(cardValue == 1){
+                // ace: onboard OR move
+                moveType.setValue("ONBOARD|MOVE");
+            }else if(cardValue == 11){
+                // jack: switch pawns
+                moveType.setValue("SWITCH");
+            }else if(cardValue == 13){
+                // king: onboard
+                moveType.setValue("ONBOARD");
+            }else{
+                // move
+                if(cardValue == 4){
+                    cardValue = -4;
+                }
+                moveType.setValue("MOVE");
+                nrSteps.setValue(String.valueOf(cardValue));
+            }
+        }
     }
 
     private static void handleOnBoardClick(int x, int y){
@@ -64,9 +109,9 @@ public class CanvasClickHandler {
                         GWT.log("You clicked on pawn"+pawn.getPawnId()+" position: "+tile.getPosition());
                         Document document = Document.get();
                         InputElement playerId = (InputElement) document.getElementById("playerId");
-                        playerId.setValue(""+pawn.getPlayerId());
+                        playerId.setValue(String.valueOf(pawn.getPlayerId()));
                         InputElement pawnId = (InputElement) document.getElementById("pawnId");
-                        pawnId.setValue(""+pawn.getPawnId().getPawnNr());
+                        pawnId.setValue(String.valueOf(pawn.getPawnId().getPawnNr()));
                         break;
                     }
                 }
@@ -83,8 +128,6 @@ public class CanvasClickHandler {
         double y2 = p2.getY();
         double dx = x2 - x1;
         double dy = y2 - y1;
-
-//        GWT.log("you clicked on "+ p2 + " --- size is "+ PawnSize.getRect(p1));
 
         return (dx * dx + dy * dy) <= (distance * distance);
     }
