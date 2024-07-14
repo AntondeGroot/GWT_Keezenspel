@@ -11,14 +11,13 @@ import java.util.List;
 public class CardsDeck {
 
     private static Context2d ctxCards;
+    private static List<Card> cards= new ArrayList<>();
 
     public static void drawCards(){
         ImageElement img = Document.get().createImageElement();
         img.setSrc("/card-deck.png");
         Document document  = Document.get();
         ctxCards = ((CanvasElement) document.getElementById("canvasCards")).getContext2d();
-
-        List<Card> cards = new ArrayList<Card>();
 
         cards.add(new Card(0,6));
         cards.add(new Card(1,12));
@@ -43,5 +42,12 @@ public class CardsDeck {
             // for spritesheets dx dy
             ctxCards.drawImage(img, sx,sy,sw,sh,dx,dy,dw,dh);
         }
+    }
+
+    public static Card pickCard(int i){
+        if(!cards.isEmpty() && i > -1 && i < cards.size()){
+            return cards.get(i);
+        }
+        return null;
     }
 }

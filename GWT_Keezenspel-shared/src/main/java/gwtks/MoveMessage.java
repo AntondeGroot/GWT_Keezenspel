@@ -7,7 +7,7 @@ public class MoveMessage implements IsSerializable {
         private int playerId;
         private PawnId pawnId1;
         private PawnId pawnId2;
-        private TileId tileId; // should be removed as this should be stored in the backend not frontend
+        private TileId tileId; // TODO: should be removed as this should be stored in the backend not frontend?
         private MoveType moveType;
         private Integer stepsPawn1;
         private Integer stepsPawn2;

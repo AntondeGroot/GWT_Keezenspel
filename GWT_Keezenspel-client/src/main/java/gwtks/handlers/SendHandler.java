@@ -33,7 +33,6 @@ public class SendHandler implements ClickHandler {
         moveMessage.setPawnId1(selectedPawnId);
         moveMessage.setMoveType(MoveType.MOVE);
         moveMessage.setTileId(pawn1.getCurrentTileId());
-//				moveMessage.setTileId(Board.getPawns().get(0).getCurrentTileId());
         moveMessage.setStepsPawn1(Integer.parseInt(getStepsNrFieldValue()));
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
