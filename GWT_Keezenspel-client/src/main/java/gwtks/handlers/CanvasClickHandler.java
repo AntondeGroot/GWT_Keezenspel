@@ -71,7 +71,6 @@ public class CanvasClickHandler {
             nrSteps.setValue("");
             InputElement moveType = (InputElement) document.getElementById("moveType");
             moveType.setValue("");
-            GWT.log("anton test");
 
             Card card = CardsDeck.pickCard(cardNr);
             if(card == null){return;}
@@ -93,6 +92,8 @@ public class CanvasClickHandler {
                 }
                 moveType.setValue("MOVE");
                 nrSteps.setValue(String.valueOf(cardValue));
+
+                PawnAndCardSelection.setCard(card);
             }
         }
     }
@@ -112,6 +113,8 @@ public class CanvasClickHandler {
                         playerId.setValue(String.valueOf(pawn.getPlayerId()));
                         InputElement pawnId = (InputElement) document.getElementById("pawnId");
                         pawnId.setValue(String.valueOf(pawn.getPawnId().getPawnNr()));
+
+                        PawnAndCardSelection.addPawn(pawn);
                         break;
                     }
                 }
