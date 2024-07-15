@@ -58,6 +58,9 @@ public class App implements EntryPoint {
 
 		board.drawPawns(ctxPawns);
 
+		//set playerId
+		PawnAndCardSelection.setPlayerId(0);
+
 		// add widgets
 		sendButton.addStyleName("sendButton");
 		pawnOnTheBoardButton.addStyleName("sendButton");
