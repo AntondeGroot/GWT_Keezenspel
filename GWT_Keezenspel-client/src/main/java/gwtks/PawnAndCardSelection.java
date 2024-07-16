@@ -1,5 +1,7 @@
 package gwtks;
 
+import gwtks.handlers.TestMoveHandler;
+
 public class PawnAndCardSelection {
     private static int playerId;
     private static Pawn pawn1;
@@ -20,6 +22,18 @@ public class PawnAndCardSelection {
 
     public static void setCard(Card p_card) {
         card = p_card;
+    }
+
+    public static Pawn getPawn1() {
+        return pawn1;
+    }
+
+    public static Pawn getPawn2() {
+        return pawn2;
+    }
+
+    public static Card getCard() {
+        return card;
     }
 
     public static void reset(){
