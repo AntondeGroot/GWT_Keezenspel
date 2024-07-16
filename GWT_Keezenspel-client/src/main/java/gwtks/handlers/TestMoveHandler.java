@@ -22,7 +22,7 @@ public class TestMoveHandler implements ClickHandler {
     /**
      * Send the MoveMessage to the server and wait for a response.
      */
-    private void sendMoveToServer() {
+    public void sendMoveToServer() {
         // First, we validate the input.
 //        errorLabel.setText("");
 
@@ -32,8 +32,13 @@ public class TestMoveHandler implements ClickHandler {
         PawnId selectedPawnId = new PawnId(playerId,pawnNr);
         Pawn pawn1 = Board.getPawn(selectedPawnId);
 
+        if(pawn1.getCurrentTileId().getTileNr() < 0){
+            moveMessage.setMoveType(MoveType.ONBOARD);
+
+        }else{
+            moveMessage.setMoveType(MoveType.MOVE);
+        }
         moveMessage.setPawnId1(selectedPawnId);
-        moveMessage.setMoveType(MoveType.MOVE);
         moveMessage.setMessageType(MessageType.CHECK_MOVE);
         moveMessage.setTileId(pawn1.getCurrentTileId());
         moveMessage.setStepsPawn1(Integer.parseInt(getStepsNrFieldValue()));

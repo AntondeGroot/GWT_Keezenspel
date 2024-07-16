@@ -68,7 +68,7 @@ public class CanvasClickHandler {
         if(cardNr > -1){
             Document document = Document.get();
             InputElement nrSteps = (InputElement) document.getElementById("stepsNr");
-            nrSteps.setValue("");
+            nrSteps.setValue("0");
             InputElement moveType = (InputElement) document.getElementById("moveType");
             moveType.setValue("");
 
@@ -76,6 +76,7 @@ public class CanvasClickHandler {
             if(card == null){return;}
 
             int cardValue = card.getCard() + 1; // go from spriteNr to face value of card
+            PawnAndCardSelection.setCard(card);
             if(cardValue == 1){
                 // ace: onboard OR move
                 moveType.setValue("ONBOARD|MOVE");
@@ -92,8 +93,11 @@ public class CanvasClickHandler {
                 }
                 moveType.setValue("MOVE");
                 nrSteps.setValue(String.valueOf(cardValue));
+            }
 
-                PawnAndCardSelection.setCard(card);
+            if(PawnAndCardSelection.getPawn1() != null && PawnAndCardSelection.getCard() != null){
+                TestMoveHandler testMoveHandler = new TestMoveHandler();
+                testMoveHandler.sendMoveToServer();
             }
         }
     }
@@ -115,6 +119,11 @@ public class CanvasClickHandler {
                         pawnId.setValue(String.valueOf(pawn.getPawnId().getPawnNr()));
 
                         PawnAndCardSelection.addPawn(pawn);
+
+                        if(PawnAndCardSelection.getPawn1() != null && PawnAndCardSelection.getCard() != null){
+                            TestMoveHandler testMoveHandler = new TestMoveHandler();
+                            testMoveHandler.sendMoveToServer();
+                        }
                         break;
                     }
                 }
