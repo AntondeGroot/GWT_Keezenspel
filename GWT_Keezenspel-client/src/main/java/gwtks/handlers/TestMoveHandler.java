@@ -1,7 +1,5 @@
 package gwtks.handlers;
 
-import com.google.gwt.canvas.client.Canvas;
-import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -9,45 +7,52 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import gwtks.*;
 import gwtks.animations.StepsAnimation;
 
-public class SwapHandler implements ClickHandler {
+import java.util.ArrayList;
+import java.util.List;
+
+public class TestMoveHandler implements ClickHandler {
     private final MovingServiceAsync movingService = GWT.create(MovingService.class);
     /**
      * Fired when the user clicks on the sendButton.
      */
     public void onClick(ClickEvent event) {
-        sendOnboardMessageToServer();
+        sendMoveToServer();
     }
 
     /**
      * Send the MoveMessage to the server and wait for a response.
      */
-    private void sendOnboardMessageToServer() {
+    private void sendMoveToServer() {
         // First, we validate the input.
 //        errorLabel.setText("");
 
         MoveMessage moveMessage = new MoveMessage();
         int playerId = Integer.parseInt(getPlayerIdFieldValue());
         int pawnNr = Integer.parseInt(getPawnIdFieldValue());
-        PawnId selectedPawnId = new PawnId(playerId, pawnNr);
-        int playerId2 = Integer.parseInt(getPlayerId2FieldValue());
-        int pawnNr2 = Integer.parseInt(getPawnId2FieldValue());
-        PawnId selectedPawnId2 = new PawnId(playerId2, pawnNr2);
+        PawnId selectedPawnId = new PawnId(playerId,pawnNr);
+        Pawn pawn1 = Board.getPawn(selectedPawnId);
 
         moveMessage.setPawnId1(selectedPawnId);
-        moveMessage.setPawnId2(selectedPawnId2);
-        moveMessage.setMoveType(MoveType.SWITCH);
-        moveMessage.setMessageType(MessageType.MAKE_MOVE);
+        moveMessage.setMoveType(MoveType.MOVE);
+        moveMessage.setMessageType(MessageType.CHECK_MOVE);
+        moveMessage.setTileId(pawn1.getCurrentTileId());
+        moveMessage.setStepsPawn1(Integer.parseInt(getStepsNrFieldValue()));
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
             public void onFailure(Throwable caught) {
                 StepsAnimation.reset();
             }
-
             public void onSuccess(MoveResponse result) {
-                StepsAnimation.reset();
-                MoveController.movePawn(result);
+                GWT.log("Test Move successful: "+result.toString());
+                List<TileId> tileIds = new ArrayList<TileId>();
+                if(result.getMovePawn1() != null){
+                    tileIds.add(result.getMovePawn1().getLast());
+                    StepsAnimation.update(tileIds);
+                }else{
+                    StepsAnimation.reset();
+                }
             }
-        });
+        } );
     }
 
     public native String getPlayerIdFieldValue() /*-{
@@ -58,13 +63,7 @@ public class SwapHandler implements ClickHandler {
         return $doc.getElementById("pawnId").value;
     }-*/;
 
-    public native String getPlayerId2FieldValue() /*-{
-        return $doc.getElementById("playerId2").value;
+    public native String getStepsNrFieldValue() /*-{
+        return $doc.getElementById("stepsNr").value;
     }-*/;
-
-    public native String getPawnId2FieldValue() /*-{
-        return $doc.getElementById("pawnId2").value;
-    }-*/;
-
-
 }

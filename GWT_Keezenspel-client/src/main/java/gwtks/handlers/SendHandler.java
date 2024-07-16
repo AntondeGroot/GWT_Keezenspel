@@ -7,6 +7,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import gwtks.*;
+import gwtks.animations.StepsAnimation;
 
 public class SendHandler implements ClickHandler {
     private final MovingServiceAsync movingService = GWT.create(MovingService.class);
@@ -32,13 +33,17 @@ public class SendHandler implements ClickHandler {
 
         moveMessage.setPawnId1(selectedPawnId);
         moveMessage.setMoveType(MoveType.MOVE);
+        moveMessage.setMessageType(MessageType.MAKE_MOVE);
         moveMessage.setTileId(pawn1.getCurrentTileId());
         moveMessage.setStepsPawn1(Integer.parseInt(getStepsNrFieldValue()));
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
-            public void onFailure(Throwable caught) {}
+            public void onFailure(Throwable caught) {
+                StepsAnimation.reset();
+            }
             public void onSuccess(MoveResponse result) {
-                MoveController.movePawn( result);
+                StepsAnimation.reset();
+                MoveController.movePawn(result);
             }
         } );
     }

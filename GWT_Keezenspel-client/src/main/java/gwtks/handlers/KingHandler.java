@@ -36,6 +36,7 @@ public class KingHandler implements ClickHandler {
 
         moveMessage.setPawnId1(selectedPawnId);
         moveMessage.setMoveType(MoveType.ONBOARD);
+        moveMessage.setMessageType(MessageType.MAKE_MOVE);
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
             public void onFailure(Throwable caught) {

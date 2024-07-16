@@ -9,6 +9,7 @@ import gwtks.Board;
 public class GameAnimation {
     private Context2d ctxPawns;
     private Context2d ctxBoard;
+    private Context2d ctxSteps;
     private Board board;
     private StepsAnimation stepsAnimation;
     private boolean isInitialized = false;
@@ -18,6 +19,7 @@ public class GameAnimation {
 
         ctxPawns = ((CanvasElement) document.getElementById("canvasPawns")).getContext2d();
         ctxBoard = ((CanvasElement) document.getElementById("canvasBoard")).getContext2d();
+        ctxSteps = ((CanvasElement) document.getElementById("canvasSteps")).getContext2d();
 
         board = new Board();
         stepsAnimation = new StepsAnimation();
@@ -25,13 +27,14 @@ public class GameAnimation {
 
     public void update(){
         stepsAnimation.update();
+        ctxSteps.clearRect(0, 0, 600, 600);
+
 
     }
 
     public void draw(){
         stepsAnimation.draw();
         board.drawPawns(ctxPawns);
-
         if(!isInitialized){
             board.drawBoard(ctxBoard);
             isInitialized = true;
