@@ -18,14 +18,14 @@ public class StepsAnimation {
     private static double ALPHA_MAX = 0.6;
     private static List<TileId> tileIds;
 
-    public void update(){
+    public static void update(){
     }
 
-    public void update(List<TileId> tileIds){
+    public static void update(List<TileId> tileIds){
         StepsAnimation.tileIds = tileIds;
     }
 
-    public void draw() {
+    public static void draw() {
         if(tileIds == null){return;}
 
         if (ctxSteps == null) {
@@ -49,7 +49,7 @@ public class StepsAnimation {
         }
     }
 
-    private void drawCircle(Context2d context, double x, double y, double radius, double alpha) {
+    private static void drawCircle(Context2d context, double x, double y, double radius, double alpha) {
         context.beginPath();
         String fillColor = "rgba(255, 165, 0, " + alpha + ")";
         String fillColorStroke = "rgba(0, 0, 0, " + alpha/2 + ")";
@@ -61,5 +61,10 @@ public class StepsAnimation {
         context.setStrokeStyle(fillColorStroke);
         context.stroke();
         context.closePath();
+    }
+
+    public static void reset(){
+        tileIds = null;
+
     }
 }

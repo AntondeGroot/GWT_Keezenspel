@@ -38,6 +38,7 @@ class GameStateOnBoardTest {
         moveMessage.setPawnId1(pawn1.getPawnId());
         moveMessage.setMoveType(MoveType.ONBOARD);
         moveMessage.setTileId(pawn1.getCurrentTileId());
+        moveMessage.setMessageType(MessageType.MAKE_MOVE);
         GameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN

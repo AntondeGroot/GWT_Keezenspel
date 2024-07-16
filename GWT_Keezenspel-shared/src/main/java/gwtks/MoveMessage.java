@@ -9,6 +9,7 @@ public class MoveMessage implements IsSerializable {
         private PawnId pawnId2;
         private TileId tileId; // TODO: should be removed as this should be stored in the backend not frontend?
         private MoveType moveType;
+        private MessageType messageType;
         private Integer stepsPawn1;
         private Integer stepsPawn2;
 
@@ -66,6 +67,14 @@ public class MoveMessage implements IsSerializable {
 
         public void setStepsPawn2(Integer stepsPawn2) {
                 this.stepsPawn2 = stepsPawn2;
+        }
+
+        public MessageType getMessageType() {
+                return messageType;
+        }
+
+        public void setMessageType(MessageType messageType) {
+                this.messageType = messageType;
         }
 
         @Override

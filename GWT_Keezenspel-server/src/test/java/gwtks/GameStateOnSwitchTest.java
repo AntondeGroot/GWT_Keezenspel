@@ -195,5 +195,6 @@ class GameStateOnSwitchTest {
         moveMessage.setPawnId1(pawn1.getPawnId());
         moveMessage.setPawnId2(pawn2.getPawnId());
         moveMessage.setMoveType(MoveType.SWITCH);
+        moveMessage.setMoveType(MoveType.MOVE);
     }
 }

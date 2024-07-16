@@ -39,6 +39,7 @@ public class App implements EntryPoint {
 	public void onModuleLoad() {
 		final Button sendButton = new Button("Make Move");
 		final Button swapButton = new Button("Swap");
+		final Button testMoveButton = new Button("Test Move");
 		final Button pawnOnTheBoardButton = new Button("King/Ace");
 		final Label errorLabel = new Label();
 
@@ -70,11 +71,15 @@ public class App implements EntryPoint {
 		RootPanel.get("pawnOnTheBoardButtonContainer").add(pawnOnTheBoardButton);
 		RootPanel.get("errorLabelContainer").add(errorLabel);
 		RootPanel.get("swapButtonContainer").add(swapButton);
+		RootPanel.get("testMoveButtonContainer").add(testMoveButton);
 
 
 		// Add a handler to send the MOVE to the server
 		SendHandler handler = new SendHandler();
 		sendButton.addClickHandler(handler);
+
+		TestMoveHandler testMoveHandler = new TestMoveHandler();
+		testMoveButton.addClickHandler(testMoveHandler);
 
 		// Add a handler to send the name to the server
 		KingHandler kingHandler = new KingHandler();
@@ -83,6 +88,8 @@ public class App implements EntryPoint {
 		// Add a handler to send the name to the server
 		SwapHandler swapHandler = new SwapHandler();
 		swapButton.addClickHandler(swapHandler);
+
+
 
 		// Start the game
 		gameAnimation = new GameAnimation();

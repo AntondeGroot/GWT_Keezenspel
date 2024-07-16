@@ -16,6 +16,7 @@ public class MoveResponse implements IsSerializable {
     private LinkedList<TileId> movePawn1;
     private LinkedList<TileId> movePawn2;
     private MoveType moveType;
+    private MessageType messageType;
 
     public Integer getNextPlayerId() {
         ArrayList<Integer> test = new ArrayList<>();
@@ -64,6 +65,14 @@ public class MoveResponse implements IsSerializable {
 
     public void setMoveType(MoveType moveType) {
         this.moveType = moveType;
+    }
+
+    public MessageType getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(MessageType messageType) {
+        this.messageType = messageType;
     }
 
     @Override

@@ -142,5 +142,6 @@ class GameStateOnKillTest {
         moveMessage.setMoveType(MoveType.MOVE);
         moveMessage.setTileId(pawn.getCurrentTileId());
         moveMessage.setStepsPawn1(steps);
+        moveMessage.setMessageType(MessageType.MAKE_MOVE);
     }
 }
