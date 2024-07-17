@@ -1,16 +1,10 @@
 package gwtks;
 
-import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.CanvasElement;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.event.dom.client.LoadEvent;
-import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.RootPanel;
 import gwtks.util.PawnRect;
 
 import java.util.LinkedList;
@@ -232,6 +226,7 @@ public class Board implements IsSerializable {
 		// Load an image and draw it to the canvas
 		int playerId = pawn.getPlayerId();
 		Image image = new Image("/pawn"+playerId+".png");
+		Image image_outline = new Image("/pawn_outline.png");
 
 		int desiredWidth = 40;
 		int desiredHeight = 40;
@@ -244,10 +239,9 @@ public class Board implements IsSerializable {
 			}
 		}
 		context.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
-
-		// do no use a onload: the image widget has to be added to the Rootpanel for it to trigger the OnLoad event
-//		image.setVisible(false); // Hide the image widget
-//		RootPanel.get().add(image);
+		if(PawnAndCardSelection.getPawn1().equals(pawn) || PawnAndCardSelection.getPawn2().equals(pawn)){
+			context.drawImage(ImageElement.as(image_outline.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
+		}
 	}
 
 	private void drawPawnAnimated(Context2d context, Pawn pawn, Point point){
@@ -255,8 +249,6 @@ public class Board implements IsSerializable {
 		int playerId = pawn.getPlayerId();
 		Image image = new Image("/pawn"+playerId+".png");
 
-		int desiredWidth = 40;
-		int desiredHeight = 40;
 		double[] xywh = PawnRect.getRect(point);
 		context.drawImage(ImageElement.as(image.getElement()),xywh[0],xywh[1],xywh[2],xywh[3] );
 	}
