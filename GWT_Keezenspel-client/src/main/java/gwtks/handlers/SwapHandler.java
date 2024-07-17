@@ -65,6 +65,4 @@ public class SwapHandler implements ClickHandler {
     public native String getPawnId2FieldValue() /*-{
         return $doc.getElementById("pawnId2").value;
     }-*/;
-
-
 }

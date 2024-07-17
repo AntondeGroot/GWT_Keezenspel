@@ -7,6 +7,7 @@ public class PawnAndCardSelection {
     private static Pawn pawn1;
     private static Pawn pawn2;
     private static Card card;
+    private static boolean drawCards = true;
 
     public static void setPlayerId(int p_playerId) {
         playerId = p_playerId;
@@ -18,10 +19,12 @@ public class PawnAndCardSelection {
         }else{
             pawn2 = pawn;
         }
+        drawCards = true;
     }
 
     public static void setCard(Card p_card) {
         card = p_card;
+        drawCards = true;
     }
 
     public static Pawn getPawn1() {
@@ -36,9 +39,17 @@ public class PawnAndCardSelection {
         return card;
     }
 
+    public static void setCardsAreDrawn(){
+        drawCards = false;
+    }
+    public static boolean getDrawCards(){
+        return drawCards;
+    }
+
     public static void reset(){
         pawn1 = null;
         pawn2 = null;
         card = null;
+        drawCards = true;
     }
 }

@@ -64,6 +64,10 @@ public class CanvasClickHandler {
                 break;
             }
         }
+        if(y < 620 || y>620+158){
+            cardNr = -1;
+        }
+
         GWT.log("cardNr = "+cardNr);
         if(cardNr > -1){
             Document document = Document.get();
@@ -99,6 +103,9 @@ public class CanvasClickHandler {
                 TestMoveHandler testMoveHandler = new TestMoveHandler();
                 testMoveHandler.sendMoveToServer();
             }
+        }
+        else{
+            PawnAndCardSelection.reset();
         }
     }
 
