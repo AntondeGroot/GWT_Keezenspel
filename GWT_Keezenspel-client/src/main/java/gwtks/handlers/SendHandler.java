@@ -32,7 +32,21 @@ public class SendHandler implements ClickHandler {
         Pawn pawn1 = Board.getPawn(selectedPawnId);
 
         moveMessage.setPawnId1(selectedPawnId);
-        moveMessage.setMoveType(MoveType.MOVE);
+        String moveType = getMoveTypeFieldValue();
+        switch (moveType.toLowerCase()) {
+            case "move":
+                moveMessage.setMoveType(MoveType.MOVE);
+                break;
+            case "onboard":
+                moveMessage.setMoveType(MoveType.ONBOARD);
+                break;
+            case "split":
+                moveMessage.setMoveType(MoveType.SPLIT);
+                break;
+            case "switch":
+                moveMessage.setMoveType(MoveType.SWITCH);
+                break;
+        }
         moveMessage.setMessageType(MessageType.MAKE_MOVE);
         moveMessage.setTileId(pawn1.getCurrentTileId());
         moveMessage.setStepsPawn1(Integer.parseInt(getStepsNrFieldValue()));
@@ -58,5 +72,9 @@ public class SendHandler implements ClickHandler {
 
     public native String getStepsNrFieldValue() /*-{
         return $doc.getElementById("stepsNr").value;
+    }-*/;
+
+    public native String getMoveTypeFieldValue() /*-{
+        return $doc.getElementById("moveType").value;
     }-*/;
 }

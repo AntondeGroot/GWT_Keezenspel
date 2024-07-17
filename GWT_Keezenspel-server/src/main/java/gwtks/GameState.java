@@ -341,6 +341,10 @@ public class GameState {
     }
 
     public static void processOnSwitch(MoveMessage moveMessage, MoveResponse moveResponse){
+        if(moveMessage.getPawnId1() == null || moveMessage.getPawnId2() == null){
+            return;
+        }
+
         int selectedPawnPlayerId1 = moveMessage.getPawnId1().getPlayerId();
         int selectedPawnPlayerId2 = moveMessage.getPawnId2().getPlayerId();
         int playerId = moveMessage.getPlayerId();
