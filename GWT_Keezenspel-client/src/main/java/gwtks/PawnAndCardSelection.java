@@ -4,8 +4,8 @@ import gwtks.handlers.TestMoveHandler;
 
 public class PawnAndCardSelection {
     private static int playerId;
-    private static Pawn pawn1;
-    private static Pawn pawn2;
+    private static Pawn pawn1 = new Pawn(new PawnId(-1,-1),new TileId(-1,90));
+    private static Pawn pawn2 = new Pawn(new PawnId(-1,-1),new TileId(-1,90));
     private static Card card;
     private static boolean drawCards = true;
 
@@ -47,8 +47,8 @@ public class PawnAndCardSelection {
     }
 
     public static void reset(){
-        pawn1 = null;
-        pawn2 = null;
+        pawn1 = new Pawn(new PawnId(-1,-1),new TileId(-1,90));
+        pawn2 = new Pawn(new PawnId(-1,-1),new TileId(-1,90));
         card = null;
         drawCards = true;
     }
