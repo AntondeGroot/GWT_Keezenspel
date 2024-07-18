@@ -1,5 +1,7 @@
 package gwtks;
 
+import java.util.Objects;
+
 public class Card {
     private int suit;
     private int card;
@@ -23,5 +25,18 @@ public class Card {
 
     public void setCard(int card) {
         this.card = card;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Card card1 = (Card) o;
+        return suit == card1.suit && card == card1.card;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(suit, card);
     }
 }
