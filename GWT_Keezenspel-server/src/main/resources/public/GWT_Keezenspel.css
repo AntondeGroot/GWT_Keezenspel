@@ -78,3 +78,9 @@ h1 {
 .column2 {
   background-color: lightsteelblue;
 }
+.profilepic{
+  border-radius: 50%;
+  border: 10px solid #000000; /* Black border */
+  background-color: #F0F0F0; /* Light grey background */
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3); /* Shadow effect */
+}

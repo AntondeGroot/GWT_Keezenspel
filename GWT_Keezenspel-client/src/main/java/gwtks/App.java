@@ -56,8 +56,10 @@ public class App implements EntryPoint {
         Board board = new Board();
 		board.createBoard(nrPlayers,600);
 		board.drawBoard(ctxBoard); // let this stay here
-
 		board.drawPawns(ctxPawns);
+
+		PlayerList playerList = new PlayerList();
+		playerList.createListElement();
 
 		//set playerId
 		PawnAndCardSelection.setPlayerId(0);
