@@ -6,7 +6,7 @@ public class CardsDeck {
     private static int roundNr = 0;
     private static ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
     private static List<Player> players = new ArrayList<>();
-    private static int nrPlayers;
+    private static int nrPlayers = 0;
 
     public static void setNrPlayers(int nr_Players) {
         nrPlayers = nr_Players;
@@ -14,6 +14,10 @@ public class CardsDeck {
 
     public static List<Card> getCardsForPlayer(int playerId) {
         return new ArrayList<>(players.get(playerId).getHand());
+    }
+
+    public static void forfeitCardsForPlayer(int playerId) {
+        players.get(playerId).getHand().clear();
     }
 
     public static void shuffle(){
@@ -54,5 +58,12 @@ public class CardsDeck {
     public static boolean playerHasCard(int playerId, Card card ){
         Player player = players.get(playerId);
         return player.hasCard(card);
+    }
+
+    public static void reset(){
+        roundNr = 0;
+        cardsDeque.clear();
+        players.clear();
+        nrPlayers = 0;
     }
 }
