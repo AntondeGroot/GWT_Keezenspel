@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Player {
     private int playerId;
-    private List<Card> hand;
+    private ArrayList<Card> hand;
 
     public Player(int playerId) {
         this.playerId = playerId;
@@ -28,7 +28,7 @@ public class Player {
         this.playerId = playerId;
     }
 
-    public List<Card> getHand() {
+    public ArrayList<Card> getHand() {
         return hand;
     }
 

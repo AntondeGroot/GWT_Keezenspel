@@ -1,10 +1,16 @@
 package gwtks;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.util.Objects;
 
-public class Card {
+@SuppressWarnings("serial")
+public class Card implements IsSerializable {
     private int suit;
     private int card;
+
+    public Card() {
+    }
 
     public Card(int suit, int card) {
         this.suit = suit;
@@ -38,5 +44,13 @@ public class Card {
     @Override
     public int hashCode() {
         return Objects.hash(suit, card);
+    }
+
+    @Override
+    public String toString() {
+        return "Card{" +
+                "suit=" + suit +
+                ", card=" + card +
+                '}';
     }
 }

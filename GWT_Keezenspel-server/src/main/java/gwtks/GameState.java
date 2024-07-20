@@ -25,6 +25,9 @@ public class GameState {
                             new TileId(playerId,-1 - pawnNr)));
                 }
             }
+            CardsDeck.setNrPlayers(nrPlayers);
+            CardsDeck.shuffle();
+            CardsDeck.dealCards();
         }
     }
 
