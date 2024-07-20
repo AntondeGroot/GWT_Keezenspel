@@ -21,7 +21,7 @@ public class PlayerList {
         int rowCount = (int) Math.ceil((double) playerNames.length / colCount);
         Grid grid = new Grid(rowCount, colCount);
 
-        for (int i = 0; i < playerNames.length; i++) {
+        for (int playerId = 0; playerId < playerNames.length; playerId++) {
 
             int imagePixelSize = 50;
 
@@ -29,7 +29,7 @@ public class PlayerList {
             img.setSrc("/profilepics.png");
 
             HorizontalPanel hp = new HorizontalPanel();
-            Label playerName = new Label(playerNames[i]);
+            Label playerName = new Label(playerNames[playerId]);
             playerName.getElement().getStyle().setMarginRight(30, Style.Unit.PX);
             playerName.getElement().getStyle().setMarginLeft(10, Style.Unit.PX);
             if(!isPlayerActive) {
@@ -46,7 +46,7 @@ public class PlayerList {
             canvas.setCoordinateSpaceHeight(imagePixelSize);
             canvas.setStyleName("profilepic");
             if(isPlayerActive){
-                canvas.getElement().getStyle().setBorderColor(PlayerColors.getHexColor(i));
+                canvas.getElement().getStyle().setBorderColor(PlayerColors.getHexColor(playerId));
             }else{
                 canvas.getElement().getStyle().setBorderColor(inactiveColor);
             }
@@ -54,23 +54,25 @@ public class PlayerList {
             // source image
             double sw = 1024/4.0;
             double sh = 1024/4.0;
-            double sx = sw*(i%4);
-            double sy = sh*(i > 3 ? 1:0);
+            double sx = sw*(playerId%4);
+            double sy = sh*(playerId > 3 ? 1:0);
             // destination
             double dy = 0-5/2;
             double dx = 0-5/2;
             double dw = imagePixelSize+5;
             double dh = imagePixelSize+5;
-            GWT.log("source image is "+sx+","+sh+", "+i);
+            GWT.log("source image is "+sx+","+sh+", "+playerId);
             GWT.log("card size = "+dh+","+dw);
             // for spritesheets dx dy
             ctx.drawImage(img, sx,sy,sw,sh,dx,dy,dw,dh);
             canvas.asWidget().setStyleName("profilepic");
             hp.add(canvas.asWidget());
             hp.add(playerName);
-
-            int row = i % 4;
-            int col = (i > 3) ? 1 : 0;
+            if(playerId == 0) {
+                hp.asWidget().setStyleName("playerPlaying");
+            }
+            int row = playerId % 4;
+            int col = (playerId > 3) ? 1 : 0;
             grid.setWidget(row, col, hp);
 
         }
