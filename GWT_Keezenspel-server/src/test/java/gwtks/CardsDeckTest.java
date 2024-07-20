@@ -97,7 +97,7 @@ class CardsDeckTest {
         CardsDeck.shuffle();
         CardsDeck.dealCards();
 
-        // GIVEN
+        // WHEN
         List<Card> cards = CardsDeck.getCardsForPlayer(0);
 
         // THEN
@@ -105,6 +105,25 @@ class CardsDeckTest {
         for (Card card : cards) {
             assertTrue(CardsDeck.playerHasCard(0, card));
         }
+    }
+
+    @Test
+    void playerForfeitsCards(){
+        // GIVEN
+        CardsDeck.setNrPlayers(2);
+        CardsDeck.shuffle();
+        CardsDeck.dealCards();
+
+        // WHEN
+        CardsDeck.forfeitCardsForPlayer(0);
+
+        // THEN
+        ArrayList<Integer> nrs = new ArrayList<>();
+        nrs.add(0);
+        nrs.add(5);
+
+        assertEquals(nrs, CardsDeck.getNrOfCardsForAllPlayers());
+        assertTrue(CardsDeck.getCardsForPlayer(0).isEmpty());
     }
 
     public static boolean isSortedNumerically(List<Card> cards) {

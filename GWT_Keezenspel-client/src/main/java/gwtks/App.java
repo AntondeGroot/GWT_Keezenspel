@@ -137,11 +137,9 @@ public class App implements EntryPoint {
 				GWT.log("cards playerId"+result.getPlayerId());
 				GWT.log("Cards received: " + result.getCards());
 				GWT.log("Cards per player: " + result.getNrOfCardsPerPlayer());
-				if(result != null && result.getCards() != null && !result.getCards().isEmpty()){
-					if(CardsDeck.areCardsDifferent(result.getCards())){
-						CardsDeck.setCards(result.getCards());
-						CardsDeck.drawCards();
-					}
+				if(CardsDeck.areCardsDifferent(result.getCards())){
+					CardsDeck.setCards(result.getCards());
+					CardsDeck.drawCards();
 				}
 			}
 		} );

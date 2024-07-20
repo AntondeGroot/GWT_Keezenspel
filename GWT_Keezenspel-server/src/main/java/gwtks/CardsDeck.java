@@ -22,7 +22,7 @@ public class CardsDeck implements IsSerializable {
     }
 
     public static ArrayList<Card> getCardsForPlayer(int playerId) {
-        if(playerId > players.size()-1) {return null;}
+        if(playerId > players.size()-1) {return new ArrayList<>();}
 
         return new ArrayList<>(players.get(playerId).getHand());
     }
