@@ -84,3 +84,8 @@ h1 {
   background-color: #F0F0F0; /* Light grey background */
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3); /* Shadow effect */
 }
+.playerPlaying{
+  border-radius: 10px;
+  border-color: darkred;
+  border: 3px double darkred;
+}
