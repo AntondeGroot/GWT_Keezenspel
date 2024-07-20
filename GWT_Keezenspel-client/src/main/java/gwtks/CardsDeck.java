@@ -14,19 +14,20 @@ public class CardsDeck {
     private static Context2d ctxCards;
     private static List<Card> cards = new ArrayList<>();
 
+    public static boolean areCardsDifferent(List<Card> otherCards){
+        return !cards.equals(otherCards);
+    }
+
+    public static void setCards(List<Card> cards){
+        CardsDeck.cards = cards;
+    }
+
     public static void drawCards(){
         ImageElement img = Document.get().createImageElement();
         img.setSrc("/card-deck.png");
         Document document  = Document.get();
         ctxCards = ((CanvasElement) document.getElementById("canvasCards")).getContext2d();
 
-        if(cards.size() == 0){
-            cards.add(new Card(0,6));
-            cards.add(new Card(1,12));
-            cards.add(new Card(2,10));
-            cards.add(new Card(3,1));
-            cards.add(new Card(1,11));
-        }
         // card width 25 is good to show how many cards they are still holding
         // card width 100 is good for your own hand
         int i=0;

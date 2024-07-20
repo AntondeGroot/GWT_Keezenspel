@@ -7,10 +7,13 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import gwtks.animations.GameAnimation;
+import gwtks.animations.StepsAnimation;
 import gwtks.handlers.*;
 
 /**
@@ -29,6 +32,7 @@ public class App implements EntryPoint {
 	 * Create a remote service proxy to talk to the server-side Moving service.
 	 */
 	private final MovingServiceAsync movingService = GWT.create(MovingService.class);
+	private final CardsServiceAsync cardsService = GWT.create(CardsService.class);
 	private GameAnimation gameAnimation;
     private Context2d ctxPawns;
 	private Context2d ctxBoard;
@@ -97,6 +101,15 @@ public class App implements EntryPoint {
 		gameAnimation = new GameAnimation();
 		animate();
 
+		Timer timer = new Timer() {
+			@Override
+			public void run() {
+				pollServer();
+			}
+		};
+		// Schedule the timer to run every 200ms
+		timer.scheduleRepeating(200);
+
 		CardsDeck.drawCards();
 
 		CanvasClickHandler.addClickHandler();
@@ -106,7 +119,6 @@ public class App implements EntryPoint {
 		ctxPawns.clearRect(0,0, 600, 600);
 		gameAnimation.update();
 		gameAnimation.draw();
-
 		AnimationScheduler.AnimationCallback animationCallback = new AnimationScheduler.AnimationCallback() {
 			@Override
 			public void execute(double v) {
@@ -115,6 +127,25 @@ public class App implements EntryPoint {
 		};
 		AnimationScheduler.get().requestAnimationFrame(animationCallback);
 	};
+
+	public void pollServer(){
+		cardsService.getCards(0, new AsyncCallback<CardResponse>() {
+			public void onFailure(Throwable caught) {
+				StepsAnimation.reset();
+			}
+			public void onSuccess(CardResponse result) {
+				GWT.log("cards playerId"+result.getPlayerId());
+				GWT.log("Cards received: " + result.getCards());
+				GWT.log("Cards per player: " + result.getNrOfCardsPerPlayer());
+				if(result != null && result.getCards() != null && !result.getCards().isEmpty()){
+					if(CardsDeck.areCardsDifferent(result.getCards())){
+						CardsDeck.setCards(result.getCards());
+						CardsDeck.drawCards();
+					}
+				}
+			}
+		} );
+	}
 
 
 }
