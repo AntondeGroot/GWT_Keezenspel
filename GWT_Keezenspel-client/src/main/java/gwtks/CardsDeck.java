@@ -27,6 +27,7 @@ public class CardsDeck {
         img.setSrc("/card-deck.png");
         Document document  = Document.get();
         ctxCards = ((CanvasElement) document.getElementById("canvasCards")).getContext2d();
+        ctxCards.clearRect(0,0,600,800);
 
         // card width 25 is good to show how many cards they are still holding
         // card width 100 is good for your own hand

@@ -46,6 +46,9 @@ public class SendHandler implements ClickHandler {
             case "switch":
                 moveMessage.setMoveType(MoveType.SWITCH);
                 break;
+            case "forfeit":
+                moveMessage.setMoveType(MoveType.FORFEIT);
+                break;
         }
         moveMessage.setMessageType(MessageType.MAKE_MOVE);
         moveMessage.setTileId(pawn1.getCurrentTileId());

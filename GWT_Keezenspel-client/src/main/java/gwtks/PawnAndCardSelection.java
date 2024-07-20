@@ -42,6 +42,7 @@ public class PawnAndCardSelection {
     public static void setCardsAreDrawn(){
         drawCards = false;
     }
+
     public static boolean getDrawCards(){
         return drawCards;
     }
