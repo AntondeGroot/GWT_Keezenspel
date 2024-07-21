@@ -13,6 +13,15 @@ public class MoveMessage implements IsSerializable {
         private MessageType messageType;
         private Integer stepsPawn1;
         private Integer stepsPawn2;
+        private Card card;
+
+        public Card getCard() {
+                return card;
+        }
+
+        public void setCard(Card card) {
+                this.card = card;
+        }
 
         public int getPlayerId() {
                 return playerId;
@@ -81,11 +90,15 @@ public class MoveMessage implements IsSerializable {
         @Override
         public String toString() {
                 return "MoveMessage{" +
-                        "pawnId1=" + pawnId1 +
+                        "playerId=" + playerId +
+                        ", pawnId1=" + pawnId1 +
                         ", pawnId2=" + pawnId2 +
+                        ", tileId=" + tileId +
                         ", moveType=" + moveType +
+                        ", messageType=" + messageType +
                         ", stepsPawn1=" + stepsPawn1 +
                         ", stepsPawn2=" + stepsPawn2 +
+                        ", card=" + card +
                         '}';
         }
 }

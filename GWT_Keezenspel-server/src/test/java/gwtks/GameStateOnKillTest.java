@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 
-import static gwtks.GameStateUtil.createPawnAndPlaceOnBoard;
+import static gwtks.GameStateUtil.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -32,11 +32,12 @@ class GameStateOnKillTest {
     @Test
     void KillPawnOnNormalTile_Forward(){
         // GIVEN
+        Card card = givePlayerCard(0,1);
         Pawn pawn1 = createPawnAndPlaceOnBoard(0, new TileId(0,9));
         Pawn pawn2 = createPawnAndPlaceOnBoard(1, new TileId(0,10));
 
         // WHEN
-        createMoveMessage(pawn1,1);
+        createMoveMessage(moveMessage, pawn1, card);
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
@@ -49,11 +50,12 @@ class GameStateOnKillTest {
     @Test
     void KillPawnOnNormalTile_Backward(){
         // GIVEN
+        Card card = givePlayerCard(0,-1);
         Pawn pawn1 = createPawnAndPlaceOnBoard(0, new TileId(0,11));
         Pawn pawn2 = createPawnAndPlaceOnBoard(1, new TileId(0,10));
 
         // WHEN
-        createMoveMessage(pawn1,-1);
+        createMoveMessage(moveMessage, pawn1,card);
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
@@ -71,11 +73,12 @@ class GameStateOnKillTest {
     @Test
     void KillPawnOnOtherStartTile_Forward(){
         // GIVEN
+        Card card = givePlayerCard(0,1);
         Pawn pawn1 = createPawnAndPlaceOnBoard(0, new TileId(0,15));
         Pawn pawn2 = createPawnAndPlaceOnBoard(2, new TileId(1,0));
 
         // WHEN
-        createMoveMessage(pawn1,1);
+        createMoveMessage(moveMessage, pawn1,card);
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
@@ -88,11 +91,12 @@ class GameStateOnKillTest {
     @Test
     void KillPawnOnOtherStartTile_Backward(){
         // GIVEN
+        Card card = givePlayerCard(0,-1);
         Pawn pawn1 = createPawnAndPlaceOnBoard(0, new TileId(1,1));
         Pawn pawn2 = createPawnAndPlaceOnBoard(2, new TileId(1,0));
 
         // WHEN
-        createMoveMessage(pawn1,-1);
+        createMoveMessage(moveMessage, pawn1, card);
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
@@ -105,11 +109,12 @@ class GameStateOnKillTest {
     @Test
     void KillPawnOnSection_Forward(){
         // GIVEN
+        Card card = givePlayerCard(0,12);
         Pawn pawn1 = createPawnAndPlaceOnBoard(0, new TileId(0,9));
         Pawn pawn2 = createPawnAndPlaceOnBoard(2, new TileId(1,5));
 
         // WHEN
-        createMoveMessage(pawn1,12);
+        createMoveMessage(moveMessage, pawn1, card);
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
@@ -122,11 +127,12 @@ class GameStateOnKillTest {
     @Test
     void KillPawnOnSection_Backward(){
         // GIVEN
+        Card card = givePlayerCard(0,-12);
         Pawn pawn1 = createPawnAndPlaceOnBoard(0, new TileId(1,5));
         Pawn pawn2 = createPawnAndPlaceOnBoard(2, new TileId(0,9));
 
         // WHEN
-        createMoveMessage(pawn1,-12);
+        createMoveMessage(moveMessage, pawn1,card);
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
@@ -135,13 +141,5 @@ class GameStateOnKillTest {
         // THEN Gamestate is correct
         assertEquals(new TileId(0,9), GameState.getPawn(pawn1).getCurrentTileId());
         assertEquals(pawn2.getNestTileId(), GameState.getPawn(pawn2).getCurrentTileId());
-    }
-
-    private void createMoveMessage(Pawn pawn, int steps){
-        moveMessage.setPawnId1(pawn.getPawnId());
-        moveMessage.setMoveType(MoveType.MOVE);
-        moveMessage.setTileId(pawn.getCurrentTileId());
-        moveMessage.setStepsPawn1(steps);
-        moveMessage.setMessageType(MessageType.MAKE_MOVE);
     }
 }

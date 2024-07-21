@@ -83,7 +83,12 @@ public class CanvasClickHandler {
             PawnAndCardSelection.setCard(card);
             if(cardValue == 1){
                 // ace: onboard OR move
-                moveType.setValue("ONBOARD|MOVE");
+                if(PawnAndCardSelection.getPawn1().getCurrentTileId().getTileNr() < 0){
+                    moveType.setValue("ONBOARD");
+                }else{
+                    moveType.setValue("MOVE");
+                    nrSteps.setValue(String.valueOf(cardValue));
+                }
             }else if(cardValue == 11){
                 // jack: switch pawns
                 moveType.setValue("SWITCH");

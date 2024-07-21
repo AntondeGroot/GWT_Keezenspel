@@ -47,6 +47,16 @@ public class CardsDeck implements IsSerializable {
         cardsDeque = new ArrayDeque<>(cards);
     }
 
+    public static void playerPlaysCard(int playerId, Card card) {
+        if(card != null) {
+            players.get(playerId).getHand().remove(card);
+        }
+    }
+
+    public static void setPlayerCard(int playerId, Card card){
+        players.get(playerId).setCard(card);
+    }
+
     public static void dealCards(){
         int nrCards = (roundNr == 0) ? 5 : 4;
 
@@ -56,8 +66,7 @@ public class CardsDeck implements IsSerializable {
 
         for (int i = 0; i < nrCards; i++) {
             for (int j = 0; j < nrPlayers; j++) {
-                Player player = players.get(j);
-                player.setCard(cardsDeque.pop());
+                setPlayerCard(j, cardsDeque.pop());
             }
         }
     }
