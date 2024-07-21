@@ -61,4 +61,30 @@ public class GameStateUtil {
         moveMessage.setMessageType(MessageType.MAKE_MOVE);
         GameState.processOnForfeit(moveMessage);
     }
+    public static void sendValidMoveMessage(int playerId){
+        // get the first pawn of the player
+        Pawn pawn = new Pawn(new PawnId(playerId,0),new TileId(playerId,-1));
+
+        // place the pawn on the board (playerId,1)
+        createPawnAndPlaceOnBoard(playerId, new TileId(playerId,1));
+
+        // fake a valid card
+        Card card = new Card(0,5);
+
+        // replace a card from the players hand with this card
+        CardsDeck.giveCardToPlayerForTesting(playerId, card);
+
+        // send move message
+        MoveMessage moveMessage = new MoveMessage();
+        moveMessage.setPlayerId(playerId);
+        moveMessage.setPawnId1(pawn.getPawnId());
+        moveMessage.setMoveType(MoveType.MOVE);
+        moveMessage.setStepsPawn1(card.getCard()+1);
+        moveMessage.setCard(card);
+        moveMessage.setMessageType(MessageType.MAKE_MOVE);
+
+        // process
+        MoveResponse moveResponse = new MoveResponse();
+        GameState.processOnMove(moveMessage, moveResponse);
+    }
 }

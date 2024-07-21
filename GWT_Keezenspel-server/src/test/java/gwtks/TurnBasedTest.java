@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 
 import static gwtks.GameStateUtil.sendForfeitMessage;
+import static gwtks.GameStateUtil.sendValidMoveMessage;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -70,9 +71,13 @@ public class TurnBasedTest {
         assertEquals(activePlayers, GameState.getActivePlayers());
     }
     @Test
-    void player1PlaysCard_Player2IsNowPlaying() {
+    void player1PlaysCard_4_5_5_CardsInTheGame() {
+        // WHEN
+        sendValidMoveMessage(0);
 
-        fail("This test is not yet implemented");
+        // THEN
+        nrCardsPerPlayer = nrCardsPerPlayer(new int[]{4,5,5});
+        assertEquals(nrCardsPerPlayer, CardsDeck.getNrOfCardsForAllPlayers());
     }
     @Test
     void player1PlaysCard_Player1Has1CardLessThanPlayer2() {
@@ -130,10 +135,6 @@ public class TurnBasedTest {
         // THEN
         nrCardsPerPlayer = nrCardsPerPlayer(new int[]{5,5,5});
         assertEquals(nrCardsPerPlayer, CardsDeck.getNrOfCardsForAllPlayers());
-    }
-    @Test
-    void allPlayersForfeit_DecksGetReshuffled() {
-        fail("This test is not yet implemented");
     }
     @Test
     void player1PlaysKingThenPlayer2PlaysKing() {
