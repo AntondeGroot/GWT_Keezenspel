@@ -8,7 +8,6 @@ public class MoveMessage implements IsSerializable {
         private int playerId;
         private PawnId pawnId1;
         private PawnId pawnId2;
-        private TileId tileId; // TODO: should be removed as this should be stored in the backend not frontend?
         private MoveType moveType;
         private MessageType messageType;
         private Integer stepsPawn1;
@@ -29,14 +28,6 @@ public class MoveMessage implements IsSerializable {
 
         public void setPlayerId(int playerId) {
                 this.playerId = playerId;
-        }
-
-        public TileId getTileId() {
-                return tileId;
-        }
-
-        public void setTileId(TileId tileId) {
-                this.tileId = tileId;
         }
 
         public PawnId getPawnId1() {
@@ -93,7 +84,6 @@ public class MoveMessage implements IsSerializable {
                         "playerId=" + playerId +
                         ", pawnId1=" + pawnId1 +
                         ", pawnId2=" + pawnId2 +
-                        ", tileId=" + tileId +
                         ", moveType=" + moveType +
                         ", messageType=" + messageType +
                         ", stepsPawn1=" + stepsPawn1 +

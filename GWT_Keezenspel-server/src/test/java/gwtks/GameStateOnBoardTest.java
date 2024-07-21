@@ -4,8 +4,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.awt.*;
-
 import static gwtks.GameStateUtil.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -39,7 +37,6 @@ class GameStateOnBoardTest {
         moveMessage.setPawnId1(pawn1.getPawnId());
         moveMessage.setMoveType(MoveType.ONBOARD);
         moveMessage.setCard(ace);
-        moveMessage.setTileId(pawn1.getCurrentTileId());
         moveMessage.setMessageType(MessageType.MAKE_MOVE);
         GameState.processOnBoard(moveMessage, moveResponse);
 
@@ -62,7 +59,6 @@ class GameStateOnBoardTest {
         moveMessage.setPawnId1(pawn1.getPawnId());
         moveMessage.setMoveType(MoveType.ONBOARD);
         moveMessage.setCard(ace);
-        moveMessage.setTileId(pawn1.getCurrentTileId());
         GameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN response msg is correct
@@ -83,7 +79,6 @@ class GameStateOnBoardTest {
         moveMessage.setPawnId1(pawn1.getPawnId());
         moveMessage.setMoveType(MoveType.ONBOARD);
         moveMessage.setCard(ace);
-        moveMessage.setTileId(pawn1.getCurrentTileId());
         GameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN response msg is correct
@@ -104,7 +99,6 @@ class GameStateOnBoardTest {
         moveMessage.setPawnId1(pawn1.getPawnId());
         moveMessage.setMoveType(MoveType.ONBOARD);
         moveMessage.setCard(king);
-        moveMessage.setTileId(pawn1.getCurrentTileId());
         GameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN response msg is correct

@@ -1,6 +1,12 @@
-package gwtks;
+package gwtks.services;
 
 import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
+import gwtks.CardsDeck;
+import gwtks.GameState;
+import gwtks.MoveVerifier;
+import gwtks.MoveMessage;
+import gwtks.MoveResponse;
+import gwtks.MovingService;
 import jakarta.servlet.annotation.WebServlet;
 
 @SuppressWarnings("serial")

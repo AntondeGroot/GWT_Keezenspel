@@ -22,7 +22,6 @@ public class PlayerList {
         Grid grid = new Grid(rowCount, colCount);
 
         for (int playerId = 0; playerId < playerNames.length; playerId++) {
-
             int imagePixelSize = 50;
 
             ImageElement img = Document.get().createImageElement();

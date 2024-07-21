@@ -10,6 +10,9 @@ public class Pawn implements IsSerializable {
     private TileId nestTileId;
     private int playerId;
 
+    public Pawn() {
+    }
+
     public Pawn(PawnId pawnId, TileId nestTileId) {
         this.playerId = pawnId.getPlayerId();
         this.pawnId = pawnId;

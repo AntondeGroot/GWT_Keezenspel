@@ -42,7 +42,6 @@ public class GameStateUtil {
         moveMessage.setPlayerId(pawn.getPlayerId());
         moveMessage.setPawnId1(pawn.getPawnId());
         moveMessage.setMoveType(MoveType.MOVE);
-        moveMessage.setTileId(pawn.getCurrentTileId());
         moveMessage.setStepsPawn1(card.getCard()+1);
         moveMessage.setCard(card);
         moveMessage.setMessageType(MessageType.MAKE_MOVE);

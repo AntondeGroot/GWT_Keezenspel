@@ -7,6 +7,7 @@ import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import gwtks.*;
+import gwtks.Card;
 
 import java.util.List;
 
