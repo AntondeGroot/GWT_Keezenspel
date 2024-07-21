@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static gwtks.GameStateUtil.givePlayerCard;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CardsDeckTest {
@@ -144,5 +145,20 @@ class CardsDeckTest {
             }
         }
         return true;
+    }
+
+    @Test
+    void getCardsForPlayer() {
+        // GIVEN
+        CardsDeck.setNrPlayers(8);
+        CardsDeck.shuffle();
+        CardsDeck.dealCards();
+
+        // WHEN
+        Card card = givePlayerCard(1,-4);
+
+        // THEN
+        assertTrue(CardsDeck.getCardsForPlayer(1).contains(card));
+        assertTrue(CardsDeck.playerHasCard(1,card));
     }
 }

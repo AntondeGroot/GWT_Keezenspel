@@ -38,6 +38,7 @@ public class TestMoveHandler implements ClickHandler {
         }else{
             moveMessage.setMoveType(MoveType.MOVE);
         }
+        moveMessage.setCard(PawnAndCardSelection.getCard());
         moveMessage.setPawnId1(selectedPawnId);
         moveMessage.setMessageType(MessageType.CHECK_MOVE);
         moveMessage.setTileId(pawn1.getCurrentTileId());

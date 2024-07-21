@@ -18,6 +18,15 @@ public class MoveResponse implements IsSerializable {
     private LinkedList<TileId> movePawn2;
     private MoveType moveType;
     private MessageType messageType;
+    private MoveResult result;
+
+    public MoveResult getResult() {
+        return result;
+    }
+
+    public void setResult(MoveResult result) {
+        this.result = result;
+    }
 
     public Integer getNextPlayerId() {
         ArrayList<Integer> test = new ArrayList<>();

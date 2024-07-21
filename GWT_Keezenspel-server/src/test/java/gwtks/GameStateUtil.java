@@ -18,4 +18,41 @@ public class GameStateUtil {
         GameState.movePawn(pawn1);
         return pawn1;
     }
+    public static Card givePlayerCard(int playerId, int nrSteps){
+        Card card = new Card(playerId, nrSteps-1);
+        CardsDeck.setPlayerCard(playerId, card);
+        return card;
+    }
+    public static Card givePlayerAce(int playerId){
+        Card ace = new Card(playerId, 0);
+        CardsDeck.setPlayerCard(playerId, ace);
+        return ace;
+    }
+    public static Card givePlayerKing(int playerId){
+        Card king = new Card(playerId, 11);
+        CardsDeck.setPlayerCard(playerId, king);
+        return king;
+    }
+    public static Card givePlayerJack(int playerId){
+        Card jack = new Card(playerId, 10);
+        CardsDeck.setPlayerCard(playerId, jack);
+        return jack;
+    }
+    public static void createMoveMessage(MoveMessage moveMessage, Pawn pawn, Card card){
+        moveMessage.setPlayerId(pawn.getPlayerId());
+        moveMessage.setPawnId1(pawn.getPawnId());
+        moveMessage.setMoveType(MoveType.MOVE);
+        moveMessage.setTileId(pawn.getCurrentTileId());
+        moveMessage.setStepsPawn1(card.getCard()+1);
+        moveMessage.setCard(card);
+        moveMessage.setMessageType(MessageType.MAKE_MOVE);
+    }
+    public static void createSwitchMessage(MoveMessage moveMessage, Pawn pawn1, Pawn pawn2, Card card){
+        moveMessage.setPlayerId(pawn1.getPlayerId());
+        moveMessage.setPawnId1(pawn1.getPawnId());
+        moveMessage.setPawnId2(pawn2.getPawnId());
+        moveMessage.setCard(card);
+        moveMessage.setMoveType(MoveType.SWITCH);
+        moveMessage.setMoveType(MoveType.MOVE);
+    }
 }

@@ -32,6 +32,7 @@ public class SendHandler implements ClickHandler {
         Pawn pawn1 = Board.getPawn(selectedPawnId);
 
         moveMessage.setPawnId1(selectedPawnId);
+        moveMessage.setCard(PawnAndCardSelection.getCard());
         String moveType = getMoveTypeFieldValue();
         switch (moveType.toLowerCase()) {
             case "move":
@@ -51,7 +52,7 @@ public class SendHandler implements ClickHandler {
                 break;
         }
         moveMessage.setMessageType(MessageType.MAKE_MOVE);
-        moveMessage.setTileId(pawn1.getCurrentTileId());
+        moveMessage.setTileId(pawn1.getCurrentTileId());//TODO SHOULD NOT BE PART OF THE FRONT-END
         moveMessage.setStepsPawn1(Integer.parseInt(getStepsNrFieldValue()));
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {

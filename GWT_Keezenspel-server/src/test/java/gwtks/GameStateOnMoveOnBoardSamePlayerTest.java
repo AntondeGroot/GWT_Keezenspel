@@ -4,7 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static gwtks.GameStateUtil.createPawnAndPlaceOnBoard;
+import static gwtks.GameStateUtil.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -17,6 +17,9 @@ class GameStateOnMoveOnBoardSamePlayerTest {
         GameState gameState = new GameState(8);
         moveMessage = new MoveMessage();
         moveResponse = new MoveResponse();
+        CardsDeck.setNrPlayers(8);
+        CardsDeck.shuffle();
+        CardsDeck.dealCards();
     }
 
     @AfterEach
@@ -24,20 +27,23 @@ class GameStateOnMoveOnBoardSamePlayerTest {
         GameState.tearDown();
         moveMessage = null;
         moveResponse = null;
+        CardsDeck.reset();
 
     }
 
     @Test
     void twoPawnsOnePlayer_CannotEndOnTheSameTile(){
         // GIVEN
+        Card card = givePlayerCard(0,1);
         Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(0,0), new TileId(0,9));
         Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(0,10));
 
         // WHEN
-        createMoveMessage(pawn1,1);
+        createMoveMessage(moveMessage, pawn1,card);
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
+        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
         assertNull(moveResponse.getMovePawn1());  // moves the pawn to the correct tile
         assertNull(moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
@@ -47,14 +53,16 @@ class GameStateOnMoveOnBoardSamePlayerTest {
     @Test
     void PawnOn15_PawnCannotBePlacedThere_Forwards(){
         // GIVEN
+        Card card = givePlayerCard(0,1);
         Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(0,0), new TileId(0,14));
         Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(0,15));
 
         // WHEN
-        createMoveMessage(pawn1,1);
+        createMoveMessage(moveMessage, pawn1, card);
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
+        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
         assertNull(moveResponse.getMovePawn1());  // moves the pawn to the correct tile
         assertNull(moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
@@ -64,14 +72,16 @@ class GameStateOnMoveOnBoardSamePlayerTest {
     @Test
     void PawnOn15_PawnCannotBePlacedThere_Backwards(){
         // GIVEN
+        Card card = givePlayerCard(0,-1);
         Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(0,0), new TileId(1,0));
         Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(0,15));
 
         // WHEN
-        createMoveMessage(pawn1,-1);
+        createMoveMessage(moveMessage, pawn1, card);
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
+        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
         assertNull(moveResponse.getMovePawn1());
         assertNull(moveResponse.getPawnId1());
         // THEN Gamestate is correct
@@ -80,15 +90,17 @@ class GameStateOnMoveOnBoardSamePlayerTest {
     }
     @Test
     void PawnOnOtherStart_PawnCannotBePlacedThere_Forwards(){
-// GIVEN
+        // GIVEN
+        Card card = givePlayerCard(0,1);
         Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(0,0), new TileId(0,15));
         Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(1,0));
 
         // WHEN
-        createMoveMessage(pawn1,1);
+        createMoveMessage(moveMessage, pawn1, card);
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
+        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
         assertNull(moveResponse.getMovePawn1());
         assertNull(moveResponse.getPawnId1());
         // THEN Gamestate is correct
@@ -98,26 +110,20 @@ class GameStateOnMoveOnBoardSamePlayerTest {
     @Test
     void PawnOnOtherStart_PawnCannotBePlacedThere_Backwards(){
         // GIVEN
+        Card card = givePlayerCard(0,-1);
         Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(0,0), new TileId(1,1));
         Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(1,0));
 
         // WHEN
-        createMoveMessage(pawn1,-1);
+        createMoveMessage(moveMessage, pawn1, card);
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
+        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
         assertNull(moveResponse.getMovePawn1());  // moves the pawn to the correct tile
         assertNull(moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(1,1), GameState.getPawn(pawn1).getCurrentTileId());
         assertEquals(new TileId(1,0), GameState.getPawn(pawn2).getCurrentTileId());
-    }
-
-    private void createMoveMessage(Pawn pawn, int steps){
-        moveMessage.setPawnId1(pawn.getPawnId());
-        moveMessage.setMoveType(MoveType.MOVE);
-        moveMessage.setTileId(pawn.getCurrentTileId());
-        moveMessage.setStepsPawn1(steps);
-        moveMessage.setMessageType(MessageType.MAKE_MOVE);
     }
 }
