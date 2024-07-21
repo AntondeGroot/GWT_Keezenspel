@@ -1,7 +1,5 @@
 package gwtks;
 
-import gwtks.handlers.TestMoveHandler;
-
 public class PawnAndCardSelection {
     private static int playerId;
     private static Pawn pawn1 = new Pawn(new PawnId(-1,-1),new TileId(-1,90));

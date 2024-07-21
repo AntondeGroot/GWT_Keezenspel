@@ -33,6 +33,7 @@ public class App implements EntryPoint {
 	 */
 	private final MovingServiceAsync movingService = GWT.create(MovingService.class);
 	private final CardsServiceAsync cardsService = GWT.create(CardsService.class);
+	private final GameStateServiceAsync gameStateService = GWT.create(GameStateService.class);
 	private GameAnimation gameAnimation;
     private Context2d ctxPawns;
 	private Context2d ctxBoard;
@@ -104,7 +105,8 @@ public class App implements EntryPoint {
 		Timer timer = new Timer() {
 			@Override
 			public void run() {
-				pollServer();
+				pollServerForCards();
+				pollServerForGameState();
 			}
 		};
 		// Schedule the timer to run every 200ms
@@ -128,14 +130,14 @@ public class App implements EntryPoint {
 		AnimationScheduler.get().requestAnimationFrame(animationCallback);
 	};
 
-	public void pollServer(){
+	public void pollServerForCards(){
 		cardsService.getCards(0, new AsyncCallback<CardResponse>() {
 			public void onFailure(Throwable caught) {
 				StepsAnimation.reset();
 			}
 			public void onSuccess(CardResponse result) {
-				GWT.log("cards playerId"+result.getPlayerId());
-				GWT.log("Cards received: " + result.getCards());
+				GWT.log("cards playerId"     + result.getPlayerId());
+				GWT.log("Cards received: "   + result.getCards());
 				GWT.log("Cards per player: " + result.getNrOfCardsPerPlayer());
 				if(CardsDeck.areCardsDifferent(result.getCards())){
 					CardsDeck.setCards(result.getCards());
@@ -144,6 +146,20 @@ public class App implements EntryPoint {
 			}
 		} );
 	}
-
-
+	public void pollServerForGameState(){
+		gameStateService.getGameState( new AsyncCallback<GameStateResponse>() {
+			public void onFailure(Throwable caught) {
+				StepsAnimation.reset();
+			}
+			public void onSuccess(GameStateResponse result) {
+				GWT.log(result.toString());
+				// only set the board when empty, e.g.
+				// when the browser was refreshed or when you join the game for the first time
+				if(Board.setPawns(result.getPawns())){
+					Board board = new Board();
+					board.drawPawns(ctxPawns);
+				}
+			}
+		} );
+	}
 }

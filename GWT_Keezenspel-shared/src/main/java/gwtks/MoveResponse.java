@@ -4,8 +4,6 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.LinkedList;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 @SuppressWarnings("serial")
 public class MoveResponse implements IsSerializable {

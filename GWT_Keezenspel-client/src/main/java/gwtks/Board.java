@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Board implements IsSerializable {
+public class Board {
 
-    private static List<TileMapping> tiles = new ArrayList<>();
-	private static List<PawnAnimationMapping> animationMappings = new ArrayList<>();
-	private static List<Pawn> pawns = new ArrayList<>();
+    private static ArrayList<TileMapping> tiles = new ArrayList<>();
+	private static ArrayList<PawnAnimationMapping> animationMappings = new ArrayList<>();
+	private static ArrayList<Pawn> pawns = new ArrayList<>();
 
 	private double cellDistance;
 
@@ -80,18 +80,6 @@ public class Board implements IsSerializable {
 		}
 
         tiles.addAll(tempTiles);
-
-		// create pawns
-		int pawnNr = 0;
-		for (int i = 0; i < nrPlayers; i++) {
-			pawnNr = 0;
-			for (TileMapping tile : tiles) {
-				if(tile.getPlayerId() == i && tile.getTileNr() < 0){//nest tiles are negative
-					pawns.add(new Pawn(new PawnId(i,pawnNr), tile.getTileId()));
-					pawnNr++;
-				}
-			}
-		}
     }
 
 	public void drawBoard(Context2d context) {
@@ -111,6 +99,14 @@ public class Board implements IsSerializable {
 			drawCircle(context, mapping.getPosition().getX(), mapping.getPosition().getY(), cellDistance/2, color);
 		}
 		context.save();
+	}
+
+	public static boolean setPawns(ArrayList<Pawn> pawns) {
+		if(Board.pawns.isEmpty()){
+			Board.pawns = pawns;
+			return true;
+		}
+		return false;
 	}
 
 	private void drawCircle(Context2d context, double x, double y, double radius, String color) {

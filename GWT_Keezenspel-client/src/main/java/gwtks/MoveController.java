@@ -1,10 +1,8 @@
 package gwtks;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.canvas.client.Canvas;
 
 import java.util.LinkedList;
-import java.util.List;
 
 public class MoveController {
 

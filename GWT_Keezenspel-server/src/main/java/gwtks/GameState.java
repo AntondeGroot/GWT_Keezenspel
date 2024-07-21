@@ -2,15 +2,13 @@ package gwtks;
 
 import java.util.LinkedList;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
 
 public class GameState {
 
-    private static List<Pawn> pawns = new ArrayList<>();
+    private static ArrayList<Pawn> pawns = new ArrayList<>();
     private static int playerIdTurn;
     private static int nrPlayers;
-    private static List<TileId> tiles = new ArrayList<>();
+    private static ArrayList<TileId> tiles = new ArrayList<>();
 
     public GameState(int nrPlayers) {
         if (pawns.isEmpty()) {
@@ -36,11 +34,11 @@ public class GameState {
         return playerIdTurn;
     }
 
-    public int getPlayerIdTurn() {
+    public static int getPlayerIdTurn() {
         return playerIdTurn;
     }
 
-    public List<Pawn> getPawns() {
+    public static ArrayList<Pawn> getPawns() {
         return pawns;
     }
 
@@ -65,6 +63,10 @@ public class GameState {
             tileNr--;
         }
         return false;
+    }
+
+    public static int getNrPlayers() {
+        return nrPlayers;
     }
 
     private static boolean isPawnTightlyClosedIn(PawnId pawnId, TileId tileId){
@@ -120,13 +122,22 @@ public class GameState {
         return true;
     }
 
+    public static TileId getPawnTileId(PawnId pawnId){
+        for(Pawn pawn : pawns){
+            if(pawn.getPawnId().equals(pawnId)){
+                return pawn.getCurrentTileId();
+            }
+        }
+        return null;
+    }
+
     public static void processOnMove(MoveMessage moveMessage, MoveResponse response){
         PawnId pawnId1 = moveMessage.getPawnId1();
         int playerId = pawnId1.getPlayerId();
-        TileId currentTileId = moveMessage.getTileId();
+        TileId currentTileId = getPawnTileId(pawnId1);
         int nrSteps = moveMessage.getStepsPawn1();
         int next = 0;
-        int playerIdOfTile = moveMessage.getTileId().getPlayerId();
+        int playerIdOfTile = currentTileId.getPlayerId();
         System.out.println("moveMessage = "+moveMessage);
         int direction = 1;
         int tileNrToCheck = currentTileId.getTileNr();
@@ -147,7 +158,7 @@ public class GameState {
         }
 
         moves.add(currentTileId);
-        next = moveMessage.getTileId().getTileNr() + moveMessage.getStepsPawn1();
+        next = currentTileId.getTileNr() + moveMessage.getStepsPawn1();
 
          // regular route
         if (next > 15 && !isPawnOnLastSection(playerId, playerIdOfTile) && !isPawnOnFinish(pawnId1, currentTileId) ) {
@@ -529,6 +540,7 @@ public class GameState {
         for (Pawn pawn : pawns) {
             if (pawn.equals(selectedPawn)){ // equals only looks at pawnId
                 pawn.setCurrentTileId(selectedPawn.getCurrentTileId());
+                break;
             }
         }
     }

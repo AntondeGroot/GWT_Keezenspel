@@ -41,7 +41,6 @@ public class TestMoveHandler implements ClickHandler {
         moveMessage.setCard(PawnAndCardSelection.getCard());
         moveMessage.setPawnId1(selectedPawnId);
         moveMessage.setMessageType(MessageType.CHECK_MOVE);
-        moveMessage.setTileId(pawn1.getCurrentTileId());
         moveMessage.setStepsPawn1(Integer.parseInt(getStepsNrFieldValue()));
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
