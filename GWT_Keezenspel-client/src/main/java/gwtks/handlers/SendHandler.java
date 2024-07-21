@@ -19,7 +19,7 @@ public class SendHandler implements ClickHandler {
     /**
      * Send the MoveMessage to the server and wait for a response.
      */
-    private void sendMoveToServer() {
+    public void sendMoveToServer() {
         // First, we validate the input.
 //        errorLabel.setText("");
 

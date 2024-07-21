@@ -16,7 +16,7 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
     @Override
     public MoveResponse makeMove(MoveMessage message) throws IllegalArgumentException {
         // Verify that the input is valid.
-        if (!MoveVerifier.isValidMove(message)) {
+        if (message.getMoveType() == null) {
             throw new IllegalArgumentException(
                     "The selected move was invalid");
         }
@@ -35,7 +35,10 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
                 break;
             case SWITCH: GameState.processOnSwitch(message,response);
                 break;
-            case FORFEIT: CardsDeck.forfeitCardsForPlayer(message.getPlayerId());
+            case FORFEIT:
+                CardsDeck.forfeitCardsForPlayer(message.getPlayerId());
+                GameState.forfeitPlayer(message.getPlayerId());
+                GameState.nextTurn();
                 break;
             default:
                 break;
