@@ -54,4 +54,11 @@ public class GameStateUtil {
         moveMessage.setMoveType(MoveType.SWITCH);
         moveMessage.setMoveType(MoveType.MOVE);
     }
+    public static void sendForfeitMessage(int playerId){
+        MoveMessage moveMessage = new MoveMessage();
+        moveMessage.setPlayerId(playerId);
+        moveMessage.setMoveType(MoveType.FORFEIT);
+        moveMessage.setMessageType(MessageType.MAKE_MOVE);
+        GameState.processOnForfeit(moveMessage);
+    }
 }

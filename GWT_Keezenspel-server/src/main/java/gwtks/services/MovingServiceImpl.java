@@ -35,10 +35,7 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
                 break;
             case SWITCH: GameState.processOnSwitch(message,response);
                 break;
-            case FORFEIT:
-                CardsDeck.forfeitCardsForPlayer(message.getPlayerId());
-                GameState.forfeitPlayer(message.getPlayerId());
-                GameState.nextTurn();
+            case FORFEIT: GameState.processOnForfeit(message);
                 break;
             default:
                 break;
