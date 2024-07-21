@@ -43,9 +43,7 @@ public class App implements EntryPoint {
 	 */
 	public void onModuleLoad() {
 		final Button sendButton = new Button("Make Move");
-		final Button swapButton = new Button("Swap");
-		final Button testMoveButton = new Button("Test Move");
-		final Button pawnOnTheBoardButton = new Button("King/Ace");
+		final Button forfeitButton = new Button("Forfeit");
 		final Label errorLabel = new Label();
 
 		// Create a Canvas for the Parcheesi board
@@ -71,32 +69,20 @@ public class App implements EntryPoint {
 
 		// add widgets
 		sendButton.addStyleName("sendButton");
-		pawnOnTheBoardButton.addStyleName("sendButton");
+		forfeitButton.addStyleName("sendButton");
 
 		// Use RootPanel.get() to get the entire body element
 		RootPanel.get("sendButtonContainer").add(sendButton);
-		RootPanel.get("pawnOnTheBoardButtonContainer").add(pawnOnTheBoardButton);
 		RootPanel.get("errorLabelContainer").add(errorLabel);
-		RootPanel.get("swapButtonContainer").add(swapButton);
-		RootPanel.get("testMoveButtonContainer").add(testMoveButton);
+		RootPanel.get("forfeitButtonContainer").add(forfeitButton);
 
 
 		// Add a handler to send the MOVE to the server
 		SendHandler handler = new SendHandler();
 		sendButton.addClickHandler(handler);
 
-		TestMoveHandler testMoveHandler = new TestMoveHandler();
-		testMoveButton.addClickHandler(testMoveHandler);
-
-		// Add a handler to send the name to the server
-		KingHandler kingHandler = new KingHandler();
-		pawnOnTheBoardButton.addClickHandler(kingHandler);
-
-		// Add a handler to send the name to the server
-		SwapHandler swapHandler = new SwapHandler();
-		swapButton.addClickHandler(swapHandler);
-
-
+		ForfeitHandler forfeitHandler = new ForfeitHandler();
+		forfeitButton.addClickHandler(forfeitHandler);
 
 		// Start the game
 		gameAnimation = new GameAnimation();
@@ -131,7 +117,9 @@ public class App implements EntryPoint {
 	};
 
 	public void pollServerForCards(){
-		cardsService.getCards(0, new AsyncCallback<CardResponse>() {
+		GWT.log("player id playing: "+PlayerList.getPlayerIdPlaying()+"\n");
+		GWT.log("...");
+		cardsService.getCards(PlayerList.getPlayerIdPlaying(), new AsyncCallback<CardResponse>() {
 			public void onFailure(Throwable caught) {
 				StepsAnimation.reset();
 			}
@@ -159,6 +147,10 @@ public class App implements EntryPoint {
 					Board board = new Board();
 					board.drawPawns(ctxPawns);
 				}
+				PlayerList playerList = new PlayerList();
+				PlayerList.setActivePlayers(result.getActivePlayers());
+				playerList.setPlayerIdPlayingAndDrawPlayerList(result.getPlayerIdTurn());
+
 			}
 		} );
 	}

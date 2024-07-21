@@ -9,6 +9,7 @@ public class GameState {
     private static int playerIdTurn;
     private static int nrPlayers;
     private static ArrayList<TileId> tiles = new ArrayList<>();
+    private static ArrayList<Integer> activePlayers = new ArrayList<>();
 
     public GameState(int nrPlayers) {
         if (pawns.isEmpty()) {
@@ -17,21 +18,32 @@ public class GameState {
             GameState.nrPlayers = nrPlayers;
             pawns = new ArrayList<Pawn>();
             for (int playerId = 0; playerId < nrPlayers; playerId++) {
+                activePlayers.add(playerId);
                 for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
                     pawns.add(new Pawn(
                             new PawnId(playerId, pawnNr),
                             new TileId(playerId,-1 - pawnNr)));
                 }
             }
+
             CardsDeck.setNrPlayers(nrPlayers);
             CardsDeck.shuffle();
             CardsDeck.dealCards();
         }
     }
 
-    public Integer nextTurn() {
+    public static ArrayList<Integer> getActivePlayers() {
+        return activePlayers;
+    }
+
+    public static void forfeitPlayer(int playerId) {
+        if(activePlayers.contains(playerId)){
+            activePlayers.remove((Integer) playerId);
+        }
+    }
+
+    public static void nextTurn() {
         playerIdTurn = (playerIdTurn + 1) % nrPlayers;
-        return playerIdTurn;
     }
 
     public static int getPlayerIdTurn() {
@@ -526,6 +538,7 @@ public class GameState {
         response.setPawnId1(pawnId);
         if(moveMessage.getMessageType() == MessageType.MAKE_MOVE){
             movePawn(new Pawn(pawnId,targetTileId));
+            nextTurn();
         }
 
         printAllPawnsNotOnNests();

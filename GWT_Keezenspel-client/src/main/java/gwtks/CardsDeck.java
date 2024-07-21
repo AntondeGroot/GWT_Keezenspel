@@ -51,7 +51,7 @@ public class CardsDeck {
             double lineThickness = 3;
             if(PawnAndCardSelection.getCard() != null && PawnAndCardSelection.getCard().equals(card)){
                 drawRoundedRect(ctxCards, dx-lineThickness/2, dy-lineThickness/2, dw+lineThickness, dh+lineThickness, 8);
-        }
+            }
         }
     }
 

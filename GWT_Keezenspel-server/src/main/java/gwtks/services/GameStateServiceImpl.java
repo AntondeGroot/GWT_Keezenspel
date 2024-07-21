@@ -16,6 +16,7 @@ public class GameStateServiceImpl extends RemoteServiceServlet implements GameSt
         response.setNrPlayers(GameState.getNrPlayers());
         response.setPawns(GameState.getPawns());
         response.setPlayerIdTurn(GameState.getPlayerIdTurn());
+        response.setActivePlayers(GameState.getActivePlayers());
         return response;
     }
 }

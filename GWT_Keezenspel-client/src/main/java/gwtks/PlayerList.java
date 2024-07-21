@@ -9,29 +9,48 @@ import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.ui.*;
 
+import java.util.ArrayList;
+
 import static java.awt.SystemColor.window;
 
 public class PlayerList {
+    private static int playerIdPlaying;
+    private static ArrayList<Integer> activePlayers = new ArrayList<>();
+
+    public void setPlayerIdPlayingAndDrawPlayerList(int playerIdPlaying) {
+        if (playerIdPlaying == PlayerList.playerIdPlaying) {
+            return;
+        }
+        PlayerList.playerIdPlaying = playerIdPlaying;
+        createListElement();
+    }
+
+    public static void setActivePlayers(ArrayList<Integer> activePlayers){
+        PlayerList.activePlayers = activePlayers;
+    }
+
+    public static int getPlayerIdPlaying() {
+        return playerIdPlaying;
+    }
 
     public void createListElement(){
         String[] playerNames = {"Player1", "Player2", "Player3", "Player4", "Player5", "Player6", "Player7", "Player8"};
-        boolean isPlayerActive = true;
         String inactiveColor = "#c2bfb6";
         int colCount = 2;
         int rowCount = (int) Math.ceil((double) playerNames.length / colCount);
         Grid grid = new Grid(rowCount, colCount);
+        RootPanel.get("playerListContainer").clear();
 
         for (int playerId = 0; playerId < playerNames.length; playerId++) {
             int imagePixelSize = 50;
 
             ImageElement img = Document.get().createImageElement();
             img.setSrc("/profilepics.png");
-
             HorizontalPanel hp = new HorizontalPanel();
             Label playerName = new Label(playerNames[playerId]);
             playerName.getElement().getStyle().setMarginRight(30, Style.Unit.PX);
             playerName.getElement().getStyle().setMarginLeft(10, Style.Unit.PX);
-            if(!isPlayerActive) {
+            if(!activePlayers.contains(playerId)){
                 playerName.getElement().getStyle().setTextDecoration(Style.TextDecoration.LINE_THROUGH);
             }
 
@@ -44,7 +63,7 @@ public class PlayerList {
             canvas.setCoordinateSpaceWidth(imagePixelSize);
             canvas.setCoordinateSpaceHeight(imagePixelSize);
             canvas.setStyleName("profilepic");
-            if(isPlayerActive){
+            if(activePlayers.contains(playerId)){
                 canvas.getElement().getStyle().setBorderColor(PlayerColors.getHexColor(playerId));
             }else{
                 canvas.getElement().getStyle().setBorderColor(inactiveColor);
@@ -67,7 +86,7 @@ public class PlayerList {
             canvas.asWidget().setStyleName("profilepic");
             hp.add(canvas.asWidget());
             hp.add(playerName);
-            if(playerId == 0) {
+            if(playerId == playerIdPlaying) {
                 hp.asWidget().setStyleName("playerPlaying");
             }
             int row = playerId % 4;
@@ -77,6 +96,5 @@ public class PlayerList {
         }
         grid.getElement().getStyle().setMargin(50, Style.Unit.PX);
         RootPanel.get("playerListContainer").add(grid);
-
     }
 }
