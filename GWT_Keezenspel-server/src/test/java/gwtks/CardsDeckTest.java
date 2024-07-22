@@ -59,17 +59,14 @@ class CardsDeckTest {
         // THEN
         Assert.assertEquals(5,CardsDeck.getCardsForPlayer(0).size());
         CardsDeck.forfeitCardsForPlayer(0);
-        CardsDeck.nextRound();
         CardsDeck.dealCards();
 
         Assert.assertEquals(4,CardsDeck.getCardsForPlayer(0).size());
         CardsDeck.forfeitCardsForPlayer(0);
-        CardsDeck.nextRound();
         CardsDeck.dealCards();
 
         Assert.assertEquals(4,CardsDeck.getCardsForPlayer(0).size());
         CardsDeck.forfeitCardsForPlayer(0);
-        CardsDeck.nextRound();
         CardsDeck.shuffle();
         CardsDeck.dealCards();
 
