@@ -11,6 +11,7 @@ public class GameState {
     private static ArrayList<TileId> tiles = new ArrayList<>();
     private static ArrayList<Integer> activePlayers = new ArrayList<>();
 
+
     public GameState(int nrPlayers) {
         if (pawns.isEmpty()) {
             PawnId pawnId = new PawnId();
@@ -36,9 +37,20 @@ public class GameState {
         return activePlayers;
     }
 
+    public static void resetActivePlayers(){
+        for (int playerId = 0; playerId < nrPlayers; playerId++) {
+            activePlayers.add(playerId);
+        }
+    }
+
     public static void forfeitPlayer(int playerId) {
         if(activePlayers.contains(playerId)){
             activePlayers.remove((Integer) playerId);
+        }
+        if(activePlayers.isEmpty()){
+            resetActivePlayers();
+            CardsDeck.shuffle();
+            CardsDeck.dealCards();
         }
     }
 
@@ -384,6 +396,12 @@ public class GameState {
 
     }
 
+    public static void processOnForfeit(MoveMessage message){
+        CardsDeck.forfeitCardsForPlayer(message.getPlayerId());
+        GameState.forfeitPlayer(message.getPlayerId());
+        GameState.nextTurn();
+    }
+
     public static void processOnSwitch(MoveMessage moveMessage, MoveResponse moveResponse){
         if(moveMessage.getPawnId1() == null || moveMessage.getPawnId2() == null){
             moveResponse.setResult(MoveResult.CANNOT_MAKE_MOVE);
@@ -563,6 +581,7 @@ public class GameState {
         playerIdTurn = 0;
         nrPlayers = 0;
         tiles = new ArrayList<>();
+        activePlayers.clear();
     }
 
     public static Pawn getPawn(Pawn selectedPawn){
