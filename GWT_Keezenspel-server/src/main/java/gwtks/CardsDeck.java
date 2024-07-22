@@ -74,9 +74,7 @@ public class CardsDeck implements IsSerializable {
                 setPlayerCard(j, cardsDeque.pop());
             }
         }
-    }
 
-    public static void nextRound(){
         roundNr = (roundNr + 1) % 3;
     }
 

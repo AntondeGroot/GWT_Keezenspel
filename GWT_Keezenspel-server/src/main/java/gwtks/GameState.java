@@ -51,11 +51,16 @@ public class GameState {
             resetActivePlayers();
             CardsDeck.shuffle();
             CardsDeck.dealCards();
+        }else{
+            nextActivePlayer();
         }
     }
 
-    public static void nextTurn() {
+    public static void nextActivePlayer() {
         playerIdTurn = (playerIdTurn + 1) % nrPlayers;
+        if(!activePlayers.isEmpty() && !activePlayers.contains(playerIdTurn)){
+            nextActivePlayer();
+        }
     }
 
     public static int getPlayerIdTurn() {
@@ -399,7 +404,7 @@ public class GameState {
     public static void processOnForfeit(MoveMessage message){
         CardsDeck.forfeitCardsForPlayer(message.getPlayerId());
         GameState.forfeitPlayer(message.getPlayerId());
-        GameState.nextTurn();
+//        GameState.nextTurn();
     }
 
     public static void processOnSwitch(MoveMessage moveMessage, MoveResponse moveResponse){
@@ -556,7 +561,7 @@ public class GameState {
         response.setPawnId1(pawnId);
         if(moveMessage.getMessageType() == MessageType.MAKE_MOVE){
             movePawn(new Pawn(pawnId,targetTileId));
-            nextTurn();
+            nextActivePlayer();
         }
 
         printAllPawnsNotOnNests();

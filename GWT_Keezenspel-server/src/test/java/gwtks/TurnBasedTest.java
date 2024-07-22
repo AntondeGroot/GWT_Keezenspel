@@ -152,6 +152,23 @@ public class TurnBasedTest {
         assertTrue(CardsDeck.getCardsForPlayer(1).isEmpty());
         assertEquals(2,GameState.getPlayerIdTurn());
     }
+    @Test
+    void allPlayersExcept1Forfeit_RemainingPlayerKeepsPlayingUntilLastCard(){
+        // GIVEN
+        sendForfeitMessage(0);
+        sendForfeitMessage(1);
+
+        for (int i = 0; i < 5; i++) {
+            // WHEN
+            sendValidMoveMessage(2);
+
+            // THEN
+            if(i < 4){
+                assertEquals("playerId turn NOT last round",2, GameState.getPlayerIdTurn());
+                assertEquals("cards remaining for player 2"+i,4-i, CardsDeck.getCardsForPlayer(2).size());
+            }
+        }
+    }
 
     private ArrayList<Integer> nrCardsPerPlayer(int[] nrCards){
         ArrayList<Integer> nrCarsperPlayer = new ArrayList<>();
