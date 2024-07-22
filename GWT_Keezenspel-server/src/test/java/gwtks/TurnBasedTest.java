@@ -9,8 +9,7 @@ import java.util.ArrayList;
 
 import static gwtks.GameStateUtil.sendForfeitMessage;
 import static gwtks.GameStateUtil.sendValidMoveMessage;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class TurnBasedTest {
     MoveMessage moveMessage = new MoveMessage();
@@ -80,13 +79,16 @@ public class TurnBasedTest {
         assertEquals(nrCardsPerPlayer, CardsDeck.getNrOfCardsForAllPlayers());
     }
     @Test
-    void player1PlaysCard_Player1Has1CardLessThanPlayer2() {
-
-        fail("This test is not yet implemented");
-    }
-    @Test
     void player1Forfeits_Player1GetsSkippedInNextTurn() {
-        fail("This test is not yet implemented");
+        // GIVEN
+        sendForfeitMessage(0);
+        sendValidMoveMessage(1);
+
+        // WHEN
+        sendValidMoveMessage(2);
+
+        // THEN
+        assertEquals(1, GameState.getPlayerIdTurn());
     }
     @Test
     void allPlayersForfeit_AllPlayersActiveAgain() {
@@ -137,8 +139,18 @@ public class TurnBasedTest {
         assertEquals(nrCardsPerPlayer, CardsDeck.getNrOfCardsForAllPlayers());
     }
     @Test
-    void player1PlaysKingThenPlayer2PlaysKing() {
-        fail("This test is not yet implemented");
+    void player2Forfeits_WhenPlayer1HasPlayed_Player3WillPlayNext(){
+        // GIVEN
+        sendValidMoveMessage(0);
+        sendForfeitMessage(1);
+        sendValidMoveMessage(2);
+
+        // WHEN
+        sendValidMoveMessage(0);
+
+        // THEN
+        assertTrue(CardsDeck.getCardsForPlayer(1).isEmpty());
+        assertEquals(2,GameState.getPlayerIdTurn());
     }
 
     private ArrayList<Integer> nrCardsPerPlayer(int[] nrCards){
