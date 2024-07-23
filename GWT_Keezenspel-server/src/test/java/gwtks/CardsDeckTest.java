@@ -126,8 +126,8 @@ class CardsDeckTest {
 
     public static boolean isSortedNumerically(List<Card> cards) {
         for (int i = 0; i < cards.size() - 1; i++) {
-            int currentValue = cards.get(i).getCard();
-            int nextValue = cards.get(i + 1).getCard();
+            int currentValue = cards.get(i).getCardValue();
+            int nextValue = cards.get(i + 1).getCardValue();
             if (currentValue > nextValue) {
                 return false;
             }

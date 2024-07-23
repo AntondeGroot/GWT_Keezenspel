@@ -42,7 +42,7 @@ public class GameStateUtil {
         moveMessage.setPlayerId(pawn.getPlayerId());
         moveMessage.setPawnId1(pawn.getPawnId());
         moveMessage.setMoveType(MoveType.MOVE);
-        moveMessage.setStepsPawn1(card.getCard()+1);
+        moveMessage.setStepsPawn1(card.getCardValue()+1);
         moveMessage.setCard(card);
         moveMessage.setMessageType(MessageType.MAKE_MOVE);
     }
@@ -79,7 +79,7 @@ public class GameStateUtil {
         moveMessage.setPlayerId(playerId);
         moveMessage.setPawnId1(pawn.getPawnId());
         moveMessage.setMoveType(MoveType.MOVE);
-        moveMessage.setStepsPawn1(card.getCard()+1);
+        moveMessage.setStepsPawn1(card.getCardValue()+1);
         moveMessage.setCard(card);
         moveMessage.setMessageType(MessageType.MAKE_MOVE);
 

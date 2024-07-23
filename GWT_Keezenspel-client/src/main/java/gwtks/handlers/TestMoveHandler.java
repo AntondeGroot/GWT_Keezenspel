@@ -27,10 +27,13 @@ public class TestMoveHandler implements ClickHandler {
 //        errorLabel.setText("");
 
         MoveMessage moveMessage = new MoveMessage();
-        int playerId = Integer.parseInt(getPlayerIdFieldValue());
+//        int playerId = Integer.parseInt(getPlayerIdFieldValue());
+        int playerId = PawnAndCardSelection.getPlayerId();
         int pawnNr = Integer.parseInt(getPawnIdFieldValue());
         PawnId selectedPawnId = new PawnId(playerId,pawnNr);
         Pawn pawn1 = Board.getPawn(selectedPawnId);
+
+        moveMessage.setPlayerId(PawnAndCardSelection.getPlayerId());
 
         if(pawn1.getCurrentTileId().getTileNr() < 0){
             moveMessage.setMoveType(MoveType.ONBOARD);

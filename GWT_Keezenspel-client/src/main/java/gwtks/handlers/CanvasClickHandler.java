@@ -80,7 +80,7 @@ public class CanvasClickHandler {
             Card card = CardsDeck.pickCard(cardNr);
             if(card == null){return;}
 
-            int cardValue = card.getCard() + 1; // go from spriteNr to face value of card
+            int cardValue = card.getCardValue() + 1; // go from spriteNr to face value of card
             PawnAndCardSelection.setCard(card);
             if(cardValue == 1){
                 // ace: onboard OR move

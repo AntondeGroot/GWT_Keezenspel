@@ -37,7 +37,7 @@ public class CardsDeck {
             // source image
             double sw = 1920/13.0;
             double sh = 1150/5.0;
-            double sx = sw*card.getCard();
+            double sx = sw*card.getCardValue();
             double sy = sh*card.getSuit();
             // destination
             int dy = 600;
