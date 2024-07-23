@@ -16,13 +16,15 @@ import static java.awt.SystemColor.window;
 public class PlayerList {
     private static int playerIdPlaying;
     private static ArrayList<Integer> activePlayers = new ArrayList<>();
+    private static boolean isInitialized = false;
 
     public void setPlayerIdPlayingAndDrawPlayerList(int playerIdPlaying) {
-        if (playerIdPlaying == PlayerList.playerIdPlaying) {
+        if (playerIdPlaying == PlayerList.playerIdPlaying && isInitialized) {
             return;
         }
         PlayerList.playerIdPlaying = playerIdPlaying;
         createListElement();
+        isInitialized = true;
     }
 
     public static void setActivePlayers(ArrayList<Integer> activePlayers){

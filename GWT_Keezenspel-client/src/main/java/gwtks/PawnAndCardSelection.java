@@ -11,6 +11,10 @@ public class PawnAndCardSelection {
         playerId = p_playerId;
     }
 
+    public static int getPlayerId(){
+        return playerId;
+    }
+
     public static void addPawn(Pawn pawn) {
         if(playerId == pawn.getPlayerId()){
             // deselect or select
@@ -21,7 +25,7 @@ public class PawnAndCardSelection {
             }
         }else{
             // only select another pawn if you have a Jack
-            if(card!= null && card.getCard()==10){
+            if(card!= null && card.getCardValue()==10){
                 // deselect or select
                 if(pawn2.equals(pawn)){
                     pawn2 = resetPawn();
@@ -29,7 +33,7 @@ public class PawnAndCardSelection {
                     pawn2 = pawn;
                 }
             }
-            if(card==null || card.getCard()!=10){
+            if(card==null || card.getCardValue()!=10){
                 pawn2 = resetPawn();
             }
         }
@@ -40,7 +44,7 @@ public class PawnAndCardSelection {
         card = p_card;
         drawCards = true;
         // if you chose a card other than a Jack, you deselect the pawn belonging to another player
-        if(card.getCard()!=10){
+        if(card.getCardValue()!=10){
             pawn2 = resetPawn();
         }
     }

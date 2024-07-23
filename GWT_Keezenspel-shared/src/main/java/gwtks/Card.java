@@ -7,14 +7,14 @@ import java.util.Objects;
 @SuppressWarnings("serial")
 public class Card implements IsSerializable {
     private int suit;
-    private int card;
+    private int cardValue;
 
     public Card() {
     }
 
-    public Card(int suit, int card) {
+    public Card(int suit, int cardValue) {
         this.suit = suit;
-        this.card = card;
+        this.cardValue = cardValue;
     }
 
     public int getSuit() {
@@ -25,12 +25,12 @@ public class Card implements IsSerializable {
         this.suit = suit;
     }
 
-    public int getCard() {
-        return card;
+    public int getCardValue() {
+        return cardValue;
     }
 
-    public void setCard(int card) {
-        this.card = card;
+    public void setCardValue(int cardValue) {
+        this.cardValue = cardValue;
     }
 
     @Override
@@ -38,19 +38,19 @@ public class Card implements IsSerializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Card card1 = (Card) o;
-        return suit == card1.suit && card == card1.card;
+        return suit == card1.suit && cardValue == card1.cardValue;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(suit, card);
+        return Objects.hash(suit, cardValue);
     }
 
     @Override
     public String toString() {
         return "Card{" +
                 "suit=" + suit +
-                ", card=" + card +
+                ", card=" + cardValue +
                 '}';
     }
 }

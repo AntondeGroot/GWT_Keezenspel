@@ -29,6 +29,7 @@ public class SendHandler implements ClickHandler {
         PawnId selectedPawnId = new PawnId(playerId,pawnNr);
         Pawn pawn1 = Board.getPawn(selectedPawnId);
 
+        moveMessage.setPlayerId(PawnAndCardSelection.getPlayerId());
         moveMessage.setPawnId1(PawnAndCardSelection.getPawnId1());
         moveMessage.setCard(PawnAndCardSelection.getCard());
         String moveType = getMoveTypeFieldValue();
@@ -51,6 +52,8 @@ public class SendHandler implements ClickHandler {
         }
         moveMessage.setMessageType(MessageType.MAKE_MOVE);
         moveMessage.setStepsPawn1(Integer.parseInt(getStepsNrFieldValue()));
+
+        GWT.log("MoveMessage"+moveMessage);
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
             public void onFailure(Throwable caught) {

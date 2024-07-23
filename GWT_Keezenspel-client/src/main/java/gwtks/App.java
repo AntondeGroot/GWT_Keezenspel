@@ -98,8 +98,6 @@ public class App implements EntryPoint {
 		// Schedule the timer to run every 200ms
 		timer.scheduleRepeating(200);
 
-		CardsDeck.drawCards();
-
 		CanvasClickHandler.addClickHandler();
 	}
 

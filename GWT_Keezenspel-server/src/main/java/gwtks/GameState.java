@@ -180,10 +180,23 @@ public class GameState {
             return;
         }
 
+        // Player must have the card he wants to play
         if(!CardsDeck.playerHasCard(moveMessage.getPlayerId(), moveMessage.getCard())) {
             System.out.println("playerId"+moveMessage.getPlayerId());
             response.setResult(MoveResult.PLAYER_DOES_NOT_HAVE_CARD);
             return;
+        }
+
+        // Player cannot move an opponents pawn without playing a Jack
+        if(moveMessage.getCard().getCardValue() != 10){
+            if(moveMessage.getPawnId1() != null && moveMessage.getPawnId1().getPlayerId() != moveMessage.getPlayerId()){
+                response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+                return;
+            }
+            if(moveMessage.getPawnId2() != null && moveMessage.getPawnId2().getPlayerId() != moveMessage.getPlayerId()){
+                response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+                return;
+            }
         }
 
         moves.add(currentTileId);
@@ -495,7 +508,7 @@ public class GameState {
         }
 
         // cannot go onboard without an Ace or King
-        int cardValue = moveMessage.getCard().getCard();
+        int cardValue = moveMessage.getCard().getCardValue();
         if(!(cardValue == 0 || cardValue == 12)){
             response.setResult(MoveResult.CANNOT_MAKE_MOVE);
             return;

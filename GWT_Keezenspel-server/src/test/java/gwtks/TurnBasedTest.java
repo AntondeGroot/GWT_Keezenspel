@@ -169,6 +169,38 @@ public class TurnBasedTest {
             }
         }
     }
+    @Test
+    void playerCanOnlyMoveHisOwnPawn(){
+        // WHEN
+        sendValidMoveMessage(0);
+
+        // send a valid move for the wrong player
+        Pawn pawn = new Pawn(new PawnId(0,0),new TileId(0,6));
+
+
+        // fake a valid card
+        Card card = new Card(0,5);
+
+        // replace a card from the players hand with this card
+        CardsDeck.giveCardToPlayerForTesting(1, card);
+
+        // send move message
+        MoveMessage moveMessage = new MoveMessage();
+        moveMessage.setPlayerId(1);
+        moveMessage.setPawnId1(pawn.getPawnId());
+        moveMessage.setMoveType(MoveType.MOVE);
+        moveMessage.setStepsPawn1(card.getCardValue()+1);
+        moveMessage.setCard(card);
+        moveMessage.setMessageType(MessageType.MAKE_MOVE);
+
+        // process
+        MoveResponse moveResponse = new MoveResponse();
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN
+        assertNull(moveResponse.getMovePawn1());
+        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
+    }
 
     private ArrayList<Integer> nrCardsPerPlayer(int[] nrCards){
         ArrayList<Integer> nrCarsperPlayer = new ArrayList<>();

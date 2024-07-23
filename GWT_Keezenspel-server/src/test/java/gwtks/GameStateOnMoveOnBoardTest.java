@@ -175,4 +175,10 @@ class GameStateOnMoveOnBoardTest {
         // THEN Gamestate is correct
         assertEquals(new TileId(0,15), GameState.getPawn(pawn1).getCurrentTileId());
     }
+    @Test
+    void playerCanOnlyMoveHisOwnPawn(){
+        // GIVEN
+        Card card = givePlayerCard(0,-1);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(0, new TileId(1,0));
+    }
 }
