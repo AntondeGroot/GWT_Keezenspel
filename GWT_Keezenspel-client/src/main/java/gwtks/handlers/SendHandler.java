@@ -29,7 +29,7 @@ public class SendHandler implements ClickHandler {
         PawnId selectedPawnId = new PawnId(playerId,pawnNr);
         Pawn pawn1 = Board.getPawn(selectedPawnId);
 
-        moveMessage.setPawnId1(selectedPawnId);
+        moveMessage.setPawnId1(PawnAndCardSelection.getPawnId1());
         moveMessage.setCard(PawnAndCardSelection.getCard());
         String moveType = getMoveTypeFieldValue();
         switch (moveType.toLowerCase()) {

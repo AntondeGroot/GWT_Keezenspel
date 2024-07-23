@@ -117,16 +117,17 @@ public class App implements EntryPoint {
 	};
 
 	public void pollServerForCards(){
-		GWT.log("player id playing: "+PlayerList.getPlayerIdPlaying()+"\n");
-		GWT.log("...");
+//		GWT.log("player id playing: "+PlayerList.getPlayerIdPlaying()+"\n");
+//		GWT.log("...");
 		cardsService.getCards(PlayerList.getPlayerIdPlaying(), new AsyncCallback<CardResponse>() {
 			public void onFailure(Throwable caught) {
 				StepsAnimation.reset();
 			}
 			public void onSuccess(CardResponse result) {
-				GWT.log("cards playerId"     + result.getPlayerId());
-				GWT.log("Cards received: "   + result.getCards());
-				GWT.log("Cards per player: " + result.getNrOfCardsPerPlayer());
+//				GWT.log("cards playerId"     + result.getPlayerId());
+//				GWT.log("Cards received: "   + result.getCards());
+//				GWT.log("Cards per player: " + result.getNrOfCardsPerPlayer());
+				PawnAndCardSelection.setPlayerId(result.getPlayerId());
 				if(CardsDeck.areCardsDifferent(result.getCards())){
 					CardsDeck.setCards(result.getCards());
 					CardsDeck.drawCards();
