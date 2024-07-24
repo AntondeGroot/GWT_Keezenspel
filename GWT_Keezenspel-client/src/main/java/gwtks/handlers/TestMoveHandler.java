@@ -27,24 +27,13 @@ public class TestMoveHandler implements ClickHandler {
 //        errorLabel.setText("");
 
         MoveMessage moveMessage = new MoveMessage();
-//        int playerId = Integer.parseInt(getPlayerIdFieldValue());
-        int playerId = PawnAndCardSelection.getPlayerId();
-        int pawnNr = Integer.parseInt(getPawnIdFieldValue());
-        PawnId selectedPawnId = new PawnId(playerId,pawnNr);
-        Pawn pawn1 = Board.getPawn(selectedPawnId);
-
         moveMessage.setPlayerId(PawnAndCardSelection.getPlayerId());
-
-        if(pawn1.getCurrentTileId().getTileNr() < 0){
-            moveMessage.setMoveType(MoveType.ONBOARD);
-
-        }else{
-            moveMessage.setMoveType(MoveType.MOVE);
-        }
+        moveMessage.setMoveType(PawnAndCardSelection.getMoveType());
         moveMessage.setCard(PawnAndCardSelection.getCard());
-        moveMessage.setPawnId1(selectedPawnId);
+        moveMessage.setPawnId1(PawnAndCardSelection.getPawnId1());
         moveMessage.setMessageType(MessageType.CHECK_MOVE);
-        moveMessage.setStepsPawn1(Integer.parseInt(getStepsNrFieldValue()));
+        moveMessage.setStepsPawn1(PawnAndCardSelection.getNrSteps());
+        moveMessage.setPawnId2(PawnAndCardSelection.getPawnId2());
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
             public void onFailure(Throwable caught) {

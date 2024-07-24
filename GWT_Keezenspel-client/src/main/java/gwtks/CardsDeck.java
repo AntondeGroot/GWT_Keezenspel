@@ -1,7 +1,6 @@
 package gwtks;
 
 import com.google.gwt.canvas.dom.client.Context2d;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ImageElement;
@@ -33,7 +32,6 @@ public class CardsDeck {
         // card width 100 is good for your own hand
         int i=0;
         for (Card card: cards){
-            GWT.log("drawing card : "+i);
             // source image
             double sw = 1920/13.0;
             double sh = 1150/5.0;
@@ -44,14 +42,13 @@ public class CardsDeck {
             double dw = 100.0;
             double dx = 10+(dw+10)* i;
             double dh = dw/sw*sh;
-            GWT.log("card height = "+dh);
-            i++;
             // for spritesheets dx dy
             ctxCards.drawImage(img, sx,sy,sw,sh,dx,dy,dw,dh);
             double lineThickness = 3;
-            if(PawnAndCardSelection.getCard() != null && PawnAndCardSelection.getCard().equals(card)){
+            if(PawnAndCardSelection.getCard() != null && PawnAndCardSelection.getCard().equals(card) && PawnAndCardSelection.getCardNr() == i){
                 drawRoundedRect(ctxCards, dx-lineThickness/2, dy-lineThickness/2, dw+lineThickness, dh+lineThickness, 8);
             }
+            i++;
         }
     }
 
