@@ -19,7 +19,7 @@ public class GameState {
         if (pawns.isEmpty()) {
             PawnId pawnId = new PawnId();
 
-//            GameState.nrPlayers = nrPlayers;
+            GameState.nrPlayers = nrPlayers;
             pawns = new ArrayList<Pawn>();
             for (int playerId = 0; playerId < nrPlayers; playerId++) {
                 activePlayers.add(playerId);
