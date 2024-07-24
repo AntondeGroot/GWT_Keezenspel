@@ -25,17 +25,17 @@ public class GameStateUtil {
     }
     public static Card givePlayerAce(int playerId){
         Card ace = new Card(playerId, 0);
-        CardsDeck.setPlayerCard(playerId, ace);
+        CardsDeck.giveCardToPlayerForTesting(playerId, ace);
         return ace;
     }
     public static Card givePlayerKing(int playerId){
         Card king = new Card(playerId, 11);
-        CardsDeck.setPlayerCard(playerId, king);
+        CardsDeck.giveCardToPlayerForTesting(playerId, king);
         return king;
     }
     public static Card givePlayerJack(int playerId){
         Card jack = new Card(playerId, 10);
-        CardsDeck.setPlayerCard(playerId, jack);
+        CardsDeck.giveCardToPlayerForTesting(playerId, jack);
         return jack;
     }
     public static void createMoveMessage(MoveMessage moveMessage, Pawn pawn, Card card){
@@ -52,7 +52,7 @@ public class GameStateUtil {
         moveMessage.setPawnId2(pawn2.getPawnId());
         moveMessage.setCard(card);
         moveMessage.setMoveType(MoveType.SWITCH);
-        moveMessage.setMoveType(MoveType.MOVE);
+        moveMessage.setMessageType(MessageType.MAKE_MOVE);
     }
     public static void sendForfeitMessage(int playerId){
         MoveMessage moveMessage = new MoveMessage();

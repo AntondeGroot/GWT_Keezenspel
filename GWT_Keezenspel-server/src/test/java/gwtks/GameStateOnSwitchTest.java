@@ -25,6 +25,7 @@ class GameStateOnSwitchTest {
         GameState.tearDown();
         moveMessage = null;
         moveResponse = null;
+        CardsDeck.reset();
     }
 
     @Test
@@ -206,6 +207,29 @@ class GameStateOnSwitchTest {
     }
     @Test
     void testWhenPawnsSwitch_CardGetsRemovedFromHand_AndNextPlayerPlays(){
-        fail("test should be implemented");
+        Card card = givePlayerJack(0);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(0,new TileId(0,12));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(1,new TileId(0,5));
+        assertEquals(5, CardsDeck.getCardsForPlayer(0).size());
+
+        createSwitchMessage(moveMessage, pawn1, pawn2, card);
+        GameState.processOnSwitch(moveMessage, moveResponse);
+
+        assertEquals(4, CardsDeck.getCardsForPlayer(0).size());
+        assertEquals(1,GameState.getPlayerIdTurn());
+    }
+    @Test
+    void testingWhenPawnsSwitch_CardNotRemovedFromHand(){
+        Card card = givePlayerJack(0);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(0,new TileId(0,12));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(1,new TileId(0,5));
+        assertEquals(5, CardsDeck.getCardsForPlayer(0).size());
+
+        createSwitchMessage(moveMessage, pawn1, pawn2, card);
+        moveMessage.setMessageType(MessageType.CHECK_MOVE);
+        GameState.processOnSwitch(moveMessage, moveResponse);
+
+        assertEquals(5, CardsDeck.getCardsForPlayer(0).size());
+        assertEquals(0,GameState.getPlayerIdTurn());
     }
 }
