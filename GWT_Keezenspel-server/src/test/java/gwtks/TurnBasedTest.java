@@ -218,10 +218,10 @@ public class TurnBasedTest {
         assertEquals(intsToList(new int[]{2}), GameState.getActivePlayers());
     }
 
-    private ArrayList<Integer> intsToList(int[] ints){
+    private ArrayList<Integer> intsToList(int[] integers){
         ArrayList<Integer> result = new ArrayList<>();
-        for (int i = 0; i < ints.length; i++) {
-            result.add(ints[i]);
+        for (int integer : integers) {
+            result.add(integer);
         }
         return result;
     }

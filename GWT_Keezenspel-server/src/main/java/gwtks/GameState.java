@@ -417,7 +417,6 @@ public class GameState {
     public static void processOnForfeit(MoveMessage message){
         CardsDeck.forfeitCardsForPlayer(message.getPlayerId());
         GameState.forfeitPlayer(message.getPlayerId());
-//        GameState.nextTurn();
     }
 
     public static void processOnSwitch(MoveMessage moveMessage, MoveResponse moveResponse){
@@ -496,8 +495,13 @@ public class GameState {
         TileId tileId1 = new TileId(pawn1.getCurrentTileId());
         TileId tileId2 = new TileId(pawn2.getCurrentTileId());
         // switch in gamestate
-        movePawn(new Pawn(pawnId1,tileId2));
-        movePawn(new Pawn(pawnId2,tileId1));
+        // only use the card when not testing
+        if(moveMessage.getMessageType() == MessageType.MAKE_MOVE){
+            movePawn(new Pawn(pawnId1,tileId2));
+            movePawn(new Pawn(pawnId2,tileId1));
+            CardsDeck.playerPlaysCard(moveMessage.getPlayerId(), moveMessage.getCard());
+            nextActivePlayer();
+        }
     }
 
     public static void processOnBoard(MoveMessage moveMessage, MoveResponse response) {
