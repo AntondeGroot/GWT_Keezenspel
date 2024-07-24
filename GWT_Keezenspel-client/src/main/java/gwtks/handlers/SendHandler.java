@@ -7,6 +7,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import gwtks.*;
 import gwtks.animations.StepsAnimation;
 
+import static gwtks.MessageType.MAKE_MOVE;
+
 public class SendHandler implements ClickHandler {
     private final MovingServiceAsync movingService = GWT.create(MovingService.class);
     /**
@@ -24,36 +26,15 @@ public class SendHandler implements ClickHandler {
 //        errorLabel.setText("");
 
         MoveMessage moveMessage = new MoveMessage();
-        int playerId = Integer.parseInt(getPlayerIdFieldValue());
-        int pawnNr = Integer.parseInt(getPawnIdFieldValue());
-        PawnId selectedPawnId = new PawnId(playerId,pawnNr);
-        Pawn pawn1 = Board.getPawn(selectedPawnId);
-
         moveMessage.setPlayerId(PawnAndCardSelection.getPlayerId());
         moveMessage.setPawnId1(PawnAndCardSelection.getPawnId1());
         moveMessage.setCard(PawnAndCardSelection.getCard());
-        String moveType = getMoveTypeFieldValue();
-        switch (moveType.toLowerCase()) {
-            case "move":
-                moveMessage.setMoveType(MoveType.MOVE);
-                break;
-            case "onboard":
-                moveMessage.setMoveType(MoveType.ONBOARD);
-                break;
-            case "split":
-                moveMessage.setMoveType(MoveType.SPLIT);
-                break;
-            case "switch":
-                moveMessage.setMoveType(MoveType.SWITCH);
-                break;
-            case "forfeit":
-                moveMessage.setMoveType(MoveType.FORFEIT);
-                break;
-        }
-        moveMessage.setMessageType(MessageType.MAKE_MOVE);
-        moveMessage.setStepsPawn1(Integer.parseInt(getStepsNrFieldValue()));
+        moveMessage.setMoveType(PawnAndCardSelection.getMoveType());
+        moveMessage.setMessageType(MAKE_MOVE);
+        moveMessage.setStepsPawn1(PawnAndCardSelection.getNrSteps());
+        moveMessage.setPawnId2(PawnAndCardSelection.getPawnId2());
 
-        GWT.log("MoveMessage"+moveMessage);
+        GWT.log("... Sending MoveMessage" + moveMessage);
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
             public void onFailure(Throwable caught) {

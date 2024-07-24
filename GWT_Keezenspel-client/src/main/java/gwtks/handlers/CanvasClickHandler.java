@@ -78,32 +78,11 @@ public class CanvasClickHandler {
             moveType.setValue("");
 
             Card card = CardsDeck.pickCard(cardNr);
+            PawnAndCardSelection.setCardNr(cardNr);
             if(card == null){return;}
 
-            int cardValue = card.getCardValue() + 1; // go from spriteNr to face value of card
             PawnAndCardSelection.setCard(card);
-            if(cardValue == 1){
-                // ace: onboard OR move
-                if(PawnAndCardSelection.getPawn1().getCurrentTileId().getTileNr() < 0){
-                    moveType.setValue("ONBOARD");
-                }else{
-                    moveType.setValue("MOVE");
-                    nrSteps.setValue(String.valueOf(cardValue));
-                }
-            }else if(cardValue == 11){
-                // jack: switch pawns
-                moveType.setValue("SWITCH");
-            }else if(cardValue == 13){
-                // king: onboard
-                moveType.setValue("ONBOARD");
-            }else{
-                // move
-                if(cardValue == 4){
-                    cardValue = -4;
-                }
-                moveType.setValue("MOVE");
-                nrSteps.setValue(String.valueOf(cardValue));
-            }
+            PawnAndCardSelection.setCardNr(cardNr);
 
             if(PawnAndCardSelection.getPawn1() != null && PawnAndCardSelection.getCard() != null){
                 TestMoveHandler testMoveHandler = new TestMoveHandler();
@@ -124,14 +103,16 @@ public class CanvasClickHandler {
             for (TileMapping tile : tiles) {
                 if (tile.getTileId().equals(tileOfPawn)) {
                     if(isWithinDistance(tile.getPosition(), new Point(x,y))){
+                        PawnAndCardSelection.addPawn(pawn);
+
+                        // for debugging
                         GWT.log("You clicked on pawn"+pawn.getPawnId()+" position: "+tile.getPosition());
                         Document document = Document.get();
                         InputElement playerId = (InputElement) document.getElementById("playerId");
-                        playerId.setValue(String.valueOf(pawn.getPlayerId()));
+                        playerId.setValue(String.valueOf(PawnAndCardSelection.getPlayerId()));
                         InputElement pawnId = (InputElement) document.getElementById("pawnId");
                         pawnId.setValue(String.valueOf(pawn.getPawnId().getPawnNr()));
-
-                        PawnAndCardSelection.addPawn(pawn);
+                        //
 
                         if(PawnAndCardSelection.getPawn1() != null && PawnAndCardSelection.getCard() != null){
                             TestMoveHandler testMoveHandler = new TestMoveHandler();

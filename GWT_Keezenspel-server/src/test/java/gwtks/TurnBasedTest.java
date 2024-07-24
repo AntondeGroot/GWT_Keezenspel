@@ -75,7 +75,7 @@ public class TurnBasedTest {
         sendValidMoveMessage(0);
 
         // THEN
-        nrCardsPerPlayer = nrCardsPerPlayer(new int[]{4,5,5});
+        nrCardsPerPlayer = intsToList(new int[]{4,5,5});
         assertEquals(nrCardsPerPlayer, CardsDeck.getNrOfCardsForAllPlayers());
     }
     @Test
@@ -109,7 +109,7 @@ public class TurnBasedTest {
         sendForfeitMessage(2);
 
         // THEN
-        nrCardsPerPlayer = nrCardsPerPlayer(new int[]{4,4,4});
+        nrCardsPerPlayer = intsToList(new int[]{4,4,4});
         assertEquals(nrCardsPerPlayer, CardsDeck.getNrOfCardsForAllPlayers());
     }
     @Test
@@ -122,7 +122,7 @@ public class TurnBasedTest {
         }
 
         // THEN
-        nrCardsPerPlayer = nrCardsPerPlayer(new int[]{4, 4, 4});
+        nrCardsPerPlayer = intsToList(new int[]{4, 4, 4});
         assertEquals(nrCardsPerPlayer, CardsDeck.getNrOfCardsForAllPlayers());
     }
     @Test
@@ -135,7 +135,7 @@ public class TurnBasedTest {
         }
 
         // THEN
-        nrCardsPerPlayer = nrCardsPerPlayer(new int[]{5,5,5});
+        nrCardsPerPlayer = intsToList(new int[]{5,5,5});
         assertEquals(nrCardsPerPlayer, CardsDeck.getNrOfCardsForAllPlayers());
     }
     @Test
@@ -201,12 +201,28 @@ public class TurnBasedTest {
         assertNull(moveResponse.getMovePawn1());
         assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
     }
-
-    private ArrayList<Integer> nrCardsPerPlayer(int[] nrCards){
-        ArrayList<Integer> nrCarsperPlayer = new ArrayList<>();
-        for (int i = 0; i < nrCards.length; i++) {
-            nrCarsperPlayer.add(nrCards[i]);
+    @Test
+    void playersPlayAllTheirCards_ExceptLastPlayer_OnlyLastPlayerIsActive(){
+        // GIVEN
+        for (int i = 0; i < 4; i++) {
+            sendValidMoveMessage(0);
+            sendValidMoveMessage(1);
+            sendValidMoveMessage(2);
         }
-        return nrCarsperPlayer;
+
+        // WHEN
+        sendValidMoveMessage(0);
+        sendValidMoveMessage(1);
+
+        // THEN
+        assertEquals(intsToList(new int[]{2}), GameState.getActivePlayers());
+    }
+
+    private ArrayList<Integer> intsToList(int[] ints){
+        ArrayList<Integer> result = new ArrayList<>();
+        for (int i = 0; i < ints.length; i++) {
+            result.add(ints[i]);
+        }
+        return result;
     }
 }
