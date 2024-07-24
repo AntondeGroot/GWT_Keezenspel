@@ -17,6 +17,7 @@ public class PlayerList {
     private static int playerIdPlaying;
     private static ArrayList<Integer> activePlayers = new ArrayList<>();
     private static boolean isInitialized = false;
+    private static int nrPlayers;
 
     public void setPlayerIdPlayingAndDrawPlayerList(int playerIdPlaying) {
         if (playerIdPlaying == PlayerList.playerIdPlaying && isInitialized) {
@@ -25,6 +26,9 @@ public class PlayerList {
         PlayerList.playerIdPlaying = playerIdPlaying;
         createListElement();
         isInitialized = true;
+    }
+    public static void setNrPlayers(int nrPlayers){
+        PlayerList.nrPlayers = nrPlayers;
     }
 
     public static void setActivePlayers(ArrayList<Integer> activePlayers){
@@ -43,7 +47,7 @@ public class PlayerList {
         Grid grid = new Grid(rowCount, colCount);
         RootPanel.get("playerListContainer").clear();
 
-        for (int playerId = 0; playerId < playerNames.length; playerId++) {
+        for (int playerId = 0; playerId < nrPlayers; playerId++) {
             int imagePixelSize = 50;
 
             ImageElement img = Document.get().createImageElement();

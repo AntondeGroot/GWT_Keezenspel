@@ -101,12 +101,14 @@ public class Board {
 		context.save();
 	}
 
-	public static boolean setPawns(ArrayList<Pawn> pawns) {
+	public static boolean isInitialized(){
+        return !Board.getPawns().isEmpty();
+    }
+
+	public static void setPawns(ArrayList<Pawn> pawns) {
 		if(Board.pawns.isEmpty()){
 			Board.pawns = pawns;
-			return true;
 		}
-		return false;
 	}
 
 	private void drawCircle(Context2d context, double x, double y, double radius, String color) {

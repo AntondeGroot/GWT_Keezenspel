@@ -7,16 +7,19 @@ public class GameState {
 
     private static ArrayList<Pawn> pawns = new ArrayList<>();
     private static int playerIdTurn;
-    private static int nrPlayers;
+    private static int nrPlayers = 3;
     private static ArrayList<TileId> tiles = new ArrayList<>();
     private static ArrayList<Integer> activePlayers = new ArrayList<>();
 
+    public GameState(){
+        this(nrPlayers);
+    }
 
     public GameState(int nrPlayers) {
         if (pawns.isEmpty()) {
             PawnId pawnId = new PawnId();
 
-            GameState.nrPlayers = nrPlayers;
+//            GameState.nrPlayers = nrPlayers;
             pawns = new ArrayList<Pawn>();
             for (int playerId = 0; playerId < nrPlayers; playerId++) {
                 activePlayers.add(playerId);
@@ -358,7 +361,7 @@ public class GameState {
 
             int tileHighestTileNr = checkHighestTileNrYouCanMoveTo(pawnId1,currentTileId,nrSteps);
             if(tileHighestTileNr > targetTileId.getTileNr()){
-                moves.add(new TileId((playerIdOfTile+1)%8, tileHighestTileNr));
+                moves.add(new TileId((playerIdOfTile+1)%nrPlayers, tileHighestTileNr));
                 if(targetTileId.getTileNr() < 15){moves.add(new TileId(targetTileId.getPlayerId(), 15));}
                 if(targetTileId.getTileNr() < 13){moves.add(new TileId(targetTileId.getPlayerId(), 13));}
                 if(targetTileId.getTileNr() < 7){moves.add(new TileId(targetTileId.getPlayerId(), 7));}

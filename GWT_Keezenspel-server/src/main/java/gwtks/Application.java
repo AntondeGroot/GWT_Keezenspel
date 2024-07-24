@@ -23,6 +23,7 @@ public class Application
     for (int i = 0; i < 8; i++) {
       ImageProcessing.create(i);
     }
+    GameState gameState = new GameState();
   }
 
   @Override
