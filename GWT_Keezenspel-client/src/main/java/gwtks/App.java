@@ -55,12 +55,6 @@ public class App implements EntryPoint {
 		ctxPawns = ((CanvasElement) document.getElementById("canvasPawns")).getContext2d();
 		ctxBoard = ((CanvasElement) document.getElementById("canvasBoard")).getContext2d();
 
-		int nrPlayers = 8;
-        Board board = new Board();
-		board.createBoard(nrPlayers,600);
-		board.drawBoard(ctxBoard); // let this stay here
-		board.drawPawns(ctxPawns);
-
 		PlayerList playerList = new PlayerList();
 		playerList.createListElement();
 
@@ -125,6 +119,7 @@ public class App implements EntryPoint {
 //				GWT.log("cards playerId"     + result.getPlayerId());
 //				GWT.log("Cards received: "   + result.getCards());
 //				GWT.log("Cards per player: " + result.getNrOfCardsPerPlayer());
+
 				PawnAndCardSelection.setPlayerId(result.getPlayerId());
 				if(CardsDeck.areCardsDifferent(result.getCards())){
 					CardsDeck.setCards(result.getCards());
@@ -142,9 +137,13 @@ public class App implements EntryPoint {
 				GWT.log(result.toString());
 				// only set the board when empty, e.g.
 				// when the browser was refreshed or when you join the game for the first time
-				if(Board.setPawns(result.getPawns())){
+				if(!Board.isInitialized()){
 					Board board = new Board();
+					Board.setPawns(result.getPawns());
+					board.createBoard(result.getNrPlayers(),600);
+					board.drawBoard(ctxBoard);
 					board.drawPawns(ctxPawns);
+					PlayerList.setNrPlayers(result.getNrPlayers());
 				}
 				PlayerList playerList = new PlayerList();
 				PlayerList.setActivePlayers(result.getActivePlayers());

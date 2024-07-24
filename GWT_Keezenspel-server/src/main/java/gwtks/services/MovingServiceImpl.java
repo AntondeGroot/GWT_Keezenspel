@@ -27,7 +27,6 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
         response.setPawnId2(message.getPawnId2());
 
         // change the gamestate
-        GameState gameState = new GameState(8);
         switch (message.getMoveType()) {
             case MOVE : GameState.processOnMove(message, response);
                 break;
