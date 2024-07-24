@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static gwtks.GameStateUtil.*;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GameStateOnSwitchTest {
@@ -202,5 +203,9 @@ class GameStateOnSwitchTest {
         // THEN: GameState is correct
         assertEquals(tileId1, GameState.getPawn(pawn1).getCurrentTileId());
         assertEquals(tileId2, GameState.getPawn(pawn2).getCurrentTileId());
+    }
+    @Test
+    void testWhenPawnsSwitch_CardGetsRemovedFromHand_AndNextPlayerPlays(){
+        fail("test should be implemented");
     }
 }

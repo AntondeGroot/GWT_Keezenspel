@@ -5,6 +5,8 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static gwtks.GameState.forfeitPlayer;
+
 public class CardsDeck implements IsSerializable {
     private static int roundNr = 0;
     private static ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
@@ -50,6 +52,9 @@ public class CardsDeck implements IsSerializable {
     public static void playerPlaysCard(int playerId, Card card) {
         if(card != null) {
             players.get(playerId).getHand().remove(card);
+            if(players.get(playerId).getHand().isEmpty()){
+                forfeitPlayer(playerId);
+            }
         }
     }
 
