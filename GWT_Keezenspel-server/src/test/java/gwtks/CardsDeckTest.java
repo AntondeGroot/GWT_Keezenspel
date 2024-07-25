@@ -2,6 +2,7 @@ package gwtks;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -11,6 +12,11 @@ import static gwtks.GameStateUtil.givePlayerCard;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CardsDeckTest {
+    @BeforeEach
+    void setup(){
+        CardsDeck.reset();
+    }
+
     @AfterEach
     void tearDown() {
         CardsDeck.reset();
