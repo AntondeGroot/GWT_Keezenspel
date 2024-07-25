@@ -262,4 +262,23 @@ class MovingOnFinishTilesTest {
         // THEN Gamestate is correct
         assertEquals(new TileId(0,14), GameState.getPawn(pawn1).getCurrentTileId());
     }
+    @Test
+    void pawnAt14_18_When18Takes4StepsBack_CannotMove(){
+        // it would otherwise end up on 0,14 and be placed on its own pawn
+        // GIVEN
+        Card card = givePlayerCard(1,-4);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(1,1), new TileId(1,18));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(1,2), new TileId(0,14));
+
+        // WHEN
+        createMoveMessage(moveMessage, pawn1, card);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN response message is correct
+        assertEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
+        assertNull(moveResponse.getMovePawn1());
+        assertNull(moveResponse.getPawnId1());
+        // THEN Gamestate is correct
+        assertEquals(new TileId(1,18), GameState.getPawn(pawn1).getCurrentTileId());
+    }
 }

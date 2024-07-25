@@ -153,7 +153,7 @@ public class GameState {
     private static boolean canMoveToTileBecauseSamePlayer(PawnId selectedPawnId, TileId nextTileId){
         Pawn pawn = getPawn(nextTileId);
         if(pawn != null) {
-            if (pawn.getPlayerId() == selectedPawnId.getPlayerId()) {
+            if (pawn.getPlayerId() == selectedPawnId.getPlayerId() && !pawn.getPawnId().equals(selectedPawnId)) {
                 return false;
             }
         }
@@ -606,6 +606,11 @@ public class GameState {
             if(moveMessage.getMessageType() == MAKE_MOVE){
                 CardsDeck.playerPlaysCard(moveMessage.getPlayerId(), moveMessage.getCard());
             }
+        }
+        if(!canMoveToTileBecauseSamePlayer(pawnId, targetTileId)){
+            clearResponse(response);
+            response.setResult(CANNOT_MAKE_MOVE);
+            return;
         }
 
         // check for kills
