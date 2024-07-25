@@ -8,7 +8,7 @@ import static gwtks.GameStateUtil.*;
 import static gwtks.MoveResult.CANNOT_MAKE_MOVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class GameStateOnCheckOnBoardTest {
+public class CheckingOnBoardTest {
     MoveMessage moveMessage = new MoveMessage();
     MoveResponse moveResponse = new MoveResponse();
 

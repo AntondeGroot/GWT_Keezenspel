@@ -8,7 +8,7 @@ import static gwtks.GameStateUtil.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class GameStateOnMoveOnBoardSamePlayerTest {
+class MovingOnBoardSamePlayerBlockingTest {
     MoveMessage moveMessage = new MoveMessage();
     MoveResponse moveResponse = new MoveResponse();
 

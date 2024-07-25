@@ -144,7 +144,7 @@ public class GameState {
         return true;
     }
 
-    private static boolean canMoveToTileBecauseSamePawn(PawnId selectedPawnId, TileId nextTileId){
+    private static boolean canMoveToTileBecauseSamePlayer(PawnId selectedPawnId, TileId nextTileId){
         Pawn pawn = getPawn(nextTileId);
         if(pawn != null) {
             if (pawn.getPlayerId() == selectedPawnId.getPlayerId()) {
@@ -209,7 +209,7 @@ public class GameState {
         if (next > 15 && !isPawnOnLastSection(playerId, playerIdOfTile) && !isPawnOnFinish(pawnId1, currentTileId) ) {
             System.out.println("GameState: OnMove: normal route between 0,15 but could move to next section");
             // check
-            if(!canMoveToTileBecauseSamePawn(pawnId1, new TileId(playerId+1, 0))&&next==16){
+            if(!canMoveToTileBecauseSamePlayer(pawnId1, new TileId(playerId+1, 0))&&next==16){
                 response.setResult(MoveResult.CANNOT_MAKE_MOVE);
                 return;
             }
@@ -219,7 +219,7 @@ public class GameState {
             if(currentTileId.getTileNr() < 13){moves.add(new TileId(currentTileId.getPlayerId(), 13));}
             if(currentTileId.getTileNr() < 15){moves.add(new TileId(currentTileId.getPlayerId(), 15));}
 
-            if (canMoveToTile(pawnId1, new TileId(playerIdOfTile+1,0))) {
+            if (canMoveToTile(pawnId1, new TileId((playerIdOfTile+1)%nrPlayers,0))) {
                 System.out.println("GameState: OnMove: can move past StartTile "+new TileId(playerIdOfTile+1,0));
                 System.out.println("GameState: OnMove: normal route can move to the next section");
                 next = next % 16;
@@ -318,7 +318,7 @@ public class GameState {
                 return;
             }
             else{
-                response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+                    response.setResult(MoveResult.CANNOT_MAKE_MOVE);
                 return;
             }
         }
