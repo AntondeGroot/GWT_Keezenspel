@@ -355,19 +355,75 @@ class MovingOverStartTileTest {
         assertEquals(new TileId(7,12), GameState.getPawn(pawn1).getCurrentTileId());
     }
     @Test
-    void canPassStartTileSamePawnWhenPawnOnDifferentStartTile(){
-        fail("not implemented");
+    void canPassStartTileSamePlayerWhenPawnOnDifferentStartTile(){
+        // GIVEN
+        Card card = givePlayerCard(2,4);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(2,1), new TileId(0,15));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(2,2), new TileId(1,0));
+
+        // WHEN
+        createMoveMessage(moveMessage, pawn1, card);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN response message is correct
+        assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());
+        assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+        assertEquals(new TileId(1,3), moveResponse.getMovePawn1().getLast());
+        // THEN Gamestate is correct
+        assertEquals(new TileId(1,3), GameState.getPawn(pawn1).getCurrentTileId());
     }
     @Test
-    void canPassStartTileBackWards_SamePawn_WhenPawnOnDifferentStartTile(){
-        fail("not implemented");
+    void canPassStartTileBackWards_SamePlayer_WhenPawnOnDifferentStartTile(){
+        // GIVEN
+        Card card = givePlayerCard(2,-4);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(2,1), new TileId(1,2));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(2,2), new TileId(1,0));
+
+        // WHEN
+        createMoveMessage(moveMessage, pawn1, card);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN response message is correct
+        assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());
+        assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+        assertEquals(new TileId(0,14), moveResponse.getMovePawn1().getLast());
+        // THEN Gamestate is correct
+        assertEquals(new TileId(0,14), GameState.getPawn(pawn1).getCurrentTileId());
     }
     @Test
-    void canPassStartTile_DifferentPawnOnDifferentStartTile(){
-        fail("not implemented");
+    void canPassStartTile_DifferentPlayerOnDifferentStartTile(){
+        // GIVEN
+        Card card = givePlayerCard(2,4);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(2,1), new TileId(0,15));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,2), new TileId(1,0));
+
+        // WHEN
+        createMoveMessage(moveMessage, pawn1, card);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN response message is correct
+        assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());
+        assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+        assertEquals(new TileId(1,3), moveResponse.getMovePawn1().getLast());
+        // THEN Gamestate is correct
+        assertEquals(new TileId(1,3), GameState.getPawn(pawn1).getCurrentTileId());
     }
     @Test
-    void canPassStartTileBackwards_DifferentPawnOnDifferentStartTile(){
-        fail("not implemented");
+    void canPassStartTileBackwards_DifferentPlayerOnDifferentStartTile(){
+        // GIVEN
+        Card card = givePlayerCard(2,-4);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(2,1), new TileId(1,2));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,2), new TileId(1,0));
+
+        // WHEN
+        createMoveMessage(moveMessage, pawn1, card);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN response message is correct
+        assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());
+        assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+        assertEquals(new TileId(0,14), moveResponse.getMovePawn1().getLast());
+        // THEN Gamestate is correct
+        assertEquals(new TileId(0,14), GameState.getPawn(pawn1).getCurrentTileId());
     }
 }

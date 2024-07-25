@@ -244,11 +244,22 @@ class MovingOnFinishTilesTest {
     }
     @Test
     void pawnAt14_15_17_When14Takes3Steps_CannotMove(){
-        // given 3 players
+        // it would otherwise end up on 0,15 and be placed on its own pawn
+        // GIVEN
+        Card card = givePlayerCard(1,3);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(1,1), new TileId(0,14));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(1,2), new TileId(0,15));
+        Pawn pawn3 = createPawnAndPlaceOnBoard(new PawnId(1,3), new TileId(1,17));
 
-        // pawns of player 1
+        // WHEN
+        createMoveMessage(moveMessage, pawn1, card);
+        GameState.processOnMove(moveMessage, moveResponse);
 
-        // expected cannot move: actual moves on the same tile as pawn on 15!
-        fail("not yet implemented");
+        // THEN response message is correct
+        assertEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
+        assertNull(moveResponse.getMovePawn1());
+        assertNull(moveResponse.getPawnId1());
+        // THEN Gamestate is correct
+        assertEquals(new TileId(0,14), GameState.getPawn(pawn1).getCurrentTileId());
     }
 }

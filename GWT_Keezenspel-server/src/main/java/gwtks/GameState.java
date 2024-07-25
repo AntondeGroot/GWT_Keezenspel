@@ -1,10 +1,13 @@
 package gwtks;
 
+import gwtks.logic.StartTileLogic;
+
 import java.util.LinkedList;
 import java.util.ArrayList;
 
 import static gwtks.MessageType.MAKE_MOVE;
 import static gwtks.MoveResult.*;
+import static gwtks.logic.StartTileLogic.canPassStartTile;
 
 public class GameState {
 
@@ -185,6 +188,7 @@ public class GameState {
         LinkedList<TileId> moves = new LinkedList<>();
         response.setMoveType(MoveType.MOVE);
         System.out.println("GameState: OnMove: received msg: " + moveMessage);
+        TileId startTileId = new TileId(-99,-99);
 
         // You cannot move from nest tiles
         if(currentTileId.getTileNr() < 0){
@@ -218,17 +222,14 @@ public class GameState {
         if (next > 15 && !isPawnOnLastSection(playerId, playerIdOfTile) && !isPawnOnFinish(pawnId1, currentTileId) ) {
             System.out.println("GameState: OnMove: normal route between 0,15 but could move to next section");
             // check
-            if(!canMoveToTileBecauseSamePlayer(pawnId1, new TileId(nextPlayerId(playerId), 0))&&next==16){
-                response.setResult(CANNOT_MAKE_MOVE);
-                return;
-            }
 
             if(currentTileId.getTileNr() < 1){moves.add(new TileId(currentTileId.getPlayerId(), 1));}
             if(currentTileId.getTileNr() < 7){moves.add(new TileId(currentTileId.getPlayerId(), 7));}
             if(currentTileId.getTileNr() < 13){moves.add(new TileId(currentTileId.getPlayerId(), 13));}
             if(currentTileId.getTileNr() < 15){moves.add(new TileId(currentTileId.getPlayerId(), 15));}
 
-            if (canMoveToTile(pawnId1, new TileId(nextPlayerId(playerIdOfTile),0))) {
+            startTileId = new TileId(nextPlayerId(playerIdOfTile), 0);
+            if (canPassStartTile(pawnId1, startTileId)){
                 System.out.println("GameState: OnMove: can move past StartTile "+new TileId(playerIdOfTile+1,0));
                 System.out.println("GameState: OnMove: normal route can move to the next section");
                 next = next % 16;
@@ -236,11 +237,6 @@ public class GameState {
                 if(next > 1){moves.add(new TileId(playerIdOfTile, 1));}
                 if(next > 7){moves.add(new TileId(playerIdOfTile, 7));}
             }else { // or turn back
-                // if your own pawn is on start, but it is not a blockade: your move is invalid
-                if(!tileIsABlockade(new TileId(nextPlayerId(playerIdOfTile),0)) && !canMoveToTileBecauseSamePlayer(pawnId1, new TileId(nextPlayerId(playerIdOfTile),0))){
-                    response.setResult(CANNOT_MAKE_MOVE);
-                    return;
-                }
                 System.out.println("GameState: OnMove: normal route is blocked by a start tile, move backwards");
                 next = (15 - next%15);
                 moves.add(new TileId(playerIdOfTile, 15));
@@ -286,7 +282,7 @@ public class GameState {
                 if(next < 1 && currentTileId.getTileNr() > 1){moves.add(new TileId(playerIdOfTile, 1));}
             }
 
-                moves.add(nextTileId);
+            moves.add(nextTileId);
             response.setMovePawn1(moves);
 
             processMove(pawnId1, new TileId(playerIdOfTile,next), moveMessage, response);
@@ -300,7 +296,8 @@ public class GameState {
             if(currentTileId.getTileNr() > 1){moves.add(new TileId(playerIdOfTile, 1));}
 
             // check if you can pass || otherwise turn back i.e. forward
-            if (canMoveToTile(pawnId1, new TileId(playerIdOfTile,0))) {
+            startTileId = new TileId(playerIdOfTile, 0);
+            if (canPassStartTile(pawnId1, startTileId)){
                 next = 16 + next;
                 playerIdOfTile = previousPlayerId(playerIdOfTile);
                 if(next < 13){moves.add(new TileId(playerIdOfTile, 13));}
@@ -391,12 +388,28 @@ public class GameState {
                 if(targetTileId.getTileNr() < 13){moves.add(new TileId(targetTileId.getPlayerId(), 13));}
                 if(targetTileId.getTileNr() < 7){moves.add(new TileId(targetTileId.getPlayerId(), 7));}
             }
+
+            if(!canMoveToTileBecauseSamePlayer(pawnId1, targetTileId)){
+                clearResponse(response);
+                response.setResult(CANNOT_MAKE_MOVE);
+                return;
+            }
+
             moves.add(targetTileId);
             response.setMovePawn1(moves);
             processMove(pawnId1, targetTileId, moveMessage, response);
             return;
         }
     }
+
+    private static void clearResponse(MoveResponse response) {
+        response.setPawnId1(null);
+        response.setPawnId2(null);
+        response.setMoveType(null);
+        response.setMovePawn1(null);
+        response.setMovePawn2(null);
+    }
+
     public static int checkHighestTileNrYouCanMoveTo(PawnId pawnId, TileId tileId, int nrSteps) {
         int direction = 1;
         int tileNrToCheck = tileId.getTileNr();
