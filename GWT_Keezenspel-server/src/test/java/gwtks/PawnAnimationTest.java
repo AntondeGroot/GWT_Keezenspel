@@ -233,4 +233,31 @@ public class PawnAnimationTest {
         // response message is correct
         assertEquals(expectedMovement, moveResponse.getMovePawn1());
     }
+    @Test
+    void pawnMovesForwards_13_7_1_ToNewSection() {
+        // setup
+        GameState.tearDown();
+        GameState gameState = new GameState(3);
+
+        // GIVEN
+        Card card = givePlayerCard(1,8);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(1,1) ,new TileId(2,12));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(1,2) ,new TileId(0,0));
+
+        // WHEN
+        createMoveMessage(moveMessage, pawn1, card);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN
+        LinkedList<TileId> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new TileId(2,12));
+        expectedMovement.add(new TileId(2,13));
+        expectedMovement.add(new TileId(2,15));
+        expectedMovement.add(new TileId(0,1));
+        expectedMovement.add(new TileId(0,4));
+
+        // response message is correct
+        assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+        assertEquals(expectedMovement, moveResponse.getMovePawn1());
+    }
 }

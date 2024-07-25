@@ -354,4 +354,20 @@ class MovingOverStartTileTest {
         // THEN Gamestate is correct
         assertEquals(new TileId(7,12), GameState.getPawn(pawn1).getCurrentTileId());
     }
+    @Test
+    void canPassStartTileSamePawnWhenPawnOnDifferentStartTile(){
+        fail("not implemented");
+    }
+    @Test
+    void canPassStartTileBackWards_SamePawn_WhenPawnOnDifferentStartTile(){
+        fail("not implemented");
+    }
+    @Test
+    void canPassStartTile_DifferentPawnOnDifferentStartTile(){
+        fail("not implemented");
+    }
+    @Test
+    void canPassStartTileBackwards_DifferentPawnOnDifferentStartTile(){
+        fail("not implemented");
+    }
 }
