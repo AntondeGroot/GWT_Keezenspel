@@ -296,7 +296,7 @@ class MovingOverStartTileTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertNull(moveResponse.getMovePawn1().getLast());
+        assertNull(moveResponse.getMovePawn1());
         assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
         // THEN Gamestate is correct
         assertEquals(new TileId(0,4), GameState.getPawn(pawn1).getCurrentTileId());
@@ -313,7 +313,7 @@ class MovingOverStartTileTest {
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertNull(moveResponse.getPawnId1());                          // moves the correct pawn
+        assertNull(moveResponse.getPawnId1());
         assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
         // THEN Gamestate is correct
         assertEquals(new TileId(7,12), GameState.getPawn(pawn1).getCurrentTileId());
