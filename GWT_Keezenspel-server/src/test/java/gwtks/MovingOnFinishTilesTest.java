@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 import static gwtks.GameStateUtil.*;
 import static gwtks.MoveResult.CANNOT_MAKE_MOVE;
 import static gwtks.MoveResult.CAN_MAKE_MOVE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MovingOnFinishTilesTest {
     MoveMessage moveMessage = new MoveMessage();
@@ -242,5 +241,14 @@ class MovingOnFinishTilesTest {
         assertNull(moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
         assertEquals(new TileId(1,19), GameState.getPawn(pawn1).getCurrentTileId());
+    }
+    @Test
+    void pawnAt14_15_17_When14Takes3Steps_CannotMove(){
+        // given 3 players
+
+        // pawns of player 1
+
+        // expected cannot move: actual moves on the same tile as pawn on 15!
+        fail("not yet implemented");
     }
 }

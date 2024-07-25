@@ -91,6 +91,9 @@ public class MoveResponse implements IsSerializable {
                 ", pawnId2=" + pawnId2 +
                 ", movePawn1=" + movePawn1 +
                 ", movePawn2=" + movePawn2 +
+                ", moveType=" + moveType +
+                ", messageType=" + messageType +
+                ", result=" + result +
                 '}';
     }
 }

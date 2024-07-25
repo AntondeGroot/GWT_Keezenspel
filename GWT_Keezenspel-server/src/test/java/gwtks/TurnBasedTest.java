@@ -177,7 +177,6 @@ public class TurnBasedTest {
         // send a valid move for the wrong player
         Pawn pawn = new Pawn(new PawnId(0,0),new TileId(0,6));
 
-
         // fake a valid card
         Card card = new Card(0,5);
 
@@ -199,7 +198,7 @@ public class TurnBasedTest {
 
         // THEN
         assertNull(moveResponse.getMovePawn1());
-        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
+        assertEquals(MoveResult.PLAYER_DOES_NOT_HAVE_CARD, moveResponse.getResult());
     }
     @Test
     void playersPlayAllTheirCards_ExceptLastPlayer_OnlyLastPlayerIsActive(){
