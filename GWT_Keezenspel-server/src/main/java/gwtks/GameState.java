@@ -3,6 +3,8 @@ package gwtks;
 import java.util.LinkedList;
 import java.util.ArrayList;
 
+import static gwtks.MoveResult.CANNOT_MAKE_MOVE;
+
 public class GameState {
 
     private static ArrayList<Pawn> pawns = new ArrayList<>();
@@ -60,7 +62,7 @@ public class GameState {
     }
 
     public static void nextActivePlayer() {
-        playerIdTurn = (playerIdTurn + 1) % nrPlayers;
+        playerIdTurn = nextPlayerId(playerIdTurn);
         if(!activePlayers.isEmpty() && !activePlayers.contains(playerIdTurn)){
             nextActivePlayer();
         }
@@ -179,7 +181,7 @@ public class GameState {
 
         // You cannot move from nest tiles
         if(currentTileId.getTileNr() < 0){
-            response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+            response.setResult(CANNOT_MAKE_MOVE);
             return;
         }
 
@@ -193,11 +195,11 @@ public class GameState {
         // Player cannot move an opponents pawn without playing a Jack
         if(moveMessage.getCard().getCardValue() != 10){
             if(moveMessage.getPawnId1() != null && moveMessage.getPawnId1().getPlayerId() != moveMessage.getPlayerId()){
-                response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+                response.setResult(CANNOT_MAKE_MOVE);
                 return;
             }
             if(moveMessage.getPawnId2() != null && moveMessage.getPawnId2().getPlayerId() != moveMessage.getPlayerId()){
-                response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+                response.setResult(CANNOT_MAKE_MOVE);
                 return;
             }
         }
@@ -209,8 +211,8 @@ public class GameState {
         if (next > 15 && !isPawnOnLastSection(playerId, playerIdOfTile) && !isPawnOnFinish(pawnId1, currentTileId) ) {
             System.out.println("GameState: OnMove: normal route between 0,15 but could move to next section");
             // check
-            if(!canMoveToTileBecauseSamePlayer(pawnId1, new TileId(playerId+1, 0))&&next==16){
-                response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+            if(!canMoveToTileBecauseSamePlayer(pawnId1, new TileId(nextPlayerId(playerId), 0))&&next==16){
+                response.setResult(CANNOT_MAKE_MOVE);
                 return;
             }
 
@@ -219,15 +221,19 @@ public class GameState {
             if(currentTileId.getTileNr() < 13){moves.add(new TileId(currentTileId.getPlayerId(), 13));}
             if(currentTileId.getTileNr() < 15){moves.add(new TileId(currentTileId.getPlayerId(), 15));}
 
-            if (canMoveToTile(pawnId1, new TileId((playerIdOfTile+1)%nrPlayers,0))) {
+            if (canMoveToTile(pawnId1, new TileId(nextPlayerId(playerIdOfTile),0))) {
                 System.out.println("GameState: OnMove: can move past StartTile "+new TileId(playerIdOfTile+1,0));
                 System.out.println("GameState: OnMove: normal route can move to the next section");
                 next = next % 16;
-                playerIdOfTile++;
-                playerIdOfTile = playerIdOfTile % nrPlayers;
+                playerIdOfTile = nextPlayerId(playerIdOfTile);
                 if(next > 1){moves.add(new TileId(playerIdOfTile, 1));}
                 if(next > 7){moves.add(new TileId(playerIdOfTile, 7));}
             }else { // or turn back
+                // if your own pawn is on start, but it is not a blockade: your move is invalid
+                if(!tileIsABlockade(new TileId(nextPlayerId(playerIdOfTile),0)) && !canMoveToTileBecauseSamePlayer(pawnId1, new TileId(nextPlayerId(playerIdOfTile),0))){
+                    response.setResult(CANNOT_MAKE_MOVE);
+                    return;
+                }
                 System.out.println("GameState: OnMove: normal route is blocked by a start tile, move backwards");
                 next = (15 - next%15);
                 moves.add(new TileId(playerIdOfTile, 15));
@@ -241,7 +247,7 @@ public class GameState {
                 response.setMovePawn1(moves);
                 processMove(pawnId1, new TileId(playerIdOfTile,next), moveMessage, response);
             }else{
-                response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+                response.setResult(CANNOT_MAKE_MOVE);
             }
             return;
         }
@@ -254,7 +260,7 @@ public class GameState {
 
             // in case you end up on your own pawn
             if(!canMoveToTile(pawnId1,nextTileId)){
-                response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+                response.setResult(CANNOT_MAKE_MOVE);
                 return;
             }
             if(nrSteps >0) {
@@ -302,7 +308,7 @@ public class GameState {
                 response.setMovePawn1(moves);
                 processMove(pawnId1, nextTileId, moveMessage, response);
             }else{
-                response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+                response.setResult(CANNOT_MAKE_MOVE);
             }
             return;
         }
@@ -317,8 +323,20 @@ public class GameState {
                 processMove(pawnId1, new TileId(playerIdOfTile,0), moveMessage, response);
                 return;
             }
-            else{
-                    response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+
+            // if your own pawn is on start, but it is not a blockade: your move is invalid
+            if(!tileIsABlockade(new TileId(playerIdOfTile,0)) && !canMoveToTileBecauseSamePlayer(pawnId1, new TileId(playerIdOfTile,0))){
+                response.setResult(CANNOT_MAKE_MOVE);
+                return;
+            }
+            // move forwards to tile 2 if you can
+            if(canMoveToTile(pawnId1, new TileId(playerIdOfTile, 2))){
+                moves.add(new TileId(playerIdOfTile, 2));
+                response.setMovePawn1(moves);
+                processMove(pawnId1, new TileId(playerIdOfTile,2), moveMessage, response);
+                return;
+            }else{
+                response.setResult(CANNOT_MAKE_MOVE);
                 return;
             }
         }
@@ -328,7 +346,7 @@ public class GameState {
             System.out.println("GameState: OnMove: pawn is already on the finish");
             // moving is not possible when the pawn is directly between two other pawns
             if (isPawnTightlyClosedIn(pawnId1, currentTileId)){
-                response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+                response.setResult(CANNOT_MAKE_MOVE);
                 return;
             }
 
@@ -361,7 +379,7 @@ public class GameState {
 
             int tileHighestTileNr = checkHighestTileNrYouCanMoveTo(pawnId1,currentTileId,nrSteps);
             if(tileHighestTileNr > targetTileId.getTileNr()){
-                moves.add(new TileId((playerIdOfTile+1)%nrPlayers, tileHighestTileNr));
+                moves.add(new TileId(nextPlayerId(playerIdOfTile), tileHighestTileNr));
                 if(targetTileId.getTileNr() < 15){moves.add(new TileId(targetTileId.getPlayerId(), 15));}
                 if(targetTileId.getTileNr() < 13){moves.add(new TileId(targetTileId.getPlayerId(), 13));}
                 if(targetTileId.getTileNr() < 7){moves.add(new TileId(targetTileId.getPlayerId(), 7));}
@@ -424,7 +442,7 @@ public class GameState {
 
     public static void processOnSwitch(MoveMessage moveMessage, MoveResponse moveResponse){
         if(moveMessage.getPawnId1() == null || moveMessage.getPawnId2() == null){
-            moveResponse.setResult(MoveResult.CANNOT_MAKE_MOVE);
+            moveResponse.setResult(CANNOT_MAKE_MOVE);
             return;
         }
 
@@ -435,12 +453,12 @@ public class GameState {
 
         // You can't switch with yourself
         if(selectedPawnPlayerId1 == selectedPawnPlayerId2){
-            moveResponse.setResult(MoveResult.CANNOT_MAKE_MOVE);
+            moveResponse.setResult(CANNOT_MAKE_MOVE);
             return;
         }
         // You can't switch two opponents
         if((selectedPawnPlayerId1 != playerId) && (selectedPawnPlayerId2 != playerId)){
-            moveResponse.setResult(MoveResult.CANNOT_MAKE_MOVE);
+            moveResponse.setResult(CANNOT_MAKE_MOVE);
             return;
         }
         if(!CardsDeck.playerHasCard(moveMessage.getPlayerId(), moveMessage.getCard())) {
@@ -470,14 +488,14 @@ public class GameState {
         int tileNr2 = pawn2.getCurrentTileId().getTileNr();
         int tilePlayerId2 = pawn2.getCurrentTileId().getPlayerId();
         if(tileNr1 < 0 || tileNr2 < 0 || tileNr1 > 15 || tileNr2 > 15){
-            moveResponse.setResult(MoveResult.CANNOT_MAKE_MOVE);
+            moveResponse.setResult(CANNOT_MAKE_MOVE);
             return;
         }
 
         // player1 can move from starttile
         // player2 cannot be taken from starttile
         if(tilePlayerId2 == pawn2.getPlayerId() && tileNr2 == 0){
-            moveResponse.setResult(MoveResult.CANNOT_MAKE_MOVE);
+            moveResponse.setResult(CANNOT_MAKE_MOVE);
             return;
         }
 
@@ -517,7 +535,7 @@ public class GameState {
         // cannot go onboard without an Ace or King
         int cardValue = moveMessage.getCard().getCardValue();
         if(!(cardValue == 0 || cardValue == 12)){
-            response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+            response.setResult(CANNOT_MAKE_MOVE);
             return;
         }
 
@@ -530,13 +548,13 @@ public class GameState {
 
         // when occupied by own pawn
         if(!canMoveToTile(pawnId1, targetTileId)){
-            response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+            response.setResult(CANNOT_MAKE_MOVE);
             return;
         }
 
         // when pawn not in the nest
         if(currentTileId.getTileNr() >= 0 ){
-            response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+            response.setResult(CANNOT_MAKE_MOVE);
             return;
         }
 
@@ -640,5 +658,20 @@ public class GameState {
                 System.out.println("pawn not on nest: "+pawn);
             }
         }
+    }
+
+    public static boolean tileIsABlockade(TileId selectedStartTile){
+        Pawn pawnOnStart = getPawn(selectedStartTile);
+        if(pawnOnStart == null){
+            return false;
+        }
+        if(pawnOnStart.getPawnId().getPlayerId() == selectedStartTile.getPlayerId()){
+            return true;
+        }
+        return false;
+    }
+
+    public static int nextPlayerId(int playerId){
+        return (playerId + 1)%nrPlayers;
     }
 }
