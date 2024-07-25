@@ -10,7 +10,7 @@ import static gwtks.MoveResult.CAN_MAKE_MOVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class GameStateOnMoveOnFinishTilesTest {
+class MovingOnFinishTilesTest {
     MoveMessage moveMessage = new MoveMessage();
     MoveResponse moveResponse = new MoveResponse();
 

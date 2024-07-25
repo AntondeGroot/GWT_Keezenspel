@@ -10,7 +10,7 @@ import static gwtks.GameStateUtil.*;
 import static gwtks.MoveResult.CAN_MAKE_MOVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PawnMovementListTest {
+public class PawnAnimationTest {
     MoveMessage moveMessage = new MoveMessage();
     MoveResponse moveResponse = new MoveResponse();
 

@@ -9,7 +9,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class GameStateOnSwitchTest {
+class MovingOnSwitchTest {
     private MoveMessage moveMessage = new MoveMessage();
     private MoveResponse moveResponse = new MoveResponse();
 
