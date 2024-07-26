@@ -17,8 +17,7 @@ public class Board {
     private static ArrayList<TileMapping> tiles = new ArrayList<>();
 	private static ArrayList<PawnAnimationMapping> animationMappings = new ArrayList<>();
 	private static ArrayList<Pawn> pawns = new ArrayList<>();
-
-	private double cellDistance;
+	private static double cellDistance;
 
     public void createBoard(int nrPlayers, double boardSize) {
 		// Clear the mappings list before creating a new board
@@ -240,6 +239,10 @@ public class Board {
 		if(PawnAndCardSelection.getPawn1().equals(pawn) || PawnAndCardSelection.getPawn2().equals(pawn)){
 			context.drawImage(ImageElement.as(image_outline.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
 		}
+	}
+
+	public static double getCellDistance() {
+		return cellDistance;
 	}
 
 	private void drawPawnAnimated(Context2d context, Pawn pawn, Point point){

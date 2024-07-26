@@ -17,8 +17,12 @@ public class StepsAnimation {
     private static double loopAlpha = 0.6;
     private static double ALPHA_MAX = 0.6;
     private static List<TileId> tileIds;
+    private static double cellDistance;
 
     public static void update(){
+        if(cellDistance == 0){
+            cellDistance = Board.getCellDistance();
+        }
     }
 
     public static void update(List<TileId> tileIds){
@@ -43,7 +47,7 @@ public class StepsAnimation {
         for (TileId tileId : tileIds) {
             for (TileMapping mapping : tiles) {
                 if (mapping.getTileId().equals(tileId)) {
-                    drawCircle(ctxSteps, mapping.getPosition().getX(), mapping.getPosition().getY(), 10, loopAlpha);
+                    drawCircle(ctxSteps, mapping.getPosition().getX(), mapping.getPosition().getY(),cellDistance/2, loopAlpha);
                 }
             }
         }
