@@ -51,6 +51,20 @@ class MovingOnBoardSamePlayerBlockingTest {
         assertEquals(new TileId(0,10), GameState.getPawn(pawn2).getCurrentTileId());
     }
     @Test
+    void twoPawnsOnePlayer_CannotEndOnTheSameTile_DoesNotPlayCard(){
+        // GIVEN
+        Card card = givePlayerCard(0,-1);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(0,0), new TileId(0,16));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(7,15));
+
+        // WHEN
+        createMoveMessage(moveMessage, pawn1,card);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN response message is correct
+        assertEquals(5, CardsDeck.getCardsForPlayer(0).size());
+    }
+    @Test
     void PawnOn15_PawnCannotBePlacedThere_Forwards(){
         // GIVEN
         Card card = givePlayerCard(0,1);
