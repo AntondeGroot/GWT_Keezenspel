@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static gwtks.GameStateUtil.givePlayerCard;
+import static gwtks.GameStateUtil.sendValidMoveMessage;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CardsDeckTest {
@@ -20,6 +21,7 @@ class CardsDeckTest {
     @AfterEach
     void tearDown() {
         CardsDeck.reset();
+        GameState.tearDown();
     }
 
     @Test
@@ -163,5 +165,212 @@ class CardsDeckTest {
         // THEN
         assertTrue(CardsDeck.getCardsForPlayer(1).contains(card));
         assertTrue(CardsDeck.playerHasCard(1,card));
+    }
+    @Test
+    void oneRound_player0LastPlayer_nextPlayer1(){
+        // GIVEN
+        new GameState(3);
+        CardsDeck.setNrPlayers(3);
+        CardsDeck.shuffle();
+        CardsDeck.dealCards();
+
+        // WHEN
+        sendValidMoveMessage(0);
+        GameState.forfeitPlayer(1);
+        GameState.forfeitPlayer(2);
+        playRemainingCards(0);
+
+        // THEN
+        assertEquals(1, CardsDeck.getPlayerIdStartingRound());
+    }
+    @Test
+    void oneRound_player1LastPlayer_nextPlayer1(){
+        // GIVEN
+        new GameState(3);
+        CardsDeck.setNrPlayers(3);
+        CardsDeck.shuffle();
+        CardsDeck.dealCards();
+
+        // WHEN
+        sendValidMoveMessage(0);
+        sendValidMoveMessage(1);
+        GameState.forfeitPlayer(2);
+        GameState.forfeitPlayer(0);
+        playRemainingCards(1);
+        // THEN
+        assertEquals(1, CardsDeck.getPlayerIdStartingRound());
+    }
+    @Test
+    void oneRound_player2LastPlayer_nextPlayer1_Forfeit(){
+        // GIVEN
+        new GameState(3);
+        CardsDeck.setNrPlayers(3);
+        CardsDeck.shuffle();
+        CardsDeck.dealCards();
+
+        // WHEN
+        GameState.forfeitPlayer(0);
+        GameState.forfeitPlayer(1);
+        GameState.forfeitPlayer(2);
+
+        // THEN
+        assertEquals(1, CardsDeck.getPlayerIdStartingRound());
+    }
+    @Test
+    void oneRound_player2LastPlayer_nextPlayer1_byPlaying(){
+        // GIVEN
+        new GameState(3);
+        CardsDeck.setNrPlayers(3);
+        CardsDeck.shuffle();
+        CardsDeck.dealCards();
+
+        // WHEN
+        GameState.forfeitPlayer(0);
+        GameState.forfeitPlayer(1);
+        playRemainingCards(2);
+        // THEN
+        assertEquals(1, CardsDeck.getPlayerIdStartingRound());
+    }
+    @Test
+    void twoRounds_player0LastPlayer_nextPlayer2(){
+        // GIVEN
+        new GameState(3);
+        CardsDeck.setNrPlayers(3);
+        CardsDeck.shuffle();
+        CardsDeck.dealCards();
+
+        // WHEN round 1
+        GameState.forfeitPlayer(0);
+        GameState.forfeitPlayer(1);
+        GameState.forfeitPlayer(2);
+        // WHEN round 2
+        GameState.forfeitPlayer(1);
+        GameState.forfeitPlayer(2);
+        playRemainingCards(0);
+
+        // THEN
+        assertEquals(2, CardsDeck.getPlayerIdStartingRound());
+    }
+    @Test
+    void twoRounds_player1LastPlayer_nextPlayer2(){
+        // GIVEN
+        new GameState(3);
+        CardsDeck.setNrPlayers(3);
+        CardsDeck.shuffle();
+        CardsDeck.dealCards();
+
+        // WHEN round 1
+        GameState.forfeitPlayer(0);
+        GameState.forfeitPlayer(1);
+        GameState.forfeitPlayer(2);
+        // WHEN round 2
+        sendValidMoveMessage(1);
+        GameState.forfeitPlayer(2);
+        GameState.forfeitPlayer(0);
+        playRemainingCards(1);
+
+        // THEN
+        assertEquals(2, CardsDeck.getPlayerIdStartingRound());
+    }
+    @Test
+    void twoRounds_player2LastPlayer_nextPlayer2(){
+        // GIVEN
+        new GameState(3);
+        CardsDeck.setNrPlayers(3);
+        CardsDeck.shuffle();
+        CardsDeck.dealCards();
+
+        // WHEN round 1
+        GameState.forfeitPlayer(0);
+        GameState.forfeitPlayer(1);
+        GameState.forfeitPlayer(2);
+        // WHEN round 2
+        GameState.forfeitPlayer(1);
+        sendValidMoveMessage(2);
+        GameState.forfeitPlayer(0);
+        playRemainingCards(2);
+        // THEN
+        assertEquals(2, CardsDeck.getPlayerIdStartingRound());
+    }
+    @Test
+    void threeRounds_player0LastPlayer_nextPlayer0(){
+        // GIVEN
+        new GameState(3);
+        CardsDeck.setNrPlayers(3);
+        CardsDeck.shuffle();
+        CardsDeck.dealCards();
+
+        // WHEN round 1
+        GameState.forfeitPlayer(0);
+        GameState.forfeitPlayer(1);
+        GameState.forfeitPlayer(2);
+        // WHEN round 2
+        GameState.forfeitPlayer(1);
+        GameState.forfeitPlayer(2);
+        GameState.forfeitPlayer(0);
+        // WHEN round 3
+        GameState.forfeitPlayer(2);
+        sendValidMoveMessage(0);
+        GameState.forfeitPlayer(1);
+        playRemainingCards(0);
+
+        // THEN
+        assertEquals(0, CardsDeck.getPlayerIdStartingRound());
+    }
+    @Test
+    void threeRounds_player1LastPlayer_nextPlayer0(){
+        // GIVEN
+        new GameState(3);
+        CardsDeck.setNrPlayers(3);
+        CardsDeck.shuffle();
+        CardsDeck.dealCards();
+
+        // WHEN round 1
+        GameState.forfeitPlayer(0);
+        GameState.forfeitPlayer(1);
+        GameState.forfeitPlayer(2);
+        // WHEN round 2
+        GameState.forfeitPlayer(1);
+        GameState.forfeitPlayer(2);
+        GameState.forfeitPlayer(0);
+        // WHEN round 3
+        GameState.forfeitPlayer(2);
+        GameState.forfeitPlayer(0);
+        playRemainingCards(1);
+
+        // THEN
+        assertEquals(0, CardsDeck.getPlayerIdStartingRound());
+    }
+    @Test
+    void threeRounds_player2LastPlayer_nextPlayer0(){
+        /// GIVEN
+        new GameState(3);
+        CardsDeck.setNrPlayers(3);
+        CardsDeck.shuffle();
+        CardsDeck.dealCards();
+
+        // WHEN round 1
+        GameState.forfeitPlayer(0);
+        GameState.forfeitPlayer(1);
+        GameState.forfeitPlayer(2);
+        // WHEN round 2
+        GameState.forfeitPlayer(1);
+        GameState.forfeitPlayer(2);
+        GameState.forfeitPlayer(0);
+        // WHEN round 3
+        sendValidMoveMessage(2);
+        GameState.forfeitPlayer(0);
+        GameState.forfeitPlayer(1);
+        playRemainingCards(2);
+
+        // THEN
+        assertEquals(0, CardsDeck.getPlayerIdStartingRound());
+    }
+
+    private void playRemainingCards(int playerId){
+        int nrCards = CardsDeck.getCardsForPlayer(playerId).size();
+        for (int i = 0; i < nrCards; i++) {
+            sendValidMoveMessage(playerId);
+        }
     }
 }
