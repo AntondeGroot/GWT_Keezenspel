@@ -19,6 +19,10 @@ public class PlayerList {
     private static boolean isInitialized = false;
     private static int nrPlayers;
 
+    public static void refresh(){
+        isInitialized = false;
+    }
+
     public void setPlayerIdPlayingAndDrawPlayerList(int playerIdPlaying) {
         if (playerIdPlaying == PlayerList.playerIdPlaying && isInitialized) {
             return;

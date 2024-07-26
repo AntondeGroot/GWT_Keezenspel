@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static gwtks.GameStateUtil.givePlayerCard;
-import static gwtks.GameStateUtil.sendValidMoveMessage;
+import static gwtks.GameStateUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CardsDeckTest {
@@ -365,12 +364,5 @@ class CardsDeckTest {
 
         // THEN
         assertEquals(0, CardsDeck.getPlayerIdStartingRound());
-    }
-
-    private void playRemainingCards(int playerId){
-        int nrCards = CardsDeck.getCardsForPlayer(playerId).size();
-        for (int i = 0; i < nrCards; i++) {
-            sendValidMoveMessage(playerId);
-        }
     }
 }
