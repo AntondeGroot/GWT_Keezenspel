@@ -82,11 +82,15 @@ public class PawnAndCardSelection {
 
     public static void setMoveType(MoveType moveType) {
         PawnAndCardSelection.moveType = moveType;
-        if(card != null && card.getCardValue() == 0){
-            if(pawn1.getCurrentTileId().getTileNr() < 0){
-                PawnAndCardSelection.moveType = ONBOARD;
-            }else{
-                PawnAndCardSelection.moveType = MoveType.MOVE;
+        if(moveType != FORFEIT){
+            // ONLY VALIDATE FOR PLAYING AN ACE
+            // NO VALIDATION IS NEEDED FOR FORFEIT
+            if(card != null && card.getCardValue() == 0){
+                if(pawn1.getCurrentTileId().getTileNr() < 0){
+                    PawnAndCardSelection.moveType = ONBOARD;
+                }else{
+                    PawnAndCardSelection.moveType = MoveType.MOVE;
+                }
             }
         }
     }
@@ -119,6 +123,7 @@ public class PawnAndCardSelection {
     }
 
     public static void reset(){
+        // do not reset playerId
         pawn1 = resetPawn();
         pawn2 = resetPawn();
         card = null;
