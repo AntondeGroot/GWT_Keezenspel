@@ -87,4 +87,10 @@ public class GameStateUtil {
         MoveResponse moveResponse = new MoveResponse();
         GameState.processOnMove(moveMessage, moveResponse);
     }
+    public static void playRemainingCards(int playerId){
+        int nrCards = CardsDeck.getCardsForPlayer(playerId).size();
+        for (int i = 0; i < nrCards; i++) {
+            sendValidMoveMessage(playerId);
+        }
+    }
 }

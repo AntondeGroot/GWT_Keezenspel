@@ -124,6 +124,7 @@ public class App implements EntryPoint {
 				if(CardsDeck.areCardsDifferent(result.getCards())){
 					CardsDeck.setCards(result.getCards());
 					CardsDeck.drawCards();
+					PlayerList.refresh();
 				}
 			}
 		} );
@@ -148,7 +149,6 @@ public class App implements EntryPoint {
 				PlayerList playerList = new PlayerList();
 				PlayerList.setActivePlayers(result.getActivePlayers());
 				playerList.setPlayerIdPlayingAndDrawPlayerList(result.getPlayerIdTurn());
-
 			}
 		} );
 	}
