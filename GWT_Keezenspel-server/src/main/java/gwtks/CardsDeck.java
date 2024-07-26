@@ -12,9 +12,11 @@ public class CardsDeck implements IsSerializable {
     private static ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
     private static ArrayList<Player> players = new ArrayList<>();
     private static int nrPlayers = 0;
+    private static int playerIdStartingRound = 0;
 
     public static void setNrPlayers(int nr_Players) {
         nrPlayers = nr_Players;
+        playerIdStartingRound = nr_Players-1;
     }
 
     public static ArrayList<Integer> getNrOfCardsForAllPlayers(){
@@ -81,6 +83,7 @@ public class CardsDeck implements IsSerializable {
         }
 
         roundNr = (roundNr + 1) % 3;
+        nextPlayerId();
     }
 
     public static boolean playerHasCard(int playerId, Card card ){
@@ -88,10 +91,19 @@ public class CardsDeck implements IsSerializable {
         return player.hasCard(card);
     }
 
+    private static void nextPlayerId(){
+        playerIdStartingRound = (playerIdStartingRound + 1) % nrPlayers;
+    }
+
+    public static int getPlayerIdStartingRound() {
+        return playerIdStartingRound;
+    }
+
     public static void reset(){
         roundNr = 0;
         cardsDeque.clear();
         players.clear();
         nrPlayers = 0;
+        playerIdStartingRound = 0;
     }
 }

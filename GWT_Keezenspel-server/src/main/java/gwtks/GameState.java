@@ -60,6 +60,7 @@ public class GameState {
             resetActivePlayers();
             CardsDeck.shuffle();
             CardsDeck.dealCards();
+            playerIdTurn = CardsDeck.getPlayerIdStartingRound();
         }else{
             nextActivePlayer();
         }
