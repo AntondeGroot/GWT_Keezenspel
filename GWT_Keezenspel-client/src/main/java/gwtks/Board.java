@@ -3,14 +3,10 @@ package gwtks;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.user.client.rpc.IsSerializable;
 import com.google.gwt.user.client.ui.Image;
 import gwtks.util.PawnRect;
 
-import java.util.LinkedList;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class Board {
 
@@ -106,6 +102,7 @@ public class Board {
 
 	public static void setPawns(ArrayList<Pawn> pawns) {
 		if(Board.pawns.isEmpty()){
+			pawns.sort(new PawnComparator());
 			Board.pawns = pawns;
 		}
 	}
@@ -163,6 +160,8 @@ public class Board {
 	}
 
 	public void drawPawns(Context2d context){
+		// TODO: ONLY DRAW PAWNS WHEN IT IS NECESSARY
+		pawns.sort(new PawnComparator());
 		for(Pawn pawn : pawns){
 			if (shouldBeAnimated(pawn)) {
 				Iterator<PawnAnimationMapping> iterator = animationMappings.iterator();
