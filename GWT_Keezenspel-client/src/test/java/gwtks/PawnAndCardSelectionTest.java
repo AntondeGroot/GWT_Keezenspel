@@ -3,6 +3,7 @@ package gwtks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static gwtks.MoveType.FORFEIT;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PawnAndCardSelectionTest {
@@ -233,6 +234,15 @@ class PawnAndCardSelectionTest {
         PawnAndCardSelection.setCard(aceCard);
 
         assertEquals(MoveType.MOVE, PawnAndCardSelection.getMoveType());
+    }
+    @Test
+    public void testSelectAceThenForfeit(){
+        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.addPawn(pawn1);
+        PawnAndCardSelection.setCard(aceCard);
+        PawnAndCardSelection.setMoveType(FORFEIT);
+
+        assertEquals(FORFEIT, PawnAndCardSelection.getMoveType());
     }
 
     private Pawn createPawn(int playerId){
