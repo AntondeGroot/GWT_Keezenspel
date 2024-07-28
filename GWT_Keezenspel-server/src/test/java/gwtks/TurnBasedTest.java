@@ -1,13 +1,16 @@
 package gwtks;
 
+import gwtks.logic.WinnerLogic;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static gwtks.GameStateUtil.*;
+import static gwtks.GameStateUtil.place4PawnsOnFinish;
 import static org.junit.Assert.*;
 
 public class TurnBasedTest {
@@ -214,5 +217,28 @@ public class TurnBasedTest {
 
         // THEN
         assertEquals(intsToList(new int[]{2}), GameState.getActivePlayers());
+    }
+    @Test
+    void players0and2Finished_OnlyPlayer1PlayingAndForfeiting_DoesNotSwitchToWinner(){
+        // GIVEN
+        ArrayList<Integer> winners = new ArrayList<>();
+        place4PawnsOnFinish(0);
+        WinnerLogic.checkForWinners(winners);
+        place4PawnsOnFinish(2);
+        WinnerLogic.checkForWinners(winners);
+
+        // WHEN
+        sendForfeitMessage(0);
+        playRemainingCards(1);
+        sendForfeitMessage(2);
+
+        // THEN
+        assertEquals(1,GameState.getPlayerIdTurn());
+        sendForfeitMessage(1);
+        assertEquals(1,GameState.getPlayerIdTurn());
+        sendForfeitMessage(1);
+        assertEquals(1,GameState.getPlayerIdTurn());
+        sendForfeitMessage(1);
+        assertEquals(1,GameState.getPlayerIdTurn());
     }
 }

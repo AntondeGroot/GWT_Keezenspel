@@ -66,12 +66,4 @@ class WinnerLogicTest {
         // THEN
         assertEquals(intsToList(new int[]{2,0,1}), winners);
     }
-
-    private void place4PawnsOnFinish(int playerId){
-        createPawnAndPlaceOnBoard(new PawnId(playerId,0) , new TileId(playerId,16));
-        createPawnAndPlaceOnBoard(new PawnId(playerId,1) , new TileId(playerId,17));
-        createPawnAndPlaceOnBoard(new PawnId(playerId,2) , new TileId(playerId,18));
-        createPawnAndPlaceOnBoard(new PawnId(playerId,3) , new TileId(playerId,19));
-    }
-
 }

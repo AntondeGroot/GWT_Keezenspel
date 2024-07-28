@@ -64,10 +64,8 @@ public class GameState {
             resetActivePlayers();
             CardsDeck.shuffle();
             CardsDeck.dealCards();
-            playerIdTurn = CardsDeck.getPlayerIdStartingRound();
-        }else{
-            nextActivePlayer();
         }
+        nextActivePlayer();
     }
 
     private static void removeWinnerFromActivePlayerList(){
@@ -669,6 +667,7 @@ public class GameState {
         nrPlayers = 0;
         tiles = new ArrayList<>();
         activePlayers.clear();
+        winners.clear();
     }
 
     public static Pawn getPawn(Pawn selectedPawn){
