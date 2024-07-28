@@ -17,9 +17,6 @@ public class CheckingOnBoardTest {
         GameState gameState = new GameState(8);
         moveMessage = new MoveMessage();
         moveResponse = new MoveResponse();
-        CardsDeck.setNrPlayers(8);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
     }
 
     @AfterEach
