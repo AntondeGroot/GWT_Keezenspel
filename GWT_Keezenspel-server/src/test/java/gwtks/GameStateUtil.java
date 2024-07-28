@@ -1,5 +1,7 @@
 package gwtks;
 
+import java.util.ArrayList;
+
 public class GameStateUtil {
 
     public static Pawn createPawnAndPlaceOnBoard(int playerId, TileId currentTileId){
@@ -92,5 +94,12 @@ public class GameStateUtil {
         for (int i = 0; i < nrCards; i++) {
             sendValidMoveMessage(playerId);
         }
+    }
+    public static ArrayList<Integer> intsToList(int[] integers){
+        ArrayList<Integer> result = new ArrayList<>();
+        for (int integer : integers) {
+            result.add(integer);
+        }
+        return result;
     }
 }

@@ -9,6 +9,7 @@ public class GameStateResponse implements IsSerializable {
     private int playerIdTurn;
     private int nrPlayers;
     private ArrayList<Integer> activePlayers;
+    private ArrayList<Integer> winners;
 
     public GameStateResponse() {
     }
@@ -45,6 +46,14 @@ public class GameStateResponse implements IsSerializable {
         this.activePlayers = activePlayers;
     }
 
+    public ArrayList<Integer> getWinners() {
+        return winners;
+    }
+
+    public void setWinners(ArrayList<Integer> winners) {
+        this.winners = winners;
+    }
+
     @Override
     public String toString() {
         return "GameStateResponse{" +
@@ -52,6 +61,7 @@ public class GameStateResponse implements IsSerializable {
                 ", playerIdTurn=" + playerIdTurn +
                 ", nrPlayers=" + nrPlayers +
                 ", activePlayers=" + activePlayers +
+                ", winners=" + winners +
                 '}';
     }
 }

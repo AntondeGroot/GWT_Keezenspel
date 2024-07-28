@@ -148,6 +148,7 @@ public class App implements EntryPoint {
 				}
 				PlayerList playerList = new PlayerList();
 				PlayerList.setActivePlayers(result.getActivePlayers());
+				PlayerList.setWinners(result.getWinners());
 				playerList.setPlayerIdPlayingAndDrawPlayerList(result.getPlayerIdTurn());
 			}
 		} );

@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static gwtks.GameStateUtil.sendForfeitMessage;
-import static gwtks.GameStateUtil.sendValidMoveMessage;
+import static gwtks.GameStateUtil.*;
 import static org.junit.Assert.*;
 
 public class TurnBasedTest {
@@ -215,13 +214,5 @@ public class TurnBasedTest {
 
         // THEN
         assertEquals(intsToList(new int[]{2}), GameState.getActivePlayers());
-    }
-
-    private ArrayList<Integer> intsToList(int[] integers){
-        ArrayList<Integer> result = new ArrayList<>();
-        for (int integer : integers) {
-            result.add(integer);
-        }
-        return result;
     }
 }
