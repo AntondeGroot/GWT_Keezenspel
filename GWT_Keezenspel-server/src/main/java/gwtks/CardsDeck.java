@@ -13,6 +13,7 @@ public class CardsDeck implements IsSerializable {
     private static ArrayList<Player> players = new ArrayList<>();
     private static int nrPlayers = 0;
     private static int playerIdStartingRound = 0;
+    private static ArrayList<Integer> activePlayers = new ArrayList<>();
 
     public static void setNrPlayers(int nr_Players) {
         nrPlayers = nr_Players;
@@ -38,9 +39,9 @@ public class CardsDeck implements IsSerializable {
     public static void shuffle(){
         ArrayList<Card> cards = new ArrayList<>();
         players = new ArrayList<>();
-
+        activePlayers = GameState.getActivePlayers();
         // create cards
-        for (int suit_i = 0; suit_i < nrPlayers; suit_i++) {
+        for (int suit_i = 0; suit_i < activePlayers.size(); suit_i++) {
             for (int card_j = 0; card_j < 13; card_j++) {
                 cards.add(new Card(suit_i % 4, card_j));
             }
@@ -72,13 +73,15 @@ public class CardsDeck implements IsSerializable {
     public static void dealCards(){
         int nrCards = (roundNr == 0) ? 5 : 4;
 
-        for (int i = 0; i < nrPlayers; i++) {
-            players.add(new Player(i));
+        for (int player_i = 0; player_i < GameState.getNrPlayers(); player_i++) {
+            players.add(new Player(player_i));
         }
 
-        for (int i = 0; i < nrCards; i++) {
-            for (int j = 0; j < nrPlayers; j++) {
-                setPlayerCard(j, cardsDeque.pop());
+        for (int player_i = 0; player_i < GameState.getNrPlayers(); player_i++) {
+            for (int j = 0; j < nrCards; j++) {
+                if(activePlayers.contains(player_i)){
+                    setPlayerCard(player_i, cardsDeque.pop());
+                }
             }
         }
 
@@ -92,7 +95,7 @@ public class CardsDeck implements IsSerializable {
     }
 
     private static void nextPlayerId(){
-        playerIdStartingRound = (playerIdStartingRound + 1) % nrPlayers;
+        playerIdStartingRound = (playerIdStartingRound + 1) % activePlayers.size();
     }
 
     public static int getPlayerIdStartingRound() {

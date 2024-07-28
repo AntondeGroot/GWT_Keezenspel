@@ -17,9 +17,6 @@ class MovingOnBoardSamePlayerBlockingTest {
         GameState gameState = new GameState(8);
         moveMessage = new MoveMessage();
         moveResponse = new MoveResponse();
-        CardsDeck.setNrPlayers(8);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
     }
 
     @AfterEach
@@ -56,13 +53,15 @@ class MovingOnBoardSamePlayerBlockingTest {
         Card card = givePlayerCard(0,-1);
         Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(0,0), new TileId(0,16));
         Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(7,15));
+        int nrCardsBeforePlaying = CardsDeck.getCardsForPlayer(0).size();
 
         // WHEN
         createMoveMessage(moveMessage, pawn1,card);
         GameState.processOnMove(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(5, CardsDeck.getCardsForPlayer(0).size());
+        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
+        assertEquals(nrCardsBeforePlaying, CardsDeck.getCardsForPlayer(0).size());
     }
     @Test
     void PawnOn15_PawnCannotBePlacedThere_Forwards(){

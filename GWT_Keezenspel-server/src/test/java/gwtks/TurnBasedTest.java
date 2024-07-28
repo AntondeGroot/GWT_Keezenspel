@@ -173,6 +173,8 @@ public class TurnBasedTest {
     }
     @Test
     void playerCanOnlyMoveHisOwnPawn(){
+        new GameState(3);
+
         // WHEN
         sendValidMoveMessage(0);
 

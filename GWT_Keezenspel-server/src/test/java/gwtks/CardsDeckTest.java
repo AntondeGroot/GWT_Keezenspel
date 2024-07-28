@@ -1,5 +1,6 @@
 package gwtks;
 
+import gwtks.logic.WinnerLogic;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,12 +26,9 @@ class CardsDeckTest {
 
     @Test
     void fivePlayers_ShuffleDeck_EachHas5Cards() {
-        // GIVEN
-        CardsDeck.setNrPlayers(5);
+        // GIVEN WHEN
+        new GameState(5);
 
-        // WHEN
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
         int totalCards = 0;
         for (int i = 0; i < 5; i++) {
             totalCards += CardsDeck.getCardsForPlayer(i).size();
@@ -41,12 +39,8 @@ class CardsDeckTest {
 
     @Test
     void onePlayer_ShuffleDeck_TheyHave5Cards() {
-        // GIVEN
-        CardsDeck.setNrPlayers(1);
-
-        // WHEN
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
+        // GIVEN WHEN
+        new GameState(1);
 
         // THEN
         List<Card> cards =  CardsDeck.getCardsForPlayer(0);
@@ -56,12 +50,8 @@ class CardsDeckTest {
 
     @Test
     void dealCards_5_4_4_CardsPerRound() {
-        // GIVEN
-        CardsDeck.setNrPlayers(1);
-
-        // WHEN
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
+        // GIVEN WHEN
+        new GameState(1);
 
         // THEN
         Assert.assertEquals(5,CardsDeck.getCardsForPlayer(0).size());
@@ -82,10 +72,8 @@ class CardsDeckTest {
 
     @Test
     void twoPlayersDoNotHaveTheSameCard() {
-        // GIVEN
-        CardsDeck.setNrPlayers(2);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
+        // GIVEN WHEN
+        new GameState(2);
 
         // WHEN
         List<Card> cards1 = CardsDeck.getCardsForPlayer(0);
@@ -97,10 +85,8 @@ class CardsDeckTest {
 
     @Test
     void playerHasCard(){
-        // GIVEN
-        CardsDeck.setNrPlayers(1);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
+        // GIVEN WHEN
+        new GameState(1);
 
         // WHEN
         List<Card> cards = CardsDeck.getCardsForPlayer(0);
@@ -115,9 +101,7 @@ class CardsDeckTest {
     @Test
     void playerForfeitsCards(){
         // GIVEN
-        CardsDeck.setNrPlayers(2);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
+        new GameState(2);
 
         // WHEN
         CardsDeck.forfeitCardsForPlayer(0);
@@ -154,9 +138,7 @@ class CardsDeckTest {
     @Test
     void getCardsForPlayer() {
         // GIVEN
-        CardsDeck.setNrPlayers(8);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
+        new GameState(8);
 
         // WHEN
         Card card = givePlayerCard(1,-4);
@@ -169,9 +151,6 @@ class CardsDeckTest {
     void oneRound_player0LastPlayer_nextPlayer1(){
         // GIVEN
         new GameState(3);
-        CardsDeck.setNrPlayers(3);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
 
         // WHEN
         sendValidMoveMessage(0);
@@ -186,9 +165,6 @@ class CardsDeckTest {
     void oneRound_player1LastPlayer_nextPlayer1(){
         // GIVEN
         new GameState(3);
-        CardsDeck.setNrPlayers(3);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
 
         // WHEN
         sendValidMoveMessage(0);
@@ -196,6 +172,7 @@ class CardsDeckTest {
         GameState.forfeitPlayer(2);
         GameState.forfeitPlayer(0);
         playRemainingCards(1);
+
         // THEN
         assertEquals(1, CardsDeck.getPlayerIdStartingRound());
     }
@@ -203,9 +180,6 @@ class CardsDeckTest {
     void oneRound_player2LastPlayer_nextPlayer1_Forfeit(){
         // GIVEN
         new GameState(3);
-        CardsDeck.setNrPlayers(3);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
 
         // WHEN
         GameState.forfeitPlayer(0);
@@ -219,9 +193,6 @@ class CardsDeckTest {
     void oneRound_player2LastPlayer_nextPlayer1_byPlaying(){
         // GIVEN
         new GameState(3);
-        CardsDeck.setNrPlayers(3);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
 
         // WHEN
         GameState.forfeitPlayer(0);
@@ -234,9 +205,6 @@ class CardsDeckTest {
     void twoRounds_player0LastPlayer_nextPlayer2(){
         // GIVEN
         new GameState(3);
-        CardsDeck.setNrPlayers(3);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
 
         // WHEN round 1
         GameState.forfeitPlayer(0);
@@ -254,9 +222,6 @@ class CardsDeckTest {
     void twoRounds_player1LastPlayer_nextPlayer2(){
         // GIVEN
         new GameState(3);
-        CardsDeck.setNrPlayers(3);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
 
         // WHEN round 1
         GameState.forfeitPlayer(0);
@@ -275,9 +240,6 @@ class CardsDeckTest {
     void twoRounds_player2LastPlayer_nextPlayer2(){
         // GIVEN
         new GameState(3);
-        CardsDeck.setNrPlayers(3);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
 
         // WHEN round 1
         GameState.forfeitPlayer(0);
@@ -295,9 +257,6 @@ class CardsDeckTest {
     void threeRounds_player0LastPlayer_nextPlayer0(){
         // GIVEN
         new GameState(3);
-        CardsDeck.setNrPlayers(3);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
 
         // WHEN round 1
         GameState.forfeitPlayer(0);
@@ -320,9 +279,6 @@ class CardsDeckTest {
     void threeRounds_player1LastPlayer_nextPlayer0(){
         // GIVEN
         new GameState(3);
-        CardsDeck.setNrPlayers(3);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
 
         // WHEN round 1
         GameState.forfeitPlayer(0);
@@ -344,9 +300,6 @@ class CardsDeckTest {
     void threeRounds_player2LastPlayer_nextPlayer0(){
         /// GIVEN
         new GameState(3);
-        CardsDeck.setNrPlayers(3);
-        CardsDeck.shuffle();
-        CardsDeck.dealCards();
 
         // WHEN round 1
         GameState.forfeitPlayer(0);
@@ -364,5 +317,25 @@ class CardsDeckTest {
 
         // THEN
         assertEquals(0, CardsDeck.getPlayerIdStartingRound());
+    }
+
+    @Test
+    void playerHasCard2(){
+        // GIVEN WHEN
+        new GameState(3);
+
+        // WHEN
+        place4PawnsOnFinish(1);
+        WinnerLogic.checkForWinners(new ArrayList<>());
+        place4PawnsOnFinish(2);
+        WinnerLogic.checkForWinners(new ArrayList<>());
+        playRemainingCards(0);
+
+        CardsDeck.shuffle();
+        CardsDeck.dealCards();
+
+        // THEN
+        int totalCards = CardsDeck.getNrOfCardsForAllPlayers().stream().mapToInt(Integer::intValue).sum();
+        assertEquals(4,totalCards);
     }
 }
