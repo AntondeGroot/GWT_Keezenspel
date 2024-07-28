@@ -8,6 +8,7 @@ import static gwtks.MessageType.*;
 import static gwtks.MoveResult.*;
 import static gwtks.MoveType.*;
 import static gwtks.logic.StartTileLogic.canPassStartTile;
+import static gwtks.logic.WinnerLogic.checkForWinners;
 
 public class GameState {
 
@@ -16,6 +17,7 @@ public class GameState {
     private static int nrPlayers = 3;
     private static ArrayList<TileId> tiles = new ArrayList<>();
     private static ArrayList<Integer> activePlayers = new ArrayList<>();
+    private static ArrayList<Integer> winners = new ArrayList<>();
 
     public GameState(){
         this(nrPlayers);
@@ -48,7 +50,9 @@ public class GameState {
 
     public static void resetActivePlayers(){
         for (int playerId = 0; playerId < nrPlayers; playerId++) {
-            activePlayers.add(playerId);
+            if(!winners.contains(playerId)){
+                activePlayers.add(playerId);
+            }
         }
     }
 
@@ -63,6 +67,14 @@ public class GameState {
             playerIdTurn = CardsDeck.getPlayerIdStartingRound();
         }else{
             nextActivePlayer();
+        }
+    }
+
+    private static void removeWinnerFromActivePlayerList(){
+        for (Integer winner_i: winners){
+            if(activePlayers.contains(winner_i)){
+                activePlayers.remove(winner_i);
+            }
         }
     }
 
@@ -629,6 +641,8 @@ public class GameState {
         if(moveMessage.getMessageType() == MAKE_MOVE){
             movePawn(new Pawn(pawnId,targetTileId));
             CardsDeck.playerPlaysCard(moveMessage.getPlayerId(), moveMessage.getCard());
+            checkForWinners(winners);
+            removeWinnerFromActivePlayerList();
             nextActivePlayer();
         }
 
@@ -703,5 +717,9 @@ public class GameState {
 
     public static int nextPlayerId(int playerId){
         return (playerId + 1)%nrPlayers;
+    }
+
+    public static ArrayList<Integer> getWinners() {
+        return winners;
     }
 }
