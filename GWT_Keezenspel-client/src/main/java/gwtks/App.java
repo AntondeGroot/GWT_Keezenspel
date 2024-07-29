@@ -7,6 +7,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
@@ -42,6 +43,11 @@ public class App implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
+		String uuid = Cookies.getCookie("uuid");
+		if(uuid.isEmpty()){
+			uuid = uuid();
+			Cookies.setCookie("uuid",uuid);
+		}
 		final Button sendButton = new Button("Make Move");
 		final Button forfeitButton = new Button("Forfeit");
 		final Label errorLabel = new Label();
@@ -153,4 +159,13 @@ public class App implements EntryPoint {
 			}
 		} );
 	}
+
+	public native static String uuid() /*-{
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+				function(c) {
+					var r = Math.random() * 16 | 0, v = c == 'x' ? r
+							: (r & 0x3 | 0x8);
+					return v.toString(16);
+				});
+	}-*/;
 }
