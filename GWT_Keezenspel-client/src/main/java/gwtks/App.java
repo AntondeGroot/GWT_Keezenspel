@@ -17,6 +17,10 @@ import gwtks.animations.GameAnimation;
 import gwtks.animations.StepsAnimation;
 import gwtks.handlers.*;
 
+import java.nio.channels.ScatteringByteChannel;
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
@@ -39,15 +43,11 @@ public class App implements EntryPoint {
     private Context2d ctxPawns;
 	private Context2d ctxBoard;
 
-	/**
+    /**
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		String uuid = Cookies.getCookie("uuid");
-		if(uuid.isEmpty()){
-			uuid = uuid();
-			Cookies.setCookie("uuid",uuid);
-		}
+
 		final Button sendButton = new Button("Make Move");
 		final Button forfeitButton = new Button("Forfeit");
 		final Label errorLabel = new Label();
@@ -63,6 +63,15 @@ public class App implements EntryPoint {
 
 		PlayerList playerList = new PlayerList();
 		playerList.createListElement();
+
+		Collection<String> cookieNames = Cookies.getCookieNames();
+        String uuid;
+        if(cookieNames.contains("uuid")){
+			uuid = Cookies.getCookie("uuid");
+		}else{
+			uuid = uuid();
+			Cookies.setCookie("uuid", uuid);
+		}
 
 		//set playerId
 		PawnAndCardSelection.setPlayerId(0);
