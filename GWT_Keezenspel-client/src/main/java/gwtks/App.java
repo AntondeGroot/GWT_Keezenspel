@@ -7,7 +7,6 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
-import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
@@ -17,9 +16,6 @@ import gwtks.animations.GameAnimation;
 import gwtks.animations.StepsAnimation;
 import gwtks.handlers.*;
 
-import java.nio.channels.ScatteringByteChannel;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -37,6 +33,7 @@ public class App implements EntryPoint {
 	 * Create a remote service proxy to talk to the server-side Moving service.
 	 */
 	private final MovingServiceAsync movingService = GWT.create(MovingService.class);
+	private final PresenterManager presenterManager = new PresenterManager();
 	private final CardsServiceAsync cardsService = GWT.create(CardsService.class);
 	private final GameStateServiceAsync gameStateService = GWT.create(GameStateService.class);
 	private GameAnimation gameAnimation;
@@ -48,15 +45,18 @@ public class App implements EntryPoint {
 	 */
 	public void onModuleLoad() {
 
-		final Button sendButton = new Button("Make Move");
-		final Button forfeitButton = new Button("Forfeit");
-		final Label errorLabel = new Label();
-
 		// Create a Canvas for the Parcheesi board
 		if(Canvas.createIfSupported()==null){
 			RootPanel.get().add(new Label("Canvas is not supported in your browser."));
 			return;
 		}
+		// todo: uncomment
+		//		presenterManager.switchToGameRoom();
+
+		final Button sendButton = new Button("Make Move");
+		final Button forfeitButton = new Button("Forfeit");
+		final Label errorLabel = new Label();
+
 		Document document = Document.get();
 		ctxPawns = ((CanvasElement) document.getElementById("canvasPawns")).getContext2d();
 		ctxBoard = ((CanvasElement) document.getElementById("canvasBoard")).getContext2d();
@@ -64,16 +64,7 @@ public class App implements EntryPoint {
 		PlayerList playerList = new PlayerList();
 		playerList.createListElement();
 
-		Collection<String> cookieNames = Cookies.getCookieNames();
-        String uuid;
-        if(cookieNames.contains("uuid")){
-			uuid = Cookies.getCookie("uuid");
-		}else{
-			uuid = uuid();
-			Cookies.setCookie("uuid", uuid);
-		}
-
-		//set playerId
+		//set playerId to first player in list todo: use Cookie
 		PawnAndCardSelection.setPlayerId(0);
 
 		// add widgets
@@ -84,7 +75,6 @@ public class App implements EntryPoint {
 		RootPanel.get("sendButtonContainer").add(sendButton);
 		RootPanel.get("errorLabelContainer").add(errorLabel);
 		RootPanel.get("forfeitButtonContainer").add(forfeitButton);
-
 
 		// Add a handler to send the MOVE to the server
 		SendHandler handler = new SendHandler();
@@ -124,16 +114,12 @@ public class App implements EntryPoint {
 	};
 
 	public void pollServerForCards(){
-//		GWT.log("player id playing: "+PlayerList.getPlayerIdPlaying()+"\n");
-//		GWT.log("...");
+		// todo: this should actually only get the cards for the Cookie.playerId
 		cardsService.getCards(PlayerList.getPlayerIdPlaying(), new AsyncCallback<CardResponse>() {
 			public void onFailure(Throwable caught) {
 				StepsAnimation.reset();
 			}
 			public void onSuccess(CardResponse result) {
-//				GWT.log("cards playerId"     + result.getPlayerId());
-//				GWT.log("Cards received: "   + result.getCards());
-//				GWT.log("Cards per player: " + result.getNrOfCardsPerPlayer());
 
 				PawnAndCardSelection.setPlayerId(result.getPlayerId());
 				if(CardsDeck.areCardsDifferent(result.getCards())){
@@ -168,13 +154,4 @@ public class App implements EntryPoint {
 			}
 		} );
 	}
-
-	public native static String uuid() /*-{
-		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
-				function(c) {
-					var r = Math.random() * 16 | 0, v = c == 'x' ? r
-							: (r & 0x3 | 0x8);
-					return v.toString(16);
-				});
-	}-*/;
 }
