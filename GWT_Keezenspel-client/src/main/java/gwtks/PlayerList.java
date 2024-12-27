@@ -55,6 +55,9 @@ public class PlayerList {
         int rowCount = (int) Math.ceil((double) playerNames.length / colCount);
         Grid grid = new Grid(rowCount, colCount);
         RootPanel.get("playerListContainer").clear();
+        // todo: to view
+        GameBoardView gameBoardView = new GameBoardView();
+        gameBoardView.getPlayerListContainer().clear();
 
         for (int playerId = 0; playerId < nrPlayers; playerId++) {
             int imagePixelSize = 50;
@@ -143,8 +146,11 @@ public class PlayerList {
             grid.setWidget(row, col, hp);
 
         }
+        // todo: old
         grid.getElement().getStyle().setMargin(50, Style.Unit.PX);
         RootPanel.get("playerListContainer").add(grid);
+        //todo: new
+//        gameBoardView.getPlayerListContainer().add(grid); uncommenting demolishes the other grid
     }
 
     public static void setWinners(ArrayList<Integer> winners) {

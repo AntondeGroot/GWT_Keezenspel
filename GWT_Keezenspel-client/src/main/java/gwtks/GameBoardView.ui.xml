@@ -1,0 +1,19 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui">
+    <g:HorizontalPanel ui:field="columnsContainer">
+        <g:VerticalPanel styleName="column1">
+            <g:HTMLPanel ui:field="canvasWrapper" styleName="canvasWrapper">
+                <canvas ui:field="canvasBoard" width="600" height="600"/>
+                <canvas ui:field="canvasSteps" width="600" height="600"/>
+                <canvas ui:field="canvasPawns" width="600" height="600"/>
+                <canvas ui:field="canvasCards" width="600" height="800"/>
+            </g:HTMLPanel>
+            <g:Label styleName="errorLabel" ui:field="errorLabel"/>
+        </g:VerticalPanel>
+        <g:VerticalPanel styleName="column2">
+            <g:Button ui:field="sendButton" styleName="sendButton">Make Move</g:Button>
+            <g:Button ui:field="forfeitButton" styleName="forfeitButton">Forfeit</g:Button>
+            <g:VerticalPanel ui:field="playerListContainer"/>
+        </g:VerticalPanel>
+    </g:HorizontalPanel>
+</ui:UiBinder>

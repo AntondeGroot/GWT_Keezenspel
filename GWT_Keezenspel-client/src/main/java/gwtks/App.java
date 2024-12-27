@@ -33,12 +33,12 @@ public class App implements EntryPoint {
 	 * Create a remote service proxy to talk to the server-side Moving service.
 	 */
 	private final MovingServiceAsync movingService = GWT.create(MovingService.class);
-	private final PresenterManager presenterManager = new PresenterManager();
 	private final CardsServiceAsync cardsService = GWT.create(CardsService.class);
 	private final GameStateServiceAsync gameStateService = GWT.create(GameStateService.class);
 	private GameAnimation gameAnimation;
     private Context2d ctxPawns;
 	private Context2d ctxBoard;
+	private GameBoardView gameBoardView;
 
     /**
 	 * This is the entry point method.
@@ -50,6 +50,13 @@ public class App implements EntryPoint {
 			RootPanel.get().add(new Label("Canvas is not supported in your browser."));
 			return;
 		}
+
+		gameBoardView = new GameBoardView();
+		RootPanel.get().clear();
+		RootPanel.get().add(gameBoardView);
+		//todo add model
+		GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(gameBoardView);
+		gameBoardPresenter.start();
 		// todo: uncomment
 		//		presenterManager.switchToGameRoom();
 
@@ -143,8 +150,10 @@ public class App implements EntryPoint {
 					Board board = new Board();
 					Board.setPawns(result.getPawns());
 					board.createBoard(result.getNrPlayers(),600);
-					board.drawBoard(ctxBoard);
-					board.drawPawns(ctxPawns);
+					board.drawBoard(ctxBoard);// todo: remove
+					board.drawBoard(gameBoardView.getCanvasBoard().getContext2d());
+					board.drawPawns(ctxPawns); // todo: remove
+					board.drawPawns(gameBoardView.getCanvasPawns().getContext2d());
 					PlayerList.setNrPlayers(result.getNrPlayers());
 				}
 				PlayerList playerList = new PlayerList();

@@ -2,19 +2,23 @@ package gwtks;
 
 public class GameBoardPresenter implements Presenter{
     private GameBoardView view;
-    private PresenterManager presenterManager;
     private GameStateServiceAsync gameStateService;
 
-    public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, PresenterManager presenterManager, GameStateServiceAsync gameStateServiceAsync) {
+    public GameBoardPresenter(GameBoardView gameBoardView) {
+        this.view = gameBoardView;
     }
 
     @Override
     public void start() {
-
+        bind();
     }
 
     @Override
     public void stop() {
 
+    }
+
+    private void bind() {
+        // todo: bind clickhandlers
     }
 }
