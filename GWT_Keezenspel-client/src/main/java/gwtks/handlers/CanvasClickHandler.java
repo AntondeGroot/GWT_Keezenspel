@@ -15,6 +15,7 @@ public class CanvasClickHandler {
 
     public static void addClickHandler(){
         GWT.log("handler added");
+        //todo: do not use the DOM to add a click handler
         Element canvas = DOM.getElementById("canvasCards");
 
         // Ensure the canvas element exists
