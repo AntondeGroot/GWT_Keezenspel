@@ -21,39 +21,8 @@ public class CardsDeck {
         CardsDeck.cards = cards;
     }
 
-    public static void drawCards(){
-        ImageElement img = Document.get().createImageElement();
-        img.setSrc("/card-deck.png");
-        // todo: old
-        Document document  = Document.get();
-        ctxCards = ((CanvasElement) document.getElementById("canvasCards")).getContext2d();
-        ctxCards.clearRect(0,0,600,800);
-        // todo: new
-        GameBoardView gameBoardView = new GameBoardView();
-        Context2d contextCards = gameBoardView.getCanvasCards().getContext2d();
-        // card width 25 is good to show how many cards they are still holding
-        // card width 100 is good for your own hand
-        int i=0;
-        for (Card card: cards){
-            // source image
-            double sw = 1920/13.0;
-            double sh = 1150/5.0;
-            double sx = sw*card.getCardValue();
-            double sy = sh*card.getSuit();
-            // destination
-            int dy = 600;
-            double dw = 100.0;
-            double dx = 10+(dw+10)* i;
-            double dh = dw/sw*sh;
-            // for spritesheets dx dy
-            ctxCards.drawImage(img, sx,sy,sw,sh,dx,dy,dw,dh); //todo: old
-            double lineThickness = 3;
-            if(PawnAndCardSelection.getCard() != null && PawnAndCardSelection.getCard().equals(card) && PawnAndCardSelection.getCardNr() == i){
-                // todo: old
-                drawRoundedRect(ctxCards, dx-lineThickness/2, dy-lineThickness/2, dw+lineThickness, dh+lineThickness, 8);
-            }
-            i++;
-        }
+    public static List<Card> getCards(){
+        return cards;
     }
 
     public static Card pickCard(int i){

@@ -3,7 +3,10 @@ package gwtks;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.CanvasElement;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.*;
@@ -11,8 +14,10 @@ import gwtks.Pawn;
 import gwtks.TileMapping;
 import gwtks.util.PawnRect;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class GameBoardView extends Composite {
 
@@ -205,5 +210,104 @@ public class GameBoardView extends Composite {
         //todo implement
 //        animationMappings.add(new PawnAnimationMapping(pawn, movePawn, animateLast));
 //        pawn1.setCurrentTileId(movePawn.getLast());
+    }
+
+    public void drawCards(List<Card> cards){
+        ImageElement img = Document.get().createImageElement();
+        img.setSrc("/card-deck.png");
+        // todo: old
+        Document document  = Document.get();
+        ctxCards = ((CanvasElement) document.getElementById("canvasCards")).getContext2d();
+        ctxCards.clearRect(0,0,600,800);
+        GameBoardView gameBoardView = new GameBoardView();
+        // card width 25 is good to show how many cards they are still holding
+        // card width 100 is good for your own hand
+        int i=0;
+        for (Card card: cards){
+            // source image
+            double sw = 1920/13.0;
+            double sh = 1150/5.0;
+            double sx = sw*card.getCardValue();
+            double sy = sh*card.getSuit();
+            // destination
+            int dy = 600;
+            double dw = 100.0;
+            double dx = 10+(dw+10)* i;
+            double dh = dw/sw*sh;
+            // for spritesheets dx dy
+            ctxCards.drawImage(img, sx,sy,sw,sh,dx,dy,dw,dh); //todo: old
+            double lineThickness = 3;
+            if(PawnAndCardSelection.getCard() != null && PawnAndCardSelection.getCard().equals(card) && PawnAndCardSelection.getCardNr() == i){
+                // todo: old
+                drawRoundedRect(ctxCards, dx-lineThickness/2, dy-lineThickness/2, dw+lineThickness, dh+lineThickness, 8);
+            }
+            i++;
+        }
+    }
+
+    public void drawCards_new(List<Card> cards) {
+        // Create an image to represent the card deck
+        Image img = new Image("/card-deck.png");
+
+        // Add a LoadHandler to ensure the image is fully loaded before drawing
+        img.addLoadHandler(new LoadHandler() {
+            @Override
+            public void onLoad(LoadEvent event) {
+                // Clear the canvas to prepare for drawing new cards
+                ctxCards.clearRect(0, 0, canvasCards.getWidth(), canvasCards.getHeight());
+
+                // Loop through the cards to draw them
+                for (int i = 0; i < cards.size(); i++) {
+                    Card card = cards.get(i);
+
+                    // Define the source rectangle (from the sprite sheet)
+                    double spriteWidth = 1920 / 13.0;
+                    double spriteHeight = 1150 / 5.0;
+                    double sourceX = spriteWidth * card.getCardValue();
+                    double sourceY = spriteHeight * card.getSuit();
+
+                    // Define the destination rectangle (on the canvas)
+                    double destX = 10 + (100.0 + 10) * i; // Offset for each card
+                    double destY = 600; // Fixed Y position
+                    double destWidth = 100.0; // Card width on canvas
+                    double destHeight = destWidth / spriteWidth * spriteHeight; // Maintain aspect ratio
+
+                    // Draw the card image on the canvas
+                    ctxCards.drawImage(
+                            ImageElement.as(img.getElement()),
+                            sourceX, sourceY, spriteWidth, spriteHeight,
+                            destX, destY, destWidth, destHeight
+                    );
+
+                    // Highlight selected card, if any
+                    if (PawnAndCardSelection.getCard() != null &&
+                            PawnAndCardSelection.getCard().equals(card) &&
+                            PawnAndCardSelection.getCardNr() == i) {
+                        drawRoundedRect(ctxCards, destX - 1.5, destY - 1.5, destWidth + 3, destHeight + 3, 8);
+                    }
+                }
+            }
+        });
+
+        // Trigger the image loading by adding it to the DOM
+        img.setVisible(false);
+        RootPanel.get().add(img);
+    }
+
+    private void drawRoundedRect(Context2d context, double x, double y, double width, double height, double radius) {
+        context.beginPath();
+        context.moveTo(x + radius, y);
+        context.lineTo(x + width - radius, y);
+        context.quadraticCurveTo(x + width, y, x + width, y + radius);
+        context.lineTo(x + width, y + height - radius);
+        context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        context.lineTo(x + radius, y + height);
+        context.quadraticCurveTo(x, y + height, x, y + height - radius);
+        context.lineTo(x, y + radius);
+        context.quadraticCurveTo(x, y, x + radius, y);
+        context.closePath();
+        context.setStrokeStyle("red");
+        context.setLineWidth(2);
+        context.stroke();
     }
 }

@@ -131,7 +131,7 @@ public class App implements EntryPoint {
 				PawnAndCardSelection.setPlayerId(result.getPlayerId());
 				if(CardsDeck.areCardsDifferent(result.getCards())){
 					CardsDeck.setCards(result.getCards());
-					CardsDeck.drawCards();
+					gameBoardView.drawCards(CardsDeck.getCards());
 					PlayerList.refresh();
 				}
 			}

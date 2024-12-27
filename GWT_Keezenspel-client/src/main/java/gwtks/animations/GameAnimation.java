@@ -7,6 +7,7 @@ import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 import gwtks.Board;
 import gwtks.CardsDeck;
+import gwtks.GameBoardView;
 import gwtks.PawnAndCardSelection;
 
 public class GameAnimation {
@@ -42,7 +43,9 @@ public class GameAnimation {
         StepsAnimation.draw();
 
         if(PawnAndCardSelection.getDrawCards()) {
-            CardsDeck.drawCards();
+            // todo: move to presenter
+            GameBoardView gameBoardView = new GameBoardView();
+            gameBoardView.drawCards(CardsDeck.getCards());
             PawnAndCardSelection.setCardsAreDrawn();
         }
 
