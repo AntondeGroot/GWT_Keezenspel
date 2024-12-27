@@ -19,6 +19,7 @@ public class GameAnimation {
     private boolean isInitialized = false;
 
     public GameAnimation() {
+        // todo: remove Document
         Document document = Document.get();
 
         ctxPawns = ((CanvasElement) document.getElementById("canvasPawns")).getContext2d();
@@ -39,18 +40,17 @@ public class GameAnimation {
     }
 
     public void draw(){
-        StepsAnimation.draw();
-
-        if(PawnAndCardSelection.getDrawCards()) {
-            CardsDeck.drawCards();
-            PawnAndCardSelection.setCardsAreDrawn();
-        }
-
-        board.drawPawns(ctxPawns);
-        if(!isInitialized){
-            board.drawBoard(ctxBoard);
-            isInitialized = true;
-        }
+//        StepsAnimation.draw();
+//
+//        if(PawnAndCardSelection.getDrawCards()) {
+//            CardsDeck.drawCards();
+//            PawnAndCardSelection.setCardsAreDrawn();
+//        }
+//
+//        board.drawPawns(ctxPawns);
+//        if(!isInitialized){
+//            board.drawBoard(ctxBoard);
+//            isInitialized = true;
+//        }
     }
-
 }
