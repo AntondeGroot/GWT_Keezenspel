@@ -22,6 +22,7 @@ public class CardsDeck {
     }
 
     public static void drawCards(){
+        // todo: Remove Document
         ImageElement img = Document.get().createImageElement();
         img.setSrc("/card-deck.png");
         Document document  = Document.get();
