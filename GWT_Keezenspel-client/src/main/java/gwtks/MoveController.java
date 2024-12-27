@@ -18,19 +18,19 @@ public class MoveController {
         Pawn pawn2 = null;
 
         if(movePawn1 == null){return;}
-
+        //todo; fix
         if(pawnId1 != null) {
             pawn1 = Board.getPawn(pawnId1);
-            Board.movePawn(pawn1, movePawn1, false);
+//            Board.movePawn(pawn1, movePawn1, false);
             GWT.log(Board.getPawns().toString());
         }
 
         if(pawnId2 != null){
             pawn2 = Board.getPawn(pawnId2);
             if(moveType == MoveType.MOVE || moveType == MoveType.ONBOARD){
-                Board.movePawn(pawn2, movePawn2, true);
+//                Board.movePawn(pawn2, movePawn2, true);
             }else{
-                Board.movePawn(pawn2, movePawn2, false);
+//                Board.movePawn(pawn2, movePawn2, false);
             }
             GWT.log(Board.getPawns().toString());
         }
