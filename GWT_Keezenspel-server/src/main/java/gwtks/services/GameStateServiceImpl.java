@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class GameStateServiceImpl extends RemoteServiceServlet implements GameStateService {
 
     @Override
-    public GameStateResponse getGameState() throws IllegalArgumentException {
+    public GameStateResponse getGameState(){
         GameStateResponse response = new GameStateResponse();
         response.setNrPlayers(GameState.getNrPlayers());
         response.setPawns(GameState.getPawns());
@@ -19,5 +19,13 @@ public class GameStateServiceImpl extends RemoteServiceServlet implements GameSt
         response.setActivePlayers(GameState.getActivePlayers());
         response.setWinners(GameState.getWinners());
         return response;
+    }
+
+    @Override
+    public void startGame(){
+        // todo: create N players, and N playerIds, one of which is the current player
+        // todo: create a Board
+        // todo: create the Gamestate
+        // todo; the gamestate should include the Model
     }
 }

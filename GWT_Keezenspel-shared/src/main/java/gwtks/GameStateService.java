@@ -5,5 +5,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("gamestate")
 public interface GameStateService extends RemoteService {
-    GameStateResponse getGameState() throws IllegalArgumentException;
+    GameStateResponse getGameState();
+    void startGame();
 }
