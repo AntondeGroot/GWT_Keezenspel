@@ -15,7 +15,6 @@ public class GameState {
     private static ArrayList<Pawn> pawns = new ArrayList<>();
     private static int playerIdTurn;
     private static int nrPlayers = 3;
-    private static ArrayList<TileId> tiles = new ArrayList<>();
     private static ArrayList<Integer> activePlayers = new ArrayList<>();
     private static ArrayList<Integer> winners = new ArrayList<>();
 
@@ -665,7 +664,6 @@ public class GameState {
         pawns = new ArrayList<>();
         playerIdTurn = 0;
         nrPlayers = 0;
-        tiles = new ArrayList<>();
         activePlayers.clear();
         winners.clear();
     }

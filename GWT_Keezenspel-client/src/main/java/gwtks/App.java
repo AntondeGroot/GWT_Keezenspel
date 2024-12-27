@@ -57,8 +57,6 @@ public class App implements EntryPoint {
 		//todo add model
 		GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(gameBoardView);
 		gameBoardPresenter.start();
-		// todo: uncomment
-		//		presenterManager.switchToGameRoom();
 
 		final Button sendButton = new Button("Make Move");
 		final Button forfeitButton = new Button("Forfeit");
@@ -131,7 +129,8 @@ public class App implements EntryPoint {
 				PawnAndCardSelection.setPlayerId(result.getPlayerId());
 				if(CardsDeck.areCardsDifferent(result.getCards())){
 					CardsDeck.setCards(result.getCards());
-					gameBoardView.drawCards(CardsDeck.getCards());
+					gameBoardView.drawCards(CardsDeck.getCards());// todo: remove old method
+					gameBoardView.drawCards_new(CardsDeck.getCards());// todo: keep new method
 					PlayerList.refresh();
 				}
 			}
