@@ -33,6 +33,7 @@ public class StepsAnimation {
         if(tileIds == null){return;}
 
         if (ctxSteps == null) {
+            //todo: remove Document
             Document document = Document.get();
             ctxSteps = ((CanvasElement) document.getElementById("canvasSteps")).getContext2d();
         }
@@ -69,6 +70,5 @@ public class StepsAnimation {
 
     public static void reset(){
         tileIds = null;
-
     }
 }
