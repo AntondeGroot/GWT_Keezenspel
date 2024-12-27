@@ -15,6 +15,7 @@ public class SendHandler implements ClickHandler {
      * Fired when the user clicks on the sendButton.
      */
     public void onClick(ClickEvent event) {
+        GWT.log("send move to server");
         sendMoveToServer();
     }
 
@@ -46,7 +47,7 @@ public class SendHandler implements ClickHandler {
             }
         } );
     }
-
+    //todo: all these native methods should not exist.
     public native String getPlayerIdFieldValue() /*-{
         return $doc.getElementById("playerId").value;
     }-*/;
