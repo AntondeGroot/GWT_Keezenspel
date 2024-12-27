@@ -52,17 +52,20 @@ public class GameBoardView extends Composite {
     @UiField
     VerticalPanel playerListContainer;
 
-    private Context2d ctxBoard;
-    private Context2d ctxPawns;
-    private Context2d ctxCards;
+
+    //todo: would this work?
+//    private Context2d ctxBoard;
+//    private Context2d ctxPawns;
+//    private Context2d ctxCards;
 
     @Override
     public void onLoad() {
         super.onLoad();
+        // todo: would this work?
         // Get the Context2d from the CanvasElement
-        ctxBoard = canvasBoard.getContext2d();
-        ctxPawns = canvasPawns.getContext2d();
-        ctxCards = canvasCards.getContext2d();
+//        ctxBoard = canvasBoard.getContext2d();
+//        ctxPawns = canvasPawns.getContext2d();
+//        ctxCards = canvasCards.getContext2d();
     }
 
     public GameBoardView() {
@@ -217,9 +220,10 @@ public class GameBoardView extends Composite {
         img.setSrc("/card-deck.png");
         // todo: old
         Document document  = Document.get();
-        ctxCards = ((CanvasElement) document.getElementById("canvasCards")).getContext2d();
+        Context2d ctxCards = ((CanvasElement) document.getElementById("canvasCards")).getContext2d();
         ctxCards.clearRect(0,0,600,800);
-        GameBoardView gameBoardView = new GameBoardView();
+        // todo: new
+        canvasCards.getContext2d().clearRect(0,0, canvasCards.getWidth(), canvasCards.getHeight());
         // card width 25 is good to show how many cards they are still holding
         // card width 100 is good for your own hand
         int i=0;
@@ -254,7 +258,7 @@ public class GameBoardView extends Composite {
             @Override
             public void onLoad(LoadEvent event) {
                 // Clear the canvas to prepare for drawing new cards
-                ctxCards.clearRect(0, 0, canvasCards.getWidth(), canvasCards.getHeight());
+                canvasCards.getContext2d().clearRect(0, 0, canvasCards.getWidth(), canvasCards.getHeight());
 
                 // Loop through the cards to draw them
                 for (int i = 0; i < cards.size(); i++) {
@@ -273,7 +277,7 @@ public class GameBoardView extends Composite {
                     double destHeight = destWidth / spriteWidth * spriteHeight; // Maintain aspect ratio
 
                     // Draw the card image on the canvas
-                    ctxCards.drawImage(
+                    canvasCards.getContext2d().drawImage(
                             ImageElement.as(img.getElement()),
                             sourceX, sourceY, spriteWidth, spriteHeight,
                             destX, destY, destWidth, destHeight
@@ -283,7 +287,7 @@ public class GameBoardView extends Composite {
                     if (PawnAndCardSelection.getCard() != null &&
                             PawnAndCardSelection.getCard().equals(card) &&
                             PawnAndCardSelection.getCardNr() == i) {
-                        drawRoundedRect(ctxCards, destX - 1.5, destY - 1.5, destWidth + 3, destHeight + 3, 8);
+                        drawRoundedRect(canvasCards.getContext2d(), destX - 1.5, destY - 1.5, destWidth + 3, destHeight + 3, 8);
                     }
                 }
             }

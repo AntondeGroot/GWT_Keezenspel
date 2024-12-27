@@ -32,9 +32,11 @@ public class GameAnimation {
 
     public void update(){
         StepsAnimation.update();
+        GameBoardView gameBoardView = new GameBoardView();
         ctxSteps.clearRect(0, 0, 600, 600);
         if(PawnAndCardSelection.getDrawCards()) {
             ctxCards.clearRect(0, 0, 600, 800);
+            gameBoardView.getCanvasCards().getContext2d().clearRect(0,0, gameBoardView.getCanvasCards().getWidth(), gameBoardView.getCanvasCards().getHeight());
             GWT.log("cards context is cleared");
         }
     }
@@ -45,7 +47,8 @@ public class GameAnimation {
         if(PawnAndCardSelection.getDrawCards()) {
             // todo: move to presenter
             GameBoardView gameBoardView = new GameBoardView();
-            gameBoardView.drawCards(CardsDeck.getCards());
+            gameBoardView.drawCards(CardsDeck.getCards());// todo: remove the old method
+            gameBoardView.drawCards_new(CardsDeck.getCards()); // todo: keep this one
             PawnAndCardSelection.setCardsAreDrawn();
         }
 
