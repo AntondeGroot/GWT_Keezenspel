@@ -3,10 +3,7 @@ package gwtks;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.CanvasElement;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.*;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -38,7 +35,7 @@ public class GameBoardView extends Composite {
     CanvasElement canvasPawns;
 
     @UiField
-    CanvasElement canvasCards;
+    CanvasElement canvasCards2;
 
     @UiField
     Button sendButton;
@@ -52,7 +49,6 @@ public class GameBoardView extends Composite {
     @UiField
     VerticalPanel playerListContainer;
 
-
     //todo: would this work?
 //    private Context2d ctxBoard;
 //    private Context2d ctxPawns;
@@ -65,7 +61,7 @@ public class GameBoardView extends Composite {
         // Get the Context2d from the CanvasElement
 //        ctxBoard = canvasBoard.getContext2d();
 //        ctxPawns = canvasPawns.getContext2d();
-//        ctxCards = canvasCards.getContext2d();
+//        ctxCards = canvasCards2.getContext2d();
     }
 
     public GameBoardView() {
@@ -88,7 +84,9 @@ public class GameBoardView extends Composite {
 
     public CanvasElement getCanvasPawns(){return canvasPawns;}
 
-    public CanvasElement getCanvasCards(){return canvasCards;}
+    // todo: rename to canvasCards when old index.html is no longer used
+    public CanvasElement getCanvasCards(){return canvasCards2;}
+    public Element getCanvasCardsAsElement(){return (Element) canvasCards2;}
 
     public void drawPlayers(ArrayList<Player> players){
         // todo: move this to CSS file
@@ -331,7 +329,7 @@ public class GameBoardView extends Composite {
         Context2d ctxCards = ((CanvasElement) document.getElementById("canvasCards")).getContext2d();
         ctxCards.clearRect(0,0,600,800);
         // todo: new
-        canvasCards.getContext2d().clearRect(0,0, canvasCards.getWidth(), canvasCards.getHeight());
+        canvasCards2.getContext2d().clearRect(0,0, canvasCards2.getWidth(), canvasCards2.getHeight());
         // card width 25 is good to show how many cards they are still holding
         // card width 100 is good for your own hand
         int i=0;
@@ -366,7 +364,7 @@ public class GameBoardView extends Composite {
             @Override
             public void onLoad(LoadEvent event) {
                 // Clear the canvas to prepare for drawing new cards
-                canvasCards.getContext2d().clearRect(0, 0, canvasCards.getWidth(), canvasCards.getHeight());
+                canvasCards2.getContext2d().clearRect(0, 0, canvasCards2.getWidth(), canvasCards2.getHeight());
 
                 // Loop through the cards to draw them
                 for (int i = 0; i < cards.size(); i++) {
@@ -385,7 +383,7 @@ public class GameBoardView extends Composite {
                     double destHeight = destWidth / spriteWidth * spriteHeight; // Maintain aspect ratio
 
                     // Draw the card image on the canvas
-                    canvasCards.getContext2d().drawImage(
+                    canvasCards2.getContext2d().drawImage(
                             ImageElement.as(img.getElement()),
                             sourceX, sourceY, spriteWidth, spriteHeight,
                             destX, destY, destWidth, destHeight
@@ -395,7 +393,7 @@ public class GameBoardView extends Composite {
                     if (PawnAndCardSelection.getCard() != null &&
                             PawnAndCardSelection.getCard().equals(card) &&
                             PawnAndCardSelection.getCardNr() == i) {
-                        drawRoundedRect(canvasCards.getContext2d(), destX - 1.5, destY - 1.5, destWidth + 3, destHeight + 3, 8);
+                        drawRoundedRect(canvasCards2.getContext2d(), destX - 1.5, destY - 1.5, destWidth + 3, destHeight + 3, 8);
                     }
                 }
             }

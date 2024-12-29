@@ -6,7 +6,7 @@
                 <canvas ui:field="canvasBoard" width="600" height="600"/>
                 <canvas ui:field="canvasSteps" width="600" height="600"/>
                 <canvas ui:field="canvasPawns" width="600" height="600"/>
-                <canvas ui:field="canvasCards" width="600" height="800"/>
+                <canvas ui:field="canvasCards2" width="600" height="800"/>
             </g:HTMLPanel>
             <g:Label styleName="errorLabel" ui:field="errorLabel"/>
         </g:VerticalPanel>

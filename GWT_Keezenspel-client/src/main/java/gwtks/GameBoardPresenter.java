@@ -1,8 +1,12 @@
 package gwtks;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import gwtks.handlers.CanvasClickHandler;
 import gwtks.handlers.ForfeitHandler;
 import gwtks.handlers.SendHandler;
 
@@ -70,5 +74,13 @@ public class GameBoardPresenter implements Presenter{
     private void bind() {
         view.getSendButton().addClickHandler(new SendHandler());
         view.getForfeitButton().addClickHandler(new ForfeitHandler());
+
+        Element canvasElement = (Element) view.getCanvasCards();
+        DOM.sinkEvents(canvasElement, Event.ONCLICK);
+        DOM.setEventListener(canvasElement, event -> {
+            if (DOM.eventGetType(event) == Event.ONCLICK) {
+                new CanvasClickHandler();
+            }
+        });
     }
 }

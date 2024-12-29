@@ -6,10 +6,13 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Window;
 import gwtks.*;
 import gwtks.Card;
 
 import java.util.List;
+
+import static com.google.gwt.user.client.Event.ONCLICK;
 
 public class CanvasClickHandler {
 
@@ -23,11 +26,11 @@ public class CanvasClickHandler {
         }
         if (canvas != null) {
             // Add a click handler to the canvas element
-            Event.sinkEvents(canvas,Event.ONCLICK);
+            Event.sinkEvents(canvas, ONCLICK);
             Event.setEventListener(canvas, new com.google.gwt.user.client.EventListener() {
                 @Override
-                public void onBrowserEvent(com.google.gwt.user.client.Event event) {
-                    if (event.getTypeInt() == com.google.gwt.user.client.Event.ONCLICK) {
+                public void onBrowserEvent(Event event) {
+                    if (event.getTypeInt() == ONCLICK) {
                         handleCanvasClick(event);
                     }
                 }
@@ -37,8 +40,10 @@ public class CanvasClickHandler {
 
     private static void handleCanvasClick(Event event) {
         Element canvas = DOM.getElementById("canvasCards");
-        int canvasTop = canvas.getAbsoluteTop();
-        int canvasLeft = canvas.getAbsoluteLeft();
+        // Use getBoundingClientRect for accurate canvas position
+        // todo: replace getAbsoluteLeft / getAbsoluteTop by a non-deprecated way
+        int canvasLeft = DOM.getAbsoluteLeft((Element) canvas) - Window.getScrollLeft();
+        int canvasTop = DOM.getAbsoluteTop((Element) canvas) - Window.getScrollTop();
         int x = event.getClientX() - canvasLeft;
         int y = event.getClientY() - canvasTop + 30;
 
