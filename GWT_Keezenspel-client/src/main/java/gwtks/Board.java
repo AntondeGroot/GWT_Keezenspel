@@ -90,7 +90,6 @@ public class Board {
 			if (tileNr <= 0 || tileNr >= 16) {
 				color = PlayerColors.getHexColor(mapping.getPlayerId());
 			}
-			GWT.log("drawing tile " + mapping.getPlayerId() + " " + tileNr + ", "+mapping.getPosition());
 			drawCircle(context, mapping.getPosition().getX(), mapping.getPosition().getY(), cellDistance/2, color);
 		}
 		context.save();
