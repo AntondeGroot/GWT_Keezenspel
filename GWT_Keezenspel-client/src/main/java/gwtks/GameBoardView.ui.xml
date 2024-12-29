@@ -11,8 +11,10 @@
             <g:Label styleName="errorLabel" ui:field="errorLabel"/>
         </g:VerticalPanel>
         <g:VerticalPanel styleName="column2">
-            <g:Button ui:field="sendButton" styleName="sendButton">Make Move</g:Button>
-            <g:Button ui:field="forfeitButton" styleName="forfeitButton">Forfeit</g:Button>
+            <g:HorizontalPanel>
+                <g:Button ui:field="sendButton" styleName="sendButton">Play Card</g:Button>
+                <g:Button ui:field="forfeitButton" styleName="forfeitButton">Forfeit</g:Button>
+            </g:HorizontalPanel>
             <g:VerticalPanel ui:field="playerListContainer" styleName="playerListContainer" width="50vw"/>
         </g:VerticalPanel>
     </g:HorizontalPanel>

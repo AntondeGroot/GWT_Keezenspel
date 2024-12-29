@@ -58,7 +58,7 @@ public class App implements EntryPoint {
 		GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(gameBoardView);
 		gameBoardPresenter.start();
 
-		final Button sendButton = new Button("Make Move");
+		final Button sendButton = new Button("Play Card");
 		final Button forfeitButton = new Button("Forfeit");
 		final Label errorLabel = new Label();
 
@@ -82,9 +82,11 @@ public class App implements EntryPoint {
 		RootPanel.get("forfeitButtonContainer").add(forfeitButton);
 
 		// Add a handler to send the MOVE to the server
+		//todo: remove
 		SendHandler handler = new SendHandler();
 		sendButton.addClickHandler(handler);
 
+		//todo: remove
 		ForfeitHandler forfeitHandler = new ForfeitHandler();
 		forfeitButton.addClickHandler(forfeitHandler);
 

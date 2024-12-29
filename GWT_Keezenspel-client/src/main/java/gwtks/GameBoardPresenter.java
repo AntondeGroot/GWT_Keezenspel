@@ -1,5 +1,8 @@
 package gwtks;
 
+import gwtks.handlers.ForfeitHandler;
+import gwtks.handlers.SendHandler;
+
 import java.util.ArrayList;
 
 public class GameBoardPresenter implements Presenter{
@@ -28,10 +31,11 @@ public class GameBoardPresenter implements Presenter{
 
     @Override
     public void stop() {
-
+        // todo: deregister all binders
     }
 
     private void bind() {
-        // todo: bind clickhandlers
+        view.getSendButton().addClickHandler(new SendHandler());
+        view.getForfeitButton().addClickHandler(new ForfeitHandler());
     }
 }
