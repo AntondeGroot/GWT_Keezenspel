@@ -60,7 +60,6 @@ public class App implements EntryPoint {
 
 		final Button sendButton = new Button("Play Card");
 		final Button forfeitButton = new Button("Forfeit");
-		final Label errorLabel = new Label();
 
 		Document document = Document.get();
 		ctxPawns = ((CanvasElement) document.getElementById("canvasPawns")).getContext2d();
@@ -78,7 +77,6 @@ public class App implements EntryPoint {
 
 		// Use RootPanel.get() to get the entire body element
 		RootPanel.get("sendButtonContainer").add(sendButton);
-		RootPanel.get("errorLabelContainer").add(errorLabel);
 		RootPanel.get("forfeitButtonContainer").add(forfeitButton);
 
 		// Add a handler to send the MOVE to the server
