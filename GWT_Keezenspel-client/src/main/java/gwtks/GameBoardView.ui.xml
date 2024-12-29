@@ -13,7 +13,7 @@
         <g:VerticalPanel styleName="column2">
             <g:Button ui:field="sendButton" styleName="sendButton">Make Move</g:Button>
             <g:Button ui:field="forfeitButton" styleName="forfeitButton">Forfeit</g:Button>
-            <g:VerticalPanel ui:field="playerListContainer"/>
+            <g:VerticalPanel ui:field="playerListContainer" styleName="playerListContainer" width="50vw"/>
         </g:VerticalPanel>
     </g:HorizontalPanel>
 </ui:UiBinder>

@@ -74,9 +74,12 @@ h1 {
 }
 .column1 {
   background-color: lightblue;
+  width: 50vw;
 }
 .column2 {
   background-color: lightsteelblue;
+  width: 50vw;
+  height: 800px;
 }
 .profilepic{
   border-radius: 50%;
@@ -88,4 +91,9 @@ h1 {
   border-radius: 10px;
   border-color: darkred;
   border: 3px double darkred;
+}
+
+.playerListContainer{
+  background-color: red;
+  border: 2px solid red;
 }
