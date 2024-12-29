@@ -11,6 +11,7 @@ import static gwtks.MoveType.FORFEIT;
 public class ForfeitHandler implements ClickHandler {
 
     public void sendMoveToServer(){
+        //todo: remove Document, getelementbyId
         Document document  = Document.get();
         InputElement moveType = (InputElement) document.getElementById("moveType");
         moveType.setValue("FORFEIT");
