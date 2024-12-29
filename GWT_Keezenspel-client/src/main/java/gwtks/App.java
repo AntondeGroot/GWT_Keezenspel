@@ -55,7 +55,7 @@ public class App implements EntryPoint {
 		RootPanel.get().clear();
 		RootPanel.get().add(gameBoardView);
 		//todo add model
-		GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(gameBoardView);
+		GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(new GameBoardModel(), gameBoardView, gameStateService);
 		gameBoardPresenter.start();
 
 		final Button sendButton = new Button("Play Card");

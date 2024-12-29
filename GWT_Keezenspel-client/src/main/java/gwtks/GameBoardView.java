@@ -90,7 +90,7 @@ public class GameBoardView extends Composite {
 
     public CanvasElement getCanvasCards(){return canvasCards;}
 
-    public void drawPlayers(ArrayList<Player> players, int playerIdPlaying){
+    public void drawPlayers(ArrayList<Player> players){
         // todo: move this to CSS file
         String inactiveColor = "#c2bfb6";
         // todo: maybe check player whether they belong in column 1 or 2, so don't expand both when a winner has been declared
@@ -151,7 +151,7 @@ public class GameBoardView extends Composite {
             // for spritesheets dx dy
             ctx.drawImage(img, sx,sy,sw,sh,dx,dy,dw,dh);
             canvas.asWidget().setStyleName("profilepic");
-            if(playerId == playerIdPlaying) {
+            if(player.isPlaying()) {
                 hp.asWidget().setStyleName("playerPlaying");
             }
 

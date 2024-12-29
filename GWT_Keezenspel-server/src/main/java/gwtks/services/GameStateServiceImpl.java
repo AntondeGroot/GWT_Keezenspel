@@ -20,4 +20,14 @@ public class GameStateServiceImpl extends RemoteServiceServlet implements GameSt
         response.setWinners(GameState.getWinners());
         return response;
     }
+
+    @Override
+    public ArrayList<Player> getPlayers(){
+        return GameState.getPlayers();
+    }
+
+    public synchronized Player addPlayer(Player player){
+        GameState.addPlayer(player);
+        return player;
+    }
 }
