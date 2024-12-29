@@ -1,32 +1,65 @@
 package gwtks;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import gwtks.handlers.ForfeitHandler;
 import gwtks.handlers.SendHandler;
 
 import java.util.ArrayList;
 
 public class GameBoardPresenter implements Presenter{
-    private GameBoardView view;
-    private GameStateServiceAsync gameStateService;
+    private final GameBoardModel model;
+    private final GameBoardView view;
+    private final GameStateServiceAsync gameStateService;
 
-    public GameBoardPresenter(GameBoardView gameBoardView) {
+    public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, GameStateServiceAsync gameStateService) {
+        this.model = gameBoardModel;
         this.view = gameBoardView;
+        this.gameStateService = gameStateService;
     }
 
     @Override
     public void start() {
         bind();
 
-        // todo: request all player info
-        ArrayList<Player> players = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            players.add(new Player("player"+i));
-        }
-        players.get(0).setPlace(1);
-        players.get(3).setPlace(3);
+        // todo: remove the following: test data
+        Timer timer = new Timer() {
+            @Override
+            public void run() {
+            }
+        };
+        timer.schedule(100);
 
-        //todo: replace 2nd argument, maybe include isPlaying in player property
-        view.drawPlayers(players, 1);
+        for (int i = 0; i < 8; i++) {
+            Player player = new Player("player"+i,"123-567");
+            if(i==0){
+                player.setIsPlaying(true);
+            }
+            gameStateService.addPlayer(player, new AsyncCallback<Player>() {
+                @Override
+                public void onFailure(Throwable throwable) {
+                }
+                @Override
+                public void onSuccess(Player o) {
+                }
+            });
+            timer.run();
+        }
+        // todo: remove the above: TESTDATA
+        timer.run();
+        gameStateService.getPlayers(new AsyncCallback<ArrayList<Player>>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+            }
+
+            @Override
+            public void onSuccess(ArrayList<Player> players) {
+                GWT.log("players = "+players);
+                model.setPlayers(players);
+                view.drawPlayers(players);
+            }
+        });
     }
 
     @Override

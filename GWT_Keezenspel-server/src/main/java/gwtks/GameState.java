@@ -15,6 +15,7 @@ public class GameState {
     private static ArrayList<Pawn> pawns = new ArrayList<>();
     private static int playerIdTurn;
     private static int nrPlayers = 3;
+    private static ArrayList<Player> players = new ArrayList<>();
     private static ArrayList<Integer> activePlayers = new ArrayList<>();
     private static ArrayList<Integer> winners = new ArrayList<>();
 
@@ -40,6 +41,16 @@ public class GameState {
             CardsDeck.setNrPlayers(nrPlayers);
             CardsDeck.shuffle();
             CardsDeck.dealCards();
+        }
+    }
+
+    public static ArrayList<Player> getPlayers() {
+        return players;
+    }
+
+    public static void addPlayer(Player player) {
+        if(!players.contains(player)){
+            players.add(player);
         }
     }
 

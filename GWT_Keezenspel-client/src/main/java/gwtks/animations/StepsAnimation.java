@@ -13,7 +13,6 @@ import java.util.List;
 public class StepsAnimation {
     private static List<TileMapping> tiles = new ArrayList<>();
     private static Context2d ctxSteps;
-    private static double alpha = 0.6;
     private static double loopAlpha = 0.6;
     private static double ALPHA_MAX = 0.6;
     private static List<TileId> tileIds;
@@ -69,6 +68,5 @@ public class StepsAnimation {
 
     public static void reset(){
         tileIds = null;
-
     }
 }

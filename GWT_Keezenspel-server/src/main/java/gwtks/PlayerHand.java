@@ -1,13 +1,12 @@
 package gwtks;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class Player {
+public class PlayerHand {
     private int playerId;
     private ArrayList<Card> hand;
 
-    public Player(int playerId) {
+    public PlayerHand(int playerId) {
         this.playerId = playerId;
         hand = new ArrayList<Card>();
     }

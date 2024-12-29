@@ -10,7 +10,7 @@ import static gwtks.GameState.forfeitPlayer;
 public class CardsDeck implements IsSerializable {
     private static int roundNr = 0;
     private static ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
-    private static ArrayList<Player> players = new ArrayList<>();
+    private static ArrayList<PlayerHand> players = new ArrayList<>();
     private static int nrPlayers = 0;
     private static int playerIdStartingRound = 0;
     private static ArrayList<Integer> activePlayers = new ArrayList<>();
@@ -74,7 +74,7 @@ public class CardsDeck implements IsSerializable {
         int nrCards = (roundNr == 0) ? 5 : 4;
 
         for (int player_i = 0; player_i < GameState.getNrPlayers(); player_i++) {
-            players.add(new Player(player_i));
+            players.add(new PlayerHand(player_i));
         }
 
         for (int player_i = 0; player_i < GameState.getNrPlayers(); player_i++) {
@@ -90,7 +90,7 @@ public class CardsDeck implements IsSerializable {
     }
 
     public static boolean playerHasCard(int playerId, Card card ){
-        Player player = players.get(playerId);
+        PlayerHand player = players.get(playerId);
         return player.hasCard(card);
     }
 
