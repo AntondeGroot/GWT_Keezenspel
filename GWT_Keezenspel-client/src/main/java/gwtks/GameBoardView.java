@@ -4,6 +4,8 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.*;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -49,19 +51,14 @@ public class GameBoardView extends Composite {
     @UiField
     VerticalPanel playerListContainer;
 
-    //todo: would this work?
-//    private Context2d ctxBoard;
-//    private Context2d ctxPawns;
-//    private Context2d ctxCards;
+    //    needed to add click listeners to the Canvas. GWT Canvas does not have
+    //    a dom element which you could find by .findElementById()
+    @UiField
+    HTMLPanel canvasWrapper;
 
     @Override
     public void onLoad() {
         super.onLoad();
-        // todo: would this work?
-        // Get the Context2d from the CanvasElement
-//        ctxBoard = canvasBoard.getContext2d();
-//        ctxPawns = canvasPawns.getContext2d();
-//        ctxCards = canvasCards2.getContext2d();
     }
 
     public GameBoardView() {

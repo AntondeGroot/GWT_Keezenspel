@@ -2,9 +2,12 @@ package gwtks;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import gwtks.handlers.CanvasClickHandler;
 import gwtks.handlers.ForfeitHandler;
@@ -64,6 +67,20 @@ public class GameBoardPresenter implements Presenter{
                 view.drawPlayers(players);
             }
         });
+        view.canvasWrapper.addDomHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                // todo: replace getAbsoluteLeft / getAbsoluteTop by a non-deprecated way
+                int canvasLeft = DOM.getAbsoluteLeft(view.getCanvasCards()) - Window.getScrollLeft();
+                int canvasTop = DOM.getAbsoluteTop(view.getCanvasCards()) - Window.getScrollTop();
+                int x = event.getClientX() - canvasLeft;
+                int y = event.getClientY() - canvasTop + 30;
+
+                GWT.log("Clicked at: (" + x + ", " + y + ")");
+                // todo: maybe replace x,y parameters
+                CanvasClickHandler.handleCanvasClick(event,x,y);
+            }
+        }, ClickEvent.getType());
     }
 
     @Override

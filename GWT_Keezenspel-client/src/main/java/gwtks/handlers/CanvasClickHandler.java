@@ -4,6 +4,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.InputElement;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
@@ -16,37 +17,7 @@ import static com.google.gwt.user.client.Event.ONCLICK;
 
 public class CanvasClickHandler {
 
-    public static void addClickHandler(){
-        GWT.log("handler added");
-        Element canvas = DOM.getElementById("canvasCards");
-
-        // Ensure the canvas element exists
-        if(canvas == null){
-            GWT.log("canvas is null");
-        }
-        if (canvas != null) {
-            // Add a click handler to the canvas element
-            Event.sinkEvents(canvas, ONCLICK);
-            Event.setEventListener(canvas, new com.google.gwt.user.client.EventListener() {
-                @Override
-                public void onBrowserEvent(Event event) {
-                    if (event.getTypeInt() == ONCLICK) {
-                        handleCanvasClick(event);
-                    }
-                }
-            });
-        }
-    }
-
-    private static void handleCanvasClick(Event event) {
-        Element canvas = DOM.getElementById("canvasCards");
-        // Use getBoundingClientRect for accurate canvas position
-        // todo: replace getAbsoluteLeft / getAbsoluteTop by a non-deprecated way
-        int canvasLeft = DOM.getAbsoluteLeft((Element) canvas) - Window.getScrollLeft();
-        int canvasTop = DOM.getAbsoluteTop((Element) canvas) - Window.getScrollTop();
-        int x = event.getClientX() - canvasLeft;
-        int y = event.getClientY() - canvasTop + 30;
-
+    public static void handleCanvasClick(ClickEvent event, int x, int y) {
         if(y>600){
             handleOnCardsDeckClick(x,y);
         }else{
@@ -76,6 +47,7 @@ public class CanvasClickHandler {
 
         GWT.log("cardNr = "+cardNr);
         if(cardNr > -1){
+            //todo remove stepsnr / movetype
             Document document = Document.get();
             InputElement nrSteps = (InputElement) document.getElementById("stepsNr");
             nrSteps.setValue("0");
