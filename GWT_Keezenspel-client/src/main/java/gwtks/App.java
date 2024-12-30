@@ -58,9 +58,6 @@ public class App implements EntryPoint {
 		GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(new GameBoardModel(), gameBoardView, gameStateService);
 		gameBoardPresenter.start();
 
-		final Button sendButton = new Button("Play Card");
-		final Button forfeitButton = new Button("Forfeit");
-
 		Document document = Document.get();
 		ctxPawns = ((CanvasElement) document.getElementById("canvasPawns")).getContext2d();
 		ctxBoard = ((CanvasElement) document.getElementById("canvasBoard")).getContext2d();
@@ -70,23 +67,6 @@ public class App implements EntryPoint {
 
 		//set playerId to first player in list todo: use Cookie
 		PawnAndCardSelection.setPlayerId(0);
-
-		// add widgets
-		sendButton.addStyleName("sendButton");
-		forfeitButton.addStyleName("sendButton");
-
-		// Use RootPanel.get() to get the entire body element
-		RootPanel.get("sendButtonContainer").add(sendButton);
-		RootPanel.get("forfeitButtonContainer").add(forfeitButton);
-
-		// Add a handler to send the MOVE to the server
-		//todo: remove
-		SendHandler handler = new SendHandler();
-		sendButton.addClickHandler(handler);
-
-		//todo: remove
-		ForfeitHandler forfeitHandler = new ForfeitHandler();
-		forfeitButton.addClickHandler(forfeitHandler);
 
 		// Start the game
 		gameAnimation = new GameAnimation();
