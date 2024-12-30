@@ -9,21 +9,14 @@ import gwtks.PawnAndCardSelection;
 import static gwtks.MoveType.FORFEIT;
 
 public class ForfeitHandler implements ClickHandler {
-
+    // todo: is this all still useful?
     public void sendMoveToServer(){
-        //todo: remove Document, getelementbyId
-        Document document  = Document.get();
-        InputElement moveType = (InputElement) document.getElementById("moveType");
-        moveType.setValue("FORFEIT");
         PawnAndCardSelection.setMoveType(FORFEIT);
-
-        SendHandler sendHandler = new SendHandler();
-        sendHandler.sendMoveToServer();
+        new SendHandler().sendMoveToServer();
     }
 
     @Override
     public void onClick(ClickEvent clickEvent) {
         sendMoveToServer();
-
     }
 }

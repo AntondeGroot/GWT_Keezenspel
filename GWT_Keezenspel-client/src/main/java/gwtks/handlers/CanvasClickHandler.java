@@ -47,13 +47,6 @@ public class CanvasClickHandler {
 
         GWT.log("cardNr = "+cardNr);
         if(cardNr > -1){
-            //todo remove stepsnr / movetype
-            Document document = Document.get();
-            InputElement nrSteps = (InputElement) document.getElementById("stepsNr");
-            nrSteps.setValue("0");
-            InputElement moveType = (InputElement) document.getElementById("moveType");
-            moveType.setValue("");
-
             Card card = CardsDeck.pickCard(cardNr);
             PawnAndCardSelection.setCardNr(cardNr);
             if(card == null){return;}
@@ -81,16 +74,8 @@ public class CanvasClickHandler {
                 if (tile.getTileId().equals(tileOfPawn)) {
                     if(isWithinDistance(tile.getPosition(), new Point(x,y))){
                         PawnAndCardSelection.addPawn(pawn);
-
                         // for debugging
                         GWT.log("You clicked on pawn"+pawn.getPawnId()+" position: "+tile.getPosition());
-                        Document document = Document.get();
-                        InputElement playerId = (InputElement) document.getElementById("playerId");
-                        playerId.setValue(String.valueOf(PawnAndCardSelection.getPlayerId()));
-                        InputElement pawnId = (InputElement) document.getElementById("pawnId");
-                        pawnId.setValue(String.valueOf(pawn.getPawnId().getPawnNr()));
-                        //
-
                         if(PawnAndCardSelection.getPawn1() != null && PawnAndCardSelection.getCard() != null){
                             TestMoveHandler testMoveHandler = new TestMoveHandler();
                             testMoveHandler.sendMoveToServer();
