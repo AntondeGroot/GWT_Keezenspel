@@ -46,20 +46,4 @@ public class SendHandler implements ClickHandler {
             }
         } );
     }
-
-    public native String getPlayerIdFieldValue() /*-{
-        return $doc.getElementById("playerId").value;
-    }-*/;
-
-    public native String getPawnIdFieldValue() /*-{
-        return $doc.getElementById("pawnId").value;
-    }-*/;
-
-    public native String getStepsNrFieldValue() /*-{
-        return $doc.getElementById("stepsNr").value;
-    }-*/;
-
-    public native String getMoveTypeFieldValue() /*-{
-        return $doc.getElementById("moveType").value;
-    }-*/;
 }
