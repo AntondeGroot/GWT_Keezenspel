@@ -16,7 +16,6 @@ public class GameAnimation {
     private Context2d ctxSteps;
     private Context2d ctxCards;
     private Board board;
-    private StepsAnimation stepsAnimation;
     private boolean isInitialized = false;
 
     public GameAnimation() {
@@ -26,8 +25,6 @@ public class GameAnimation {
         ctxBoard = ((CanvasElement) document.getElementById("canvasBoard")).getContext2d();
         ctxSteps = ((CanvasElement) document.getElementById("canvasSteps")).getContext2d();
         ctxCards = ((CanvasElement) document.getElementById("canvasCards")).getContext2d();
-
-        board = new Board();
     }
 
     public void update(){
@@ -51,12 +48,11 @@ public class GameAnimation {
             gameBoardView.drawCards_new(CardsDeck.getCards()); // todo: keep this one
             PawnAndCardSelection.setCardsAreDrawn();
         }
-
+        board = new Board();
         board.drawPawns(ctxPawns);
         if(!isInitialized){
             board.drawBoard(ctxBoard);
             isInitialized = true;
         }
     }
-
 }
