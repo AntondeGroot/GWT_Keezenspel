@@ -76,7 +76,7 @@ public class App implements EntryPoint {
 			@Override
 			public void run() {
 				pollServerForCards();
-				pollServerForGameState();
+//				pollServerForGameState();
 			}
 		};
 		// Schedule the timer to run every 200ms
@@ -111,32 +111,6 @@ public class App implements EntryPoint {
 					gameBoardView.drawCards_new(CardsDeck.getCards());// todo: keep new method
 					PlayerList.refresh();
 				}
-			}
-		} );
-	}
-	public void pollServerForGameState(){
-		gameStateService.getGameState( new AsyncCallback<GameStateResponse>() {
-			public void onFailure(Throwable caught) {
-				StepsAnimation.reset();
-			}
-			public void onSuccess(GameStateResponse result) {
-				GWT.log(result.toString());
-				// only set the board when empty, e.g.
-				// when the browser was refreshed or when you join the game for the first time
-				if(!Board.isInitialized()){
-					Board board = new Board();
-					Board.setPawns(result.getPawns());
-					board.createBoard(result.getNrPlayers(),600);
-					board.drawBoard(ctxBoard);// todo: remove
-					board.drawBoard(gameBoardView.getCanvasBoard().getContext2d());
-					board.drawPawns(ctxPawns); // todo: remove
-					board.drawPawns(gameBoardView.getCanvasPawns().getContext2d());
-					PlayerList.setNrPlayers(result.getNrPlayers());
-				}
-				PlayerList playerList = new PlayerList();
-				PlayerList.setActivePlayers(result.getActivePlayers());
-				PlayerList.setWinners(result.getWinners());
-				playerList.setPlayerIdPlayingAndDrawPlayerList(result.getPlayerIdTurn());
 			}
 		} );
 	}

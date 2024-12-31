@@ -1,6 +1,9 @@
 package gwtks;
 
+import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.CanvasElement;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -9,16 +12,22 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import gwtks.animations.StepsAnimation;
 import gwtks.handlers.CanvasClickHandler;
 import gwtks.handlers.ForfeitHandler;
 import gwtks.handlers.SendHandler;
+import gwtks.services.PollingService;
 
 import java.util.ArrayList;
 
 public class GameBoardPresenter implements Presenter{
     private final GameBoardModel model;
+    private Board boardModel;
     private final GameBoardView view;
     private final GameStateServiceAsync gameStateService;
+    //todo: to remove
+    private Context2d ctxPawns;
+    private Context2d ctxBoard;
 
     public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, GameStateServiceAsync gameStateService) {
         this.model = gameBoardModel;
@@ -29,6 +38,10 @@ public class GameBoardPresenter implements Presenter{
     @Override
     public void start() {
         bind();
+
+        // todo: make service an input parameter
+        PollingService pollingService = GWT.create(PollingService.class);
+        pollingService.startPolling(200, this::pollServerForGameState);
 
         // todo: remove the following: test data
         Timer timer = new Timer() {
@@ -65,6 +78,8 @@ public class GameBoardPresenter implements Presenter{
                 GWT.log("players = "+players);
                 model.setPlayers(players);
                 view.drawPlayers(players);
+                boardModel = new Board();
+                boardModel.createBoard(players.size(), view.getCanvasBoard().getWidth()); // todo: make createBoard accept a list of players
             }
         });
         view.canvasWrapper.addDomHandler(new ClickHandler() {
@@ -81,6 +96,10 @@ public class GameBoardPresenter implements Presenter{
                 CanvasClickHandler.handleCanvasClick(event,x,y);
             }
         }, ClickEvent.getType());
+        //todo: remove
+        Document document = Document.get();
+        ctxPawns = ((CanvasElement) document.getElementById("canvasPawns")).getContext2d();
+        ctxBoard = ((CanvasElement) document.getElementById("canvasBoard")).getContext2d();
     }
 
     @Override
@@ -99,5 +118,32 @@ public class GameBoardPresenter implements Presenter{
                 new CanvasClickHandler();
             }
         });
+    }
+
+    public void pollServerForGameState(){
+        gameStateService.getGameState( new AsyncCallback<GameStateResponse>() {
+            public void onFailure(Throwable caught) {
+                StepsAnimation.reset();
+            }
+            public void onSuccess(GameStateResponse result) {
+                GWT.log(result.toString());
+                // only set the board when empty, e.g.
+                // when the browser was refreshed or when you join the game for the first time
+                if(!Board.isInitialized()){
+                    Board board = new Board();
+                    Board.setPawns(result.getPawns());
+                    board.createBoard(result.getNrPlayers(),600);
+                    board.drawBoard(ctxBoard);// todo: remove
+                    board.drawBoard(view.getCanvasBoard().getContext2d());
+                    board.drawPawns(ctxPawns); // todo: remove
+                    board.drawPawns(view.getCanvasPawns().getContext2d());
+                    PlayerList.setNrPlayers(result.getNrPlayers());
+                }
+                PlayerList playerList = new PlayerList();
+                PlayerList.setActivePlayers(result.getActivePlayers());
+                PlayerList.setWinners(result.getWinners());
+                playerList.setPlayerIdPlayingAndDrawPlayerList(result.getPlayerIdTurn());
+            }
+        } );
     }
 }
