@@ -5,6 +5,7 @@ import com.google.gwt.core.client.GWT;
 import static gwtks.MoveType.*;
 
 public class PawnAndCardSelection {
+    // todo: turn this into a model
     private static int playerId;
     private static Pawn pawn1 = new Pawn(new PawnId(-1,-1),new TileId(-1,90));
     private static Pawn pawn2 = new Pawn(new PawnId(-1,-1),new TileId(-1,90));
