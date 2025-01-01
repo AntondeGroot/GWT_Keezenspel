@@ -25,6 +25,10 @@ public class GameBoardPresenter implements Presenter{
     private Board boardModel;
     private final GameBoardView view;
     private final GameStateServiceAsync gameStateService;
+    private final CardsServiceAsync cardsService = GWT.create(CardsService.class);//todo: remove from presenter and inject it
+    // todo: make service an input parameter
+    private final PollingService pollingService = GWT.create(PollingService.class);
+
     //todo: to remove
     private Context2d ctxPawns;
     private Context2d ctxBoard;
@@ -39,9 +43,7 @@ public class GameBoardPresenter implements Presenter{
     public void start() {
         bind();
 
-        // todo: make service an input parameter
-        PollingService pollingService = GWT.create(PollingService.class);
-        pollingService.startPolling(200, this::pollServerForGameState);
+        pollingService.startPolling(200, this::pollServerForUpdates);
 
         // todo: remove the following: test data
         Timer timer = new Timer() {
@@ -79,7 +81,7 @@ public class GameBoardPresenter implements Presenter{
                 model.setPlayers(players);
                 view.drawPlayers(players);
                 boardModel = new Board();
-                boardModel.createBoard(players.size(), view.getCanvasBoard().getWidth()); // todo: make createBoard accept a list of players
+                boardModel.createBoard(players.size(), 600); // todo: make createBoard accept a list of players
             }
         });
         view.canvasWrapper.addDomHandler(new ClickHandler() {
@@ -105,6 +107,7 @@ public class GameBoardPresenter implements Presenter{
     @Override
     public void stop() {
         // todo: deregister all binders
+        pollingService.stopPolling();
     }
 
     private void bind() {
@@ -120,7 +123,12 @@ public class GameBoardPresenter implements Presenter{
         });
     }
 
-    public void pollServerForGameState(){
+    private void pollServerForUpdates(){
+        pollServerForGameState();
+        pollServerForCards();
+    }
+
+    private void pollServerForGameState(){
         gameStateService.getGameState( new AsyncCallback<GameStateResponse>() {
             public void onFailure(Throwable caught) {
                 StepsAnimation.reset();
@@ -134,15 +142,34 @@ public class GameBoardPresenter implements Presenter{
                     Board.setPawns(result.getPawns());
                     board.createBoard(result.getNrPlayers(),600);
                     board.drawBoard(ctxBoard);// todo: remove
-                    board.drawBoard(view.getCanvasBoard().getContext2d());
+                    board.drawBoard(view.getCanvasBoardContext());
                     board.drawPawns(ctxPawns); // todo: remove
-                    board.drawPawns(view.getCanvasPawns().getContext2d());
+                    board.drawPawns(view.getCanvasPawnsContext());
                     PlayerList.setNrPlayers(result.getNrPlayers());
                 }
                 PlayerList playerList = new PlayerList();
                 PlayerList.setActivePlayers(result.getActivePlayers());
                 PlayerList.setWinners(result.getWinners());
                 playerList.setPlayerIdPlayingAndDrawPlayerList(result.getPlayerIdTurn());
+            }
+        } );
+    }
+
+    private void pollServerForCards(){
+        // todo: this should actually only get the cards for the Cookie.playerId
+        cardsService.getCards(PlayerList.getPlayerIdPlaying(), new AsyncCallback<CardResponse>() {
+            public void onFailure(Throwable caught) {
+                StepsAnimation.reset();
+            }
+            public void onSuccess(CardResponse result) {
+
+                PawnAndCardSelection.setPlayerId(result.getPlayerId());
+                if(CardsDeck.areCardsDifferent(result.getCards())){
+                    CardsDeck.setCards(result.getCards());
+                    view.drawCards(CardsDeck.getCards());// todo: remove old method
+                    view.drawCards_new(CardsDeck.getCards());// todo: keep new method
+                    PlayerList.refresh();
+                }
             }
         } );
     }

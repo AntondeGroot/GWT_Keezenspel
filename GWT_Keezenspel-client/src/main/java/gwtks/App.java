@@ -7,15 +7,9 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
-import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
 import gwtks.animations.GameAnimation;
-import gwtks.animations.StepsAnimation;
-import gwtks.handlers.*;
-
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -32,8 +26,6 @@ public class App implements EntryPoint {
 	/**
 	 * Create a remote service proxy to talk to the server-side Moving service.
 	 */
-	private final MovingServiceAsync movingService = GWT.create(MovingService.class);
-	private final CardsServiceAsync cardsService = GWT.create(CardsService.class);
 	private final GameStateServiceAsync gameStateService = GWT.create(GameStateService.class);
 	private GameAnimation gameAnimation;
     private Context2d ctxPawns;
@@ -71,20 +63,11 @@ public class App implements EntryPoint {
 		// Start the game
 		gameAnimation = new GameAnimation();
 		animate();
-
-		Timer timer = new Timer() {
-			@Override
-			public void run() {
-				pollServerForCards();
-//				pollServerForGameState();
-			}
-		};
-		// Schedule the timer to run every 200ms
-		timer.scheduleRepeating(200);
 	}
 
 	public void animate(){
 		ctxPawns.clearRect(0,0, 600, 600);
+		gameBoardView.getCanvasPawnsContext().clearRect(0,0, gameBoardView.getCanvasPawns().getWidth(), gameBoardView.getCanvasPawns().getHeight());
 		gameAnimation.update();
 		gameAnimation.draw();
 		AnimationScheduler.AnimationCallback animationCallback = new AnimationScheduler.AnimationCallback() {
@@ -95,23 +78,4 @@ public class App implements EntryPoint {
 		};
 		AnimationScheduler.get().requestAnimationFrame(animationCallback);
 	};
-
-	public void pollServerForCards(){
-		// todo: this should actually only get the cards for the Cookie.playerId
-		cardsService.getCards(PlayerList.getPlayerIdPlaying(), new AsyncCallback<CardResponse>() {
-			public void onFailure(Throwable caught) {
-				StepsAnimation.reset();
-			}
-			public void onSuccess(CardResponse result) {
-
-				PawnAndCardSelection.setPlayerId(result.getPlayerId());
-				if(CardsDeck.areCardsDifferent(result.getCards())){
-					CardsDeck.setCards(result.getCards());
-					gameBoardView.drawCards(CardsDeck.getCards());// todo: remove old method
-					gameBoardView.drawCards_new(CardsDeck.getCards());// todo: keep new method
-					PlayerList.refresh();
-				}
-			}
-		} );
-	}
 }

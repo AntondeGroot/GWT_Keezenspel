@@ -4,6 +4,7 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 import gwtks.Board;
+import gwtks.GameBoardView;
 import gwtks.TileId;
 import gwtks.TileMapping;
 
@@ -36,6 +37,8 @@ public class StepsAnimation {
             ctxSteps = ((CanvasElement) document.getElementById("canvasSteps")).getContext2d();
         }
         ctxSteps.clearRect(0, 0, 600, 600);
+        GameBoardView gameBoardView = new GameBoardView();
+        gameBoardView.getCanvasStepsContext().clearRect(0,0,600,600);
 
         loopAlpha -= 0.005;
         if (loopAlpha <= 0.0) {
@@ -47,6 +50,7 @@ public class StepsAnimation {
             for (TileMapping mapping : tiles) {
                 if (mapping.getTileId().equals(tileId)) {
                     drawCircle(ctxSteps, mapping.getPosition().getX(), mapping.getPosition().getY(),cellDistance/2, loopAlpha);
+                    drawCircle(gameBoardView.getCanvasStepsContext(), mapping.getPosition().getX(), mapping.getPosition().getY(),cellDistance/2, loopAlpha);
                 }
             }
         }

@@ -20,24 +20,13 @@ import java.util.stream.Collectors;
 
 public class GameBoardView extends Composite {
 
+    private Document document;
+
     interface Binder extends UiBinder<Widget, GameBoardView> {}
     private static Binder uiBinder = GWT.create(Binder.class);
 //    private ArrayList<TileMapping> tiles = new ArrayList<>(); // todo: set tiles when view is constructed
 //    private double cellDistance;
 //    private static ArrayList<PawnAnimationMapping> animationMappings = new ArrayList<>();
-
-    @UiField
-    CanvasElement canvasBoard;
-
-    // todo: rename to steps animation or something like that
-    @UiField
-    CanvasElement canvasSteps;
-
-    @UiField
-    CanvasElement canvasPawns;
-
-    @UiField
-    CanvasElement canvasCards2;
 
     @UiField
     Button sendButton;
@@ -63,6 +52,7 @@ public class GameBoardView extends Composite {
 
     public GameBoardView() {
         initWidget(uiBinder.createAndBindUi(this));
+        document = Document.get();
 //        this.tiles = tiles;
 //        this.cellDistance = celldistance;
     }
@@ -77,13 +67,23 @@ public class GameBoardView extends Composite {
 
     public VerticalPanel getPlayerListContainer(){return playerListContainer;}
 
-    public CanvasElement getCanvasBoard(){return canvasBoard;}
+    public Context2d getCanvasBoardContext(){return
+            ((CanvasElement) document.getElementById("canvasBoard2")).getContext2d();}
 
-    public CanvasElement getCanvasPawns(){return canvasPawns;}
+    public Context2d getCanvasPawnsContext(){return ((CanvasElement) document.getElementById("canvasPawns2")).getContext2d();}
+
+    public Context2d getCanvasStepsContext(){return ((CanvasElement) document.getElementById("canvasSteps2")).getContext2d();}
+
+    public Context2d getCanvasCardsContext(){return ((CanvasElement) document.getElementById("canvasCards2")).getContext2d();}
 
     // todo: rename to canvasCards when old index.html is no longer used
-    public CanvasElement getCanvasCards(){return canvasCards2;}
-    public Element getCanvasCardsAsElement(){return (Element) canvasCards2;}
+    public CanvasElement getCanvasCards(){
+        return (CanvasElement) document.getElementById("canvasCards2");
+    }
+
+    public CanvasElement getCanvasPawns(){
+        return (CanvasElement) document.getElementById("canvasPawns2");
+    }
 
     public void drawPlayers(ArrayList<Player> players){
         // todo: move this to CSS file
@@ -326,7 +326,7 @@ public class GameBoardView extends Composite {
         Context2d ctxCards = ((CanvasElement) document.getElementById("canvasCards")).getContext2d();
         ctxCards.clearRect(0,0,600,800);
         // todo: new
-        canvasCards2.getContext2d().clearRect(0,0, canvasCards2.getWidth(), canvasCards2.getHeight());
+        getCanvasCardsContext().clearRect(0,0, getCanvasCards().getWidth(), getCanvasCards().getHeight());
         // card width 25 is good to show how many cards they are still holding
         // card width 100 is good for your own hand
         int i=0;
@@ -361,7 +361,7 @@ public class GameBoardView extends Composite {
             @Override
             public void onLoad(LoadEvent event) {
                 // Clear the canvas to prepare for drawing new cards
-                canvasCards2.getContext2d().clearRect(0, 0, canvasCards2.getWidth(), canvasCards2.getHeight());
+                getCanvasCardsContext().clearRect(0, 0, getCanvasCards().getWidth(), getCanvasCards().getHeight());
 
                 // Loop through the cards to draw them
                 for (int i = 0; i < cards.size(); i++) {
@@ -380,7 +380,7 @@ public class GameBoardView extends Composite {
                     double destHeight = destWidth / spriteWidth * spriteHeight; // Maintain aspect ratio
 
                     // Draw the card image on the canvas
-                    canvasCards2.getContext2d().drawImage(
+                    getCanvasCardsContext().drawImage(
                             ImageElement.as(img.getElement()),
                             sourceX, sourceY, spriteWidth, spriteHeight,
                             destX, destY, destWidth, destHeight
@@ -390,7 +390,7 @@ public class GameBoardView extends Composite {
                     if (PawnAndCardSelection.getCard() != null &&
                             PawnAndCardSelection.getCard().equals(card) &&
                             PawnAndCardSelection.getCardNr() == i) {
-                        drawRoundedRect(canvasCards2.getContext2d(), destX - 1.5, destY - 1.5, destWidth + 3, destHeight + 3, 8);
+                        drawRoundedRect(getCanvasCardsContext(), destX - 1.5, destY - 1.5, destWidth + 3, destHeight + 3, 8);
                     }
                 }
             }
