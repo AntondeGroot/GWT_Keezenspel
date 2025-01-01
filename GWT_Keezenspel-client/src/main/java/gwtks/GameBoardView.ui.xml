@@ -3,10 +3,12 @@
     <g:HorizontalPanel ui:field="columnsContainer">
         <g:VerticalPanel styleName="column1">
             <g:HTMLPanel ui:field="canvasWrapper" styleName="canvasWrapper">
-                <canvas ui:field="canvasBoard" width="600" height="600"/>
-                <canvas ui:field="canvasSteps" width="600" height="600"/>
-                <canvas ui:field="canvasPawns" width="600" height="600"/>
-                <canvas ui:field="canvasCards2" width="600" height="800"/>
+                <!-- for canvas use regular id="" -->
+                <!-- do not use ui:field, see below: -->
+                <canvas id="canvasBoard2" width="600" height="600"/>
+                <canvas id="canvasSteps2" width="600" height="600"/>
+                <canvas id="canvasPawns2" width="600" height="600"/>
+                <canvas id="canvasCards2" width="600" height="800"/>
             </g:HTMLPanel>
             <g:Label styleName="errorLabel" ui:field="errorLabel"/>
         </g:VerticalPanel>
@@ -19,3 +21,7 @@
         </g:VerticalPanel>
     </g:HorizontalPanel>
 </ui:UiBinder>
+<!-- when redrawing a canvas it gives problems and not update it-->
+<!-- instead: use DOM.getElementByID() -->
+<!-- Example: when you draw rect() before a true if-statement it will draw fine -->
+<!-- But when placed in a true if-statement it will not draw whatsoever -->

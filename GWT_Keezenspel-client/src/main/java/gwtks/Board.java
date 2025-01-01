@@ -79,6 +79,7 @@ public class Board {
 
 	public void drawBoard(Context2d context) {
 		GWT.log("drawing board");
+
 		double cellSize = 40.0;
 		String color = "";
 		int tileNr = 0;
