@@ -112,3 +112,18 @@ h1 {
 
 .playerListContainer{
 }
+
+.inactivePlayer{
+  border-color: #c2bfb6;
+}
+.inactivePlayerName{
+  text-decoration: line-through;
+  margin-right: 30px;
+  margin-left: 10px;
+}
+.activePlayerName{
+  font-weight: bold;
+  font-size: 16px;
+  margin-right: 30px;
+  margin-left: 10px;
+}
