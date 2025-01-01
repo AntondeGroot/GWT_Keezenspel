@@ -86,8 +86,6 @@ public class GameBoardView extends Composite {
     }
 
     public void drawPlayers(ArrayList<Player> players){
-        // todo: move this to CSS file
-        String inactiveColor = "#c2bfb6";
         // todo: maybe check player whether they belong in column 1 or 2, so don't expand both when a winner has been declared
         List<Integer> column1 = Arrays.asList(0, 1, 2, 3);
         List<Integer> column2 = Arrays.asList(4, 5, 6, 7);
@@ -108,12 +106,12 @@ public class GameBoardView extends Composite {
             ImageElement img = Document.get().createImageElement();
             img.setSrc("/profilepics.png");
             HorizontalPanel hp = new HorizontalPanel();
-            Label playerName = new Label(players.get(playerId).getName());
-            playerName.getElement().getStyle().setMarginRight(30, Style.Unit.PX);
-            playerName.getElement().getStyle().setMarginLeft(10, Style.Unit.PX);
+            Label playerName = new Label(player.getName());
 
-            if(!players.get(playerId).isActive()){
-                playerName.getElement().getStyle().setTextDecoration(Style.TextDecoration.LINE_THROUGH);
+            if(player.isActive()){
+                playerName.getElement().addClassName("activePlayerName");
+            }else{
+                playerName.getElement().addClassName("inactivePlayerName");
             }
 
             hp.setHorizontalAlignment(HorizontalPanel.ALIGN_LEFT);
@@ -125,11 +123,13 @@ public class GameBoardView extends Composite {
             canvas.setCoordinateSpaceWidth(imagePixelSize);
             canvas.setCoordinateSpaceHeight(imagePixelSize);
             canvas.setStyleName("profilepic");
-            if(players.get(playerId).isActive()){
+
+            if(player.isActive()){
                 canvas.getElement().getStyle().setBorderColor(PlayerColors.getHexColor(playerId));
             }else{
-                canvas.getElement().getStyle().setBorderColor(inactiveColor);
+                canvas.getElement().addClassName("inactivePlayer");
             }
+
             Context2d ctx = canvas.getContext2d();
             // source image
             double sw = 1024/4.0;
