@@ -43,6 +43,7 @@ public class SendHandler implements ClickHandler {
             public void onSuccess(MoveResponse result) {
                 StepsAnimation.reset();
                 MoveController.movePawn(result);
+                PawnAndCardSelection.reset();
             }
         } );
     }
