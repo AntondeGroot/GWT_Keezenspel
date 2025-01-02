@@ -8,8 +8,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static gwtks.GameState.getPawn;
-import static gwtks.GameStateUtil.createPawnAndPlaceOnBoard;
+import static gwtks.GameStateUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StartTileLogicTest {
@@ -17,7 +16,8 @@ class StartTileLogicTest {
 
     @BeforeEach
     void setup(){
-        GameState gameState = new GameState(3);
+
+        createGame_With_NPlayers(3);
         startTileId = new TileId(0, 0);
     }
 

@@ -1,5 +1,6 @@
 package gwtks.services;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import gwtks.*;
 import jakarta.servlet.annotation.WebServlet;
@@ -29,5 +30,24 @@ public class GameStateServiceImpl extends RemoteServiceServlet implements GameSt
     public synchronized Player addPlayer(Player player){
         GameState.addPlayer(player);
         return player;
+    }
+
+    @Override
+    public void startGame() throws IllegalStateException {
+        //todo: remove testdata
+        if(GameState.getPawns().isEmpty()){
+            for (int i = 0; i < 3; i++) {
+                Player player = new Player("player"+i,"123-567");
+                if(i==0){
+                    player.setIsPlaying(true);
+                }
+                GameState.addPlayer(player);
+            }
+        }
+        //todo: remove testdata
+        //todo: replace with isRunning method
+        if(GameState.getPawns().isEmpty()){
+            GameState.start();
+        }
     }
 }

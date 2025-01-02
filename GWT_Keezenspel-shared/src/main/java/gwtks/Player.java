@@ -55,4 +55,13 @@ public class Player implements IsSerializable {
     public void setInActive(){
         isActive = false;
     }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "name='" + name + '\'' +
+                ", isPlaying=" + isPlaying +
+                ", isActive=" + isActive +
+                '}';
+    }
 }

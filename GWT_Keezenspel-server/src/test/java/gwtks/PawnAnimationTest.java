@@ -16,7 +16,7 @@ public class PawnAnimationTest {
 
     @BeforeEach
     void setUp() {
-        GameState gameState = new GameState(8);
+        createGame_With_NPlayers(8);
         moveMessage = new MoveMessage();
         moveResponse = new MoveResponse();
     }
@@ -237,7 +237,7 @@ public class PawnAnimationTest {
     void pawnMovesForwards_13_7_1_ToNewSection() {
         // setup
         GameState.tearDown();
-        GameState gameState = new GameState(3);
+        createGame_With_NPlayers(3);
 
         // GIVEN
         Card card = givePlayerCard(1,8);

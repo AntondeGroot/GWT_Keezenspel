@@ -21,7 +21,7 @@ public class TurnBasedTest {
 
     @BeforeEach
     void setUp() {
-        GameState gameState = new GameState(3);
+        createGame_With_NPlayers(3);
         moveMessage = new MoveMessage();
         moveResponse = new MoveResponse();
         activePlayers.add(0);
@@ -173,7 +173,6 @@ public class TurnBasedTest {
     }
     @Test
     void playerCanOnlyMoveHisOwnPawn(){
-        new GameState(3);
 
         // WHEN
         sendValidMoveMessage(0);

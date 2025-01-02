@@ -3,7 +3,6 @@ package gwtks;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Style;
@@ -13,26 +12,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.awt.SystemColor.window;
-
 public class PlayerList {
     private static int playerIdPlaying;
+    private final GameStateServiceAsync gameStateService = GWT.create(GameStateService.class);
     private static ArrayList<Integer> activePlayers = new ArrayList<>();
     private static ArrayList<Integer> winners = new ArrayList<>();
-    private static boolean isInitialized = false;
+    private static boolean isUpToDate = false;
     private static int nrPlayers;
 
     public static void refresh(){
-        isInitialized = false;
+        isUpToDate = false;
     }
 
     public void setPlayerIdPlayingAndDrawPlayerList(int playerIdPlaying) {
-        if (playerIdPlaying == PlayerList.playerIdPlaying && isInitialized) {
+        if (playerIdPlaying == PlayerList.playerIdPlaying && isUpToDate) {
             return;
         }
         PlayerList.playerIdPlaying = playerIdPlaying;
-        createListElement();
-        isInitialized = true;
+        drawPlayers();
+        isUpToDate = true;
     }
     public static void setNrPlayers(int nrPlayers){
         PlayerList.nrPlayers = nrPlayers;
@@ -46,7 +44,7 @@ public class PlayerList {
         return playerIdPlaying;
     }
 
-    public void createListElement(){
+    public void drawPlayers(){
         String[] playerNames = {"Player1", "Player2", "Player3", "Player4", "Player5", "Player6", "Player7", "Player8"};
         String inactiveColor = "#c2bfb6";
         List<Integer> column1 = Arrays.asList(0, 1, 2, 3);
