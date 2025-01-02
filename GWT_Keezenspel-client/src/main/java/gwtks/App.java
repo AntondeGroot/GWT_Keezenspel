@@ -28,8 +28,6 @@ public class App implements EntryPoint {
 	 */
 	private final GameStateServiceAsync gameStateService = GWT.create(GameStateService.class);
 	private GameAnimation gameAnimation;
-    private Context2d ctxPawns;
-	private Context2d ctxBoard;
 	private GameBoardView gameBoardView;
 
     /**
@@ -50,13 +48,6 @@ public class App implements EntryPoint {
 		GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(new GameBoardModel(), gameBoardView, gameStateService);
 		gameBoardPresenter.start();
 
-		Document document = Document.get();
-		ctxPawns = ((CanvasElement) document.getElementById("canvasPawns")).getContext2d();
-		ctxBoard = ((CanvasElement) document.getElementById("canvasBoard")).getContext2d();
-
-		PlayerList playerList = new PlayerList();
-		playerList.drawPlayers();
-
 		//set playerId to first player in list todo: use Cookie
 		PawnAndCardSelection.setPlayerId(0);
 
@@ -66,7 +57,6 @@ public class App implements EntryPoint {
 	}
 
 	public void animate(){
-		ctxPawns.clearRect(0,0, 600, 600);
 		gameBoardView.getCanvasPawnsContext().clearRect(0,0, gameBoardView.getCanvasPawns().getWidth(), gameBoardView.getCanvasPawns().getHeight());
 		gameAnimation.update();
 		gameAnimation.draw();
