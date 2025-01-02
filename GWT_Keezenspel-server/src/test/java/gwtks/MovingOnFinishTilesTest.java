@@ -4,6 +4,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedList;
+
 import static gwtks.GameStateUtil.*;
 import static gwtks.MoveResult.CANNOT_MAKE_MOVE;
 import static gwtks.MoveResult.CAN_MAKE_MOVE;
@@ -277,5 +279,29 @@ class MovingOnFinishTilesTest {
         assertNull(moveResponse.getPawnId1());
         // THEN Gamestate is correct
         assertEquals(new TileId(1,18), GameState.getPawn(pawn1).getCurrentTileId());
+    }
+
+    @Test
+    void pawnMoves_ToFinish_AnimateToRightTile_BugFix() {
+        /**
+         */
+
+        // setup
+        GameState.tearDown();
+        createGame_With_NPlayers(3);
+
+        // GIVEN
+        Card card = givePlayerCard(2,10);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(2,1) ,new TileId(1,7));
+        /* The existence of the second pawn at a position of >7 causes the first pawn to not go into the finish and moves to (1,3)*/
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(2,2) ,new TileId(2,8));
+
+        // WHEN
+        createMoveMessage(moveMessage, pawn1, card);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN
+        assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+        assertEquals(new TileId(2,17), moveResponse.getMovePawn1().getLast());
     }
 }

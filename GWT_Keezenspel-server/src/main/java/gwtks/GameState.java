@@ -474,10 +474,11 @@ public class GameState {
 
         for (int i = 0; i < nrSteps; i++) {
             tileNrToCheck = tileNrToCheck + direction;
-
-            if(!canMoveToTile(pawnId, new TileId(pawnId.getPlayerId(), tileNrToCheck))) {
-                direction = - direction;
-                tileNrToCheck = tileNrToCheck + 2*direction;
+            if(tileNrToCheck > 15){// only check tiles when they are on the finish
+                if(!canMoveToTile(pawnId, new TileId(pawnId.getPlayerId(), tileNrToCheck))) {
+                    direction = - direction;
+                    tileNrToCheck = tileNrToCheck + 2*direction;
+                }
             }
         }
 
