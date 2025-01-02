@@ -1,5 +1,7 @@
 package gwtks;
 
+import gwtks.handlers.ForfeitHandler;
+import gwtks.handlers.SendHandler;
 import gwtks.logic.WinnerLogic;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
