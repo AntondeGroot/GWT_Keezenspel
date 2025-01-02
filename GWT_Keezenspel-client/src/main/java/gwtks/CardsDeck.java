@@ -1,16 +1,10 @@
 package gwtks;
 
-import com.google.gwt.canvas.dom.client.Context2d;
-import com.google.gwt.dom.client.CanvasElement;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.ImageElement;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class CardsDeck {
 
-    private static Context2d ctxCards;
     private static List<Card> cards = new ArrayList<>();
 
     public static boolean areCardsDifferent(List<Card> otherCards){
@@ -33,22 +27,5 @@ public class CardsDeck {
             cards = null;
         }
         return null;
-    }
-
-    private static void drawRoundedRect(Context2d context, double x, double y, double width, double height, double radius) {
-        context.beginPath();
-        context.moveTo(x + radius, y);
-        context.lineTo(x + width - radius, y);
-        context.quadraticCurveTo(x + width, y, x + width, y + radius);
-        context.lineTo(x + width, y + height - radius);
-        context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-        context.lineTo(x + radius, y + height);
-        context.quadraticCurveTo(x, y + height, x, y + height - radius);
-        context.lineTo(x, y + radius);
-        context.quadraticCurveTo(x, y, x + radius, y);
-        context.closePath();
-        context.setStrokeStyle("red");
-        context.setLineWidth(2);
-        context.stroke();
     }
 }

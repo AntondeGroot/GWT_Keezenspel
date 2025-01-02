@@ -10,7 +10,7 @@ import java.util.*;
 
 public class Board {
 
-    private static ArrayList<TileMapping> tiles = new ArrayList<>();
+    private static final ArrayList<TileMapping> tiles = new ArrayList<>();
 	private static ArrayList<PawnAnimationMapping> animationMappings = new ArrayList<>();
 	private static ArrayList<Pawn> pawns = new ArrayList<>();
 	private static double cellDistance;
@@ -24,7 +24,7 @@ public class Board {
 
 		// create normal tiles
 		for (int j = -9; j < 7; j++) {
-			// for construction purposes it is easier to take one boardsection that consists only of 90 degrees angles
+			// for construction purposes it is easier to take one board section that consists only of 90 degrees angles
 			// for game purposes it is easier that the starting point is position 0 and the last position is 15
 			// therefore the construction goes from the last playerId, from position 7 til 15 and then starts with playerId 1 position 0 to 6
 			// then all the tiles are rotated based on the number of players, where the playerId is updated based on the rotation.
@@ -66,7 +66,7 @@ public class Board {
 
 		// to create the tiles for other players rotate all tiles
 		List<TileMapping> tempTiles = new ArrayList<>();
-		int playerId = 0;
+		int playerId;
 		for (TileMapping tile : tiles) {
 			for (int k = 1; k < nrPlayers; k++) {
 				playerId = (tile.getPlayerId()+k)%nrPlayers;
@@ -80,13 +80,9 @@ public class Board {
 	public void drawBoard(Context2d context) {
 		GWT.log("drawing board");
 
-		double cellSize = 40.0;
-		String color = "";
-		int tileNr = 0;
-
 		for (TileMapping mapping : tiles) {
-			color = "#D3D3D3";
-			tileNr = mapping.getTileNr();
+			String color = "#D3D3D3";
+			int tileNr = mapping.getTileNr();
 			// only player tiles get a color
 			if (tileNr <= 0 || tileNr >= 16) {
 				color = PlayerColors.getHexColor(mapping.getPlayerId());
@@ -118,24 +114,6 @@ public class Board {
 	}
 
 	public static Point getPosition(int playerId, int tileNr) {
-		for (TileMapping mapping : tiles) {
-			if (mapping.getPlayerId() == playerId && mapping.getTileNr() == tileNr) {
-				return mapping.getPosition();
-			}
-		}
-		return null;
-	}
-
-    public static Point getPosition(TileId tileId) {
-		for (TileMapping mapping : tiles) {
-			if (mapping.getPlayerId() == tileId.getPlayerId() && mapping.getTileNr() == tileId.getTileNr()) {
-				return mapping.getPosition();
-			}
-		}
-		return null;
-    }
-
-	public static Point getTile(int playerId, int tileNr){
 		for (TileMapping mapping : tiles) {
 			if (mapping.getPlayerId() == playerId && mapping.getTileNr() == tileNr) {
 				return mapping.getPosition();
@@ -224,8 +202,8 @@ public class Board {
 		Image image = new Image("/pawn"+playerId+".png");
 		Image image_outline = new Image("/pawn_outline.png");
 
-		int desiredWidth = 40;
-		int desiredHeight = 40;
+		double desiredWidth = 40;
+		double desiredHeight = 40;
 		Point point = new Point(0,0);
 		// Draw the image on the canvas once it's loaded
 
@@ -250,6 +228,6 @@ public class Board {
 		Image image = new Image("/pawn"+playerId+".png");
 
 		double[] xywh = PawnRect.getRect(point);
-		context.drawImage(ImageElement.as(image.getElement()),xywh[0],xywh[1],xywh[2],xywh[3] );
+		context.drawImage(ImageElement.as(image.getElement()), xywh[0], xywh[1], xywh[2], xywh[3] );
 	}
 }

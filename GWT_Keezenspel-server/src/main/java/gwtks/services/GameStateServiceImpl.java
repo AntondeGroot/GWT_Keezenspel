@@ -1,6 +1,5 @@
 package gwtks.services;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import gwtks.*;
 import jakarta.servlet.annotation.WebServlet;
