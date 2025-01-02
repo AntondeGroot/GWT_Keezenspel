@@ -15,11 +15,22 @@ h1 {
   width: 600px;
   height: 800px;
 }
+.columnWrapper {
+  position: relative;
+  width: 600px;
+  height: 800px;
+}
 
 .canvasWrapper canvas {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+.buttonContainer {
+  position: absolute;
+  top: 600px;
+  left: 575px;
 }
 
 .sendButton {
