@@ -7,6 +7,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Label;
 import gwtks.animations.GameAnimation;
+import gwtks.services.PollingService;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -24,6 +25,9 @@ public class App implements EntryPoint {
 	 * Create a remote service proxy to talk to the server-side Moving service.
 	 */
 	private final GameStateServiceAsync gameStateService = GWT.create(GameStateService.class);
+	private final CardsServiceAsync cardsService = GWT.create(CardsService.class);
+	private final PollingService pollingService = GWT.create(PollingService.class);
+
 	private GameAnimation gameAnimation;
 	private GameBoardView gameBoardView;
 
@@ -42,7 +46,7 @@ public class App implements EntryPoint {
 		RootPanel.get().clear();
 		RootPanel.get().add(gameBoardView);
 		//todo add model
-		GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(new GameBoardModel(), gameBoardView, gameStateService);
+		GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(new GameBoardModel(), gameBoardView, gameStateService, cardsService, pollingService);
 		gameBoardPresenter.start();
 
 		//set playerId to first player in list todo: use Cookie

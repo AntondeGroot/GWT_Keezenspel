@@ -21,14 +21,15 @@ public class GameBoardPresenter implements Presenter{
     private Board boardModel;
     private final GameBoardView view;
     private final GameStateServiceAsync gameStateService;
-    private final CardsServiceAsync cardsService = GWT.create(CardsService.class);//todo: remove from presenter and inject it
-    // todo: make service an input parameter
-    private final PollingService pollingService = GWT.create(PollingService.class);
+    private final CardsServiceAsync cardsService;
+    private final PollingService pollingService;
 
-    public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, GameStateServiceAsync gameStateService) {
+    public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, GameStateServiceAsync gameStateService, CardsServiceAsync cardsService, PollingService pollingService) {
         this.model = gameBoardModel;
         this.view = gameBoardView;
         this.gameStateService = gameStateService;
+        this.cardsService = cardsService;
+        this.pollingService = pollingService;
     }
 
     @Override
