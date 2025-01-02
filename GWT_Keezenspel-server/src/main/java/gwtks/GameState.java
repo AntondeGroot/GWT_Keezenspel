@@ -410,10 +410,15 @@ public class GameState {
 
             TileId targetTileId = moveAndCheckEveryTile(pawnId1, currentTileId, nrSteps);
 
-            int tileHighestTileNr = checkHighestTileNrYouCanMoveTo(pawnId1,currentTileId,nrSteps);
+            int tileHighestTileNr = checkHighestTileNrYouCanMoveTo(pawnId1, currentTileId, nrSteps);
             if(tileHighestTileNr > targetTileId.getTileNr()){
-                moves.add(new TileId(nextPlayerId(playerIdOfTile), tileHighestTileNr));
-                if(targetTileId.getTileNr() < 15){moves.add(new TileId(targetTileId.getPlayerId(), 15));}
+                if(tileHighestTileNr > 15){
+                    // move to finish
+                    moves.add(new TileId(nextPlayerId(playerIdOfTile), tileHighestTileNr));
+                    // possibly move back out of finish
+                    // otherwise if 16 was taken, then it would move (0,15) (1,15) (0,15) and then correctly back
+                    if(targetTileId.getTileNr() < 15){moves.add(new TileId(targetTileId.getPlayerId(), 15));}
+                }
                 if(targetTileId.getTileNr() < 13){moves.add(new TileId(targetTileId.getPlayerId(), 13));}
                 if(targetTileId.getTileNr() < 7){moves.add(new TileId(targetTileId.getPlayerId(), 7));}
             }

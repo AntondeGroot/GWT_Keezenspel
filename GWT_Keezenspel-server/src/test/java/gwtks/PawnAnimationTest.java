@@ -260,4 +260,41 @@ public class PawnAnimationTest {
         assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
         assertEquals(expectedMovement, moveResponse.getMovePawn1());
     }
+
+    @Test
+    void pawnMoves_FinishIsFull_AnimateToRightTile_BugFix() {
+        /**
+         * When the finish tile (1,16) is taken for player1
+         * And player 1 tries to move onto it:
+         * The animation animates a move to tile (1,15)
+         * instead of tile (0,15)
+         * it also had the points (0,15)  (1,15) (0,15) so
+         * it would unnecessarily be doubled.
+         */
+
+        // setup
+        GameState.tearDown();
+        createGame_With_NPlayers(3);
+
+        // GIVEN
+        Card card = givePlayerCard(1,8);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(1,1) ,new TileId(1,16));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(1,2) ,new TileId(0,12));
+
+        // WHEN
+        createMoveMessage(moveMessage, pawn2, card);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN
+        LinkedList<TileId> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new TileId(0,12));
+        expectedMovement.add(new TileId(0,13));
+        expectedMovement.add(new TileId(0,15));
+        expectedMovement.add(new TileId(0,13));
+        expectedMovement.add(new TileId(0,10));
+
+        // response message is correct
+        assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+        assertEquals(expectedMovement, moveResponse.getMovePawn1());
+    }
 }
