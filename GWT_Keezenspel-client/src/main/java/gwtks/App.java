@@ -55,7 +55,7 @@ public class App implements EntryPoint {
 		ctxBoard = ((CanvasElement) document.getElementById("canvasBoard")).getContext2d();
 
 		PlayerList playerList = new PlayerList();
-		playerList.createListElement();
+		playerList.drawPlayers();
 
 		//set playerId to first player in list todo: use Cookie
 		PawnAndCardSelection.setPlayerId(0);

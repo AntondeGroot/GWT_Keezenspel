@@ -45,45 +45,33 @@ public class GameBoardPresenter implements Presenter{
 
         pollingService.startPolling(200, this::pollServerForUpdates);
 
-        // todo: remove the following: test data
-        Timer timer = new Timer() {
-            @Override
-            public void run() {
-            }
-        };
-        timer.schedule(100);
-
-        for (int i = 0; i < 8; i++) {
-            Player player = new Player("player"+i,"123-567");
-            if(i==0){
-                player.setIsPlaying(true);
-            }
-            gameStateService.addPlayer(player, new AsyncCallback<Player>() {
-                @Override
-                public void onFailure(Throwable throwable) {
-                }
-                @Override
-                public void onSuccess(Player o) {
-                }
-            });
-            timer.run();
-        }
-        // todo: remove the above: TESTDATA
-        timer.run();
-        gameStateService.getPlayers(new AsyncCallback<ArrayList<Player>>() {
+        //todo: bind startgame to a button
+        gameStateService.startGame(new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable throwable) {
+                GWT.log("Game is already running");
             }
-
             @Override
-            public void onSuccess(ArrayList<Player> players) {
-                GWT.log("players = "+players);
-                model.setPlayers(players);
-                view.drawPlayers(players);
-                boardModel = new Board();
-                boardModel.createBoard(players.size(), 600); // todo: make createBoard accept a list of players
+            public void onSuccess(Void o) {
+                gameStateService.getPlayers(new AsyncCallback<ArrayList<Player>>() {
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                    }
+
+                    @Override
+                    public void onSuccess(ArrayList<Player> players) {
+                        GWT.log("players = "+players);
+                        model.setPlayers(players);
+                        view.drawPlayers(players);
+                        boardModel = new Board();
+                        GWT.log("gamestateservice getplayers board.create");
+
+                        boardModel.createBoard(players.size(), 600); // todo: make createBoard accept a list of players
+                    }
+                });
             }
         });
+
         view.canvasWrapper.addDomHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
@@ -140,6 +128,7 @@ public class GameBoardPresenter implements Presenter{
                 if(!Board.isInitialized()){
                     Board board = new Board();
                     Board.setPawns(result.getPawns());
+                    GWT.log("pollserver board.create"+result);
                     board.createBoard(result.getNrPlayers(),600);
                     board.drawBoard(ctxBoard);// todo: remove
                     board.drawBoard(view.getCanvasBoardContext());
@@ -147,10 +136,11 @@ public class GameBoardPresenter implements Presenter{
                     board.drawPawns(view.getCanvasPawnsContext());
                     PlayerList.setNrPlayers(result.getNrPlayers());
                 }
+                // update model
                 PlayerList playerList = new PlayerList();
                 PlayerList.setActivePlayers(result.getActivePlayers());
                 PlayerList.setWinners(result.getWinners());
-                playerList.setPlayerIdPlayingAndDrawPlayerList(result.getPlayerIdTurn());
+                playerList.setPlayerIdPlayingAndDrawPlayerList(result.getPlayerIdTurn());// todo: old
             }
         } );
     }

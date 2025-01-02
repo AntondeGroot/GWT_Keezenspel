@@ -14,7 +14,7 @@ class MovingOnBoardSamePlayerBlockingTest {
 
     @BeforeEach
     void setUp() {
-        GameState gameState = new GameState(8);
+        createGame_With_NPlayers(8);
         moveMessage = new MoveMessage();
         moveResponse = new MoveResponse();
     }

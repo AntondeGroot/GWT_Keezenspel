@@ -108,4 +108,11 @@ public class GameStateUtil {
         createPawnAndPlaceOnBoard(new PawnId(playerId,2) , new TileId(playerId,18));
         createPawnAndPlaceOnBoard(new PawnId(playerId,3) , new TileId(playerId,19));
     }
+
+    public static void createGame_With_NPlayers(int nrPlayers){
+        for (int i = 0; i < nrPlayers; i++) {
+            GameState.addPlayer(new Player("player"+i,"123-i"));
+        }
+        GameState.start();
+    }
 }

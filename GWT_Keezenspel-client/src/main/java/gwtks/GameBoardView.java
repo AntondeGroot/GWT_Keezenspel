@@ -4,8 +4,6 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.*;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -38,7 +36,7 @@ public class GameBoardView extends Composite {
     Label errorLabel;
 
     @UiField
-    VerticalPanel playerListContainer;
+    VerticalPanel playerListContainer2;
 
     //    needed to add click listeners to the Canvas. GWT Canvas does not have
     //    a dom element which you could find by .findElementById()
@@ -65,7 +63,7 @@ public class GameBoardView extends Composite {
         return forfeitButton;
     }
 
-    public VerticalPanel getPlayerListContainer(){return playerListContainer;}
+    public VerticalPanel getPlayerListContainer(){return playerListContainer2;}
 
     public Context2d getCanvasBoardContext(){return
             ((CanvasElement) document.getElementById("canvasBoard2")).getContext2d();}
@@ -90,15 +88,18 @@ public class GameBoardView extends Composite {
         List<Integer> column1 = Arrays.asList(0, 1, 2, 3);
         List<Integer> column2 = Arrays.asList(4, 5, 6, 7);
         int colCount = 2;
-        int rowCount = (int) Math.ceil((double) players.size() / colCount);
+        // for a maximum of 8 players, there are either 4 rows and 2 columns
+        // or there are between 1 and 4 rows
+        int rowCount = Math.min(players.size(), 4);
         Grid grid = new Grid(rowCount, colCount);
-        playerListContainer.clear();
+        playerListContainer2.clear();
 
         List<Player> winners = players.stream()
                 .filter(player -> player.getPlace() > -1)
                 .collect(Collectors.toList());
 
         GWT.log("winners: " + winners);
+        GWT.log("players: " + players);
         int playerId = 0;
         for (Player player : players) {
             int imagePixelSize = 50;
@@ -132,6 +133,8 @@ public class GameBoardView extends Composite {
 
             Context2d ctx = canvas.getContext2d();
             // source image
+            //todo: use img.width or something instead
+            // move this to the server, users should have chosen their profile pic
             double sw = 1024/4.0;
             double sh = 1024/4.0;
             double sx = sw*(playerId%4);
@@ -141,7 +144,7 @@ public class GameBoardView extends Composite {
             double dx = 0-5/2;
             double dw = imagePixelSize+5;
             double dh = imagePixelSize+5;
-            GWT.log("source image is "+sx+","+sh+", "+playerId);
+            GWT.log("source image is "+sx+","+sh+", playerId2: " + playerId);
             GWT.log("card size = "+dh+","+dw);
             // for spritesheets dx dy
             ctx.drawImage(img, sx,sy,sw,sh,dx,dy,dw,dh);
@@ -190,7 +193,8 @@ public class GameBoardView extends Composite {
             playerId++;
         }
         grid.getElement().getStyle().setMargin(50, Style.Unit.PX);
-        playerListContainer.add(grid);
+        playerListContainer2.add(grid);
+        GWT.log("finished player list");
     }
 
     public void drawPawns(ArrayList<Pawn> pawns){

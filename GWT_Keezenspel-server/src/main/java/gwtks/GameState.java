@@ -14,22 +14,17 @@ public class GameState {
 
     private static ArrayList<Pawn> pawns = new ArrayList<>();
     private static int playerIdTurn;
-    private static int nrPlayers = 3;
     private static ArrayList<Player> players = new ArrayList<>();
     private static ArrayList<Integer> activePlayers = new ArrayList<>();
     private static ArrayList<Integer> winners = new ArrayList<>();
+    private static int MAX_PLAYERS = 8;
 
-    public GameState(){
-        this(nrPlayers);
-    }
+    public GameState() {}
 
-    public GameState(int nrPlayers) {
+    public static void start(){
         if (pawns.isEmpty()) {
-            PawnId pawnId = new PawnId();
-
-            GameState.nrPlayers = nrPlayers;
             pawns = new ArrayList<Pawn>();
-            for (int playerId = 0; playerId < nrPlayers; playerId++) {
+            for (int playerId = 0; playerId < players.size(); playerId++) {
                 activePlayers.add(playerId);
                 for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
                     pawns.add(new Pawn(
@@ -38,7 +33,7 @@ public class GameState {
                 }
             }
 
-            CardsDeck.setNrPlayers(nrPlayers);
+            CardsDeck.setNrPlayers(players.size());
             CardsDeck.shuffle();
             CardsDeck.dealCards();
         }
@@ -49,7 +44,7 @@ public class GameState {
     }
 
     public static void addPlayer(Player player) {
-        if(!players.contains(player)){
+        if(!players.contains(player) && players.size() < MAX_PLAYERS){
             players.add(player);
         }
     }
@@ -59,7 +54,7 @@ public class GameState {
     }
 
     public static void resetActivePlayers(){
-        for (int playerId = 0; playerId < nrPlayers; playerId++) {
+        for (int playerId = 0; playerId < players.size(); playerId++) {
             if(!winners.contains(playerId)){
                 activePlayers.add(playerId);
             }
@@ -106,7 +101,7 @@ public class GameState {
     }
 
     private static int previousPlayerId(int playerId){
-        return (playerId + nrPlayers -1) % nrPlayers;
+        return (playerId + players.size() -1) % players.size();
     }
 
     private static boolean isPawnOnFinish(PawnId pawnId, TileId tileId){
@@ -125,7 +120,7 @@ public class GameState {
     }
 
     public static int getNrPlayers() {
-        return nrPlayers;
+        return players.size();
     }
 
     private static boolean isPawnTightlyClosedIn(PawnId pawnId, TileId tileId){
@@ -674,7 +669,7 @@ public class GameState {
     public static void tearDown(){
         pawns = new ArrayList<>();
         playerIdTurn = 0;
-        nrPlayers = 0;
+        players.clear();
         activePlayers.clear();
         winners.clear();
     }
@@ -724,7 +719,7 @@ public class GameState {
     }
 
     public static int nextPlayerId(int playerId){
-        return (playerId + 1)%nrPlayers;
+        return (playerId + 1)%players.size();
     }
 
     public static ArrayList<Integer> getWinners() {

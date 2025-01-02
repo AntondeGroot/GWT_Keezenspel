@@ -17,7 +17,7 @@
                 <g:Button ui:field="sendButton" styleName="sendButton">Play Card</g:Button>
                 <g:Button ui:field="forfeitButton" styleName="forfeitButton">Forfeit</g:Button>
             </g:HorizontalPanel>
-            <g:VerticalPanel ui:field="playerListContainer" styleName="playerListContainer" width="50vw"/>
+            <g:VerticalPanel ui:field="playerListContainer2" styleName="playerListContainer" width="50vw"/>
         </g:VerticalPanel>
     </g:HorizontalPanel>
 </ui:UiBinder>

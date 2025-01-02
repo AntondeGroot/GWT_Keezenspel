@@ -1,9 +1,6 @@
 package gwtks.logic;
 
 import gwtks.GameState;
-import gwtks.GameStateUtil;
-import gwtks.PawnId;
-import gwtks.TileId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +15,7 @@ class WinnerLogicTest {
     ArrayList<Integer> winners = new ArrayList<>();
     @BeforeEach
     void setup(){
-        GameState gameState = new GameState(3);
+        createGame_With_NPlayers(3);
     }
 
     @AfterEach
