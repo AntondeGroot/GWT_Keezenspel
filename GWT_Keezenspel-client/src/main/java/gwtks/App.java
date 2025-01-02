@@ -2,11 +2,8 @@ package gwtks;
 
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.canvas.client.Canvas;
-import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.CanvasElement;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Label;
 import gwtks.animations.GameAnimation;
@@ -67,5 +64,5 @@ public class App implements EntryPoint {
 			}
 		};
 		AnimationScheduler.get().requestAnimationFrame(animationCallback);
-	};
+	}
 }

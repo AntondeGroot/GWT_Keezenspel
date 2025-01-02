@@ -2,7 +2,6 @@ package gwtks.services;
 
 import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import gwtks.CardsDeck;
-import gwtks.GameState;
 import gwtks.CardResponse;
 import gwtks.CardsService;
 import jakarta.servlet.annotation.WebServlet;

@@ -1,7 +1,5 @@
 package gwtks;
 
-import com.google.gwt.core.client.GWT;
-
 import java.util.Comparator;
 
 public class PawnComparator implements Comparator<Pawn> {

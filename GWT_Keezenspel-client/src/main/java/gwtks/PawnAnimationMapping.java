@@ -13,17 +13,15 @@ public class PawnAnimationMapping {
     public PawnAnimationMapping(Pawn pawn, LinkedList<TileId> tileIdList, boolean animateLast) {
         this.pawn = pawn;
         this.animateLast = animateLast;
-        Point pointFrom = new Point(0,0);
-        Point pointTo = new Point(0,0);
         ArrayList<Point> tempResult = new ArrayList<Point>();
 
         for (int i = 0; i < tileIdList.size()-1 ; i++) {
-            pointFrom = convertTileIdToPoint(tileIdList.get(i));
-            pointTo = convertTileIdToPoint(tileIdList.get(i+1));
+            Point pointFrom = convertTileIdToPoint(tileIdList.get(i));
+            Point pointTo = convertTileIdToPoint(tileIdList.get(i+1));
 
             tempResult.addAll(drawLine(pointFrom,pointTo));
         }
-        GWT.log("positions for drawing a line is: "+tempResult.toString());
+        GWT.log("positions for drawing a line is: "+tempResult);
         points.addAll(tempResult);
     }
 

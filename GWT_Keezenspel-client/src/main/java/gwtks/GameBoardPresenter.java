@@ -37,7 +37,7 @@ public class GameBoardPresenter implements Presenter{
 
         pollingService.startPolling(200, this::pollServerForUpdates);
 
-        //todo: bind startgame to a button
+        //todo: bind startGame method to a button
         gameStateService.startGame(new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable throwable) {
@@ -56,7 +56,7 @@ public class GameBoardPresenter implements Presenter{
                         model.setPlayers(players);
                         view.drawPlayers(players);
                         boardModel = new Board();
-                        GWT.log("gamestateservice getplayers board.create");
+                        GWT.log("gameStateService getPlayers board.create");
 
                         boardModel.createBoard(players.size(), 600); // todo: make createBoard accept a list of players
                     }
@@ -116,7 +116,7 @@ public class GameBoardPresenter implements Presenter{
                 if(!Board.isInitialized()){
                     Board board = new Board();
                     Board.setPawns(result.getPawns());
-                    GWT.log("pollserver board.create"+result);
+                    GWT.log("poll server board.create"+result);
                     board.createBoard(result.getNrPlayers(),600);
                     board.drawBoard(view.getCanvasBoardContext()); // todo: make view.drawBoard(model);
                     board.drawPawns(view.getCanvasPawnsContext());
