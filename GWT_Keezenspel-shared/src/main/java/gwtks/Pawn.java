@@ -29,6 +29,7 @@ public class Pawn implements IsSerializable {
     }
 
     public int getPlayerId() {
+        //todo: replace playerId with playerUUID
         return playerId;
     }
 

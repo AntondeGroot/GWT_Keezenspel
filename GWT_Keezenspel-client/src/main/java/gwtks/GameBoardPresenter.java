@@ -1,9 +1,6 @@
 package gwtks;
 
-import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.CanvasElement;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -27,10 +24,6 @@ public class GameBoardPresenter implements Presenter{
     private final CardsServiceAsync cardsService = GWT.create(CardsService.class);//todo: remove from presenter and inject it
     // todo: make service an input parameter
     private final PollingService pollingService = GWT.create(PollingService.class);
-
-    //todo: to remove
-    private Context2d ctxPawns;
-    private Context2d ctxBoard;
 
     public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, GameStateServiceAsync gameStateService) {
         this.model = gameBoardModel;
@@ -85,10 +78,6 @@ public class GameBoardPresenter implements Presenter{
                 CanvasClickHandler.handleCanvasClick(event,x,y);
             }
         }, ClickEvent.getType());
-        //todo: remove
-        Document document = Document.get();
-        ctxPawns = ((CanvasElement) document.getElementById("canvasPawns")).getContext2d();
-        ctxBoard = ((CanvasElement) document.getElementById("canvasBoard")).getContext2d();
     }
 
     @Override
@@ -129,9 +118,7 @@ public class GameBoardPresenter implements Presenter{
                     Board.setPawns(result.getPawns());
                     GWT.log("pollserver board.create"+result);
                     board.createBoard(result.getNrPlayers(),600);
-                    board.drawBoard(ctxBoard);// todo: remove
-                    board.drawBoard(view.getCanvasBoardContext());
-                    board.drawPawns(ctxPawns); // todo: remove
+                    board.drawBoard(view.getCanvasBoardContext()); // todo: make view.drawBoard(model);
                     board.drawPawns(view.getCanvasPawnsContext());
                     PlayerList.setNrPlayers(result.getNrPlayers());
                 }
@@ -167,8 +154,7 @@ public class GameBoardPresenter implements Presenter{
                 PawnAndCardSelection.setPlayerId(result.getPlayerId());
                 if(CardsDeck.areCardsDifferent(result.getCards())){
                     CardsDeck.setCards(result.getCards());
-                    view.drawCards(CardsDeck.getCards());// todo: remove old method
-                    view.drawCards_new(CardsDeck.getCards());// todo: keep new method
+                    view.drawCards(CardsDeck.getCards());// todo: keep new method
                     PlayerList.refresh();
                 }
             }

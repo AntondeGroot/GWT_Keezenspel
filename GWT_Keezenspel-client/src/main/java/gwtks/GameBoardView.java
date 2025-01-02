@@ -323,41 +323,7 @@ public class GameBoardView extends Composite {
 //        pawn1.setCurrentTileId(movePawn.getLast());
     }
 
-    public void drawCards(List<Card> cards){
-        ImageElement img = Document.get().createImageElement();
-        img.setSrc("/card-deck.png");
-        // todo: old
-        Document document  = Document.get();
-        Context2d ctxCards = ((CanvasElement) document.getElementById("canvasCards")).getContext2d();
-        ctxCards.clearRect(0,0,600,800);
-        // todo: new
-        getCanvasCardsContext().clearRect(0,0, getCanvasCards().getWidth(), getCanvasCards().getHeight());
-        // card width 25 is good to show how many cards they are still holding
-        // card width 100 is good for your own hand
-        int i=0;
-        for (Card card: cards){
-            // source image
-            double sw = 1920/13.0;
-            double sh = 1150/5.0;
-            double sx = sw*card.getCardValue();
-            double sy = sh*card.getSuit();
-            // destination
-            int dy = 600;
-            double dw = 100.0;
-            double dx = 10+(dw+10)* i;
-            double dh = dw/sw*sh;
-            // for spritesheets dx dy
-            ctxCards.drawImage(img, sx,sy,sw,sh,dx,dy,dw,dh); //todo: old
-            double lineThickness = 3;
-            if(PawnAndCardSelection.getCard() != null && PawnAndCardSelection.getCard().equals(card) && PawnAndCardSelection.getCardNr() == i){
-                // todo: old
-                drawRoundedRect(ctxCards, dx-lineThickness/2, dy-lineThickness/2, dw+lineThickness, dh+lineThickness, 8);
-            }
-            i++;
-        }
-    }
-
-    public void drawCards_new(List<Card> cards) {
+    public void drawCards(List<Card> cards) {
         // Create an image to represent the card deck
         Image img = new Image("/card-deck.png");
 

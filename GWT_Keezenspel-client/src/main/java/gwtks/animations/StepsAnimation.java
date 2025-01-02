@@ -13,7 +13,6 @@ import java.util.List;
 
 public class StepsAnimation {
     private static List<TileMapping> tiles = new ArrayList<>();
-    private static Context2d ctxSteps;
     private static double loopAlpha = 0.6;
     private static double ALPHA_MAX = 0.6;
     private static List<TileId> tileIds;
@@ -32,11 +31,6 @@ public class StepsAnimation {
     public static void draw() {
         if(tileIds == null){return;}
 
-        if (ctxSteps == null) {
-            Document document = Document.get();
-            ctxSteps = ((CanvasElement) document.getElementById("canvasSteps")).getContext2d();
-        }
-        ctxSteps.clearRect(0, 0, 600, 600);
         GameBoardView gameBoardView = new GameBoardView();
         gameBoardView.getCanvasStepsContext().clearRect(0,0,600,600);
 
@@ -49,7 +43,6 @@ public class StepsAnimation {
         for (TileId tileId : tileIds) {
             for (TileMapping mapping : tiles) {
                 if (mapping.getTileId().equals(tileId)) {
-                    drawCircle(ctxSteps, mapping.getPosition().getX(), mapping.getPosition().getY(),cellDistance/2, loopAlpha);
                     drawCircle(gameBoardView.getCanvasStepsContext(), mapping.getPosition().getX(), mapping.getPosition().getY(),cellDistance/2, loopAlpha);
                 }
             }
