@@ -9,7 +9,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import gwtks.animations.StepsAnimation;
@@ -140,9 +139,21 @@ public class GameBoardPresenter implements Presenter{
                 PlayerList playerList = new PlayerList();
                 PlayerList.setActivePlayers(result.getActivePlayers());
                 PlayerList.setWinners(result.getWinners());
+                if(!PlayerList.isIsUpToDate()){//todo: modernize
+                    gameStateService.getPlayers(new AsyncCallback<ArrayList<Player>>() {
+                        @Override
+                        public void onFailure(Throwable throwable) {
+                        }
+
+                        @Override
+                        public void onSuccess(ArrayList<Player> players) {
+                            model.setPlayers(players);
+                            view.getPlayerListContainer().clear();
+                            view.drawPlayers(model.getPlayers());
+                }});}
                 playerList.setPlayerIdPlayingAndDrawPlayerList(result.getPlayerIdTurn());// todo: old
             }
-        } );
+        });
     }
 
     private void pollServerForCards(){

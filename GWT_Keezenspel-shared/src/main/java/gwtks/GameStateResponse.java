@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public class GameStateResponse implements IsSerializable {
     private ArrayList<Pawn> pawns;
+    private ArrayList<Player> players;
     private int playerIdTurn;
     private int nrPlayers;
     private ArrayList<Integer> activePlayers;
@@ -21,6 +22,11 @@ public class GameStateResponse implements IsSerializable {
     public void setPawns(ArrayList<Pawn> pawns) {
         this.pawns = pawns;
     }
+    //todo: you could remove activePlayers and winners as that info is already contained within Players
+
+    public ArrayList<Player> getPlayers() {return players;}
+
+    public void setPlayers(ArrayList<Player> players) {this.players = players;}
 
     public int getPlayerIdTurn() {
         return playerIdTurn;
