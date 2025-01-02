@@ -128,7 +128,8 @@ public class GameBoardView extends Composite {
             if(player.isActive()){
                 canvas.getElement().getStyle().setBorderColor(PlayerColors.getHexColor(playerId));
             }else{
-                canvas.getElement().addClassName("inactivePlayer");
+//                canvas.getElement().addClassName("inactivePlayer"); //todo: this did not work
+                canvas.getElement().getStyle().setBorderColor("#c2bfb6");
             }
 
             Context2d ctx = canvas.getContext2d();

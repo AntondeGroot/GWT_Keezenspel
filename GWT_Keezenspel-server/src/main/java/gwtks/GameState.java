@@ -54,16 +54,25 @@ public class GameState {
     }
 
     public static void resetActivePlayers(){
+        // todo: old
         for (int playerId = 0; playerId < players.size(); playerId++) {
             if(!winners.contains(playerId)){
                 activePlayers.add(playerId);
             }
         }
+        // todo: new
+        for(Player player : players){
+            if(!player.hasFinished()){
+                player.setActive();
+            }
+        }
     }
 
     public static void forfeitPlayer(int playerId) {
+        // todo: modernize
         if(activePlayers.contains(playerId)){
             activePlayers.remove((Integer) playerId);
+            players.get(playerId).setInActive();
         }
         if(activePlayers.isEmpty()){
             resetActivePlayers();
@@ -85,6 +94,11 @@ public class GameState {
         playerIdTurn = nextPlayerId(playerIdTurn);
         if(!activePlayers.isEmpty() && !activePlayers.contains(playerIdTurn)){
             nextActivePlayer();
+        }
+        // todo: check if all players have finished
+        // update player with PlayerId to be playing
+        for (int i = 0; i < players.size(); i++) {
+            players.get(i).setIsPlaying(i==playerIdTurn);
         }
     }
 

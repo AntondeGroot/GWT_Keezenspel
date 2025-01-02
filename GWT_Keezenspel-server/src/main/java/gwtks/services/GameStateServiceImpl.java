@@ -14,6 +14,7 @@ public class GameStateServiceImpl extends RemoteServiceServlet implements GameSt
     @Override
     public GameStateResponse getGameState() throws IllegalArgumentException {
         GameStateResponse response = new GameStateResponse();
+        response.setPlayers(GameState.getPlayers());
         response.setNrPlayers(GameState.getNrPlayers());
         response.setPawns(GameState.getPawns());
         response.setPlayerIdTurn(GameState.getPlayerIdTurn());

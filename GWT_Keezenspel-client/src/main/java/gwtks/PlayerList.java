@@ -32,6 +32,9 @@ public class PlayerList {
         drawPlayers();
         isUpToDate = true;
     }
+    public static boolean isIsUpToDate(){
+        return isUpToDate;
+    }
     public static void setNrPlayers(int nrPlayers){
         PlayerList.nrPlayers = nrPlayers;
     }
