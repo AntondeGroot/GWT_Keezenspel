@@ -5,6 +5,6 @@
 
   <source path="" />
 
-  <entry-point class="gwtks.App" />
+  <entry-point class="ADG.App" />
 
 </module>
