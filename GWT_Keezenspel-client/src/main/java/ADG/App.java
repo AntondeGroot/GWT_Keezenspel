@@ -1,12 +1,10 @@
 package ADG;
 
-import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Label;
-import ADG.animations.GameAnimation;
 import ADG.services.PollingService;
 
 /**
@@ -46,8 +44,5 @@ public class App implements EntryPoint {
 		//todo add model
 		GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(new GameBoardModel(), gameBoardView, gameStateService, cardsService, pollingService);
 		gameBoardPresenter.start();
-
-		//set playerId to first player in list todo: use Cookie
-		PawnAndCardSelection.setPlayerId(0);
 	}
 }
