@@ -1,9 +1,10 @@
 package ADG;
 
+import ADG.Games.Keezen.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static ADG.MoveType.FORFEIT;
+import static ADG.Games.Keezen.MoveType.FORFEIT;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PawnAndCardSelectionTest {

@@ -1,11 +1,12 @@
 package ADG;
 
+import ADG.Games.Keezen.*;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Label;
-import ADG.services.PollingService;
+import ADG.Games.Keezen.services.PollingService;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -37,12 +38,7 @@ public class App implements EntryPoint {
 			RootPanel.get().add(new Label("Canvas is not supported in your browser."));
 			return;
 		}
-
-		gameBoardView = new GameBoardView();
-		RootPanel.get().clear();
-		RootPanel.get().add(gameBoardView);
-		//todo add model
-		GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(new GameBoardModel(), gameBoardView, gameStateService, cardsService, pollingService);
-		gameBoardPresenter.start();
+		GameModule gameModule = new GameModule();
+		gameModule.onStart();
 	}
 }

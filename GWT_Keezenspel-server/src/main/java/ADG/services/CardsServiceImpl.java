@@ -1,9 +1,9 @@
 package ADG.services;
 
 import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
-import ADG.CardsDeck;
-import ADG.CardResponse;
-import ADG.CardsService;
+import ADG.Games.Keezen.CardsDeck;
+import ADG.Games.Keezen.CardResponse;
+import ADG.Games.Keezen.CardsService;
 import jakarta.servlet.annotation.WebServlet;
 
 @SuppressWarnings("serial")
