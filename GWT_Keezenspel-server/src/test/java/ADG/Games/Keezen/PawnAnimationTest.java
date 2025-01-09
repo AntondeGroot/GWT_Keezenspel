@@ -297,4 +297,69 @@ public class PawnAnimationTest {
         assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
         assertEquals(expectedMovement, moveResponse.getMovePawn1());
     }
+
+
+    @Test
+    void pawnMoves_PingPong_3StepsOnFinish_test() {
+        // setup
+        GameState.tearDown();
+        createGame_With_NPlayers(3);
+
+        // GIVEN
+        Card card = givePlayerCard(1,3);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(1,1) ,new TileId(1,17));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(1,2) ,new TileId(1,19));
+        Pawn pawn3 = createPawnAndPlaceOnBoard(new PawnId(1,3) ,new TileId(1,16));
+
+
+        // WHEN
+        createMoveMessage(moveMessage, pawn1, card);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN
+        LinkedList<TileId> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new TileId(1,17));
+        expectedMovement.add(new TileId(1,18));
+        expectedMovement.add(new TileId(1,17));
+        expectedMovement.add(new TileId(1,18));
+
+        // response message is correct
+        assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+        assertEquals(expectedMovement, moveResponse.getMovePawn1());
+    }
+
+    @Test
+    void pawnMoves_PingPong_9StepsOnFinish_test() {
+        // setup
+        GameState.tearDown();
+        createGame_With_NPlayers(3);
+
+        // GIVEN
+        Card card = givePlayerCard(1,9);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(1,1) ,new TileId(1,17));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(1,2) ,new TileId(1,19));
+        Pawn pawn3 = createPawnAndPlaceOnBoard(new PawnId(1,3) ,new TileId(1,16));
+
+
+        // WHEN
+        createMoveMessage(moveMessage, pawn1, card);
+        GameState.processOnMove(moveMessage, moveResponse);
+
+        // THEN
+        LinkedList<TileId> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new TileId(1,17));
+        expectedMovement.add(new TileId(1,18));
+        expectedMovement.add(new TileId(1,17));
+        expectedMovement.add(new TileId(1,18));
+        expectedMovement.add(new TileId(1,17));
+        expectedMovement.add(new TileId(1,18));
+        expectedMovement.add(new TileId(1,17));
+        expectedMovement.add(new TileId(1,18));
+        expectedMovement.add(new TileId(1,17));
+        expectedMovement.add(new TileId(1,18));
+
+        // response message is correct
+        assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+        assertEquals(expectedMovement, moveResponse.getMovePawn1());
+    }
 }
