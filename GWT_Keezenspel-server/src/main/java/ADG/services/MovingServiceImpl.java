@@ -1,8 +1,8 @@
 package ADG.services;
 
-import ADG.GameState;
+import ADG.Games.Keezen.GameState;
 import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
-import ADG.*;
+import ADG.Games.Keezen.*;
 import jakarta.servlet.annotation.WebServlet;
 
 @SuppressWarnings("serial")

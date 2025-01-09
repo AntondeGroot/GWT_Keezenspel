@@ -1,5 +1,7 @@
 package ADG;
 
+import ADG.Games.Keezen.GameState;
+import ADG.Games.Keezen.ImageProcessing;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;

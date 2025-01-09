@@ -1,6 +1,8 @@
 package ADG;
 
-import ADG.Pawn;
+import ADG.Games.Keezen.Board;
+import ADG.Games.Keezen.Pawn;
+import ADG.Games.Keezen.TileMapping;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -30,8 +32,8 @@ class BoardTest {
     void createDistinctPawnsFor2Players() {
         Board board = new Board();
         board.createBoard(2,300);
-        List<ADG.Pawn> pawns =  Board.getPawns();
-        Set<ADG.Pawn> pawnSet = new HashSet<>(pawns);
+        List<Pawn> pawns =  Board.getPawns();
+        Set<Pawn> pawnSet = new HashSet<>(pawns);
         assertEquals(2*4, pawns.size());
         assertEquals(2*4, pawnSet.size());
     }
@@ -40,7 +42,7 @@ class BoardTest {
     void createDistinctPawnsFor8Players() {
         Board board = new Board();
         board.createBoard(8,300);
-        List<ADG.Pawn> pawns =  Board.getPawns();
+        List<Pawn> pawns =  Board.getPawns();
         Set<Pawn> pawnSet = new HashSet<>(pawns);
         assertEquals(8*4, pawns.size());
         assertEquals(8*4, pawnSet.size());
