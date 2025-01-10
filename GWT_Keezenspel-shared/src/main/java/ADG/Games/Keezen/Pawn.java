@@ -8,7 +8,7 @@ public class Pawn implements IsSerializable {
     private PawnId pawnId;
     private TileId currentTileId;
     private TileId nestTileId;
-    private int playerId;
+    private String playerId;
 
     public Pawn() {
     }
@@ -28,12 +28,11 @@ public class Pawn implements IsSerializable {
         this.pawnId = pawnId;
     }
 
-    public int getPlayerId() {
-        //todo: replace playerId with playerUUID
+    public String getPlayerId() {
         return playerId;
     }
 
-    public void setPlayerId(int playerId) {
+    public void setPlayerId(String playerId) {
         this.playerId = playerId;
     }
 

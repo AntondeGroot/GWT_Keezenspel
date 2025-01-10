@@ -8,22 +8,22 @@ import java.util.ArrayList;
 
 public class WinnerLogic {
 
-    public static void checkForWinners(ArrayList<Integer> winners){
+    public static void checkForWinners(ArrayList<String> winners){
         ArrayList<Pawn> pawns = GameState.getPawns();
         ArrayList<Player> players = GameState.getPlayers();
-        int player_i = 0;
+
         for(Player player : players){
             int nrPawnsFinished = 0;
+            String playerId = player.getUUID();
             for (Pawn pawn: pawns){
-                if(pawn.getPlayerId() == player_i && pawn.getCurrentTileId().getTileNr() > 15){
+                if(playerId.equals(pawn.getPlayerId()) && pawn.getCurrentTileId().getTileNr() > 15){
                     nrPawnsFinished++;
                 }
             }
-            if(nrPawnsFinished == 4 && !winners.contains(player_i)){
+            if(nrPawnsFinished == 4 && !winners.contains(playerId)){
                 player.setPlace(winners.size()+1);
-                winners.add(player_i);
+                winners.add(playerId);
             }
-            player_i++;
         }
     }
 }

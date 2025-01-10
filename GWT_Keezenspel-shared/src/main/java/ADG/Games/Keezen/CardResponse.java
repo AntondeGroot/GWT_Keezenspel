@@ -3,25 +3,26 @@ package ADG.Games.Keezen;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class CardResponse implements IsSerializable {
     // serializable messages cannot contain List but must use a concrete implementation like ArrayList or LinkedList
-    int playerId;
+    String playerUUID;
     ArrayList<Card> cards;
-    ArrayList<Integer> nrOfCardsPerPlayer;
+    HashMap<String, Integer> nrOfCardsPerPlayer;
 
     public CardResponse() {
     }
 
 
 
-    public int getPlayerId() {
-        return playerId;
+    public String getPlayerId() {
+        return playerUUID;
     }
 
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
+    public void setPlayerId(String playerId) {
+        this.playerUUID = playerId;
     }
 
     public List<Card> getCards() {
@@ -32,18 +33,18 @@ public class CardResponse implements IsSerializable {
         this.cards = cards;
     }
 
-    public List<Integer> getNrOfCardsPerPlayer() {
+    public HashMap<String, Integer> getNrOfCardsPerPlayer() {
         return nrOfCardsPerPlayer;
     }
 
-    public void setNrOfCardsPerPlayer(ArrayList<Integer> nrOfCardsPerPlayer) {
+    public void setNrOfCardsPerPlayer(HashMap<String, Integer> nrOfCardsPerPlayer) {
         this.nrOfCardsPerPlayer = nrOfCardsPerPlayer;
     }
 
     @Override
     public String toString() {
         return "CardResponse{" +
-                "playerId=" + playerId +
+                "playerId=" + playerUUID +
                 ", cards=" + cards +
                 ", nrOfCardsPerPlayer=" + nrOfCardsPerPlayer +
                 '}';

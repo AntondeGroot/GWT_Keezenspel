@@ -6,10 +6,10 @@ import java.util.Objects;
 
 
 public class TileId implements IsSerializable {
-    private int playerId;
+    private String playerId;
     private int tileNr;
 
-    public TileId(int playerId, int tileNr) {
+    public TileId(String playerId, int tileNr) {
         this.playerId = playerId;
         this.tileNr = tileNr;
     }
@@ -22,11 +22,11 @@ public class TileId implements IsSerializable {
         this.tileNr = other.tileNr;
     }
 
-    public int getPlayerId() {
+    public String getPlayerId() {
         return playerId;
     }
 
-    public void setPlayerId(int playerId) {
+    public void setPlayerId(String playerId) {
         this.playerId = playerId;
     }
 
@@ -49,7 +49,7 @@ public class TileId implements IsSerializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TileId tileId = (TileId) o;
-        return playerId == tileId.playerId && tileNr == tileId.tileNr;
+        return tileNr == tileId.tileNr && Objects.equals(playerId, tileId.playerId);
     }
 
     @Override

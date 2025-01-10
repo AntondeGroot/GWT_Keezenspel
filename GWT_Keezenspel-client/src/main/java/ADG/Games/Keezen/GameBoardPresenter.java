@@ -1,6 +1,5 @@
 package ADG.Games.Keezen;
 
-import ADG.*;
 import ADG.Games.Keezen.animations.GameAnimation;
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.core.client.GWT;
@@ -65,7 +64,7 @@ public class GameBoardPresenter{
                         boardModel = new Board();
                         GWT.log("gameStateService getPlayers board.create");
 
-                        boardModel.createBoard(players.size(), 600); // todo: make createBoard accept a list of players
+                        boardModel.createBoard(players, 600); // todo: make createBoard accept a list of players
                     }
                 });
             }
@@ -122,8 +121,10 @@ public class GameBoardPresenter{
                 if(!Board.isInitialized()){
                     Board board = new Board();
                     Board.setPawns(result.getPawns());
+                    GWT.log("server created nr pawns: "+result.getPawns().size());
+                    GWT.log(result.getPawns().toString());
                     GWT.log("poll server board.create"+result);
-                    board.createBoard(result.getNrPlayers(),600);
+                    board.createBoard(result.getPlayers(),600);
                     board.drawBoard(view.getCanvasBoardContext()); // todo: make view.drawBoard(model);
                     board.drawPawns(view.getCanvasPawnsContext());
                     PlayerList.setNrPlayers(result.getNrPlayers());
@@ -151,16 +152,17 @@ public class GameBoardPresenter{
 
     private void pollServerForCards(){
         // todo: this should actually only get the cards for the Cookie.playerId
-        cardsService.getCards(PlayerList.getPlayerIdPlaying(), new AsyncCallback<CardResponse>() {
+        PawnAndCardSelection.setPlayerId(Cookie.getPlayerId());
+        cardsService.getCards(Cookie.getPlayerId(), new AsyncCallback<CardResponse>() {
             public void onFailure(Throwable caught) {
                 StepsAnimation.reset();
             }
             public void onSuccess(CardResponse result) {
 
-                PawnAndCardSelection.setPlayerId(result.getPlayerId());
+                PawnAndCardSelection.resetSelection();//todo: this should not be updated each time
                 if(CardsDeck.areCardsDifferent(result.getCards())){
                     CardsDeck.setCards(result.getCards());
-                    view.drawCards(CardsDeck.getCards());// todo: keep new method
+                    view.drawCards(CardsDeck.getCards());
                     PlayerList.refresh();
                 }
             }

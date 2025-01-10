@@ -32,8 +32,8 @@ class MovingOnBoardSamePlayerBlockingTest {
     void twoPawnsOnePlayer_CannotEndOnTheSameTile(){
         // GIVEN
         Card card = givePlayerCard(0,1);
-        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId(0,0), new TileId(0,9));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(0,10));
+        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId("0",0), new TileId("0",9));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("0",1), new TileId("0",10));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1,card);
@@ -44,16 +44,16 @@ class MovingOnBoardSamePlayerBlockingTest {
         assertNull(moveResponse.getMovePawn1());  // moves the pawn to the correct tile
         assertNull(moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
-        assertEquals(new TileId(0,9), GameState.getPawn(pawn1).getCurrentTileId());
-        assertEquals(new TileId(0,10), GameState.getPawn(pawn2).getCurrentTileId());
+        assertEquals(new TileId("0",9), GameState.getPawn(pawn1).getCurrentTileId());
+        assertEquals(new TileId("0",10), GameState.getPawn(pawn2).getCurrentTileId());
     }
     @Test
     void twoPawnsOnePlayer_CannotEndOnTheSameTile_DoesNotPlayCard(){
         // GIVEN
         Card card = givePlayerCard(0,-1);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(0,0), new TileId(0,16));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(7,15));
-        int nrCardsBeforePlaying = ADG.Games.Keezen.CardsDeck.getCardsForPlayer(0).size();
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("0",0), new TileId("0",16));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("0",1), new TileId("7",15));
+        int nrCardsBeforePlaying = ADG.Games.Keezen.CardsDeck.getCardsForPlayer("0").size();
 
         // WHEN
         createMoveMessage(moveMessage, pawn1,card);
@@ -61,14 +61,14 @@ class MovingOnBoardSamePlayerBlockingTest {
 
         // THEN response message is correct
         assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
-        assertEquals(nrCardsBeforePlaying, CardsDeck.getCardsForPlayer(0).size());
+        assertEquals(nrCardsBeforePlaying, CardsDeck.getCardsForPlayer("0").size());
     }
     @Test
     void PawnOn15_PawnCannotBePlacedThere_Forwards(){
         // GIVEN
         Card card = givePlayerCard(0,1);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(0,0), new TileId(0,14));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(0,15));
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("0",0), new TileId("0",14));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("0",1), new TileId("0",15));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -79,15 +79,15 @@ class MovingOnBoardSamePlayerBlockingTest {
         assertNull(moveResponse.getMovePawn1());  // moves the pawn to the correct tile
         assertNull(moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
-        assertEquals(new TileId(0,14), GameState.getPawn(pawn1).getCurrentTileId());
-        assertEquals(new TileId(0,15), GameState.getPawn(pawn2).getCurrentTileId());
+        assertEquals(new TileId("0",14), GameState.getPawn(pawn1).getCurrentTileId());
+        assertEquals(new TileId("0",15), GameState.getPawn(pawn2).getCurrentTileId());
     }
     @Test
     void PawnOn15_PawnCannotBePlacedThere_Backwards(){
         // GIVEN
         Card card = givePlayerCard(0,-1);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(0,0), new TileId(1,0));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(0,15));
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("0",0), new TileId("1",0));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("0",1), new TileId("0",15));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -98,15 +98,15 @@ class MovingOnBoardSamePlayerBlockingTest {
         assertNull(moveResponse.getMovePawn1());
         assertNull(moveResponse.getPawnId1());
         // THEN Gamestate is correct
-        assertEquals(new TileId(1,0), GameState.getPawn(pawn1).getCurrentTileId());
-        assertEquals(new TileId(0,15), GameState.getPawn(pawn2).getCurrentTileId());
+        assertEquals(new TileId("1",0), GameState.getPawn(pawn1).getCurrentTileId());
+        assertEquals(new TileId("0",15), GameState.getPawn(pawn2).getCurrentTileId());
     }
     @Test
     void PawnOnOtherStart_PawnCannotBePlacedThere_Forwards(){
         // GIVEN
         Card card = givePlayerCard(0,1);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(0,0), new TileId(0,15));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(1,0));
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("0",0), new TileId("0",15));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("0",1), new TileId("1",0));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -117,15 +117,15 @@ class MovingOnBoardSamePlayerBlockingTest {
         assertNull(moveResponse.getMovePawn1());
         assertNull(moveResponse.getPawnId1());
         // THEN Gamestate is correct
-        assertEquals(new TileId(0,15), GameState.getPawn(pawn1).getCurrentTileId());
-        assertEquals(new TileId(1,0), GameState.getPawn(pawn2).getCurrentTileId());
+        assertEquals(new TileId("0",15), GameState.getPawn(pawn1).getCurrentTileId());
+        assertEquals(new TileId("1",0), GameState.getPawn(pawn2).getCurrentTileId());
     }
     @Test
     void PawnOnOtherStart_PawnCannotBePlacedThere_Backwards(){
         // GIVEN
         Card card = givePlayerCard(0,-1);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(0,0), new TileId(1,1));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(1,0));
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("0",0), new TileId("1",1));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("0",1), new TileId("1",0));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -136,7 +136,7 @@ class MovingOnBoardSamePlayerBlockingTest {
         assertNull(moveResponse.getMovePawn1());  // moves the pawn to the correct tile
         assertNull(moveResponse.getPawnId1());                          // moves the correct pawn
         // THEN Gamestate is correct
-        assertEquals(new TileId(1,1), GameState.getPawn(pawn1).getCurrentTileId());
-        assertEquals(new TileId(1,0), GameState.getPawn(pawn2).getCurrentTileId());
+        assertEquals(new TileId("1",1), GameState.getPawn(pawn1).getCurrentTileId());
+        assertEquals(new TileId("1",0), GameState.getPawn(pawn2).getCurrentTileId());
     }
 }

@@ -1,15 +1,14 @@
 package ADG.Games.Keezen;
 
-import ADG.*;
 import com.google.gwt.core.client.GWT;
 
 import static ADG.Games.Keezen.MoveType.*;
 
 public class PawnAndCardSelection {
     // todo: turn this into a model
-    private static int playerId;
-    private static Pawn pawn1 = new Pawn(new PawnId(-1,-1),new TileId(-1,90));
-    private static Pawn pawn2 = new Pawn(new PawnId(-1,-1),new TileId(-1,90));
+    private static String playerId;
+    private static Pawn pawn1 = new Pawn(new PawnId("-1",-1),new TileId("-1",90)); // todo: initialize somewhere?
+    private static Pawn pawn2 = new Pawn(new PawnId("-1",-1),new TileId("-1",90));
     private static Card card;
     private static boolean drawCards = true;
     private static MoveType moveType;
@@ -18,39 +17,44 @@ public class PawnAndCardSelection {
     // if you have more than 4 players you will have 1 suit that is a double, if you have a hand with two of the same card
     // if you then pick one, both cards would otherwise be highlighted
 
-    public static void setPlayerId(int p_playerId) {
-        if(playerId != p_playerId){
-            pawn1 = resetPawn();
-            pawn2 = resetPawn();
-            card = null;
-            playerId = p_playerId;
-        }
+    public static void setPlayerId(String id) {
+        playerId = id;
     }
 
-    public static int getPlayerId(){
+    public static void resetSelection() {
+        // todo: should this ever be the case?
+//        if(playerId != p_playerId){
+//            pawn1 = resetPawn();
+//            pawn2 = resetPawn();
+//            card = null;
+//            playerId = p_playerId;
+//        }
+    }
+
+    public static String getPlayerId(){
         return playerId;
     }
 
     public static void addPawn(Pawn pawn) {
         // deselect pawn1
-        if(playerId == pawn.getPlayerId() && pawn1 !=null && pawn1.equals(pawn)){
+        if(playerId.equals(pawn.getPlayerId()) && pawn1 !=null && pawn1.equals(pawn)){
             pawn1 = resetPawn();
             return;
         }
 
         // deselect pawn2
-        if(playerId != pawn.getPlayerId() && pawn2 !=null && pawn2.equals(pawn)){
+        if(!playerId.equals(pawn.getPlayerId()) && pawn2 !=null && pawn2.equals(pawn)){
             pawn2 = resetPawn();
             return;
         }
 
         // select pawn1
-        if(playerId == pawn.getPlayerId()){
+        if(playerId.equals(pawn.getPlayerId())){
             pawn1 = pawn;
         }
 
         // select pawn2
-        if(playerId != pawn.getPlayerId()) {
+        if(!playerId.equals(pawn.getPlayerId())) {
             pawn2 = pawn;
         }
 
@@ -121,7 +125,7 @@ public class PawnAndCardSelection {
     }
 
     private static Pawn resetPawn(){
-        return new Pawn(new PawnId(-1,-1),new TileId(-1,90));
+        return new Pawn(new PawnId("-1",-1),new TileId("-1",90));//todo: improve reset
     }
 
     public static void reset(){

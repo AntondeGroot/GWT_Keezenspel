@@ -5,10 +5,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.Objects;
 
 public class PawnId implements IsSerializable {
-    private int playerId;
+    private String playerId;
     private int pawnNr;
 
-    public PawnId(int playerId, int pawnNr) {
+    public PawnId(String playerId, int pawnNr) {
         this.playerId = playerId;
         this.pawnNr = pawnNr;
     }
@@ -16,11 +16,11 @@ public class PawnId implements IsSerializable {
     public PawnId() {
     }
 
-    public int getPlayerId() {
+    public String getPlayerId() {
         return playerId;
     }
 
-    public void setPlayerId(int playerId) {
+    public void setPlayerId(String playerId) {
         this.playerId = playerId;
     }
 
@@ -37,7 +37,7 @@ public class PawnId implements IsSerializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PawnId pawnId = (PawnId) o;
-        return playerId == pawnId.playerId && pawnNr == pawnId.pawnNr;
+        return pawnNr == pawnId.pawnNr && Objects.equals(playerId, pawnId.playerId);
     }
 
     @Override

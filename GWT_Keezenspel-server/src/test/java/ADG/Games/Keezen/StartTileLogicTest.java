@@ -19,7 +19,7 @@ class StartTileLogicTest {
     void setup(){
 
         createGame_With_NPlayers(3);
-        startTileId = new TileId(0, 0);
+        startTileId = new TileId("0", 0);
     }
 
     @AfterEach
@@ -29,28 +29,28 @@ class StartTileLogicTest {
 
     @Test
     void player2_canPassPlayer2_OnStartTile0(){
-        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId(2,1), new TileId(2,12));
-        Pawn pawn2 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId(2,2), new TileId(0,0));
+        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId("2",1), new TileId("2",12));
+        Pawn pawn2 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId("2",2), new TileId("0",0));
 
         Assertions.assertTrue(StartTileLogic.canPassStartTile(pawn1.getPawnId(), startTileId));
     }
     @Test
     void player2_canPassPlayer1_OnStartTile0(){
-        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId(2,1), new TileId(2,12));
-        Pawn pawn2 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId(1,2), new TileId(0,0));
+        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId("2",1), new TileId("2",12));
+        Pawn pawn2 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId("1",2), new TileId("0",0));
 
         assertTrue(StartTileLogic.canPassStartTile(pawn1.getPawnId(), startTileId));
     }
     @Test
     void player2_cannotPassPlayer0_OnStartTile0(){
-        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId(2,1), new TileId(2,12));
-        Pawn pawn2 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(0,0));
+        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId("2",1), new TileId("2",12));
+        Pawn pawn2 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId("0",1), new TileId("0",0));
 
         assertFalse(StartTileLogic.canPassStartTile(pawn1.getPawnId(), startTileId));
     }
     @Test
     void player2_canPassEmptyStartTile0(){
-        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId(2,1), new TileId(2,12));
+        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard(new PawnId("2",1), new TileId("2",12));
 
         assertTrue(StartTileLogic.canPassStartTile(pawn1.getPawnId(), startTileId));
     }

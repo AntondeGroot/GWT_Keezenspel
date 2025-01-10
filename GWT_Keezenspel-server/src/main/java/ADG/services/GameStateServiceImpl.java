@@ -14,6 +14,7 @@ public class GameStateServiceImpl extends RemoteServiceServlet implements GameSt
     @Override
     public GameStateResponse getGameState() throws IllegalArgumentException {
         GameStateResponse response = new GameStateResponse();
+        response.setPlayerColors(GameState.getPlayerColors());
         response.setPlayers(GameState.getPlayers());
         response.setNrPlayers(GameState.getNrPlayers());
         response.setPawns(GameState.getPawns());
@@ -38,7 +39,7 @@ public class GameStateServiceImpl extends RemoteServiceServlet implements GameSt
         //todo: remove testdata
         if(GameState.getPawns().isEmpty()){
             for (int i = 0; i < 3; i++) {
-                Player player = new Player("player"+i,"123-567");
+                Player player = new Player("player"+i,String.valueOf(i));
                 if(i==0){
                     player.setIsPlaying(true);
                 }

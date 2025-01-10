@@ -20,10 +20,10 @@ class PawnAndCardSelectionTest {
     void setup(){
         PawnAndCardSelection.reset();
 
-        pawn1 = new Pawn(new PawnId(1, 1), new TileId(1, 0));
-        pawn1OffBoard = new Pawn(new PawnId(1, 1), new TileId(1, -1));
-        pawn2 = new Pawn(new PawnId(2, 1), new TileId(2, 0));
-        pawn2OffBoard = new Pawn(new PawnId(2, 1), new TileId(2, -1));
+        pawn1 = new Pawn(new PawnId("1", 1), new TileId("1", 0));
+        pawn1OffBoard = new Pawn(new PawnId("1", 1), new TileId("1", -1));
+        pawn2 = new Pawn(new PawnId("2", 1), new TileId("2", 0));
+        pawn2OffBoard = new Pawn(new PawnId("2", 1), new TileId("2", -1));
 
         aceCard = new Card(0,0);
         jackCard = new Card(0,10);
@@ -33,7 +33,7 @@ class PawnAndCardSelectionTest {
     @Test
     void clickOnOwnPawn_IsPawn1() {
         // GIVEN
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
 
         // WHEN
         PawnAndCardSelection.addPawn(pawn1);
@@ -45,7 +45,7 @@ class PawnAndCardSelectionTest {
     @Test
     void clickOnOtherPawn_CannotSelect() {
         // GIVEN
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
 
         // WHEN
         PawnAndCardSelection.addPawn(pawn2);
@@ -57,7 +57,7 @@ class PawnAndCardSelectionTest {
     @Test
     void clickOnOtherPawn_CanSelectWhenJack(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
 
         // WHEN
         PawnAndCardSelection.setCard(jackCard);
@@ -70,7 +70,7 @@ class PawnAndCardSelectionTest {
     @Test
     void clickOnOtherPawn_CannotSelectWhenNotJack(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
 
         // WHEN
         PawnAndCardSelection.setCard(nonJackCard);
@@ -83,7 +83,7 @@ class PawnAndCardSelectionTest {
     @Test
     void selected2PawnsWithJack_WhenOtherCardSelected_OnlyOwnPawnIsSelected(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
 
         // WHEN
         PawnAndCardSelection.addPawn(pawn1);
@@ -100,7 +100,7 @@ class PawnAndCardSelectionTest {
 
     @Test
     public void testAddPawnSamePlayer() {
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
         PawnAndCardSelection.addPawn(pawn1);
         assertEquals(pawn1, PawnAndCardSelection.getPawn1());
 
@@ -111,10 +111,11 @@ class PawnAndCardSelectionTest {
 
     @Test
     public void testAddPawnDifferentPlayerWithoutJack() {
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
         PawnAndCardSelection.addPawn(pawn1);
 
-        PawnAndCardSelection.setPlayerId(2);
+        PawnAndCardSelection.resetSelection();
+        PawnAndCardSelection.setPlayerId("2");
         PawnAndCardSelection.setCard(nonJackCard);
         PawnAndCardSelection.addPawn(pawn2);
 
@@ -123,7 +124,7 @@ class PawnAndCardSelectionTest {
 
     @Test
     public void testAddPawnDifferentPlayerWithJack_SelectAndDeselect() {
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
         PawnAndCardSelection.addPawn(pawn1);
         PawnAndCardSelection.setCard(jackCard);
         PawnAndCardSelection.addPawn(pawn2);
@@ -146,7 +147,7 @@ class PawnAndCardSelectionTest {
 
     @Test
     public void testSetCardNonJackDeselectsPawn() {
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
         PawnAndCardSelection.addPawn(pawn1);
         PawnAndCardSelection.setCard(jackCard);
         PawnAndCardSelection.addPawn(pawn2);
@@ -159,7 +160,7 @@ class PawnAndCardSelectionTest {
 
     @Test
     public void testSelectAndDeselectPawn_SelectCard_PawnStillDeselected() {
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
         PawnAndCardSelection.addPawn(pawn1);
         PawnAndCardSelection.addPawn(pawn1);
         PawnAndCardSelection.setCard(jackCard);
@@ -169,12 +170,13 @@ class PawnAndCardSelectionTest {
 
     @Test
     public void testChangingPlayerIdDeselectsPawnsAndCards() {
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
         PawnAndCardSelection.addPawn(pawn1);
         PawnAndCardSelection.setCard(jackCard);
         PawnAndCardSelection.addPawn(pawn2);
 
-        PawnAndCardSelection.setPlayerId(2);
+        PawnAndCardSelection.resetSelection();
+        PawnAndCardSelection.setPlayerId("2");
 
         assertNull(PawnAndCardSelection.getPawnId1());
         assertNull(PawnAndCardSelection.getPawnId2());
@@ -192,7 +194,7 @@ class PawnAndCardSelectionTest {
 
     @Test
     public void testReset() {
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
         PawnAndCardSelection.addPawn(pawn1);
         PawnAndCardSelection.setCard(jackCard);
 
@@ -206,7 +208,7 @@ class PawnAndCardSelectionTest {
 
     @Test
     public void testSetAceThenSelectPawnOffBoard_MoveOnBoard(){
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
         PawnAndCardSelection.setCard(aceCard);
         PawnAndCardSelection.addPawn(pawn1OffBoard);
 
@@ -214,7 +216,7 @@ class PawnAndCardSelectionTest {
     }
     @Test
     public void testSelectPawnOffBoardThenSelectAce_MoveOnBoard(){
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
         PawnAndCardSelection.addPawn(pawn1OffBoard);
         PawnAndCardSelection.setCard(aceCard);
 
@@ -222,7 +224,7 @@ class PawnAndCardSelectionTest {
     }
     @Test
     public void testSetAceThenSelectPawnOnBoard_MoveOnMove(){
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
         PawnAndCardSelection.setCard(aceCard);
         PawnAndCardSelection.addPawn(pawn1);
 
@@ -230,7 +232,7 @@ class PawnAndCardSelectionTest {
     }
     @Test
     public void testSelectPawnOnBoardThenSelectAce_MoveOnMove(){
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
         PawnAndCardSelection.addPawn(pawn1);
         PawnAndCardSelection.setCard(aceCard);
 
@@ -238,7 +240,7 @@ class PawnAndCardSelectionTest {
     }
     @Test
     public void testSelectAceThenForfeit(){
-        PawnAndCardSelection.setPlayerId(1);
+        PawnAndCardSelection.setPlayerId("1");
         PawnAndCardSelection.addPawn(pawn1);
         PawnAndCardSelection.setCard(aceCard);
         PawnAndCardSelection.setMoveType(FORFEIT);
@@ -246,7 +248,7 @@ class PawnAndCardSelectionTest {
         assertEquals(FORFEIT, PawnAndCardSelection.getMoveType());
     }
 
-    private Pawn createPawn(int playerId){
+    private Pawn createPawn(String playerId){
         return new Pawn(new PawnId(playerId, 1), new TileId(playerId, 0));
     }
 }

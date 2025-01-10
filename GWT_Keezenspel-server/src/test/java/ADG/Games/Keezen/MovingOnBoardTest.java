@@ -31,9 +31,10 @@ class MovingOnBoardTest {
     void putPlayerOnBoard_WhenPossible() {
         // GIVEN
         Card ace = givePlayerAce(0);
-        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard(0,new TileId(0,-2));
+        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard("0",new TileId("0",-2));
 
         // WHEN
+        moveMessage.setPlayerId("0");
         moveMessage.setPawnId1(pawn1.getPawnId());
         moveMessage.setMoveType(MoveType.ONBOARD);
         moveMessage.setCard(ace);
@@ -42,20 +43,21 @@ class MovingOnBoardTest {
 
         // THEN
         // response message is correct
-        assertEquals(new TileId(0,0), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tileNr
+        assertEquals(new TileId("0",0), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tileNr
         assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());                          // moves the correct pawn
         // GameState is correct
-        assertEquals(new TileId(0,0) ,GameState.getPawn(pawn1).getCurrentTileId());
+        assertEquals(new TileId("0",0) ,GameState.getPawn(pawn1).getCurrentTileId());
     }
 
     @Test
     void putPlayerNotOnBoard_WhenSamePlayerIsAlreadyThere() {
         // GIVEN
         Card ace = givePlayerAce(0);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(0,0), new TileId(0,-1));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId(0,1), new TileId(0,0));
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("0",0), new TileId("0",-1));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("0",1), new TileId("0",0));
 
         // WHEN
+        moveMessage.setPlayerId("0");
         moveMessage.setPawnId1(pawn1.getPawnId());
         moveMessage.setMoveType(MoveType.ONBOARD);
         moveMessage.setCard(ace);
@@ -66,16 +68,17 @@ class MovingOnBoardTest {
         assertNull(moveResponse.getMovePawn1());
         assertNull(moveResponse.getPawnId1());
         // THEN GameState is correct
-        assertEquals(new TileId(0,-1) , GameState.getPawn(pawn1).getCurrentTileId());
+        assertEquals(new TileId("0",-1) , GameState.getPawn(pawn1).getCurrentTileId());
     }
 
     @Test
     void putPlayerNotOnBoard_WhenNotOnNestTiles(){
         // GIVEN
         Card ace = givePlayerAce(0);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(0,new TileId(0,3));
+        Pawn pawn1 = createPawnAndPlaceOnBoard("0",new TileId("0",3));
 
         // WHEN
+        moveMessage.setPlayerId("0");
         moveMessage.setPawnId1(pawn1.getPawnId());
         moveMessage.setMoveType(MoveType.ONBOARD);
         moveMessage.setCard(ace);
@@ -93,9 +96,10 @@ class MovingOnBoardTest {
     void putPlayerNotOnBoard_WhenOnFinishTiles(){
         // GIVEN
         Card king = givePlayerKing(0);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(0,new TileId(0,17));
+        Pawn pawn1 = createPawnAndPlaceOnBoard("0",new TileId("0",17));
 
         // WHEN
+        moveMessage.setPlayerId("0");
         moveMessage.setPawnId1(pawn1.getPawnId());
         moveMessage.setMoveType(MoveType.ONBOARD);
         moveMessage.setCard(king);

@@ -11,10 +11,10 @@ import jakarta.servlet.annotation.WebServlet;
 public class CardsServiceImpl extends RemoteServiceServlet implements CardsService {
 
     @Override
-    public CardResponse getCards(int playerId) throws IllegalArgumentException {
+    public CardResponse getCards(String playerUUID) throws IllegalArgumentException {
         CardResponse response = new CardResponse();
-        response.setPlayerId(playerId);
-        response.setCards(CardsDeck.getCardsForPlayer(playerId));
+        response.setPlayerId(playerUUID);
+        response.setCards(CardsDeck.getCardsForPlayer(playerUUID));
         response.setNrOfCardsPerPlayer(CardsDeck.getNrOfCardsForAllPlayers());
         return response;
     }

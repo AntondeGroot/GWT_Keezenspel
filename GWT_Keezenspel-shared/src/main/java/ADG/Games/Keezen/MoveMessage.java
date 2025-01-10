@@ -5,7 +5,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 @SuppressWarnings("serial")
 public class MoveMessage implements IsSerializable {
         // serializable messages cannot contain List but must use a concrete implementation like ArrayList or LinkedList
-        private int playerId;
+        private String playerId;
         private PawnId pawnId1;
         private PawnId pawnId2;
         private MoveType moveType;
@@ -22,11 +22,11 @@ public class MoveMessage implements IsSerializable {
                 this.card = card;
         }
 
-        public int getPlayerId() {
+        public String getPlayerId() {
                 return playerId;
         }
 
-        public void setPlayerId(int playerId) {
+        public void setPlayerId(String playerId) {
                 this.playerId = playerId;
         }
 
