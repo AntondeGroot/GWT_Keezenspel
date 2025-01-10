@@ -5,6 +5,8 @@ import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import ADG.Games.Keezen.*;
 import jakarta.servlet.annotation.WebServlet;
 
+import java.util.Objects;
+
 @SuppressWarnings("serial")
 @WebServlet("/app/move")
 public class MovingServiceImpl extends RemoteServiceServlet implements MovingService {
@@ -15,6 +17,10 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
         if (message.getMoveType() == null) {
             throw new IllegalArgumentException(
                     "The selected move was invalid");
+        }
+
+        if(!Objects.equals(message.getPlayerId(), GameState.getPlayerIdTurn())){
+            throw new IllegalArgumentException("It was not your turn to make a move");
         }
 
         MoveResponse response = new MoveResponse();
