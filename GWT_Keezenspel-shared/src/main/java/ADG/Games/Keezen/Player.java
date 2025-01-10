@@ -54,7 +54,7 @@ public class Player implements IsSerializable {
         return place > 0;
     }
 
-    public void setInActive(){
+    public void setInactive(){
         isActive = false;
     }
 
