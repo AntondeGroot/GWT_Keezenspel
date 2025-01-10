@@ -1,6 +1,5 @@
 package ADG.Games.Keezen;
 
-import ADG.*;
 import ADG.Games.Keezen.animations.GameAnimation;
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.core.client.GWT;
@@ -151,16 +150,17 @@ public class GameBoardPresenter{
 
     private void pollServerForCards(){
         // todo: this should actually only get the cards for the Cookie.playerId
-        cardsService.getCards(PlayerList.getPlayerIdPlaying(), new AsyncCallback<CardResponse>() {
+        PawnAndCardSelection.setPlayerId(Cookie.getPlayerId());
+        cardsService.getCards(Cookie.getPlayerId(), new AsyncCallback<CardResponse>() {
             public void onFailure(Throwable caught) {
                 StepsAnimation.reset();
             }
             public void onSuccess(CardResponse result) {
 
-                PawnAndCardSelection.setPlayerId(result.getPlayerId());
+                PawnAndCardSelection.resetSelection();//todo: this should not be updated each time
                 if(CardsDeck.areCardsDifferent(result.getCards())){
                     CardsDeck.setCards(result.getCards());
-                    view.drawCards(CardsDeck.getCards());// todo: keep new method
+                    view.drawCards(CardsDeck.getCards());
                     PlayerList.refresh();
                 }
             }
