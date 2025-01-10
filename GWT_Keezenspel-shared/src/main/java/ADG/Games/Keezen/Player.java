@@ -22,9 +22,11 @@ public class Player implements IsSerializable {
         this.isActive = false;
     }
 
-    public void setUuid(String uuid) {
+    public void setUUID(String uuid) {
         this.uuid = uuid;
     }
+
+    public String getUUID(){return uuid;}
 
     public void setIsPlaying(boolean playing) {
         this.isPlaying = playing;
