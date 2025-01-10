@@ -32,11 +32,11 @@ class MovingOnSwitchTest {
     void switchPawnsOnNormalTiles_SelectedOwnPawnFirst() {
         // GIVEN
         Card card = givePlayerJack(0);
-        int playerId = 0;
+        String playerId = "0";
         TileId tileId1 = new TileId(playerId, 5);
-        TileId tileId2 = new TileId(1, 3);
+        TileId tileId2 = new TileId("1", 3);
         Pawn pawn1 = createPawnAndPlaceOnBoard(playerId, tileId1);
-        Pawn pawn2 = createPawnAndPlaceOnBoard(1, tileId2);
+        Pawn pawn2 = createPawnAndPlaceOnBoard("1", tileId2);
 
         // WHEN
         createSwitchMessage(moveMessage, pawn1, pawn2, card);
@@ -53,12 +53,12 @@ class MovingOnSwitchTest {
     @Test
     void switchPawnsOnNormalTiles_SelectedOtherPawnFirst() {
         // GIVEN
-        int playerId = 0;
+        String playerId = "0";
         Card card = givePlayerJack(0);
         TileId tileId1 = new TileId(playerId, 5);
-        TileId tileId2 = new TileId(1, 3);
+        TileId tileId2 = new TileId("1", 3);
         Pawn pawn1 = createPawnAndPlaceOnBoard(playerId, tileId1);
-        Pawn pawn2 = createPawnAndPlaceOnBoard(1, tileId2);
+        Pawn pawn2 = createPawnAndPlaceOnBoard("1", tileId2);
 
         // WHEN
         createSwitchMessage(moveMessage, pawn1, pawn2, card);
@@ -75,17 +75,17 @@ class MovingOnSwitchTest {
     @Test
     void doNotSwitchPawnsBelongingToOthers() {
         // GIVEN
-        int playerId = 0;
+        String playerId = "0";
         Card card = givePlayerJack(0);
         Card card2 = givePlayerJack(2);
         TileId tileId1 = new TileId(playerId, 5);
-        TileId tileId2 = new TileId(1, 3);
+        TileId tileId2 = new TileId("1", 3);
         Pawn pawn1 = createPawnAndPlaceOnBoard(playerId, tileId1);
-        Pawn pawn2 = createPawnAndPlaceOnBoard(1, tileId2);
+        Pawn pawn2 = createPawnAndPlaceOnBoard("1", tileId2);
 
         // WHEN
         createSwitchMessage(moveMessage, pawn1, pawn2, card);
-        moveMessage.setPlayerId(2); // request is made from unrelated player
+        moveMessage.setPlayerId("2"); // request is made from unrelated player
         GameState.processOnSwitch(moveMessage, moveResponse);
 
         // THEN: response message is correct
@@ -99,12 +99,12 @@ class MovingOnSwitchTest {
     @Test
     void cantSwitchPawnFromNest() {
         // GIVEN
-        int playerId = 0;
+        String playerId = "0";
         Card card = givePlayerJack(0);
         TileId tileId1 = new TileId(playerId, -1);
-        TileId tileId2 = new TileId(1, 3);
+        TileId tileId2 = new TileId("1", 3);
         Pawn pawn1 = createPawnAndPlaceOnBoard(playerId, tileId1);
-        Pawn pawn2 = createPawnAndPlaceOnBoard(1, tileId2);
+        Pawn pawn2 = createPawnAndPlaceOnBoard("1", tileId2);
 
         // WHEN
         createSwitchMessage(moveMessage, pawn1, pawn2, card); // request is made from unrelated player
@@ -121,12 +121,12 @@ class MovingOnSwitchTest {
     @Test
     void cantSwitchPawnFromFinish() {
         // GIVEN
-        int playerId = 0;
+        String playerId = "0";
         Card card = givePlayerJack(0);
         TileId tileId1 = new TileId(playerId, 16);
-        TileId tileId2 = new TileId(1, 3);
+        TileId tileId2 = new TileId("1", 3);
         Pawn pawn1 = createPawnAndPlaceOnBoard(playerId, tileId1);
-        Pawn pawn2 = createPawnAndPlaceOnBoard(1, tileId2);
+        Pawn pawn2 = createPawnAndPlaceOnBoard("1", tileId2);
 
         // WHEN
         createSwitchMessage(moveMessage, pawn1, pawn2, card); // request is made from unrelated player
@@ -143,12 +143,12 @@ class MovingOnSwitchTest {
     @Test
     void cantTakeOtherPawnFromStart() {
         // GIVEN
-        int playerId = 0;
+        String playerId = "0";
         Card card = givePlayerJack(0);
         TileId tileId1 = new TileId(playerId, 4);
-        TileId tileId2 = new TileId(1, 0);
+        TileId tileId2 = new TileId("1", 0);
         Pawn pawn1 = createPawnAndPlaceOnBoard(playerId, tileId1);
-        Pawn pawn2 = createPawnAndPlaceOnBoard(1, tileId2);
+        Pawn pawn2 = createPawnAndPlaceOnBoard("1", tileId2);
 
         // WHEN
         createSwitchMessage(moveMessage, pawn1, pawn2, card); // request is made from unrelated player
@@ -165,12 +165,12 @@ class MovingOnSwitchTest {
     @Test
     void canSwitchPawnFromOwnStart() {
         // GIVEN
-        int playerId = 0;
+        String playerId = "0";
         Card card = givePlayerJack(0);
         TileId tileId1 = new TileId(playerId, 0);
-        TileId tileId2 = new TileId(1, 5);
+        TileId tileId2 = new TileId("1", 5);
         Pawn pawn1 = createPawnAndPlaceOnBoard(playerId, tileId1);
-        Pawn pawn2 = createPawnAndPlaceOnBoard(1, tileId2);
+        Pawn pawn2 = createPawnAndPlaceOnBoard("1", tileId2);
 
         // WHEN
         createSwitchMessage(moveMessage, pawn1, pawn2, card); // request is made from unrelated player
@@ -186,8 +186,8 @@ class MovingOnSwitchTest {
     @Test
     void cantSwitchWithOwnPawn() {
         // GIVEN
-        int playerId = 0;
-        Card card = givePlayerJack(playerId);
+        String playerId = "0";
+        Card card = givePlayerJack(Integer.valueOf(playerId));
         TileId tileId1 = new TileId(playerId, 4);
         TileId tileId2 = new TileId(playerId, 2);
         Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId(playerId,0), tileId1);
@@ -208,28 +208,28 @@ class MovingOnSwitchTest {
     @Test
     void testWhenPawnsSwitch_CardGetsRemovedFromHand_AndNextPlayerPlays(){
         Card card = givePlayerJack(0);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(0,new TileId(0,12));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(1,new TileId(0,5));
-        assertEquals(5, ADG.Games.Keezen.CardsDeck.getCardsForPlayer(0).size());
+        Pawn pawn1 = createPawnAndPlaceOnBoard("0",new TileId("0",12));
+        Pawn pawn2 = createPawnAndPlaceOnBoard("1",new TileId("0",5));
+        assertEquals(5, CardsDeck.getCardsForPlayer("0").size());
 
         createSwitchMessage(moveMessage, pawn1, pawn2, card);
         GameState.processOnSwitch(moveMessage, moveResponse);
 
-        assertEquals(4, ADG.Games.Keezen.CardsDeck.getCardsForPlayer(0).size());
-        assertEquals(1,GameState.getPlayerIdTurn());
+        assertEquals(4, ADG.Games.Keezen.CardsDeck.getCardsForPlayer("0").size());
+        assertEquals("1",GameState.getPlayerIdTurn());
     }
     @Test
     void testingWhenPawnsSwitch_CardNotRemovedFromHand(){
         Card card = givePlayerJack(0);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(0,new TileId(0,12));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(1,new TileId(0,5));
-        assertEquals(5, ADG.Games.Keezen.CardsDeck.getCardsForPlayer(0).size());
+        Pawn pawn1 = createPawnAndPlaceOnBoard("0",new TileId("0",12));
+        Pawn pawn2 = createPawnAndPlaceOnBoard("1",new TileId("0",5));
+        assertEquals(5, ADG.Games.Keezen.CardsDeck.getCardsForPlayer("0").size());
 
         createSwitchMessage(moveMessage, pawn1, pawn2, card);
         moveMessage.setMessageType(MessageType.CHECK_MOVE);
         GameState.processOnSwitch(moveMessage, moveResponse);
 
-        assertEquals(5, CardsDeck.getCardsForPlayer(0).size());
-        assertEquals(0,GameState.getPlayerIdTurn());
+        assertEquals(5, CardsDeck.getCardsForPlayer("0").size());
+        assertEquals("0",GameState.getPlayerIdTurn());
     }
 }

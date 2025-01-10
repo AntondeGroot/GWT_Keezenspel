@@ -1,0 +1,52 @@
+package ADG.Games.Keezen;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class GameStateTest {
+    @BeforeEach
+    void setUp() {
+        GameState.stop();
+    }
+
+    @Test
+    void createDistinctPawnsFor2Players() {
+        GameState gameState = new GameState();
+        GameState.addPlayer(new Player("0","0"));
+        GameState.addPlayer(new Player("1","1"));
+        GameState.start();
+
+        List<Pawn> pawns =  GameState.getPawns();
+        Set<Pawn> pawnSet = new HashSet<>(pawns);
+        assertEquals(2*4, pawns.size());
+        assertEquals(2*4, pawnSet.size());
+    }
+
+    @Test
+    void createDistinctPawnsFor8Players() {
+        GameState gameState = new GameState();
+        for (int i = 0; i < 8; i++) {
+            GameState.addPlayer(new Player(String.valueOf(i),String.valueOf(i)));
+        }
+        GameState.start();
+        List<Pawn> pawns =  GameState.getPawns();
+        Set<Pawn> pawnSet = new HashSet<>(pawns);
+        assertEquals(8*4, pawns.size());
+        assertEquals(8*4, pawnSet.size());
+    }
+
+    private ArrayList<Player> createPlayers(int nr){
+        ArrayList<Player> players = new ArrayList<Player>();
+        for (int i = 0; i < nr; i++) {
+            players.add(new Player(String.valueOf(i), String.valueOf(i)));
+        }
+        return players;
+    }
+}

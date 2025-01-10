@@ -3,6 +3,7 @@ package ADG.Games.Keezen;
 import ADG.Games.Keezen.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class GameStateUtil {
 
@@ -22,24 +23,28 @@ public class GameStateUtil {
         GameState.movePawn(pawn1);
         return pawn1;
     }
-    public static Card givePlayerCard(String playerId, int nrSteps){
+    public static Card givePlayerCard(int playerInt, int nrSteps){
+        String playerId = String.valueOf(playerInt);
         Card card = new Card(0, nrSteps-1);
-        ADG.Games.Keezen.CardsDeck.setPlayerCard(playerId, card);
+        CardsDeck.setPlayerCard(playerId, card);
         return card;
     }
-    public static Card givePlayerAce(String playerId){
+    public static Card givePlayerAce(int playerInt){
+        String playerId = String.valueOf(playerInt);
         Card ace = new Card(0, 0);
-        ADG.Games.Keezen.CardsDeck.giveCardToPlayerForTesting(playerId, ace);
+        CardsDeck.giveCardToPlayerForTesting(playerId, ace);
         return ace;
     }
-    public static Card givePlayerKing(String playerId){
+    public static Card givePlayerKing(int playerInt){
+        String playerId = String.valueOf(playerInt);
         Card king = new Card(0, 11);
-        ADG.Games.Keezen.CardsDeck.giveCardToPlayerForTesting(playerId, king);
+        CardsDeck.giveCardToPlayerForTesting(playerId, king);
         return king;
     }
-    public static Card givePlayerJack(String playerId){
+    public static Card givePlayerJack(int playerInt) {
+        String playerId = String.valueOf(playerInt);
         Card jack = new Card(0, 10);
-        ADG.Games.Keezen.CardsDeck.giveCardToPlayerForTesting(playerId, jack);
+        CardsDeck.giveCardToPlayerForTesting(playerId, jack);
         return jack;
     }
     public static void createMoveMessage(MoveMessage moveMessage, Pawn pawn, Card card){
@@ -76,7 +81,7 @@ public class GameStateUtil {
         Card card = new Card(0,5);
 
         // replace a card from the players hand with this card
-        ADG.Games.Keezen.CardsDeck.giveCardToPlayerForTesting(playerId, card);
+        CardsDeck.giveCardToPlayerForTesting(playerId, card);
 
         // send move message
         MoveMessage moveMessage = new MoveMessage();
@@ -97,6 +102,7 @@ public class GameStateUtil {
             sendValidMoveMessage(playerId);
         }
     }
+    //todo: remove the following?
     public static ArrayList<Integer> intsToList(int[] integers){
         ArrayList<Integer> result = new ArrayList<>();
         for (int integer : integers) {
@@ -104,6 +110,13 @@ public class GameStateUtil {
         }
         return result;
     }
+
+    public static ArrayList<String> stringsToList(String[] strings){
+        ArrayList<String> result = new ArrayList<>();
+        Collections.addAll(result, strings);
+        return result;
+    }
+
     public static void place4PawnsOnFinish(String playerId){
         createPawnAndPlaceOnBoard(new PawnId(playerId,0) , new TileId(playerId,16));
         createPawnAndPlaceOnBoard(new PawnId(playerId,1) , new TileId(playerId,17));
@@ -111,9 +124,10 @@ public class GameStateUtil {
         createPawnAndPlaceOnBoard(new PawnId(playerId,3) , new TileId(playerId,19));
     }
 
-    public static void createGame_With_NPlayers(String nrPlayers){
+    public static void createGame_With_NPlayers(int nrPlayers){
+        GameState.stop();
         for (int i = 0; i < nrPlayers; i++) {
-            GameState.addPlayer(new Player("player"+i,"123-i"));
+            GameState.addPlayer(new Player(String.valueOf(i),String.valueOf(i)));
         }
         GameState.start();
     }

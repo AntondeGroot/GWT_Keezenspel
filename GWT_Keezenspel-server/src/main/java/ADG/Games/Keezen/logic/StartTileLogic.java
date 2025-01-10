@@ -4,6 +4,8 @@ import ADG.Games.Keezen.Pawn;
 import ADG.Games.Keezen.PawnId;
 import ADG.Games.Keezen.TileId;
 
+import java.util.Objects;
+
 import static ADG.Games.Keezen.GameState.getPawn;
 
 public class StartTileLogic {
@@ -19,7 +21,7 @@ public class StartTileLogic {
             return true;
         }
 
-        if(pawnOnTile.getPlayerId() == tileId.getPlayerId()) {
+        if(Objects.equals(pawnOnTile.getPlayerId(), tileId.getPlayerId())) {
             return false;
         }
 

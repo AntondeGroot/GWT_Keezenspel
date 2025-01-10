@@ -31,8 +31,8 @@ public class CheckingOnBoardTest {
     void checkOnBoard_DoesNotRemoveCardFromHand() {
         // GIVEN
         Card card = givePlayerAce(0);
-        int nrCards = ADG.Games.Keezen.CardsDeck.getCardsForPlayer(0).size();
-        Pawn pawn1 = new Pawn(new PawnId(0,1), new TileId(0, -1));
+        int nrCards = ADG.Games.Keezen.CardsDeck.getCardsForPlayer("0").size();
+        Pawn pawn1 = new Pawn(new PawnId("0",1), new TileId("0", -1));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -40,15 +40,15 @@ public class CheckingOnBoardTest {
         GameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN response message is correct
-        assertEquals(nrCards, ADG.Games.Keezen.CardsDeck.getCardsForPlayer(0).size());
+        assertEquals(nrCards, ADG.Games.Keezen.CardsDeck.getCardsForPlayer("0").size());
     }
 
     @Test
     void checkOnBoard_WrongCard_DoesNotShow() {
         // GIVEN
         Card card = givePlayerCard(0,3);
-        int nrCards = CardsDeck.getCardsForPlayer(0).size();
-        Pawn pawn1 = new Pawn(new PawnId(0,1), new TileId(0, -1));
+        int nrCards = CardsDeck.getCardsForPlayer("0").size();
+        Pawn pawn1 = new Pawn(new PawnId("0",1), new TileId("0", -1));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);

@@ -1,13 +1,12 @@
 package ADG;
 
 import ADG.Games.Keezen.Board;
-import ADG.Games.Keezen.Pawn;
+import ADG.Games.Keezen.Player;
 import ADG.Games.Keezen.TileMapping;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,7 +14,7 @@ class BoardTest {
     @Test
     void createBoardForTwoPlayers() {
         Board board = new Board();
-        board.createBoard(2,300);
+        board.createBoard(createPlayers(2),300);
         List<TileMapping> mappings =  Board.getTiles();
         assertEquals(24*2, mappings.size());
     }
@@ -23,28 +22,16 @@ class BoardTest {
     @Test
     void createBoardForEightPlayers() {
         Board board = new Board();
-        board.createBoard(8,300);
+        board.createBoard(createPlayers(8),300);
         List<TileMapping> mappings =  Board.getTiles();
         assertEquals(24*8, mappings.size());
     }
 
-    @Test
-    void createDistinctPawnsFor2Players() {
-        Board board = new Board();
-        board.createBoard(2,300);
-        List<Pawn> pawns =  Board.getPawns();
-        Set<Pawn> pawnSet = new HashSet<>(pawns);
-        assertEquals(2*4, pawns.size());
-        assertEquals(2*4, pawnSet.size());
-    }
-
-    @Test
-    void createDistinctPawnsFor8Players() {
-        Board board = new Board();
-        board.createBoard(8,300);
-        List<Pawn> pawns =  Board.getPawns();
-        Set<Pawn> pawnSet = new HashSet<>(pawns);
-        assertEquals(8*4, pawns.size());
-        assertEquals(8*4, pawnSet.size());
+    private ArrayList<Player> createPlayers(int nr){
+        ArrayList<Player> players = new ArrayList<Player>();
+        for (int i = 0; i < nr; i++) {
+            players.add(new Player(String.valueOf(i), String.valueOf(i)));
+        }
+        return players;
     }
 }

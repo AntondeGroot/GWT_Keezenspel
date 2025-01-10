@@ -9,10 +9,10 @@ public class GameStateResponse implements IsSerializable {
     private ArrayList<Pawn> pawns;
     private ArrayList<Player> players;
     private HashMap<String, Integer> playerColors;
-    private int playerIdTurn;
+    private String playerIdTurn;
     private int nrPlayers;
-    private ArrayList<Integer> activePlayers;
-    private ArrayList<Integer> winners;
+    private ArrayList<String> activePlayers;
+    private ArrayList<String> winners;
 
     public GameStateResponse() {
     }
@@ -38,11 +38,11 @@ public class GameStateResponse implements IsSerializable {
 
     public void setPlayers(ArrayList<Player> players) {this.players = players;}
 
-    public int getPlayerIdTurn() {
+    public String getPlayerIdTurn() {
         return playerIdTurn;
     }
 
-    public void setPlayerIdTurn(int playerIdTurn) {
+    public void setPlayerIdTurn(String playerIdTurn) {
         this.playerIdTurn = playerIdTurn;
     }
 
@@ -54,19 +54,19 @@ public class GameStateResponse implements IsSerializable {
         this.nrPlayers = nrPlayers;
     }
 
-    public ArrayList<Integer> getActivePlayers() {
+    public ArrayList<String> getActivePlayers() {
         return activePlayers;
     }
 
-    public void setActivePlayers(ArrayList<Integer> activePlayers) {
+    public void setActivePlayers(ArrayList<String> activePlayers) {
         this.activePlayers = activePlayers;
     }
 
-    public ArrayList<Integer> getWinners() {
+    public ArrayList<String> getWinners() {
         return winners;
     }
 
-    public void setWinners(ArrayList<Integer> winners) {
+    public void setWinners(ArrayList<String> winners) {
         this.winners = winners;
     }
 

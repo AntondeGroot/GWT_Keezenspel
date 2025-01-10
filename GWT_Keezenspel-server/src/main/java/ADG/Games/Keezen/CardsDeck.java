@@ -3,34 +3,30 @@ package ADG.Games.Keezen;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static ADG.Games.Keezen.GameState.forfeitPlayer;
 
 public class CardsDeck implements IsSerializable {
     private static int roundNr = 0;
     private static ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
-//    private static ArrayList<PlayerHand> players = new ArrayList<>();
     private static HashMap<String, PlayerHand> playerHands = new HashMap<>();
-    private static ArrayList<Player> players2 = new ArrayList<>();
     private static int nrPlayers = 0;
     private static int playerIdStartingRound = 0;
-    private static ArrayList<Integer> activePlayers = new ArrayList<>();
+    private static ArrayList<String> activePlayers = new ArrayList<>();
 
     public static void addPlayers(ArrayList<Player> players) {
         for (Player p : players) {
             playerHands.put(p.getUUID(), new PlayerHand());
         }
-        players2.addAll(players);
-        playerIdStartingRound = 0;
+        playerIdStartingRound = players.size()-1;
     }
 
-    public static ArrayList<Integer> getNrOfCardsForAllPlayers(){
-        // todo: implement getNrOfCards to show the hands of other players
-        return new ArrayList<>();
-//        return (ArrayList<Integer>) players.stream()
-//                .map(player -> player.getHand().size())
-//                .collect(Collectors.toList());
+    public static HashMap<String, Integer> getNrOfCardsForAllPlayers(){
+        HashMap<String, Integer> nrOfCards = new HashMap<>();
+        for(Map.Entry<String, PlayerHand> p : playerHands.entrySet()){
+            nrOfCards.put(p.getKey(), p.getValue().getHand().size());
+        }
+        return nrOfCards;
     }
 
     public static ArrayList<Card> getCardsForPlayer(String playerUUID) {
@@ -68,7 +64,9 @@ public class CardsDeck implements IsSerializable {
     }
 
     public static void giveCardToPlayerForTesting(String playerId, Card card){
-//        players.get(playerId).getHand().remove(0); // todo; was this ever necessary?
+        // this way you can replace one card by another, play a card in a Test, and then know based on
+        // the game whether the player should have 5 or 4 cards in their hand left.
+        playerHands.get(playerId).getHand().remove(0);
         setPlayerCard(playerId, card);
     }
 
@@ -98,6 +96,10 @@ public class CardsDeck implements IsSerializable {
 
     public static boolean playerHasCard(String playerId, Card card ){
         return playerHands.get(playerId).hasCard(card);
+    }
+
+    public static boolean playerDoesNotHaveCard(String playerId, Card card ){
+        return !playerHasCard(playerId, card);
     }
 
     private static void nextPlayerId(){

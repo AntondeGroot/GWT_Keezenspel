@@ -8,6 +8,7 @@ public class Player implements IsSerializable {
     private String name;
     private int place = -1;
     private String uuid;
+    private int color = 0;
 
     public Player() {}
 
@@ -15,6 +16,14 @@ public class Player implements IsSerializable {
         this.isActive = true;
         this.name = name;
         this.uuid = uuid;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public int getColor(){
+        return color;
     }
 
     public void setPlace(int place) {

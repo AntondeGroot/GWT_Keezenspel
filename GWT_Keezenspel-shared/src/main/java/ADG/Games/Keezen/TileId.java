@@ -49,7 +49,7 @@ public class TileId implements IsSerializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TileId tileId = (TileId) o;
-        return playerId == tileId.playerId && tileNr == tileId.tileNr;
+        return tileNr == tileId.tileNr && Objects.equals(playerId, tileId.playerId);
     }
 
     @Override

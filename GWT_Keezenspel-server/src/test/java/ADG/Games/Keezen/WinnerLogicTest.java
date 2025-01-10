@@ -11,7 +11,7 @@ import static ADG.Games.Keezen.logic.WinnerLogic.checkForWinners;
 import static org.junit.jupiter.api.Assertions.*;
 
 class WinnerLogicTest {
-    ArrayList<Integer> winners = new ArrayList<>();
+    ArrayList<String> winners = new ArrayList<>();
     @BeforeEach
     void setup(){
         createGame_With_NPlayers(3);
@@ -26,40 +26,40 @@ class WinnerLogicTest {
     @Test
     void testOneWinner(){
         // GIVEN
-        place4PawnsOnFinish(0);
+        place4PawnsOnFinish("0");
 
         // WHEN
         checkForWinners(winners);
 
         // THEN
-        assertTrue(winners.contains(0));
+        assertTrue(winners.contains("0"));
     }
     @Test
     void testPlayer2Wins_ThenPlayer1Wins(){
         // GIVEN
-        place4PawnsOnFinish(2);
+        place4PawnsOnFinish("2");
         checkForWinners(winners);
 
         // WHEN
-        place4PawnsOnFinish(1);
+        place4PawnsOnFinish("1");
         checkForWinners(winners);
 
         // THEN
-        assertEquals(intsToList(new int[]{2,1}), winners);
+        assertEquals(stringsToList(new String[]{"2","1"}), winners);
     }
     @Test
     void testPlayer2Wins_Player0Wins_ThenPlayer1Wins(){
         // GIVEN
-        place4PawnsOnFinish(2);
+        place4PawnsOnFinish("2");
         checkForWinners(winners);
-        place4PawnsOnFinish(0);
+        place4PawnsOnFinish("0");
         checkForWinners(winners);
 
         // WHEN
-        place4PawnsOnFinish(1);
+        place4PawnsOnFinish("1");
         checkForWinners(winners);
 
         // THEN
-        assertEquals(intsToList(new int[]{2,0,1}), winners);
+        assertEquals(stringsToList(new String[]{"2","0","1"}), winners);
     }
 }

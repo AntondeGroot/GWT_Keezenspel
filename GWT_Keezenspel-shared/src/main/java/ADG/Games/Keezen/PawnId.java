@@ -37,7 +37,7 @@ public class PawnId implements IsSerializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PawnId pawnId = (PawnId) o;
-        return playerId == pawnId.playerId && pawnNr == pawnId.pawnNr;
+        return pawnNr == pawnId.pawnNr && Objects.equals(playerId, pawnId.playerId);
     }
 
     @Override

@@ -7,8 +7,8 @@ import static ADG.Games.Keezen.MoveType.*;
 public class PawnAndCardSelection {
     // todo: turn this into a model
     private static String playerId;
-    private static Pawn pawn1; //= new Pawn(new PawnId(-1,-1),new TileId(-1,90)); // todo: initialize somewhere?
-    private static Pawn pawn2; //= new Pawn(new PawnId(-1,-1),new TileId(-1,90));
+    private static Pawn pawn1 = new Pawn(new PawnId("-1",-1),new TileId("-1",90)); // todo: initialize somewhere?
+    private static Pawn pawn2 = new Pawn(new PawnId("-1",-1),new TileId("-1",90));
     private static Card card;
     private static boolean drawCards = true;
     private static MoveType moveType;
