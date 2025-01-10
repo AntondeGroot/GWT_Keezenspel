@@ -7,7 +7,7 @@ import java.util.List;
 
 public class CardResponse implements IsSerializable {
     // serializable messages cannot contain List but must use a concrete implementation like ArrayList or LinkedList
-    int playerId;
+    String playerUUID;
     ArrayList<Card> cards;
     ArrayList<Integer> nrOfCardsPerPlayer;
 
@@ -16,12 +16,12 @@ public class CardResponse implements IsSerializable {
 
 
 
-    public int getPlayerId() {
-        return playerId;
+    public String getPlayerId() {
+        return playerUUID;
     }
 
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
+    public void setPlayerId(String playerId) {
+        this.playerUUID = playerId;
     }
 
     public List<Card> getCards() {
@@ -43,7 +43,7 @@ public class CardResponse implements IsSerializable {
     @Override
     public String toString() {
         return "CardResponse{" +
-                "playerId=" + playerId +
+                "playerId=" + playerUUID +
                 ", cards=" + cards +
                 ", nrOfCardsPerPlayer=" + nrOfCardsPerPlayer +
                 '}';
