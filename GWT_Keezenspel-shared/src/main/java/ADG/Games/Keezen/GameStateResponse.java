@@ -3,16 +3,26 @@ package ADG.Games.Keezen;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class GameStateResponse implements IsSerializable {
     private ArrayList<Pawn> pawns;
     private ArrayList<Player> players;
+    private HashMap<String, Integer> playerColors;
     private int playerIdTurn;
     private int nrPlayers;
     private ArrayList<Integer> activePlayers;
     private ArrayList<Integer> winners;
 
     public GameStateResponse() {
+    }
+
+    public void setPlayerColors(HashMap<String, Integer> playerColors) {
+        this.playerColors = playerColors;
+    }
+
+    public HashMap<String, Integer> getPlayerColors() {
+        return playerColors;
     }
 
     public ArrayList<Pawn> getPawns() {
