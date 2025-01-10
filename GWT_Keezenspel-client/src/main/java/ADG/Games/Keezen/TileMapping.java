@@ -6,12 +6,12 @@ public class TileMapping {
     private TileId tileId;
     private Point position;
 
-    public TileMapping(int playerId, int tileNr, Point position) {
+    public TileMapping(String playerId, int tileNr, Point position) {
         this.tileId = new TileId(playerId, tileNr);
         this.position = position;
     }
 
-    public int getPlayerId() {
+    public String getPlayerId() {
         return tileId.getPlayerId();
     }
 
