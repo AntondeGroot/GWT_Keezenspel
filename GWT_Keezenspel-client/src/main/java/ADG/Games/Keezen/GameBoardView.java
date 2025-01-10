@@ -285,6 +285,11 @@ public class GameBoardView extends Composite {
 //        //context.save();
     }
 
+    public void enableButtons(Boolean enabled){
+        sendButton.setEnabled(enabled);
+        forfeitButton.setEnabled(enabled);
+    }
+
     private void drawCircle(double x, double y, double radius, String color) {
 //        Context2d context = ctxBoard;
 //        context.beginPath();

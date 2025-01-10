@@ -146,6 +146,7 @@ public class GameBoardPresenter{
                             view.drawPlayers(model.getPlayers());
                 }});}
                 playerList.setPlayerIdPlayingAndDrawPlayerList(result.getPlayerIdTurn());// todo: old
+                view.enableButtons(result.getPlayerIdTurn().equals(Cookie.getPlayerId()));
             }
         });
     }
