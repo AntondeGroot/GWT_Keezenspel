@@ -163,6 +163,23 @@ public class GameState {
         return players.size();
     }
 
+    private static boolean isPawnLooselyClosedIn(PawnId pawnId, TileId tileId){
+        int tileNr = tileId.getTileNr();
+        String playerId = pawnId.getPlayerId();
+
+        if(tileNr <= 16){
+            return false;
+        }
+
+        for (int i = tileId.getTileNr(); i > 16; i--) {
+            if(!canMoveToTile(pawnId, new TileId(playerId, i-1))){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static boolean isPawnTightlyClosedIn(PawnId pawnId, TileId tileId){
 
         if(tileId.getTileNr() == 19
@@ -185,6 +202,14 @@ public class GameState {
         return false;
     }
 
+    /**
+     * @param selectedPawnId
+     * @param nextTileId
+     * @Return True if it ends on own position
+     * @Return False it it ends on own other pawn of same player
+     * @Return False if it ends on blockaded starting tile
+     *
+     */
     private static boolean canMoveToTile(PawnId selectedPawnId, TileId nextTileId){
         if(nextTileId.getTileNr() > 19){
             return false;
@@ -408,6 +433,15 @@ public class GameState {
                 response.setResult(CANNOT_MAKE_MOVE);
                 return;
             }
+            // moving between pawns on the finish tile
+            if(isPawnLooselyClosedIn(pawnId1, currentTileId)){
+                ArrayList<TileId> pingpongmoves = pingpongMove(pawnId1, currentTileId, nrSteps);
+                moves.clear();
+                moves.addAll(pingpongmoves);// todo is this necessary?
+                response.setMovePawn1(moves);
+                processMove(pawnId1, pingpongmoves.getLast(), moveMessage, response);
+                return;
+            }
 
             TileId targetTileId = moveAndCheckEveryTile(pawnId1, currentTileId, nrSteps);
             int tileHighestTileNr = 0;
@@ -487,6 +521,37 @@ public class GameState {
             }
         }
         return tileNrToCheck;
+    }
+
+    public static ArrayList<TileId> pingpongMove(PawnId pawnId, TileId tileId , int nrSteps){
+        // it is already guaranteed that a pawn is loosely closed in on the finish tiles
+        ArrayList<TileId> moves = new ArrayList<>();
+        int direction = 1;
+        int tileNrToCheck = tileId.getTileNr();
+        moves.add(tileId);
+        if (nrSteps < 0) {
+            direction = -1;
+            nrSteps = Math.abs(nrSteps);
+        }
+
+        for (int i = 0; i < nrSteps; i++) {
+            tileNrToCheck = tileNrToCheck + direction;
+            if(!canMoveToTile(pawnId, new TileId(pawnId.getPlayerId(), tileNrToCheck))) {
+                moves.add(new TileId(pawnId.getPlayerId(), tileNrToCheck-direction));
+                direction = - direction;
+                tileNrToCheck = tileNrToCheck + 2*direction;
+            }
+        }
+        moves.add(new TileId(pawnId.getPlayerId(), tileNrToCheck));
+
+        // an extra check to see if the first two moves are identical. this can happen when you do -4 steps and are
+        // closed in from behind or try to move forward but are blocked that way.
+        if(moves.size() >= 2){
+            if(moves.get(0).equals(moves.get(1))){
+                moves.removeFirst();
+            }
+        }
+        return moves;
     }
 
     public static TileId moveAndCheckEveryTile(PawnId pawnId, TileId tileId, int nrSteps){

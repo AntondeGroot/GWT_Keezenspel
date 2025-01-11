@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import static ADG.Games.Keezen.GameStateUtil.*;
@@ -361,5 +362,137 @@ public class PawnAnimationTest {
         // response message is correct
         assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
         assertEquals(expectedMovement, moveResponse.getMovePawn1());
+    }
+
+    @Test
+    void pawnMoves_PingPongMethod_9StepsOnFinish_test() {
+        // setup
+        GameState.tearDown();
+        createGame_With_NPlayers(3);
+
+        // GIVEN
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("1",1) ,new TileId("1",17));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("1",2) ,new TileId("1",19));
+        Pawn pawn3 = createPawnAndPlaceOnBoard(new PawnId("1",3) ,new TileId("1",16));
+
+
+        // WHEN
+        LinkedList<TileId> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new TileId("1",17));
+        expectedMovement.add(new TileId("1",18));
+        expectedMovement.add(new TileId("1",17));
+        expectedMovement.add(new TileId("1",18));
+        expectedMovement.add(new TileId("1",17));
+        expectedMovement.add(new TileId("1",18));
+        expectedMovement.add(new TileId("1",17));
+        expectedMovement.add(new TileId("1",18));
+        expectedMovement.add(new TileId("1",17));
+        expectedMovement.add(new TileId("1",18));
+
+        ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),9);
+        // THEN
+        System.out.println(actualMovement);
+        assertEquals(expectedMovement, actualMovement);
+    }
+
+    @Test
+    void pawnMoves_PingPongMethod_6StepsOnFinish_3places_test() {
+        // setup
+        int nrSteps = 6;
+        GameState.tearDown();
+        createGame_With_NPlayers(3);
+
+        // GIVEN
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("1",1) ,new TileId("1",17));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("1",3) ,new TileId("1",16));
+
+
+        // WHEN
+        LinkedList<TileId> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new TileId("1",17));
+        expectedMovement.add(new TileId("1",19));
+        expectedMovement.add(new TileId("1",17));
+        expectedMovement.add(new TileId("1",19));
+
+        ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
+        // THEN
+        System.out.println(actualMovement);
+        assertEquals(expectedMovement, actualMovement);
+    }
+
+    @Test
+    void pawnMoves_PingPongMethod_5StepsOnFinish_3places_test() {
+        // setup
+        int nrSteps = 5;
+        GameState.tearDown();
+        createGame_With_NPlayers(3);
+
+        // GIVEN
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("1",1) ,new TileId("1",17));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("1",3) ,new TileId("1",16));
+
+
+        // WHEN
+        LinkedList<TileId> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new TileId("1",17));
+        expectedMovement.add(new TileId("1",19));
+        expectedMovement.add(new TileId("1",17));
+        expectedMovement.add(new TileId("1",18));
+
+        ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
+        // THEN
+        System.out.println(actualMovement);
+        assertEquals(expectedMovement, actualMovement);
+    }
+
+    @Test
+    void pawnMoves_PingPongMethod_Negative4StepsOnFinish_3places_test() {
+        // setup
+        int nrSteps = -4;
+        GameState.tearDown();
+        createGame_With_NPlayers(3);
+
+        // GIVEN
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("1",1) ,new TileId("1",17));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("1",3) ,new TileId("1",16));
+
+
+        // WHEN
+        LinkedList<TileId> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new TileId("1",17));
+        expectedMovement.add(new TileId("1",19));
+        expectedMovement.add(new TileId("1",17));
+
+        ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
+        // THEN
+        System.out.println(actualMovement);
+        assertEquals(expectedMovement, actualMovement);
+    }
+
+    @Test
+    void pawnMoves_PingPongMethod_Negative4StepsOnFinish_test() {
+        // setup
+        GameState.tearDown();
+        createGame_With_NPlayers(3);
+        int nrSteps = -4;
+
+        // GIVEN
+        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("1",1) ,new TileId("1",17));
+        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("1",2) ,new TileId("1",19));
+        Pawn pawn3 = createPawnAndPlaceOnBoard(new PawnId("1",3) ,new TileId("1",16));
+
+
+        // WHEN
+        LinkedList<TileId> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new TileId("1",17));
+        expectedMovement.add(new TileId("1",18));
+        expectedMovement.add(new TileId("1",17));
+        expectedMovement.add(new TileId("1",18));
+        expectedMovement.add(new TileId("1",17));
+
+        ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
+        // THEN
+        System.out.println(actualMovement);
+        assertEquals(expectedMovement, actualMovement);
     }
 }
