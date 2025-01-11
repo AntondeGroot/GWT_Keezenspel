@@ -374,6 +374,7 @@ public class GameBoardView extends Composite {
         });
 
         // Trigger the image loading by adding it to the DOM
+        removeCardDeckImage();
         img.setVisible(false);
         RootPanel.get().add(img);
     }
@@ -394,4 +395,26 @@ public class GameBoardView extends Composite {
         context.setLineWidth(2);
         context.stroke();
     }
+
+    public void removeCardDeckImage() {
+        // todo: can this be done any other way? how was it done for the pawns? There it didn't need a loadHandler
+        // Get the parent element (e.g., RootPanel)
+        Element parentElement = RootPanel.get().getElement();
+
+        // Iterate through child elements to find the matching <img>
+        NodeList<Element> imgElements = parentElement.getElementsByTagName("img");
+        for (int i = 0; i < imgElements.getLength(); i++) {
+            Element imgElement = imgElements.getItem(i);
+
+            // Check if the <img> has the desired `src` attribute
+            if ("/card-deck.png".equals(imgElement.getAttribute("src"))) {
+                imgElement.removeFromParent(); // Remove the element from the DOM
+                GWT.log("Image removed successfully.");
+                return;
+            }
+        }
+
+        GWT.log("Image not found in DOM.");
+    }
+
 }
