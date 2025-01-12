@@ -14,7 +14,7 @@ class MovingOnBoardTest {
 
     @BeforeEach
     void setUp() {
-        createGame_With_NPlayers(8);
+        createGame_With_NPlayers(3);
         moveMessage = new MoveMessage();
         moveResponse = new MoveResponse();
     }
@@ -22,6 +22,7 @@ class MovingOnBoardTest {
     @AfterEach
     void tearDown() {
         GameState.tearDown();
+        CardsDeck.reset();
         moveMessage = null;
         moveResponse = null;
     }
@@ -34,11 +35,7 @@ class MovingOnBoardTest {
         Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard("0",new TileId("0",-2));
 
         // WHEN
-        moveMessage.setPlayerId("0");
-        moveMessage.setPawnId1(pawn1.getPawnId());
-        moveMessage.setMoveType(MoveType.ONBOARD);
-        moveMessage.setCard(ace);
-        moveMessage.setMessageType(MessageType.MAKE_MOVE);
+        createOnBoardMessage("0", pawn1, ace);
         GameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN
@@ -50,6 +47,41 @@ class MovingOnBoardTest {
     }
 
     @Test
+    void putPlayerOnBoard_ThenNextPlayerPlays() {
+        // GIVEN
+        Card ace = givePlayerAce(0);
+        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard("0",new TileId("0",-2));
+
+        // WHEN
+        createOnBoardMessage("0", pawn1, ace);
+        GameState.processOnBoard(moveMessage, moveResponse);
+
+        // THEN
+        assertEquals("1" ,GameState.getPlayerIdTurn());
+    }
+
+    @Test
+    void putPlayerOnBoardAsLastCard_ThenNextPlayerPlays() {
+        // GIVEN
+        GameState.setPlayerIdTurn("0");
+        for (int i = 0; i < 4; i++) {
+            sendValidMoveMessage("0");
+            sendValidMoveMessage("1");
+            sendValidMoveMessage("2");
+        }
+
+        Card ace = givePlayerAce(0);
+        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard("0",new TileId("0",-2));
+
+        // WHEN
+        createOnBoardMessage("0", pawn1, ace);
+        GameState.processOnBoard(moveMessage, moveResponse);
+
+        // THEN
+        assertEquals("1" ,GameState.getPlayerIdTurn());
+    }
+
+    @Test
     void putPlayerNotOnBoard_WhenSamePlayerIsAlreadyThere() {
         // GIVEN
         Card ace = givePlayerAce(0);
@@ -57,10 +89,7 @@ class MovingOnBoardTest {
         Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("0",1), new TileId("0",0));
 
         // WHEN
-        moveMessage.setPlayerId("0");
-        moveMessage.setPawnId1(pawn1.getPawnId());
-        moveMessage.setMoveType(MoveType.ONBOARD);
-        moveMessage.setCard(ace);
+        createOnBoardMessage("0", pawn1, ace);
         GameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN response msg is correct
@@ -78,10 +107,7 @@ class MovingOnBoardTest {
         Pawn pawn1 = createPawnAndPlaceOnBoard("0",new TileId("0",3));
 
         // WHEN
-        moveMessage.setPlayerId("0");
-        moveMessage.setPawnId1(pawn1.getPawnId());
-        moveMessage.setMoveType(MoveType.ONBOARD);
-        moveMessage.setCard(ace);
+        createOnBoardMessage("0", pawn1, ace);
         GameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN response msg is correct
@@ -99,10 +125,7 @@ class MovingOnBoardTest {
         Pawn pawn1 = createPawnAndPlaceOnBoard("0",new TileId("0",17));
 
         // WHEN
-        moveMessage.setPlayerId("0");
-        moveMessage.setPawnId1(pawn1.getPawnId());
-        moveMessage.setMoveType(MoveType.ONBOARD);
-        moveMessage.setCard(king);
+        createOnBoardMessage("0", pawn1, king);
         GameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN response msg is correct
@@ -111,5 +134,13 @@ class MovingOnBoardTest {
         assertNull(moveResponse.getMovePawn1());
         // THEN GameState is correct
         assertEquals(17,GameState.getPawn(pawn1).getCurrentTileId().getTileNr());
+    }
+
+    public void createOnBoardMessage(String playerId, Pawn pawn, Card card){
+        moveMessage.setPlayerId(playerId);
+        moveMessage.setPawnId1(pawn.getPawnId());
+        moveMessage.setMoveType(MoveType.ONBOARD);
+        moveMessage.setCard(card);
+        moveMessage.setMessageType(MessageType.MAKE_MOVE);
     }
 }

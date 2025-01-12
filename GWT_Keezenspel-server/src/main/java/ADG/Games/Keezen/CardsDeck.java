@@ -10,15 +10,12 @@ public class CardsDeck implements IsSerializable {
     private static int roundNr = 0;
     private static ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
     private static HashMap<String, PlayerHand> playerHands = new HashMap<>();
-    private static int nrPlayers = 0;
-    private static int playerIdStartingRound = 0;
     private static ArrayList<String> activePlayers = new ArrayList<>();
 
     public static void addPlayers(ArrayList<Player> players) {
         for (Player p : players) {
             playerHands.put(p.getUUID(), new PlayerHand());
         }
-        playerIdStartingRound = players.size()-1;
     }
 
     public static HashMap<String, Integer> getNrOfCardsForAllPlayers(){
@@ -54,13 +51,14 @@ public class CardsDeck implements IsSerializable {
         cardsDeque = new ArrayDeque<>(cards);
     }
 
-    public static void playerPlaysCard(String playerId, Card card) {
+    public static boolean playerPlaysCard(String playerId, Card card) {
         if(card != null) {
             playerHands.get(playerId).getHand().remove(card);
             if(playerHands.get(playerId).getHand().isEmpty()){
-                forfeitPlayer(playerId);
+                return true;
             }
         }
+        return false;
     }
 
     public static void giveCardToPlayerForTesting(String playerId, Card card){
@@ -82,8 +80,8 @@ public class CardsDeck implements IsSerializable {
             playerHands.get(playerId).dropCards();
         }
 
-        for(Player player: GameState.getPlayers()){
-            for (int j = 0; j < nrCards; j++) {
+        for (int j = 0; j < nrCards; j++) {
+            for(Player player: GameState.getPlayers()){
                 if(player.isActive()){
                     setPlayerCard(player.getUUID(), cardsDeque.pop());
                 }
@@ -91,7 +89,6 @@ public class CardsDeck implements IsSerializable {
         }
 
         roundNr = (roundNr + 1) % 3;
-        nextPlayerId();
     }
 
     public static boolean playerHasCard(String playerId, Card card ){
@@ -102,19 +99,9 @@ public class CardsDeck implements IsSerializable {
         return !playerHasCard(playerId, card);
     }
 
-    private static void nextPlayerId(){
-        playerIdStartingRound = (playerIdStartingRound + 1) % activePlayers.size();
-    }
-
-    public static int getPlayerIdStartingRound() {
-        return playerIdStartingRound;
-    }
-
     public static void reset(){
         roundNr = 0;
         cardsDeque.clear();
         playerHands.clear();
-        nrPlayers = 0;
-        playerIdStartingRound = 0;
     }
 }
