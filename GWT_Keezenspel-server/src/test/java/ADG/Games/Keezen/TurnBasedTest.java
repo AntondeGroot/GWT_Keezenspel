@@ -14,6 +14,7 @@ import java.util.HashMap;
 import static ADG.Games.Keezen.GameStateUtil.*;
 import static ADG.Games.Keezen.GameStateUtil.place4PawnsOnFinish;
 import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TurnBasedTest {
     MoveMessage moveMessage = new MoveMessage();
@@ -180,8 +181,8 @@ public class TurnBasedTest {
 
             // THEN
             if(i < 4){
-                assertEquals("playerId turn NOT last round","2", GameState.getPlayerIdTurn());
-                assertEquals("cards remaining for player 2"+i,4-i, CardsDeck.getCardsForPlayer("2").size());
+                Assert.assertEquals("playerId turn NOT last round","2", GameState.getPlayerIdTurn());
+                Assert.assertEquals("cards remaining for player 2", 4-i, CardsDeck.getCardsForPlayer("2").size());
             }
         }
     }
@@ -255,5 +256,247 @@ public class TurnBasedTest {
         assertEquals("1",GameState.getPlayerIdTurn());
         sendForfeitMessage("1");
         assertEquals("1",GameState.getPlayerIdTurn());
+    }
+    @Test
+    void players1Starts_WhenPlayer1PlaysLastCard_Player2ShouldPlay_Bugfix(){
+        // GIVEN
+        GameState.setPlayerIdTurn("1");
+        for (int i = 0; i < 4; i++) {
+            sendValidMoveMessage("1");
+            sendValidMoveMessage("2");
+            sendValidMoveMessage("0");
+        }
+
+        // WHEN
+        sendValidMoveMessage("1");
+
+        // THEN
+        Assertions.assertEquals("2", GameState.getPlayerIdTurn());
+    }
+
+    @Test
+    void players2Starts_WhenPlayer2PlaysLastCard_Player0ShouldPlay_Bugfix(){
+        // GIVEN
+        GameState.setPlayerIdTurn("2");
+        for (int i = 0; i < 4; i++) {
+            sendValidMoveMessage("2");
+            sendValidMoveMessage("0");
+            sendValidMoveMessage("1");
+        }
+
+        // WHEN
+        sendValidMoveMessage("2");
+
+        // THEN
+        Assertions.assertEquals("0", GameState.getPlayerIdTurn());
+    }
+
+    @Test
+    void players2Starts_WhenPlayer2PlaysLastCard_AndPlayer0Forfeits_Player1ShouldPlay(){
+        // GIVEN
+        GameState.setPlayerIdTurn("2");
+        for (int i = 0; i < 4; i++) {
+            sendValidMoveMessage("2");
+            sendValidMoveMessage("0");
+            sendValidMoveMessage("1");
+        }
+
+        // WHEN
+        sendValidMoveMessage("2");
+        sendForfeitMessage("0");
+
+        // THEN
+        Assertions.assertEquals("1", GameState.getPlayerIdTurn());
+    }
+
+    @Test
+    void players0Starts_WhenPlayer0and2Forfeit_Player1PlaysLastCard_Player1ShouldPlay_bugfix(){
+        // GIVEN
+        GameState.setPlayerIdTurn("0");
+        sendForfeitMessage("0");
+        sendValidMoveMessage("1");
+        sendForfeitMessage("2");
+
+        for (int i = 0; i < 3; i++) {
+            sendValidMoveMessage("1");
+        }
+
+        // WHEN send last card
+        sendValidMoveMessage("1");
+
+        // THEN
+        Assertions.assertEquals("1", GameState.getPlayerIdTurn());
+    }
+
+    @Test
+    void oneRound_player0LastPlayer_nextPlayer1(){
+        // GIVEN
+        createGame_With_NPlayers(3);
+
+        // WHEN
+        sendValidMoveMessage("0");
+        GameState.forfeitPlayer("1");
+        GameState.forfeitPlayer("2");
+        playRemainingCards("0");
+
+        // THEN
+        assertEquals("1", GameState.getPlayerIdTurn());
+    }
+    @Test
+    void oneRound_player1LastPlayer_nextPlayer1(){
+        // GIVEN
+        createGame_With_NPlayers(3);
+
+        // WHEN
+        sendValidMoveMessage("0");
+        sendValidMoveMessage("1");
+        GameState.forfeitPlayer("2");
+        GameState.forfeitPlayer("0");
+        playRemainingCards("1");
+
+        // THEN
+        assertEquals("1", GameState.getPlayerIdTurn());
+    }
+    @Test
+    void oneRound_player2LastPlayer_nextPlayer1_Forfeit(){
+        // GIVEN
+        createGame_With_NPlayers(3);
+
+        // WHEN
+        GameState.forfeitPlayer("0");
+        GameState.forfeitPlayer("1");
+        GameState.forfeitPlayer("2");
+
+        // THEN
+        assertEquals("1", GameState.getPlayerIdTurn());
+    }
+    @Test
+    void oneRound_player2LastPlayer_nextPlayer1_byPlaying(){
+        // GIVEN
+        createGame_With_NPlayers(3);
+
+        // WHEN
+        GameState.forfeitPlayer("0");
+        GameState.forfeitPlayer("1");
+        playRemainingCards("2");
+        // THEN
+        assertEquals("1", GameState.getPlayerIdTurn());
+    }
+    @Test
+    void twoRounds_player0LastPlayer_nextPlayer2(){
+        // GIVEN
+        createGame_With_NPlayers(3);
+
+        // WHEN round 1
+        GameState.forfeitPlayer("0");
+        GameState.forfeitPlayer("1");
+        GameState.forfeitPlayer("2");
+        // WHEN round 2
+        GameState.forfeitPlayer("1");
+        GameState.forfeitPlayer("2");
+        playRemainingCards("0");
+
+        // THEN
+        assertEquals("2", GameState.getPlayerIdTurn());
+    }
+    @Test
+    void twoRounds_player1LastPlayer_nextPlayer2(){
+        // GIVEN
+        createGame_With_NPlayers(3);
+
+        // WHEN round 1
+        GameState.forfeitPlayer("0");
+        GameState.forfeitPlayer("1");
+        GameState.forfeitPlayer("2");
+        // WHEN round 2
+        sendValidMoveMessage("1");
+        GameState.forfeitPlayer("2");
+        GameState.forfeitPlayer("0");
+        playRemainingCards("1");
+
+        // THEN
+        assertEquals("2", GameState.getPlayerIdTurn());
+    }
+    @Test
+    void twoRounds_player2LastPlayer_nextPlayer2(){
+        // GIVEN
+        createGame_With_NPlayers(3);
+
+        // WHEN round 1
+        GameState.forfeitPlayer("0");
+        GameState.forfeitPlayer("1");
+        GameState.forfeitPlayer("2");
+        // WHEN round 2
+        GameState.forfeitPlayer("1");
+        sendValidMoveMessage("2");
+        GameState.forfeitPlayer("0");
+        playRemainingCards("2");
+        // THEN
+        assertEquals("2", GameState.getPlayerIdTurn());
+    }
+    @Test
+    void threeRounds_player0LastPlayer_nextPlayer0(){
+        // GIVEN
+        createGame_With_NPlayers(3);
+
+        // WHEN round 1
+        GameState.forfeitPlayer("0");
+        GameState.forfeitPlayer("1");
+        GameState.forfeitPlayer("2");
+        // WHEN round 2
+        GameState.forfeitPlayer("1");
+        GameState.forfeitPlayer("2");
+        GameState.forfeitPlayer("0");
+        // WHEN round 3
+        GameState.forfeitPlayer("2");
+        sendValidMoveMessage("0");
+        GameState.forfeitPlayer("1");
+        playRemainingCards("0");
+
+        // THEN
+        assertEquals("0", GameState.getPlayerIdTurn());
+    }
+    @Test
+    void threeRounds_player1LastPlayer_nextPlayer0(){
+        // GIVEN
+        createGame_With_NPlayers(3);
+
+        // WHEN round 1
+        GameState.forfeitPlayer("0");
+        GameState.forfeitPlayer("1");
+        GameState.forfeitPlayer("2");
+        // WHEN round 2
+        GameState.forfeitPlayer("1");
+        GameState.forfeitPlayer("2");
+        GameState.forfeitPlayer("0");
+        // WHEN round 3
+        GameState.forfeitPlayer("2");
+        GameState.forfeitPlayer("0");
+        playRemainingCards("1");
+
+        // THEN
+        assertEquals("0", GameState.getPlayerIdTurn());
+    }
+    @Test
+    void threeRounds_player2LastPlayer_nextPlayer0(){
+        /// GIVEN
+        createGame_With_NPlayers(3);
+
+        // WHEN round 1
+        GameState.forfeitPlayer("0");
+        GameState.forfeitPlayer("1");
+        GameState.forfeitPlayer("2");
+        // WHEN round 2
+        GameState.forfeitPlayer("1");
+        GameState.forfeitPlayer("2");
+        GameState.forfeitPlayer("0");
+        // WHEN round 3
+        sendValidMoveMessage("2");
+        GameState.forfeitPlayer("0");
+        GameState.forfeitPlayer("1");
+        playRemainingCards("2");
+
+        // THEN
+        assertEquals("0", GameState.getPlayerIdTurn());
     }
 }

@@ -15,7 +15,7 @@ class MovingOnSwitchTest {
 
     @BeforeEach
     void setUp() {
-        createGame_With_NPlayers(8);
+        createGame_With_NPlayers(3);
         moveMessage = new MoveMessage();
         moveResponse = new MoveResponse();
     }
@@ -26,6 +26,48 @@ class MovingOnSwitchTest {
         moveMessage = null;
         moveResponse = null;
         ADG.Games.Keezen.CardsDeck.reset();
+    }
+
+    @Test
+    void playerPlaysJack_ThenNextPlayerPlays() {
+        // GIVEN
+        Card card = givePlayerJack(0);
+        String playerId = "0";
+        TileId tileId1 = new TileId(playerId, 5);
+        TileId tileId2 = new TileId("1", 3);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(playerId, tileId1);
+        Pawn pawn2 = createPawnAndPlaceOnBoard("1", tileId2);
+
+        // WHEN
+        createSwitchMessage(moveMessage, pawn1, pawn2, card);
+        GameState.processOnSwitch(moveMessage, moveResponse);
+
+        // THEN: response message is correct
+        assertEquals("1", GameState.getPlayerIdTurn());
+    }
+    @Test
+    void playerPlaysJackAsLastCard_ThenNextPlayerPlays() {
+        // GIVEN
+        String playerId = "0";
+        TileId tileId1 = new TileId(playerId, 5);
+        TileId tileId2 = new TileId("1", 3);
+        Pawn pawn1 = createPawnAndPlaceOnBoard(playerId, tileId1);
+        Pawn pawn2 = createPawnAndPlaceOnBoard("1", tileId2);
+
+        for (int i = 0; i < 4; i++) {
+            sendValidMoveMessage("0");
+            sendValidMoveMessage("1");
+            sendValidMoveMessage("2");
+        }
+
+        Card card = givePlayerJack(0);
+
+        // WHEN
+        createSwitchMessage(moveMessage, pawn1, pawn2, card);
+        GameState.processOnSwitch(moveMessage, moveResponse);
+
+        // THEN
+        assertEquals("1", GameState.getPlayerIdTurn());
     }
 
     @Test
@@ -215,8 +257,8 @@ class MovingOnSwitchTest {
         createSwitchMessage(moveMessage, pawn1, pawn2, card);
         GameState.processOnSwitch(moveMessage, moveResponse);
 
-        assertEquals(4, ADG.Games.Keezen.CardsDeck.getCardsForPlayer("0").size());
-        assertEquals("1",GameState.getPlayerIdTurn());
+        assertEquals(4, CardsDeck.getCardsForPlayer("0").size());
+        assertEquals("1", GameState.getPlayerIdTurn());
     }
     @Test
     void testingWhenPawnsSwitch_CardNotRemovedFromHand(){

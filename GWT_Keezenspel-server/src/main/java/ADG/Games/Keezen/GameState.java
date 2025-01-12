@@ -14,6 +14,7 @@ public class GameState {
 
     private static ArrayList<Pawn> pawns = new ArrayList<>();
     private static String playerIdTurn;
+    private static String playerIdStartingRound;
     private static final ArrayList<Player> players = new ArrayList<>();
     private static final HashMap<String, Integer> playerColors = new HashMap<>(); // to map a player UUID to an int for player Colors
     private static final ArrayList<String> activePlayers = new ArrayList<>();
@@ -31,7 +32,8 @@ public class GameState {
     }
 
     public static void start(){
-        playerIdTurn = players.get(0).getUUID();
+        playerIdTurn = players.getFirst().getUUID();
+        playerIdStartingRound = playerIdTurn;
         if (pawns.isEmpty()) {
             pawns = new ArrayList<Pawn>();
             int playerInt = 0;
@@ -75,6 +77,7 @@ public class GameState {
     }
 
     public static void resetActivePlayers(){
+        activePlayers.clear();
         for(Player player : players){
             if(!player.hasFinished()){
                 player.setActive();
@@ -94,21 +97,29 @@ public class GameState {
             resetActivePlayers();
             CardsDeck.shuffle();
             CardsDeck.dealCards();
+            nextRoundPlayer();
+        }else {
+            activePlayers.remove(playerId);
+            nextActivePlayer();
         }
-        //todo: remove commented code
-        activePlayers.remove(playerId);
-
-//        if(activePlayers.isEmpty()){
-//            resetActivePlayers();
-//            CardsDeck.shuffle();
-//            CardsDeck.dealCards();
-//        }
-        nextActivePlayer();
     }
 
     private static void removeWinnerFromActivePlayerList(){
         for (String winnerId: winners){
             activePlayers.remove(winnerId);
+        }
+    }
+
+    private static void nextRoundPlayer(){
+        playerIdTurn = nextPlayerId(playerIdStartingRound);
+        playerIdStartingRound = playerIdTurn;
+        if(!activePlayers.isEmpty() && !activePlayers.contains(playerIdTurn)){
+            nextRoundPlayer();
+        }
+        // todo: check if all players have finished
+        // update player with PlayerId to be playing
+        for(Player player : players){
+            player.setIsPlaying(player.getUUID().equals(playerIdTurn));
         }
     }
 
@@ -126,6 +137,14 @@ public class GameState {
 
     public static String getPlayerIdTurn() {
         return playerIdTurn;
+    }
+
+    /**
+     * for testing purposes
+     * @param playerIdTurn
+     */
+    public static void setPlayerIdTurn(String playerIdTurn){
+        GameState.playerIdTurn = playerIdTurn;
     }
 
     public static ArrayList<Pawn> getPawns() {
@@ -658,8 +677,12 @@ public class GameState {
         if(moveMessage.getMessageType() == MAKE_MOVE){
             movePawn(new Pawn(pawnId1,tileId2));
             movePawn(new Pawn(pawnId2,tileId1));
-            CardsDeck.playerPlaysCard(playerId, card);
-            nextActivePlayer();
+            Boolean playerHasNoCardsLeft = CardsDeck.playerPlaysCard(playerId, card);
+            if(playerHasNoCardsLeft){
+                forfeitPlayer(playerId);
+            }else{
+                nextActivePlayer();
+            }
         }
     }
 
@@ -746,10 +769,14 @@ public class GameState {
         response.setPawnId1(pawnId);
         if(moveMessage.getMessageType() == MAKE_MOVE){
             movePawn(new Pawn(pawnId,targetTileId));
-            CardsDeck.playerPlaysCard(playerId, card);
+            Boolean playerHasNoCardsLeft = CardsDeck.playerPlaysCard(playerId, card);
+            if(playerHasNoCardsLeft){
+                forfeitPlayer(playerId);
+            }else{
+                nextActivePlayer();
+            }
             checkForWinners(winners);
             removeWinnerFromActivePlayerList();
-            nextActivePlayer();
         }
 
         response.setMessageType(moveMessage.getMessageType());
@@ -770,10 +797,11 @@ public class GameState {
 
     public static void tearDown(){
         pawns = new ArrayList<>();
-        playerIdTurn = "";
+        playerIdTurn = "0";
         players.clear();
         activePlayers.clear();
         winners.clear();
+        playerIdStartingRound = "0";
     }
 
     public static Pawn getPawn(Pawn selectedPawn){
