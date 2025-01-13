@@ -8,7 +8,7 @@ import ADG.Games.Keezen.util.PawnRect;
 
 import java.util.*;
 
-import static ADG.Games.Keezen.util.PlayerUUIDColor.ColorToUUID;
+import static ADG.Games.Keezen.util.PlayerUUIDColor.colorToUUID;
 import static ADG.Games.Keezen.util.PlayerUUIDColor.UUIDtoColor;
 
 public class Board {
@@ -35,7 +35,7 @@ public class Board {
 			// then all the tiles are rotated based on the number of players, where the playerId is updated based on the rotation.
 			int playerId = (j < 0) ? nrPlayers - 1 : 0;
 			int tileNr = (j < 0) ? j + 16 : j;
-			tiles.add(new TileMapping(ColorToUUID(playerId, players), tileNr, new Point(startPoint)));
+			tiles.add(new TileMapping(colorToUUID(playerId, players), tileNr, new Point(startPoint)));
 
 			if( j < -3){
 				// move downwards for 6 tiles
@@ -50,25 +50,27 @@ public class Board {
 		}
 
 		// create finish tiles
-		Point point = new Point(getPosition(ColorToUUID(nrPlayers-1, players),15));
+		Point point = new Point(getPosition(colorToUUID(nrPlayers-1, players),15));
 		for (int i = 1; i <= 4; i++) {
 			point.setY(point.getY() - cellDistance);
-			String playerUUID = ColorToUUID(0, players);
+			String playerUUID = colorToUUID(0, players);
 			tiles.add(new TileMapping(playerUUID, 15+i, new Point(point)));
 		}
 
 		// create nest tiles
 		// they will be assigned negative values to distinguish them from the playing field
 		// they will be assigned different negative values to distinguish them from each other so that 2 pawns cannot end up on the same nest tile
-		point = new Point(getPosition(ColorToUUID(0, players),1)); // todo: there are too many calls to ColorToUUID, that is wasteful
+		String playerUUID = colorToUUID(0, players);
+
+		point = new Point(getPosition(playerUUID,1));
 		point.setX(point.getX() - 1.5*cellDistance);
-		tiles.add(new TileMapping(ColorToUUID(0, players), -1, new Point(point)));
+		tiles.add(new TileMapping(playerUUID, -1, new Point(point)));
 		point.setX(point.getX() - cellDistance);
-		tiles.add(new TileMapping(ColorToUUID(0, players), -2, new Point(point)));
+		tiles.add(new TileMapping(playerUUID, -2, new Point(point)));
 		point.setY(point.getY() - cellDistance);
-		tiles.add(new TileMapping(ColorToUUID(0, players), -3, new Point(point)));
+		tiles.add(new TileMapping(playerUUID, -3, new Point(point)));
 		point.setX(point.getX() + cellDistance);
-		tiles.add(new TileMapping(ColorToUUID(0, players), -4, new Point(point)));
+		tiles.add(new TileMapping(playerUUID, -4, new Point(point)));
 
 		// to create the tiles for other players rotate all tiles
 		List<TileMapping> tempTiles = new ArrayList<>();
@@ -77,7 +79,7 @@ public class Board {
 			for (int k = 1; k < nrPlayers; k++) {
 				int colorInt = (UUIDtoColor(tile.getPlayerId(), players)+k)%nrPlayers;
 				GWT.log("color int: " + colorInt);
-				playerId = ColorToUUID(colorInt, players);
+				playerId = colorToUUID(colorInt, players);
 				tempTiles.add(new TileMapping(playerId, tile.getTileNr(), tile.getPosition().rotate(new Point(300,300), 360.0/nrPlayers*k)));
 			}
 		}
