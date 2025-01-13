@@ -6,9 +6,9 @@ import java.util.ArrayList;
 
 public class PlayerUUIDColor {
 
-    public static String ColorToUUID(int Colorint, ArrayList<Player> players){
+    public static String colorToUUID(int colorIndex, ArrayList<Player> players){
         for (Player p : players) {
-            if(p.getColor() == Colorint){
+            if(p.getColor() == colorIndex){
                 return p.getUUID();
             }
         }
