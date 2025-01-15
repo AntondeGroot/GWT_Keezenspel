@@ -13,7 +13,7 @@ public class StepsAnimation {
     private static List<TileMapping> tiles = new ArrayList<>();
     private static double loopAlpha = 0.6;
     private static double ALPHA_MAX = 0.6;
-    private static List<TileId> tileIds;
+    private static List<TileId> tileIdsToBeHighlighted;
     private static double cellDistance;
 
     public static void update(){
@@ -23,11 +23,11 @@ public class StepsAnimation {
     }
 
     public static void update(List<TileId> tileIds){
-        StepsAnimation.tileIds = tileIds;
+        StepsAnimation.tileIdsToBeHighlighted = tileIds;
     }
 
     public static void draw() {
-        if(tileIds == null){return;}
+        if(tileIdsToBeHighlighted == null){return;}
 
         GameBoardView gameBoardView = new GameBoardView();
         gameBoardView.getCanvasStepsContext().clearRect(0,0,600,600);
@@ -38,7 +38,7 @@ public class StepsAnimation {
         }
 
         tiles = Board.getTiles();
-        for (TileId tileId : tileIds) {
+        for (TileId tileId : tileIdsToBeHighlighted) {
             for (TileMapping mapping : tiles) {
                 if (mapping.getTileId().equals(tileId)) {
                     drawCircle(gameBoardView.getCanvasStepsContext(), mapping.getPosition().getX(), mapping.getPosition().getY(),cellDistance/2, loopAlpha);
@@ -62,6 +62,6 @@ public class StepsAnimation {
     }
 
     public static void reset(){
-        tileIds = null;
+        tileIdsToBeHighlighted = null;
     }
 }
