@@ -206,7 +206,7 @@ public class TurnBasedTest {
         moveMessage.setPlayerId("1");
         moveMessage.setPawnId1(pawn.getPawnId());
         moveMessage.setMoveType(MoveType.MOVE);
-        moveMessage.setStepsPawn1(card.getCardValue()+1);
+        moveMessage.setStepsPawn1(card.getCardValue());
         moveMessage.setCard(card);
         moveMessage.setMessageType(MessageType.MAKE_MOVE);
 

@@ -4,8 +4,6 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.*;
 
-import static ADG.Games.Keezen.GameState.forfeitPlayer;
-
 public class CardsDeck implements IsSerializable {
     private static int roundNr = 0;
     private static ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
@@ -41,7 +39,7 @@ public class CardsDeck implements IsSerializable {
         activePlayers = GameState.getActivePlayers();
         // create cards
         for (int suit_i = 0; suit_i < activePlayers.size(); suit_i++) {
-            for (int card_j = 0; card_j < 13; card_j++) {
+            for (int card_j = 1; card_j < 14; card_j++) {
                 cards.add(new Card(suit_i % 4, card_j));
             }
         }

@@ -95,7 +95,7 @@ public class GameBoardPresenter{
         view.getSendButton().addClickHandler(new SendHandler());
         view.getForfeitButton().addClickHandler(new ForfeitHandler());
 
-        Element canvasElement = (Element) view.getCanvasCards();
+        Element canvasElement = view.getCanvasCards();
         DOM.sinkEvents(canvasElement, Event.ONCLICK);
         DOM.setEventListener(canvasElement, event -> {
             if (DOM.eventGetType(event) == Event.ONCLICK) {
@@ -159,8 +159,6 @@ public class GameBoardPresenter{
                 StepsAnimation.reset();
             }
             public void onSuccess(CardResponse result) {
-
-                PawnAndCardSelection.resetSelection();//todo: this should not be updated each time
                 if(CardsDeck.areCardsDifferent(result.getCards())){
                     CardsDeck.setCards(result.getCards());
                     view.drawCards(CardsDeck.getCards());

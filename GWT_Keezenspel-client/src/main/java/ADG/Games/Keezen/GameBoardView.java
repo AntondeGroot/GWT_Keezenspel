@@ -347,7 +347,7 @@ public class GameBoardView extends Composite {
                     // Define the source rectangle (from the sprite sheet)
                     double spriteWidth = 1920 / 13.0;
                     double spriteHeight = 1150 / 5.0;
-                    double sourceX = spriteWidth * card.getCardValue();
+                    double sourceX = spriteWidth * (card.getCardValue()-1);
                     double sourceY = spriteHeight * card.getSuit();
 
                     // Define the destination rectangle (on the canvas)

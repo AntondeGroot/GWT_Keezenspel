@@ -24,13 +24,11 @@ public class TestMoveHandler implements ClickHandler {
      * Send the MoveMessage to the server and wait for a response.
      */
     public void sendMoveToServer() {
-        // First, we validate the input.
-//        errorLabel.setText("");
-
         MoveMessage moveMessage = new MoveMessage();
         moveMessage.setPlayerId(PawnAndCardSelection.getPlayerId());
         moveMessage.setMoveType(PawnAndCardSelection.getMoveType());
         moveMessage.setCard(PawnAndCardSelection.getCard());
+        GWT.log("test card: "+PawnAndCardSelection.getCard());
         moveMessage.setPawnId1(PawnAndCardSelection.getPawnId1());
         moveMessage.setMessageType(MessageType.CHECK_MOVE);
         moveMessage.setStepsPawn1(PawnAndCardSelection.getNrSteps());
@@ -52,16 +50,4 @@ public class TestMoveHandler implements ClickHandler {
             }
         } );
     }
-
-    public native String getPlayerIdFieldValue() /*-{
-        return $doc.getElementById("playerId").value;
-    }-*/;
-
-    public native String getPawnIdFieldValue() /*-{
-        return $doc.getElementById("pawnId").value;
-    }-*/;
-
-    public native String getStepsNrFieldValue() /*-{
-        return $doc.getElementById("stepsNr").value;
-    }-*/;
 }
