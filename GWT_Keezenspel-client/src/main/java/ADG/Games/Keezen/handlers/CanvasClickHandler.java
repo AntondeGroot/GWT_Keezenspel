@@ -20,8 +20,8 @@ public class CanvasClickHandler {
     private static void handleOnCardsDeckClick(int x, int y){
         GWT.log("Clicked on CardsDeck : "+x+","+y);
         int padding = 10;
-        int start = 0;
-        int end = 0;
+        int start;
+        int end;
         int cardNr = -1;
 
         //TODO: make it independent on hard coded values
@@ -40,7 +40,7 @@ public class CanvasClickHandler {
         GWT.log("cardNr = "+cardNr);
         if(cardNr > -1){
             Card card = CardsDeck.pickCard(cardNr);
-            PawnAndCardSelection.setCardNr(cardNr);
+            PawnAndCardSelection.setCardNr(cardNr); // to distinguish when you have multiple identical cards
             if(card == null){return;}
 
             PawnAndCardSelection.setCard(card);

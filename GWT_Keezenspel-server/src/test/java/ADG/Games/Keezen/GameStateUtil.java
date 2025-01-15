@@ -1,7 +1,5 @@
 package ADG.Games.Keezen;
 
-import ADG.Games.Keezen.*;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -25,25 +23,31 @@ public class GameStateUtil {
     }
     public static Card givePlayerCard(int playerInt, int nrSteps){
         String playerId = String.valueOf(playerInt);
-        Card card = new Card(0, nrSteps-1);
+        Card card = new Card(0, nrSteps);
         CardsDeck.setPlayerCard(playerId, card);
         return card;
     }
     public static Card givePlayerAce(int playerInt){
         String playerId = String.valueOf(playerInt);
-        Card ace = new Card(0, 0);
+        Card ace = new Card(0, 1);
         CardsDeck.giveCardToPlayerForTesting(playerId, ace);
         return ace;
     }
     public static Card givePlayerKing(int playerInt){
         String playerId = String.valueOf(playerInt);
-        Card king = new Card(0, 11);
+        Card king = new Card(0, 12);
         CardsDeck.giveCardToPlayerForTesting(playerId, king);
         return king;
     }
+    public static Card givePlayerSeven(int playerInt){
+        String playerId = String.valueOf(playerInt);
+        Card sevenCard = new Card(0, 7);
+        CardsDeck.giveCardToPlayerForTesting(playerId, sevenCard);
+        return sevenCard;
+    }
     public static Card givePlayerJack(int playerInt) {
         String playerId = String.valueOf(playerInt);
-        Card jack = new Card(0, 10);
+        Card jack = new Card(0, 11);
         CardsDeck.giveCardToPlayerForTesting(playerId, jack);
         return jack;
     }
@@ -51,7 +55,7 @@ public class GameStateUtil {
         moveMessage.setPlayerId(pawn.getPlayerId());
         moveMessage.setPawnId1(pawn.getPawnId());
         moveMessage.setMoveType(MoveType.MOVE);
-        moveMessage.setStepsPawn1(card.getCardValue()+1);
+        moveMessage.setStepsPawn1(card.getCardValue());
         moveMessage.setCard(card);
         moveMessage.setMessageType(MessageType.MAKE_MOVE);
     }
@@ -88,7 +92,7 @@ public class GameStateUtil {
         moveMessage.setPlayerId(playerId);
         moveMessage.setPawnId1(pawn.getPawnId());
         moveMessage.setMoveType(MoveType.MOVE);
-        moveMessage.setStepsPawn1(card.getCardValue()+1);
+        moveMessage.setStepsPawn1(card.getCardValue());
         moveMessage.setCard(card);
         moveMessage.setMessageType(MessageType.MAKE_MOVE);
 
@@ -101,14 +105,6 @@ public class GameStateUtil {
         for (int i = 0; i < nrCards; i++) {
             sendValidMoveMessage(playerId);
         }
-    }
-    //todo: remove the following?
-    public static ArrayList<Integer> intsToList(int[] integers){
-        ArrayList<Integer> result = new ArrayList<>();
-        for (int integer : integers) {
-            result.add(integer);
-        }
-        return result;
     }
 
     public static ArrayList<String> stringsToList(String[] strings){

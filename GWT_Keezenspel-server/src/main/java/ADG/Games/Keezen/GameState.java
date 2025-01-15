@@ -303,7 +303,7 @@ public class GameState {
         }
 
         // Player cannot move an opponents pawn without playing a Jack
-        if(card.getCardValue() != 10){
+        if(card.getCardValue() != 11){
             if(moveMessage.getPawnId1() != null && !Objects.equals(moveMessage.getPawnId1().getPlayerId(), playerId)){
                 response.setResult(CANNOT_MAKE_MOVE);
                 return;
@@ -365,7 +365,7 @@ public class GameState {
                 response.setResult(CANNOT_MAKE_MOVE);
                 return;
             }
-            if(nrSteps >0) {
+            if(nrSteps > 0) {
                 if (next > 1 && currentTileId.getTileNr() < 1) {
                     moves.add(new TileId(playerIdOfTile, 1));
                 }
@@ -705,7 +705,7 @@ public class GameState {
 
         // cannot go onboard without an Ace or King
         int cardValue = card.getCardValue();
-        if(!(cardValue == 0 || cardValue == 12)){
+        if(!(cardValue == 1 || cardValue == 13)){// todo: remove magic numbers
             response.setResult(CANNOT_MAKE_MOVE);
             return;
         }

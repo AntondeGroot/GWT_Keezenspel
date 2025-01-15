@@ -1,14 +1,12 @@
 package ADG.Games.Keezen;
 
-import com.google.gwt.core.client.GWT;
-
 import static ADG.Games.Keezen.MoveType.*;
 
 public class PawnAndCardSelection {
-    // todo: turn this into a model
+    // todo: turn this into a model, do not use statics
     private static String playerId;
-    private static Pawn pawn1 = new Pawn(new PawnId("-1",-1),new TileId("-1",90)); // todo: initialize somewhere?
-    private static Pawn pawn2 = new Pawn(new PawnId("-1",-1),new TileId("-1",90));
+    private static Pawn pawn1 = resetPawn();
+    private static Pawn pawn2 = resetPawn();
     private static Card card;
     private static boolean drawCards = true;
     private static MoveType moveType;
@@ -21,54 +19,141 @@ public class PawnAndCardSelection {
         playerId = id;
     }
 
-    public static void resetSelection() {
-        // todo: should this ever be the case?
-//        if(playerId != p_playerId){
-//            pawn1 = resetPawn();
-//            pawn2 = resetPawn();
-//            card = null;
-//            playerId = p_playerId;
-//        }
-    }
-
     public static String getPlayerId(){
         return playerId;
     }
 
     public static void addPawn(Pawn pawn) {
-        // deselect pawn1
-        if(playerId.equals(pawn.getPlayerId()) && pawn1 !=null && pawn1.equals(pawn)){
-            pawn1 = resetPawn();
+        validateSelectionBasedOnPlayerID(pawn); // not accounting for if they are on nest/board/finish
+        validateSelectionBasedOnLocation();     // validate if they are on nest/board/finish
+        validateMoveType();
+    }
+
+    private static void validateSelectionBasedOnLocation() {
+        if(card == null){
             return;
+        }
+
+        switch (card.getCardValue()) {
+            case 1: break;//always valid: nest/board/finish
+            case 11: validateAllPawnsAreOnBoard(); break;
+            case 13: validateAllPawnsAreOnNest(); break;
+            default: validateAllPawnsAreOnBoardOrFinish(); break;
+        }
+    }
+
+    private static void validateAllPawnsAreOnBoard() {
+        if(!pawn1.equals(resetPawn())){
+            if(!(pawn1.getCurrentTileId().getTileNr() >= 0 && pawn1.getCurrentTileId().getTileNr() < 16)){// reset when not on board
+                pawn1 = resetPawn();
+            }
+        }
+        if(!pawn2.equals(resetPawn())){
+            if(!(pawn2.getCurrentTileId().getTileNr() >= 0 && pawn2.getCurrentTileId().getTileNr() < 16)){// todo: logic like this should be in some helper.util
+                pawn2 = resetPawn();
+            }
+        }
+    }
+
+    private static void validateAllPawnsAreOnBoardOrFinish() {
+        if(!pawn1.equals(resetPawn())){
+            if(pawn1.getCurrentTileId().getTileNr() < 0){// reset when on nest
+                pawn1 = resetPawn();
+            }
+        }
+        if(!pawn2.equals(resetPawn())){
+            if(pawn2.getCurrentTileId().getTileNr() < 0){// reset when on nest
+                pawn2 = resetPawn();
+            }
+        }
+    }
+
+    private static void validateAllPawnsAreOnNest() {
+        if(!pawn1.equals(resetPawn())){
+            if(pawn1.getCurrentTileId().getTileNr() > 0){
+                pawn1 = resetPawn();
+            }
+        }
+        if(!pawn2.equals(resetPawn())){
+            if(pawn2.getCurrentTileId().getTileNr() > 0){
+                pawn2 = resetPawn();
+            }
+        }
+    }
+
+    private static boolean aPawnWasNotDeselected(Pawn pawn) {
+        if (pawn1.equals(pawn)) {
+            // this moves pawn 2 to pawn1 and resets pawn2
+            // if pawn 2 was already reset, this changes nothing but clears pawn1
+            pawn1 = pawn2;
+            pawn2 = resetPawn();
+            return false;
         }
 
         // deselect pawn2
-        if(!playerId.equals(pawn.getPlayerId()) && pawn2 !=null && pawn2.equals(pawn)){
+        if (pawn2.equals(pawn)) {
             pawn2 = resetPawn();
+            return false;
+        }
+
+        return true;
+    }
+
+    private static void handlePlayerCanSelect2Pawns(Pawn pawn) {
+        if(aPawnWasNotDeselected(pawn)){
+            if (!playerId.equals(pawn.getPlayerId())) {
+                return;
+            }
+
+            // select pawn
+            if (pawn1.equals(resetPawn())) {
+                pawn1 = pawn;
+            }else{
+                pawn2 = pawn;
+            }
+        }
+    }
+
+    private static void handlePlayerCanSelect1Pawn(Pawn pawn) {
+        if(aPawnWasNotDeselected(pawn)){
+            if (playerId.equals(pawn.getPlayerId())) {
+                pawn1 = pawn;
+            }
+        }
+    }
+
+    private static void handlePlayerCanSelectTheirOwnAndOpponentsPawn(Pawn pawn) {
+       if(aPawnWasNotDeselected(pawn)){
+            // select pawn1
+            if (playerId.equals(pawn.getPlayerId())) {
+                pawn1 = pawn;
+            }
+
+           // select pawn2
+           if (!playerId.equals(pawn.getPlayerId())) {
+               pawn2 = pawn;
+           }
+       }
+    }
+
+    private static void validateSelectionBasedOnPlayerID(Pawn pawn) {
+        if(card == null){
+            handlePlayerCanSelect1Pawn(pawn);
             return;
         }
 
-        // select pawn1
-        if(playerId.equals(pawn.getPlayerId())){
-            pawn1 = pawn;
+        switch (card.getCardValue()) {
+            case 7: handlePlayerCanSelect2Pawns(pawn); break;
+            case 11: handlePlayerCanSelectTheirOwnAndOpponentsPawn(pawn); break;
+            default: handlePlayerCanSelect1Pawn(pawn); break;
         }
-
-        // select pawn2
-        if(!playerId.equals(pawn.getPlayerId())) {
-            pawn2 = pawn;
-        }
-
-        cardValidation();
     }
 
     public static void setCard(Card p_card) {
         card = p_card;
-        cardValidation();
+        validateMoveType();
+        validateSelectionBasedOnLocation();
         drawCards = true;
-        // if you chose a card other than a Jack, you deselect the pawn belonging to another player
-        if(card.getCardValue()!=10){
-            pawn2 = resetPawn();
-        }
     }
 
     public static Pawn getPawn1() {
@@ -76,7 +161,7 @@ public class PawnAndCardSelection {
     }
 
     public static PawnId getPawnId1(){
-        if(pawn1 == null || pawn1.equals(resetPawn())){
+        if(pawn1.equals(resetPawn())){
             return null;
         }
         return pawn1.getPawnId();
@@ -88,21 +173,15 @@ public class PawnAndCardSelection {
 
     public static void setMoveType(MoveType moveType) {
         PawnAndCardSelection.moveType = moveType;
-        if(moveType != FORFEIT){
-            // ONLY VALIDATE FOR PLAYING AN ACE
-            // NO VALIDATION IS NEEDED FOR FORFEIT
-            if(card != null && card.getCardValue() == 0){
-                if(pawn1.getCurrentTileId().getTileNr() < 0){
-                    PawnAndCardSelection.moveType = ONBOARD;
-                }else{
-                    PawnAndCardSelection.moveType = MoveType.MOVE;
-                }
-            }
+        if(moveType == FORFEIT){
+            pawn1 = resetPawn();
+            pawn2 = resetPawn();
+            card = null;
         }
     }
 
     public static PawnId getPawnId2(){
-        if(pawn2 == null || pawn2.equals(resetPawn())){
+        if(pawn2.equals(resetPawn())){
             return null;
         }
         return pawn2.getPawnId();
@@ -138,37 +217,57 @@ public class PawnAndCardSelection {
         nrSteps = 0;
     }
 
-    private static void cardValidation(){
+    private static void validateMoveType(){
         if(card == null){
-            pawn2 = resetPawn();
             return;
         }
-        int cardFaceValue = card.getCardValue()+1;
-        if(cardFaceValue == 1){
-            // ace: onboard OR move
-            GWT.log("ace selected move: "+PawnAndCardSelection.getPawn1());
-            if(PawnAndCardSelection.getPawn1().getCurrentTileId().getTileNr() < 0){
-                PawnAndCardSelection.setMoveType(ONBOARD);
-            }else{
-                PawnAndCardSelection.setMoveType(MOVE);
-                nrSteps = cardFaceValue;
-            }
-        }else if(cardFaceValue == 11){
-            // jack: switch pawns
-            PawnAndCardSelection.setMoveType(SWITCH);
-        }else if(cardFaceValue == 13){
-            // king: onboard
-            PawnAndCardSelection.setMoveType(ONBOARD);
-        }else{
-            // move
-            if(cardFaceValue == 4){
-                cardFaceValue = -4;
-            }
-            PawnAndCardSelection.setMoveType(MOVE);
-            nrSteps = cardFaceValue;
+
+        switch (card.getCardValue()) {
+            case 1: handleAce(); break;
+            case 7: handleSeven(); break;
+            case 11: handleJack(); break;
+            case 13: handleKing(); break;
+            default: handleDefaultCard(); break;
         }
-        if(card.getCardValue() != 10){
+
+        // selection of card deselects second pawn when card is not 7 or jack
+        if(card.getCardValue() != 11 && card.getCardValue() != 7){
             pawn2 = resetPawn();
+        }
+    }
+
+    private static void handleAce() {
+        if (pawn1.getCurrentTileId().getTileNr() < 0) {
+            setMoveType(ONBOARD);
+        } else {
+            setMoveType(MOVE);
+            nrSteps = 1;
+        }
+    }
+
+    private static void handleSeven() {
+        if (!pawn1.equals(resetPawn()) && !pawn2.equals(resetPawn())) {
+            setMoveType(SPLIT);
+            //todo: set nr steps when 7 splits
+        } else {
+            setMoveType(MOVE);
+            nrSteps = 7;
+        }
+    }
+
+    private static void handleJack() {
+        setMoveType(SWITCH);
+    }
+
+    private static void handleKing() {
+        setMoveType(ONBOARD);
+    }
+
+    private static void handleDefaultCard() {
+        setMoveType(MOVE);
+        nrSteps = card.getCardValue();
+        if (nrSteps == 4) {
+            nrSteps = -4;
         }
     }
 

@@ -20,13 +20,6 @@ public class App implements EntryPoint {
 			+ "attempting to contact the server. Please check your network "
 			+ "connection and try again.";
 
-	/**
-	 * Create a remote service proxy to talk to the server-side Moving service.
-	 */
-	private final GameStateServiceAsync gameStateService = GWT.create(GameStateService.class);
-	private final CardsServiceAsync cardsService = GWT.create(CardsService.class);
-	private final PollingService pollingService = GWT.create(PollingService.class);
-	private GameBoardView gameBoardView;
 
     /**
 	 * This is the entry point method.
