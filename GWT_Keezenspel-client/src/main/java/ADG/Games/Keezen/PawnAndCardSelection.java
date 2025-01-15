@@ -11,6 +11,7 @@ public class PawnAndCardSelection {
     private static boolean drawCards = true;
     private static MoveType moveType;
     private static int nrSteps;
+    private static int nrStepsPawn2;
     private static int cardNr; // for selecting which card in your hand you picked
     // if you have more than 4 players you will have 1 suit that is a double, if you have a hand with two of the same card
     // if you then pick one, both cards would otherwise be highlighted
@@ -215,6 +216,7 @@ public class PawnAndCardSelection {
         drawCards = true;
         moveType = null;
         nrSteps = 0;
+        nrStepsPawn2 = 0;
     }
 
     private static void validateMoveType(){
@@ -252,6 +254,7 @@ public class PawnAndCardSelection {
         } else {
             setMoveType(MOVE);
             nrSteps = 7;
+            nrStepsPawn2 = 0;
         }
     }
 

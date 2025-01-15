@@ -80,6 +80,10 @@ public class GameBoardPresenter{
                 int y = event.getClientY() - canvasTop + 30;
 
                 GWT.log("Clicked at: (" + x + ", " + y + ")");
+                TileId tileId = Board.getTileId(x,y);
+                if(tileId != null) {
+                    GWT.log("you clicked TileId: " + tileId);
+                }
                 // todo: maybe replace x,y parameters
                 CanvasClickHandler.handleCanvasClick(event,x,y);
             }
