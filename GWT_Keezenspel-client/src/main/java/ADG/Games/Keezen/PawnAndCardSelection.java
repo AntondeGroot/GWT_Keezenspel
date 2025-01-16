@@ -153,6 +153,7 @@ public class PawnAndCardSelection {
     public static void setCard(Card p_card) {
         card = p_card;
         validateMoveType();
+        validateSelectionBasedOnPlayerID(pawn2);
         validateSelectionBasedOnLocation();
         drawCards = true;
     }

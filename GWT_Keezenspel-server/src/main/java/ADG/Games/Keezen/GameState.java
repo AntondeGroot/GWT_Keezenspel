@@ -7,6 +7,7 @@ import static ADG.Games.Keezen.CardsDeck.playerDoesNotHaveCard;
 import static ADG.Games.Keezen.MessageType.*;
 import static ADG.Games.Keezen.MoveResult.*;
 import static ADG.Games.Keezen.MoveType.*;
+import static ADG.Games.Keezen.logic.MissingTiles.extrapolateMissingTiles;
 import static ADG.Games.Keezen.logic.StartTileLogic.canPassStartTile;
 import static ADG.Games.Keezen.logic.WinnerLogic.checkForWinners;
 
@@ -155,7 +156,7 @@ public class GameState {
         return sectionId.equals(previousPlayerId(playerId));
     }
 
-    private static String previousPlayerId(String playerId){
+    public static String previousPlayerId(String playerId){
         int playerInt = playerColors.get(playerId);
         int previousPlayerInt = (playerInt + players.size() - 1) % players.size();
         return playerColors.entrySet().stream()
@@ -268,6 +269,95 @@ public class GameState {
         }
         return null;
     }
+
+    public static void processOnSplit(MoveMessage moveMessage, MoveResponse response){
+        PawnId pawnId1 = moveMessage.getPawnId1();
+        PawnId pawnId2 = moveMessage.getPawnId2();
+        Card card = moveMessage.getCard();
+        MoveType moveType = moveMessage.getMoveType();
+        int nrStepsPawn1 = moveMessage.getStepsPawn1();
+        int nrStepsPawn2;
+        if(moveMessage.getMessageType().equals(CHECK_MOVE)){
+            nrStepsPawn2 = 7;
+        }else{
+            nrStepsPawn2 = moveMessage.getStepsPawn2();
+        }
+        String playerId = pawnId1.getPlayerId();
+        String playerId2 = pawnId2.getPlayerId();
+
+        if(!playerId.equals(playerId2)){
+            response.setResult(CANNOT_MAKE_MOVE);
+            return;
+        }
+
+        if(pawnId1 == null || card == null || pawnId2 == null){
+            response.setResult(INVALID_SELECTION);
+            return;
+        }
+
+        if(card.getCardValue() != 7){
+            response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
+            return;
+        }
+
+        if((nrStepsPawn1 + nrStepsPawn2 != 7) &&  moveType==MOVE){
+            response.setResult(INVALID_SELECTION);
+            return;
+        }
+        //todo: fill in to test move
+        MoveMessage moveMessagePawn1 = new MoveMessage();
+        MoveMessage moveMessagePawn2 = new MoveMessage();
+        // pawn1
+        moveMessagePawn1.setPlayerId(playerId);
+        moveMessagePawn1.setCard(card); // todo: this will be problematic if you want to make a move twice
+        moveMessagePawn1.setStepsPawn1(nrStepsPawn1);
+        moveMessagePawn1.setPawnId1(moveMessage.getPawnId1());
+        moveMessagePawn1.setMessageType(CHECK_MOVE);
+        moveMessagePawn1.setMoveType(SPLIT);
+        // pawn2
+        moveMessagePawn2.setPlayerId(playerId);
+        moveMessagePawn2.setCard(card); // todo: this will be problematic if you want to make a move twice
+        moveMessagePawn2.setStepsPawn1(nrStepsPawn2);
+        moveMessagePawn2.setPawnId1(moveMessage.getPawnId2());
+        moveMessagePawn2.setMessageType(CHECK_MOVE);
+        moveMessagePawn2.setMoveType(SPLIT);
+
+        MoveResponse moveResponsePawn1 = new MoveResponse();
+        MoveResponse moveResponsePawn2 = new MoveResponse();
+
+        processOnMove(moveMessagePawn1, moveResponsePawn1);// TODO: figure out a way to exclude if one pawn ends on the other pawn who moves
+        processOnMove(moveMessagePawn2, moveResponsePawn2);// todo: test when the other pawn moves back on the same spot as the other pawn it still can't move
+        // todo: for example when it moves back.
+        if(moveResponsePawn1.getResult() == CAN_MAKE_MOVE && moveResponsePawn2.getResult() == CAN_MAKE_MOVE){
+            // todo fill in to move for real
+            if(moveMessage.getMessageType() == MAKE_MOVE){
+                if(moveMessage.getStepsPawn1() + moveMessage.getStepsPawn2() != 7){
+                    response.setResult(INVALID_SELECTION);
+                    return;
+                }
+                // DO IT AGAIN NOW FOR REAL
+                moveMessagePawn1.setMessageType(MAKE_MOVE);
+                CardsDeck.setPlayerCard(playerId, card); // duplicate the 7 card so that the player can play both pawns with 1 card
+                moveMessagePawn2.setMessageType(MAKE_MOVE);
+                processOnMove(moveMessagePawn1, moveResponsePawn1);
+                processOnMove(moveMessagePawn2, moveResponsePawn2);
+                response.setMessageType(MAKE_MOVE);
+            }else{
+                response.setMessageType(CHECK_MOVE);
+            }
+            response.setPawnId1(moveMessage.getPawnId1());
+            response.setPawnId2(moveMessage.getPawnId2());//todo: what else?
+            response.setMovePawn1(extrapolateMissingTiles(moveResponsePawn1.getMovePawn1()));
+            response.setMovePawn2(extrapolateMissingTiles(moveResponsePawn2.getMovePawn1()));
+            response.setResult(CAN_MAKE_MOVE);
+            // todo: fill in response
+        }else{
+            response.setResult(CANNOT_MAKE_MOVE);
+        }
+        response.setMoveType(SPLIT);
+    }
+
+
 
     public static void processOnMove(MoveMessage moveMessage, MoveResponse response){
         PawnId pawnId1 = moveMessage.getPawnId1();

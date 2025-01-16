@@ -24,6 +24,7 @@ public class TurnBasedTest {
 
     @BeforeEach
     void setUp() {
+        CardsDeck.reset();
         createGame_With_NPlayers(3);
         moveMessage = new MoveMessage();
         moveResponse = new MoveResponse();
@@ -40,6 +41,7 @@ public class TurnBasedTest {
         activePlayers.clear();
         CardsDeck.reset();
         nrCardsPerPlayer = new HashMap<>();
+        GameState.stop();
     }
 
     @Test

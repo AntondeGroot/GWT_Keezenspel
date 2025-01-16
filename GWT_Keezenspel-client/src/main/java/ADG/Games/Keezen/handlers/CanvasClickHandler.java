@@ -18,7 +18,6 @@ public class CanvasClickHandler {
     }
 
     private static void handleOnCardsDeckClick(int x, int y){
-        GWT.log("Clicked on CardsDeck : "+x+","+y);
         int padding = 10;
         int start;
         int end;
@@ -36,8 +35,7 @@ public class CanvasClickHandler {
         if(y < 620 || y>620+158){
             cardNr = -1;
         }
-
-        GWT.log("cardNr = "+cardNr);
+        GWT.log("Clicked on CardsDeck : "+x+","+y+"\n"+"CardNr: "+cardNr);
         if(cardNr > -1){
             Card card = CardsDeck.pickCard(cardNr);
             PawnAndCardSelection.setCardNr(cardNr); // to distinguish when you have multiple identical cards
@@ -57,9 +55,10 @@ public class CanvasClickHandler {
     }
 
     private static void handleOnBoardClick(int x, int y){
+        StringBuilder logMsg = new StringBuilder();
         List<TileMapping> tiles = Board.getTiles();
         List<Pawn> pawns = Board.getPawns();
-        GWT.log("Clicked on Board : "+x+","+y);
+        logMsg.append("clicked on Board : ("+x+","+y+")\n");
         for (Pawn pawn : pawns) {
             TileId tileOfPawn = pawn.getCurrentTileId();
             for (TileMapping tile : tiles) {
@@ -67,7 +66,7 @@ public class CanvasClickHandler {
                     if(isWithinDistance(tile.getPosition(), new Point(x,y))){
                         PawnAndCardSelection.addPawn(pawn);
                         // for debugging
-                        GWT.log("You clicked on pawn"+pawn.getPawnId()+" position: "+tile.getPosition());
+                        logMsg.append("You clicked on pawn"+pawn.getPawnId()+" position: "+tile.getPosition());
                         if(PawnAndCardSelection.getPawn1() != null && PawnAndCardSelection.getCard() != null){
                             TestMoveHandler testMoveHandler = new TestMoveHandler();
                             testMoveHandler.sendMoveToServer();
@@ -77,8 +76,7 @@ public class CanvasClickHandler {
                 }
             }
         }
-
-
+        GWT.log(logMsg.toString());
     }
     public static boolean isWithinDistance(Point p1, Point p2) {
         int distance = 15;

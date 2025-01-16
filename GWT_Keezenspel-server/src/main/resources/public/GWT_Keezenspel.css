@@ -133,3 +133,11 @@ h1 {
   margin-right: 30px;
   margin-left: 10px;
 }
+
+.TextBoxForPawnSteps{
+  width: 20px;
+  margin-right: 5px;
+}
+.TextBoxLabel{
+  margin-right: 5px;
+}

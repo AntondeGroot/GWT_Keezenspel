@@ -26,15 +26,6 @@ public class MoveResponse implements IsSerializable {
         this.result = result;
     }
 
-    public Integer getNextPlayerId() {
-        ArrayList<Integer> test = new ArrayList<>();
-        return nextPlayerId;
-    }
-
-    public void setNextPlayerId(Integer nextPlayerId) {
-        this.nextPlayerId = nextPlayerId;
-    }
-
     public PawnId getPawnId1() {
         return pawnId1;
     }
@@ -85,15 +76,15 @@ public class MoveResponse implements IsSerializable {
 
     @Override
     public String toString() {
-        return "MoveResponse{" +
-                "nextPlayerId=" + nextPlayerId +
-                ", pawnId1=" + pawnId1 +
-                ", pawnId2=" + pawnId2 +
-                ", movePawn1=" + movePawn1 +
-                ", movePawn2=" + movePawn2 +
-                ", moveType=" + moveType +
-                ", messageType=" + messageType +
-                ", result=" + result +
+        return "MoveResponse{\n" +
+                "    result=" + result +",\n\n"+
+                "    nextPlayerId=" + nextPlayerId +",\n"+
+                "    pawnId1=" + pawnId1 +",\n"+
+                "    pawnId2=" + pawnId2 +",\n"+
+                "    movePawn1=" + movePawn1 +",\n"+
+                "    movePawn2=" + movePawn2 +",\n"+
+                "    moveType=" + moveType +",\n"+
+                "    messageType=" + messageType +",\n"+
                 '}';
     }
 }

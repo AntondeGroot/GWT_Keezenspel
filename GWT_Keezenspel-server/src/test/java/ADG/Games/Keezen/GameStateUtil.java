@@ -51,6 +51,16 @@ public class GameStateUtil {
         CardsDeck.giveCardToPlayerForTesting(playerId, jack);
         return jack;
     }
+    public static void createSplitMessage(MoveMessage moveMessage, Pawn pawn, int nrSteps1, Pawn pawn2, Integer nrSteps2, Card card){
+        moveMessage.setPlayerId(pawn.getPlayerId());
+        moveMessage.setPawnId1(pawn.getPawnId());
+        moveMessage.setStepsPawn1(nrSteps1);
+        moveMessage.setStepsPawn2(nrSteps2);
+        moveMessage.setPawnId2(pawn2.getPawnId());
+        moveMessage.setMoveType(MoveType.SPLIT);
+        moveMessage.setCard(card);
+        moveMessage.setMessageType(MessageType.MAKE_MOVE);
+    }
     public static void createMoveMessage(MoveMessage moveMessage, Pawn pawn, Card card){
         moveMessage.setPlayerId(pawn.getPlayerId());
         moveMessage.setPawnId1(pawn.getPawnId());

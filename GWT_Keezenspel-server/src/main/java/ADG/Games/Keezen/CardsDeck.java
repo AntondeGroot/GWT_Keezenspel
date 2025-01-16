@@ -67,7 +67,7 @@ public class CardsDeck implements IsSerializable {
     }
 
     public static void setPlayerCard(String playerId, Card card){
-        playerHands.get(playerId).setCard(card);
+        playerHands.get(playerId).addCard(card);
     }
 
     public static void dealCards(){

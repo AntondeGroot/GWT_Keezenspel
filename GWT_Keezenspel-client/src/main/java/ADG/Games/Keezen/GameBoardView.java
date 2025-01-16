@@ -44,6 +44,15 @@ public class GameBoardView extends Composite {
     @UiField
     HTMLPanel canvasWrapper;
 
+    @UiField
+    HorizontalPanel pawnIntegerBoxes;
+
+    @UiField
+    TextBox stepsPawn1;
+
+    @UiField
+    TextBox stepsPawn2;
+
     @Override
     public void onLoad() {
         super.onLoad();
@@ -52,8 +61,29 @@ public class GameBoardView extends Composite {
     public GameBoardView() {
         initWidget(uiBinder.createAndBindUi(this));
         document = Document.get();
-//        this.tiles = tiles;
-//        this.cellDistance = celldistance;
+        stepsPawn1.addChangeHandler(event -> {
+            String value = stepsPawn1.getValue(); // Get the current value of the TextBox
+
+            // Check if the value is of length 1 and numerical
+            if (value.length() == 1 && value.matches("\\d")) {
+                if(Integer.parseInt(value) > 7 || Integer.parseInt(value) < 0) {
+                    stepsPawn1.setValue("7");
+                    stepsPawn2.setValue("0");
+                }else{
+                    stepsPawn2.setValue(String.valueOf(7-Integer.parseInt(value)));
+                }
+            } else {
+                // Invalid input
+                stepsPawn1.setValue("7");
+                stepsPawn2.setValue("0");
+            }
+        });
+    }
+
+    public void hidePawnTextBoxes(){
+        pawnIntegerBoxes.setVisible(false);
+        stepsPawn1.setValue("");
+        stepsPawn2.setValue("");
     }
 
     public Button getSendButton(){
