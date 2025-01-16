@@ -2,6 +2,8 @@ package ADG.Games.Keezen;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
+import java.util.Objects;
+
 public class Player implements IsSerializable {
     private boolean isActive;
     private boolean isPlaying;
@@ -68,11 +70,24 @@ public class Player implements IsSerializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return isActive == player.isActive && isPlaying == player.isPlaying && place == player.place && color == player.color && Objects.equals(name, player.name) && Objects.equals(uuid, player.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isActive, isPlaying, name, place, uuid, color);
+    }
+
+    @Override
     public String toString() {
-        return "Player{" +
+        return "\nPlayer{" +
                 "name='" + name + '\'' +
                 ", isPlaying=" + isPlaying +
                 ", isActive=" + isActive +
-                '}';
+                "}";
     }
 }

@@ -13,10 +13,9 @@ public class PawnAndCardSelectionSevenTest {
     private Pawn ownPawnOnNest;
     private Pawn ownPawnOnFinish;
     private Pawn otherPawnOnBoard;
-    private Pawn otherPawnOnNest;
-    private Pawn otherPawnOnFinish;
     private Card sevenCard;
     private Card nonJackCard;
+    private Card jackCard;
 
     @BeforeEach
     void setup(){
@@ -29,11 +28,10 @@ public class PawnAndCardSelectionSevenTest {
         ownPawnOnFinish = new Pawn(new PawnId("1", 4), new TileId("1", 16));
         // other player pawns
         otherPawnOnBoard = new Pawn(new PawnId("2", 1), new TileId("2", 0));
-        otherPawnOnNest = new Pawn(new PawnId("2", 2), new TileId("2", -1));
-        otherPawnOnFinish = new Pawn(new PawnId("2", 3), new TileId("2", 16));
 
         sevenCard = new Card(0,7);
         nonJackCard = new Card(0,5);
+        jackCard = new Card(0,11);
     }
 
     @Test
@@ -219,5 +217,22 @@ public class PawnAndCardSelectionSevenTest {
         assertEquals(7, PawnAndCardSelection.getNrSteps());
         assertNull(PawnAndCardSelection.getPawnId2());
         assertEquals(ownPawnOnBoard2, PawnAndCardSelection.getPawn1());
+    }
+
+    @Test
+    public void test_setSeven_Select2Pawns_SetJack_DeselectsPawn2_bugfix(){
+        // this bug occurred because both Seven and Jack allow two pawns to be selected
+
+        // GIVEN
+        PawnAndCardSelection.setPlayerId("1");
+        PawnAndCardSelection.setCard(sevenCard);
+        PawnAndCardSelection.addPawn(ownPawnOnBoard);
+        PawnAndCardSelection.addPawn(ownPawnOnBoard2);
+
+        // WHEN
+        PawnAndCardSelection.setCard(jackCard);
+
+        // THEN
+        assertNull(PawnAndCardSelection.getPawnId2());
     }
 }

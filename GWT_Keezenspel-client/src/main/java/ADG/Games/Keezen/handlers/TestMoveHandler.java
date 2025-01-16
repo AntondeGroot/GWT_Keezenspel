@@ -33,16 +33,24 @@ public class TestMoveHandler implements ClickHandler {
         moveMessage.setMessageType(MessageType.CHECK_MOVE);
         moveMessage.setStepsPawn1(PawnAndCardSelection.getNrSteps());
         moveMessage.setPawnId2(PawnAndCardSelection.getPawnId2());
+        GWT.log(moveMessage.toString());
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
             public void onFailure(Throwable caught) {
                 StepsAnimation.reset();
             }
             public void onSuccess(MoveResponse result) {
-                GWT.log("Test Move successful: "+result.toString());
+                GWT.log("Test Move: "+result.toString());
                 List<TileId> tileIds = new ArrayList<TileId>();
                 if(result.getMovePawn1() != null){
-                    tileIds.add(result.getMovePawn1().getLast());
+                    if(result.getMoveType()==MoveType.SPLIT){
+                        // draw only where a pawn ends up
+                        tileIds.add(result.getMovePawn1().getLast());
+                        tileIds.add(result.getMovePawn2().getLast());
+                    }else{
+                        // draw only where a pawn ends up
+                        tileIds.add(result.getMovePawn1().getLast());
+                    }
                     StepsAnimation.update(tileIds);
                 }else{
                     StepsAnimation.reset();

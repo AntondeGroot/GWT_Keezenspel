@@ -24,7 +24,6 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
         }
 
         MoveResponse response = new MoveResponse();
-        response.setNextPlayerId(0);
         response.setPawnId1(message.getPawnId1());
         response.setPawnId2(message.getPawnId2());
 
@@ -37,6 +36,8 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
             case SWITCH: GameState.processOnSwitch(message,response);
                 break;
             case FORFEIT: GameState.processOnForfeit(message);
+                break;
+            case SPLIT: GameState.processOnSplit(message, response);
                 break;
             default:
                 break;

@@ -26,6 +26,7 @@ public class GameBoardPresenter{
     private final CardsServiceAsync cardsService;
     private final PollingService pollingService;
     private GameAnimation gameAnimation;
+    private GameStateResponse gameStateResponseUpdate = new GameStateResponse();
 
     public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, GameStateServiceAsync gameStateService, CardsServiceAsync cardsService, PollingService pollingService) {
         this.model = gameBoardModel;
@@ -119,7 +120,13 @@ public class GameBoardPresenter{
                 StepsAnimation.reset();
             }
             public void onSuccess(GameStateResponse result) {
-                GWT.log(result.toString());
+                if(!gameStateResponseUpdate.equals(result)){
+                    GWT.log("\n"+result.toString());
+                    gameStateResponseUpdate = result;
+                }else{
+                    // todo: maybe skip something down below,
+//                    return;
+                }
                 // only set the board when empty, e.g.
                 // when the browser was refreshed or when you join the game for the first time
                 if(!Board.isInitialized()){
@@ -137,7 +144,7 @@ public class GameBoardPresenter{
                 PlayerList playerList = new PlayerList();
                 PlayerList.setActivePlayers(result.getActivePlayers());
                 PlayerList.setWinners(result.getWinners());
-                if(!PlayerList.isIsUpToDate()){//todo: modernize
+                if(!PlayerList.isIsUpToDate()){
                     gameStateService.getPlayers(new AsyncCallback<ArrayList<Player>>() {
                         @Override
                         public void onFailure(Throwable throwable) {
@@ -145,6 +152,7 @@ public class GameBoardPresenter{
 
                         @Override
                         public void onSuccess(ArrayList<Player> players) {
+                            GWT.log("Players were updated: "+players);
                             model.setPlayers(players);
                             view.getPlayerListContainer().clear();
                             view.drawPlayers(model.getPlayers());

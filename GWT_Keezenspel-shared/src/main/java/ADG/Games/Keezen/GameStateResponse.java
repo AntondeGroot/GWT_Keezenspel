@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class GameStateResponse implements IsSerializable {
     private ArrayList<Pawn> pawns;
@@ -71,13 +72,26 @@ public class GameStateResponse implements IsSerializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GameStateResponse that = (GameStateResponse) o;
+        return nrPlayers == that.nrPlayers && Objects.equals(pawns, that.pawns) && Objects.equals(players, that.players) && Objects.equals(playerColors, that.playerColors) && Objects.equals(playerIdTurn, that.playerIdTurn) && Objects.equals(activePlayers, that.activePlayers) && Objects.equals(winners, that.winners);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pawns, players, playerColors, playerIdTurn, nrPlayers, activePlayers, winners);
+    }
+
+    @Override
     public String toString() {
-        return "GameStateResponse{" +
-                "pawns=" + pawns +
-                ", playerIdTurn=" + playerIdTurn +
-                ", nrPlayers=" + nrPlayers +
-                ", activePlayers=" + activePlayers +
-                ", winners=" + winners +
+        return "GameStateResponse{\n" +
+                "    pawns = " + pawns + ",\n"+
+                "    playerIdTurn = " + playerIdTurn +",\n"+
+                "    nrPlayers = " + nrPlayers +",\n"+
+                "    activePlayers = " + activePlayers +",\n"+
+                "    winners=" + winners +",\n"+
                 '}';
     }
 }
