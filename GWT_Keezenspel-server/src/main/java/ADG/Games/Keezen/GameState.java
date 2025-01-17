@@ -276,12 +276,7 @@ public class GameState {
         Card card = moveMessage.getCard();
         MoveType moveType = moveMessage.getMoveType();
         int nrStepsPawn1 = moveMessage.getStepsPawn1();
-        int nrStepsPawn2;
-        if(moveMessage.getMessageType().equals(CHECK_MOVE)){
-            nrStepsPawn2 = 7;
-        }else{
-            nrStepsPawn2 = moveMessage.getStepsPawn2();
-        }
+        int nrStepsPawn2 = moveMessage.getStepsPawn2();
         String playerId = pawnId1.getPlayerId();
         String playerId2 = pawnId2.getPlayerId();
 
@@ -339,8 +334,8 @@ public class GameState {
                 moveMessagePawn1.setMessageType(MAKE_MOVE);
                 CardsDeck.setPlayerCard(playerId, card); // duplicate the 7 card so that the player can play both pawns with 1 card
                 moveMessagePawn2.setMessageType(MAKE_MOVE);
-                processOnMove(moveMessagePawn1, moveResponsePawn1);
-                processOnMove(moveMessagePawn2, moveResponsePawn2);
+                processOnMove(moveMessagePawn1, moveResponsePawn1, false);
+                processOnMove(moveMessagePawn2, moveResponsePawn2, true);
                 response.setMessageType(MAKE_MOVE);
             }else{
                 response.setMessageType(CHECK_MOVE);
@@ -358,8 +353,12 @@ public class GameState {
     }
 
 
-
     public static void processOnMove(MoveMessage moveMessage, MoveResponse response){
+        processOnMove(moveMessage, response, true);
+    }
+
+    public static void processOnMove(MoveMessage moveMessage, MoveResponse response, boolean goToNextPlayer){
+        // only don't go to next player when playing a SPLIT card, since you have to make processOnMove twice
         PawnId pawnId1 = moveMessage.getPawnId1();
         Card card = moveMessage.getCard();
         if(pawnId1 == null || card == null){
@@ -437,7 +436,7 @@ public class GameState {
             moves.add(nextTileId);
             if(canMoveToTile(pawnId1, nextTileId)){
                 response.setMovePawn1(moves);
-                processMove(pawnId1, new TileId(playerIdOfTile,next), moveMessage, response);
+                processMove(pawnId1, new TileId(playerIdOfTile,next), moveMessage, response, goToNextPlayer);
             }else{
                 response.setResult(CANNOT_MAKE_MOVE);
             }
@@ -474,7 +473,7 @@ public class GameState {
             moves.add(nextTileId);
             response.setMovePawn1(moves);
 
-            processMove(pawnId1, new TileId(playerIdOfTile,next), moveMessage, response);
+            processMove(pawnId1, new TileId(playerIdOfTile,next), moveMessage, response, goToNextPlayer);
 
             return;
         }
@@ -499,7 +498,7 @@ public class GameState {
             moves.add(nextTileId);
             if(canMoveToTile(pawnId1, nextTileId)){
                 response.setMovePawn1(moves);
-                processMove(pawnId1, nextTileId, moveMessage, response);
+                processMove(pawnId1, nextTileId, moveMessage, response, goToNextPlayer);
             }else{
                 response.setResult(CANNOT_MAKE_MOVE);
             }
@@ -513,7 +512,7 @@ public class GameState {
             if (canMoveToTile(pawnId1, new TileId(playerIdOfTile,0))) {
                 moves.add(new TileId(playerIdOfTile, 0));
                 response.setMovePawn1(moves);
-                processMove(pawnId1, new TileId(playerIdOfTile,0), moveMessage, response);
+                processMove(pawnId1, new TileId(playerIdOfTile,0), moveMessage, response, goToNextPlayer);
                 return;
             }
 
@@ -526,7 +525,7 @@ public class GameState {
             if(canMoveToTile(pawnId1, new TileId(playerIdOfTile, 2))){
                 moves.add(new TileId(playerIdOfTile, 2));
                 response.setMovePawn1(moves);
-                processMove(pawnId1, new TileId(playerIdOfTile,2), moveMessage, response);
+                processMove(pawnId1, new TileId(playerIdOfTile,2), moveMessage, response, goToNextPlayer);
                 return;
             }else{
                 response.setResult(CANNOT_MAKE_MOVE);
@@ -548,7 +547,7 @@ public class GameState {
                 moves.clear();
                 moves.addAll(pingpongmoves);// todo is this necessary?
                 response.setMovePawn1(moves);
-                processMove(pawnId1, pingpongmoves.getLast(), moveMessage, response);
+                processMove(pawnId1, pingpongmoves.getLast(), moveMessage, response, goToNextPlayer);
                 return;
             }
 
@@ -567,7 +566,7 @@ public class GameState {
 
             moves.add(targetTileId);
             response.setMovePawn1(moves);
-            processMove(pawnId1, targetTileId, moveMessage, response);
+            processMove(pawnId1, targetTileId, moveMessage, response, goToNextPlayer);
             return;
         }
 
@@ -600,7 +599,7 @@ public class GameState {
 
             moves.add(targetTileId);
             response.setMovePawn1(moves);
-            processMove(pawnId1, targetTileId, moveMessage, response);
+            processMove(pawnId1, targetTileId, moveMessage, response, goToNextPlayer);
             return;
         }
     }
@@ -826,6 +825,10 @@ public class GameState {
     }
 
     public static void processMove(PawnId pawnId, TileId targetTileId, MoveMessage moveMessage, MoveResponse response){
+        processMove(pawnId, targetTileId, moveMessage, response, true);
+    }
+
+    public static void processMove(PawnId pawnId, TileId targetTileId, MoveMessage moveMessage, MoveResponse response, boolean goToNextPlayer){
         String playerId = moveMessage.getPlayerId();
         Card card = moveMessage.getCard();
 
@@ -860,13 +863,15 @@ public class GameState {
         if(moveMessage.getMessageType() == MAKE_MOVE){
             movePawn(new Pawn(pawnId,targetTileId));
             Boolean playerHasNoCardsLeft = CardsDeck.playerPlaysCard(playerId, card);
-            if(playerHasNoCardsLeft){
-                forfeitPlayer(playerId);
-            }else{
-                nextActivePlayer();
+            if(goToNextPlayer){// this is only false when you SPLIT a move, the second time calling it will make you go to the next player
+                if(playerHasNoCardsLeft){
+                    forfeitPlayer(playerId);
+                }else{
+                    nextActivePlayer();
+                }
+                checkForWinners(winners);
+                removeWinnerFromActivePlayerList();
             }
-            checkForWinners(winners);
-            removeWinnerFromActivePlayerList();
         }
 
         response.setMessageType(moveMessage.getMessageType());

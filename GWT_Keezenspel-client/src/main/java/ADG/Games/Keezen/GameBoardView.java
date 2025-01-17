@@ -61,23 +61,24 @@ public class GameBoardView extends Composite {
     public GameBoardView() {
         initWidget(uiBinder.createAndBindUi(this));
         document = Document.get();
-        stepsPawn1.addChangeHandler(event -> {
-            String value = stepsPawn1.getValue(); // Get the current value of the TextBox
+        stepsPawn1.setValue("7");
+        stepsPawn2.setValue("0");
 
-            // Check if the value is of length 1 and numerical
-            if (value.length() == 1 && value.matches("\\d")) {
-                if(Integer.parseInt(value) > 7 || Integer.parseInt(value) < 0) {
-                    stepsPawn1.setValue("7");
-                    stepsPawn2.setValue("0");
-                }else{
-                    stepsPawn2.setValue(String.valueOf(7-Integer.parseInt(value)));
-                }
-            } else {
-                // Invalid input
-                stepsPawn1.setValue("7");
-                stepsPawn2.setValue("0");
-            }
-        });
+
+    }
+
+    public int getStepsPawn1() {
+        if(stepsPawn1.getValue().isEmpty()) {
+            return 0;
+        }
+        return Integer.parseInt(stepsPawn1.getValue());
+    }
+
+    public int getStepsPawn2() {
+        if(stepsPawn2.getValue().isEmpty()) {
+            return 0;
+        }
+        return Integer.parseInt(stepsPawn2.getValue());
     }
 
     public void hidePawnTextBoxes(){

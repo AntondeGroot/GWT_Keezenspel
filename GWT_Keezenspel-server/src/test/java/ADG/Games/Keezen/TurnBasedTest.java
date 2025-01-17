@@ -13,6 +13,7 @@ import java.util.HashMap;
 
 import static ADG.Games.Keezen.GameStateUtil.*;
 import static ADG.Games.Keezen.GameStateUtil.place4PawnsOnFinish;
+import static ADG.Games.Keezen.MoveResult.CAN_MAKE_MOVE;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -500,5 +501,28 @@ public class TurnBasedTest {
 
         // THEN
         assertEquals("0", GameState.getPlayerIdTurn());
+    }
+
+    @Test
+    void test_whenSplitIsPlayed_nextPlayerIs() {
+        /// GIVEN
+        createGame_With_NPlayers(3);
+        // send a valid move for the wrong player
+        Pawn pawn1 = new Pawn(new PawnId("0",1),new TileId("0",6));
+        Pawn pawn2 = new Pawn(new PawnId("0",2),new TileId("0",0));
+        placePawnOnBoard(pawn1);
+        placePawnOnBoard(pawn2);
+        // fake a valid card
+        Card card = new Card(0,7);
+        // replace a card from the players hand with this card
+        CardsDeck.giveCardToPlayerForTesting("0", card);
+
+        createSplitMessage(moveMessage, pawn1, 3, pawn2, 4, card);
+        // process
+        MoveResponse moveResponse = new MoveResponse();
+        GameState.processOnSplit(moveMessage, moveResponse);
+
+        assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+        assertEquals("1", GameState.getPlayerIdTurn());
     }
 }

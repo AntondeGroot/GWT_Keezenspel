@@ -10,7 +10,7 @@ public class PawnAndCardSelection {
     private static Card card;
     private static boolean drawCards = true;
     private static MoveType moveType;
-    private static int nrSteps;
+    private static int nrStepsPawn1;
     private static int nrStepsPawn2;
     private static int cardNr; // for selecting which card in your hand you picked
     // if you have more than 4 players you will have 1 suit that is a double, if you have a hand with two of the same card
@@ -216,7 +216,7 @@ public class PawnAndCardSelection {
         card = null;
         drawCards = true;
         moveType = null;
-        nrSteps = 0;
+        nrStepsPawn1 = 0;
         nrStepsPawn2 = 0;
     }
 
@@ -244,7 +244,7 @@ public class PawnAndCardSelection {
             setMoveType(ONBOARD);
         } else {
             setMoveType(MOVE);
-            nrSteps = 1;
+            nrStepsPawn1 = 1;
         }
     }
 
@@ -254,7 +254,7 @@ public class PawnAndCardSelection {
             //todo: set nr steps when 7 splits
         } else {
             setMoveType(MOVE);
-            nrSteps = 7;
+            nrStepsPawn1 = 7;
             nrStepsPawn2 = 0;
         }
     }
@@ -269,9 +269,9 @@ public class PawnAndCardSelection {
 
     private static void handleDefaultCard() {
         setMoveType(MOVE);
-        nrSteps = card.getCardValue();
-        if (nrSteps == 4) {
-            nrSteps = -4;
+        nrStepsPawn1 = card.getCardValue();
+        if (nrStepsPawn1 == 4) {
+            nrStepsPawn1 = -4;
         }
     }
 
@@ -283,7 +283,17 @@ public class PawnAndCardSelection {
         PawnAndCardSelection.cardNr = cardNr;
     }
 
-    public static int getNrSteps() {
-        return nrSteps;
+    public static int getNrStepsPawn1() {
+        return nrStepsPawn1;
+    }
+    public static int getNrStepsPawn2() {
+        return nrStepsPawn2;
+    }
+
+    public static void setNrStepsPawn1(int steps){
+        nrStepsPawn1 = steps;
+    }
+    public static void setNrStepsPawn2(int steps){
+        nrStepsPawn2 = steps;
     }
 }

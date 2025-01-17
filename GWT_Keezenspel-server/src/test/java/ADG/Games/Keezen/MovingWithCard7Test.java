@@ -37,8 +37,8 @@ public class MovingWithCard7Test {
 
         // GIVEN
         givePlayerSeven(0);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("0", 1),new TileId("0",0));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("0", 2),new TileId("0",10));
+        Pawn pawn1 = placePawnOnBoard(new PawnId("0", 1),new TileId("0",0));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("0", 2),new TileId("0",10));
 
         // WHEN
         createSplitMessage(moveMessage, pawn1, 4, pawn2,3, sevenCard);
@@ -56,8 +56,8 @@ public class MovingWithCard7Test {
     void test_moveTwoPawns_TestSplitAll7TilesForBothPawns(){
         // GIVEN
         givePlayerSeven(0);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("0", 1),new TileId("0",0));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("0", 2),new TileId("0",5));
+        Pawn pawn1 = placePawnOnBoard(new PawnId("0", 1),new TileId("0",0));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("0", 2),new TileId("0",5));
 
         // WHEN no decision was made how to split the 7 among the two pawns
         createSplitMessage(moveMessage, pawn1, 7, pawn2,7, sevenCard);
@@ -70,47 +70,20 @@ public class MovingWithCard7Test {
     }
 
     @Test
-    void test_moveTwoPawns_TestSplitAll7TilesForBothPawns_OneGoesToNextSegment(){
+    void test_moveTwoPawns_TestSplitForBothPawns_OneGoesToNextSegment(){
         // GIVEN
         givePlayerSeven(0);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("0", 1),new TileId("0",0));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("0", 2),new TileId("0",10));
+        Pawn pawn1 = placePawnOnBoard(new PawnId("0", 1),new TileId("0",0));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("0", 2),new TileId("0",14));
 
         // WHEN no decision was made how to split the 7 among the two pawns
-        createSplitMessage(moveMessage, pawn1, 7, pawn2,null, sevenCard); // the second is null because no choice was made
+        createSplitMessage(moveMessage, pawn1, 3, pawn2,4, sevenCard); // the second is null because no choice was made
         moveMessage.setMessageType(CHECK_MOVE);
         GameState.processOnSplit(moveMessage, moveResponse);
 
         // THEN
-        assertEquals(createExpectedMovement(0,7), moveResponse.getMovePawn1());
-        assertEquals(createExpectedMovement(10,7), moveResponse.getMovePawn2());
-    }
-
-    @Test
-    void test_moveTwoPawns_TestSplitAll7TilesForBothPawns_bugfix(){
-        // GIVEN
-        givePlayerSeven(0);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("0", 1),new TileId("0",0));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("0", 2),new TileId("0",17));
-
-        // WHEN no decision was made how to split the 7 among the two pawns
-        createSplitMessage(moveMessage, pawn1, 7, pawn2,null, sevenCard);// the second is null because no choice was made
-        moveMessage.setMessageType(CHECK_MOVE);
-        GameState.processOnSplit(moveMessage, moveResponse);
-
-        LinkedList<TileId> expectedTiles = new LinkedList<TileId>();
-        expectedTiles.add(new TileId("0",17));
-        expectedTiles.add(new TileId("0",18));
-        expectedTiles.add(new TileId("0",19));
-        expectedTiles.add(new TileId("0",18));
-        expectedTiles.add(new TileId("0",17));
-        expectedTiles.add(new TileId("0",16));
-        expectedTiles.add(new TileId("7",15));
-        expectedTiles.add(new TileId("7",14));
-
-        // THEN
-        assertEquals(createExpectedMovement(0,7), moveResponse.getMovePawn1());
-        assertEquals(expectedTiles, moveResponse.getMovePawn2());
+        assertEquals(createExpectedMovement(0,3), moveResponse.getMovePawn1());
+        assertEquals(createExpectedMovement(14,4), moveResponse.getMovePawn2());
     }
 
     private ArrayList<TileId> createExpectedMovement(int startTileNr, int nrSteps){

@@ -33,7 +33,7 @@ public class PawnAnimationTest {
     void pawnMovesAroundCorner7() {
         // GIVEN
         Card card = givePlayerCard(0,4);
-        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard("0",new TileId("0",5));
+        Pawn pawn1 = GameStateUtil.placePawnOnNest("0",new TileId("0",5));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -53,7 +53,7 @@ public class PawnAnimationTest {
     void pawnMovesAroundCorner1() {
         // GIVEN
         Card card = givePlayerCard(0,3);
-        Pawn pawn1 = createPawnAndPlaceOnBoard("0",new TileId("0",0));
+        Pawn pawn1 = placePawnOnNest("0",new TileId("0",0));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -73,7 +73,7 @@ public class PawnAnimationTest {
     void pawnMovesAroundCorner13And0() {
         // GIVEN
         Card card = givePlayerCard(2,8);
-        Pawn pawn1 = createPawnAndPlaceOnBoard("2",new TileId("0",12));
+        Pawn pawn1 = placePawnOnNest("2",new TileId("0",12));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -95,7 +95,7 @@ public class PawnAnimationTest {
     void pawnMoveFrom9To12() {
         // GIVEN
         Card card = givePlayerCard(0,3);
-        Pawn pawn1 = createPawnAndPlaceOnBoard("0",new TileId("0",9));
+        Pawn pawn1 = placePawnOnNest("0",new TileId("0",9));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -113,7 +113,7 @@ public class PawnAnimationTest {
     void pawnMoveFrom11To1() {
         // GIVEN
         Card card = givePlayerCard(2,6);
-        Pawn pawn1 = createPawnAndPlaceOnBoard("2",new TileId("0",11));
+        Pawn pawn1 = placePawnOnNest("2",new TileId("0",11));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -134,7 +134,7 @@ public class PawnAnimationTest {
     void pawnMoveHitsAllCorners() {
         // GIVEN
         Card card = givePlayerCard(2,19);
-        Pawn pawn1 = createPawnAndPlaceOnBoard("2",new TileId("0",0));
+        Pawn pawn1 = placePawnOnNest("2",new TileId("0",0));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -157,7 +157,7 @@ public class PawnAnimationTest {
     void pawnMovesIntoFinishAndOvershoots() {
         // GIVEN
         Card card = givePlayerCard(1,5);
-        Pawn pawn1 = createPawnAndPlaceOnBoard("1",new TileId("0",15));
+        Pawn pawn1 = placePawnOnNest("1",new TileId("0",15));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -176,7 +176,7 @@ public class PawnAnimationTest {
     void pawnMovesBackwardsOverCorners15_13_7_1() {
         // GIVEN
         Card card = givePlayerCard(1,-12);
-        Pawn pawn1 = createPawnAndPlaceOnBoard("1",new TileId("1",16));
+        Pawn pawn1 = placePawnOnNest("1",new TileId("1",16));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -198,7 +198,7 @@ public class PawnAnimationTest {
     void pawnMovesBackwardsOverCorners13_7() {
         // GIVEN
         Card card = givePlayerCard(0,-8);
-        Pawn pawn1 = createPawnAndPlaceOnBoard("0",new TileId("0",14));
+        Pawn pawn1 = placePawnOnNest("0",new TileId("0",14));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -219,7 +219,7 @@ public class PawnAnimationTest {
     void pawnMovesBackwardsOverCorners7() {
         // GIVEN
         Card card = givePlayerCard(0,-4);
-        Pawn pawn1 = createPawnAndPlaceOnBoard("0",new TileId("0",8));
+        Pawn pawn1 = placePawnOnNest("0",new TileId("0",8));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -242,8 +242,8 @@ public class PawnAnimationTest {
 
         // GIVEN
         Card card = givePlayerCard(1,8);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("1",1) ,new TileId("2",12));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("1",2) ,new TileId("0",0));
+        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("2",12));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("1",2) ,new TileId("0",0));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -279,8 +279,8 @@ public class PawnAnimationTest {
 
         // GIVEN
         Card card = givePlayerCard(1,8);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("1",1) ,new TileId("1",16));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("1",2) ,new TileId("0",12));
+        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",16));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("1",2) ,new TileId("0",12));
 
         // WHEN
         createMoveMessage(moveMessage, pawn2, card);
@@ -308,9 +308,9 @@ public class PawnAnimationTest {
 
         // GIVEN
         Card card = givePlayerCard(1,3);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("1",1) ,new TileId("1",17));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("1",2) ,new TileId("1",19));
-        Pawn pawn3 = createPawnAndPlaceOnBoard(new PawnId("1",3) ,new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",17));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("1",2) ,new TileId("1",19));
+        Pawn pawn3 = placePawnOnBoard(new PawnId("1",3) ,new TileId("1",16));
 
 
         // WHEN
@@ -337,9 +337,9 @@ public class PawnAnimationTest {
 
         // GIVEN
         Card card = givePlayerCard(1,9);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("1",1) ,new TileId("1",17));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("1",2) ,new TileId("1",19));
-        Pawn pawn3 = createPawnAndPlaceOnBoard(new PawnId("1",3) ,new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",17));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("1",2) ,new TileId("1",19));
+        Pawn pawn3 = placePawnOnBoard(new PawnId("1",3) ,new TileId("1",16));
 
 
         // WHEN
@@ -371,9 +371,9 @@ public class PawnAnimationTest {
         createGame_With_NPlayers(3);
 
         // GIVEN
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("1",1) ,new TileId("1",17));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("1",2) ,new TileId("1",19));
-        Pawn pawn3 = createPawnAndPlaceOnBoard(new PawnId("1",3) ,new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",17));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("1",2) ,new TileId("1",19));
+        Pawn pawn3 = placePawnOnBoard(new PawnId("1",3) ,new TileId("1",16));
 
 
         // WHEN
@@ -403,8 +403,8 @@ public class PawnAnimationTest {
         createGame_With_NPlayers(3);
 
         // GIVEN
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("1",1) ,new TileId("1",17));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("1",3) ,new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",17));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("1",3) ,new TileId("1",16));
 
 
         // WHEN
@@ -428,8 +428,8 @@ public class PawnAnimationTest {
         createGame_With_NPlayers(3);
 
         // GIVEN
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("1",1) ,new TileId("1",17));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("1",3) ,new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",17));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("1",3) ,new TileId("1",16));
 
 
         // WHEN
@@ -453,8 +453,8 @@ public class PawnAnimationTest {
         createGame_With_NPlayers(3);
 
         // GIVEN
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("1",1) ,new TileId("1",17));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("1",3) ,new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",17));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("1",3) ,new TileId("1",16));
 
 
         // WHEN
@@ -477,9 +477,9 @@ public class PawnAnimationTest {
         int nrSteps = -4;
 
         // GIVEN
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("1",1) ,new TileId("1",17));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("1",2) ,new TileId("1",19));
-        Pawn pawn3 = createPawnAndPlaceOnBoard(new PawnId("1",3) ,new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",17));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("1",2) ,new TileId("1",19));
+        Pawn pawn3 = placePawnOnBoard(new PawnId("1",3) ,new TileId("1",16));
 
 
         // WHEN

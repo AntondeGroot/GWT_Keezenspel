@@ -31,8 +31,12 @@ public class TestMoveHandler implements ClickHandler {
         GWT.log("test card: "+PawnAndCardSelection.getCard());
         moveMessage.setPawnId1(PawnAndCardSelection.getPawnId1());
         moveMessage.setMessageType(MessageType.CHECK_MOVE);
-        moveMessage.setStepsPawn1(PawnAndCardSelection.getNrSteps());
+        moveMessage.setStepsPawn1(PawnAndCardSelection.getNrStepsPawn1());
+        if(PawnAndCardSelection.getMoveType()==MoveType.SPLIT){
+            moveMessage.setStepsPawn2(PawnAndCardSelection.getNrStepsPawn2());
+        }
         moveMessage.setPawnId2(PawnAndCardSelection.getPawnId2());
+
         GWT.log(moveMessage.toString());
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
