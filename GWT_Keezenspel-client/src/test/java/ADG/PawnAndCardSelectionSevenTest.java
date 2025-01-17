@@ -199,7 +199,7 @@ public class PawnAndCardSelectionSevenTest {
         PawnAndCardSelection.addPawn(ownPawnOnBoard);
 
         // THEN
-        assertEquals(7, PawnAndCardSelection.getNrSteps());
+        assertEquals(7, PawnAndCardSelection.getNrStepsPawn1());
     }
 
     @Test
@@ -214,7 +214,7 @@ public class PawnAndCardSelectionSevenTest {
         PawnAndCardSelection.addPawn(ownPawnOnBoard);
 
         // THEN
-        assertEquals(7, PawnAndCardSelection.getNrSteps());
+        assertEquals(7, PawnAndCardSelection.getNrStepsPawn1());
         assertNull(PawnAndCardSelection.getPawnId2());
         assertEquals(ownPawnOnBoard2, PawnAndCardSelection.getPawn1());
     }

@@ -86,7 +86,7 @@ public class GameBoardPresenter{
                     GWT.log("you clicked TileId: " + tileId);
                 }
                 // todo: maybe replace x,y parameters
-                CanvasClickHandler.handleCanvasClick(event,x,y);
+                CanvasClickHandler.handleCanvasClick(event,x,y, view.getStepsPawn1(), view.getStepsPawn2());
             }
         }, ClickEvent.getType());
     }
@@ -105,6 +105,24 @@ public class GameBoardPresenter{
         DOM.setEventListener(canvasElement, event -> {
             if (DOM.eventGetType(event) == Event.ONCLICK) {
                 new CanvasClickHandler();
+            }
+        });
+        
+        view.stepsPawn1.addChangeHandler(event -> {
+            String value = view.stepsPawn1.getValue(); // Get the current value of the TextBox
+
+            // Check if the value is of length 1 and numerical
+            if (value.length() == 1 && value.matches("\\d")) {
+                if(Integer.parseInt(value) > 7 || Integer.parseInt(value) < 0) {
+                    view.stepsPawn1.setValue("7");
+                    view.stepsPawn2.setValue("0");
+                }else{
+                    view.stepsPawn2.setValue(String.valueOf(7-Integer.parseInt(value)));
+                }
+            } else {
+                // Invalid input
+                view.stepsPawn1.setValue("7");
+                view.stepsPawn2.setValue("0");
             }
         });
     }

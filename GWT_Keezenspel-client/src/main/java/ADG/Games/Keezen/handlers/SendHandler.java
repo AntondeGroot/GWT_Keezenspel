@@ -33,7 +33,10 @@ public class SendHandler implements ClickHandler {
         moveMessage.setCard(PawnAndCardSelection.getCard());
         moveMessage.setMoveType(PawnAndCardSelection.getMoveType());
         moveMessage.setMessageType(MAKE_MOVE);
-        moveMessage.setStepsPawn1(PawnAndCardSelection.getNrSteps());
+        moveMessage.setStepsPawn1(PawnAndCardSelection.getNrStepsPawn1());
+        if(PawnAndCardSelection.getMoveType()==MoveType.SPLIT){
+            moveMessage.setStepsPawn2(PawnAndCardSelection.getNrStepsPawn2());
+        }
         moveMessage.setPawnId2(PawnAndCardSelection.getPawnId2());
 
         GWT.log("... Sending MoveMessage" + moveMessage);

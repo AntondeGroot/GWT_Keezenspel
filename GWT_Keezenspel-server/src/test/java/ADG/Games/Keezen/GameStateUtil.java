@@ -5,7 +5,7 @@ import java.util.Collections;
 
 public class GameStateUtil {
 
-    public static Pawn createPawnAndPlaceOnBoard(String playerId, TileId currentTileId){
+    public static Pawn placePawnOnNest(String playerId, TileId currentTileId){
         // for creating pawns for different players
         PawnId pawnId1 = new PawnId(playerId,0);
         Pawn pawn1 = new Pawn(pawnId1, new TileId(playerId, -1));
@@ -14,12 +14,18 @@ public class GameStateUtil {
         return pawn1;
     }
 
-    public static Pawn createPawnAndPlaceOnBoard(PawnId pawnId, TileId currentTileId){
+    public static Pawn placePawnOnBoard(PawnId pawnId, TileId currentTileId){
         // for creating multiple pawns for the same player
         Pawn pawn1 = new Pawn(pawnId, new TileId(pawnId.getPlayerId(), -pawnId.getPawnNr()-1));
         pawn1.setCurrentTileId(currentTileId);
         GameState.movePawn(pawn1);
         return pawn1;
+    }
+    public static Pawn placePawnOnBoard(Pawn pawn){
+        // for creating multiple pawns for the same player
+        pawn.setCurrentTileId(pawn.getCurrentTileId());
+        GameState.movePawn(pawn);
+        return pawn;
     }
     public static Card givePlayerCard(int playerInt, int nrSteps){
         String playerId = String.valueOf(playerInt);
@@ -89,7 +95,7 @@ public class GameStateUtil {
         Pawn pawn = new Pawn(new PawnId(playerId,0),new TileId(playerId,-1));
 
         // place the pawn on the board (playerId,1)
-        createPawnAndPlaceOnBoard(playerId, new TileId(playerId,1));
+        placePawnOnNest(playerId, new TileId(playerId,1));
 
         // fake a valid card
         Card card = new Card(0,5);
@@ -124,10 +130,10 @@ public class GameStateUtil {
     }
 
     public static void place4PawnsOnFinish(String playerId){
-        createPawnAndPlaceOnBoard(new PawnId(playerId,0) , new TileId(playerId,16));
-        createPawnAndPlaceOnBoard(new PawnId(playerId,1) , new TileId(playerId,17));
-        createPawnAndPlaceOnBoard(new PawnId(playerId,2) , new TileId(playerId,18));
-        createPawnAndPlaceOnBoard(new PawnId(playerId,3) , new TileId(playerId,19));
+        placePawnOnBoard(new PawnId(playerId,0) , new TileId(playerId,16));
+        placePawnOnBoard(new PawnId(playerId,1) , new TileId(playerId,17));
+        placePawnOnBoard(new PawnId(playerId,2) , new TileId(playerId,18));
+        placePawnOnBoard(new PawnId(playerId,3) , new TileId(playerId,19));
     }
 
     public static void createGame_With_NPlayers(int nrPlayers){

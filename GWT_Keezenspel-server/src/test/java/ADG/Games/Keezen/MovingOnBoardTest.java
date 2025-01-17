@@ -32,7 +32,7 @@ class MovingOnBoardTest {
     void putPlayerOnBoard_WhenPossible() {
         // GIVEN
         Card ace = givePlayerAce(0);
-        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard("0",new TileId("0",-2));
+        Pawn pawn1 = GameStateUtil.placePawnOnNest("0",new TileId("0",-2));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
@@ -50,7 +50,7 @@ class MovingOnBoardTest {
     void putPlayerOnBoard_ThenNextPlayerPlays() {
         // GIVEN
         Card ace = givePlayerAce(0);
-        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard("0",new TileId("0",-2));
+        Pawn pawn1 = GameStateUtil.placePawnOnNest("0",new TileId("0",-2));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
@@ -71,7 +71,7 @@ class MovingOnBoardTest {
         }
 
         Card ace = givePlayerAce(0);
-        Pawn pawn1 = GameStateUtil.createPawnAndPlaceOnBoard("0",new TileId("0",-2));
+        Pawn pawn1 = GameStateUtil.placePawnOnNest("0",new TileId("0",-2));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
@@ -85,8 +85,8 @@ class MovingOnBoardTest {
     void putPlayerNotOnBoard_WhenSamePlayerIsAlreadyThere() {
         // GIVEN
         Card ace = givePlayerAce(0);
-        Pawn pawn1 = createPawnAndPlaceOnBoard(new PawnId("0",0), new TileId("0",-1));
-        Pawn pawn2 = createPawnAndPlaceOnBoard(new PawnId("0",1), new TileId("0",0));
+        Pawn pawn1 = placePawnOnBoard(new PawnId("0",0), new TileId("0",-1));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("0",1), new TileId("0",0));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
@@ -104,7 +104,7 @@ class MovingOnBoardTest {
     void putPlayerNotOnBoard_WhenNotOnNestTiles(){
         // GIVEN
         Card ace = givePlayerAce(0);
-        Pawn pawn1 = createPawnAndPlaceOnBoard("0",new TileId("0",3));
+        Pawn pawn1 = placePawnOnNest("0",new TileId("0",3));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
@@ -122,7 +122,7 @@ class MovingOnBoardTest {
     void putPlayerNotOnBoard_WhenOnFinishTiles(){
         // GIVEN
         Card king = givePlayerKing(0);
-        Pawn pawn1 = createPawnAndPlaceOnBoard("0",new TileId("0",17));
+        Pawn pawn1 = placePawnOnNest("0",new TileId("0",17));
 
         // WHEN
         createOnBoardMessage("0", pawn1, king);
