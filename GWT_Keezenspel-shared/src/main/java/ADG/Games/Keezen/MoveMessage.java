@@ -14,6 +14,8 @@ public class MoveMessage implements IsSerializable {
         private Integer stepsPawn2;
         private Card card;
 
+        public MoveMessage() {}
+
         public Card getCard() {
                 return card;
         }

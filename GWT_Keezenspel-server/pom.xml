@@ -12,9 +12,9 @@
   <packaging>war</packaging>
 
   <properties>
-    <!-- The server can use Java 17 syntax -->
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <!-- The server can use Java 21 syntax -->
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
   </properties>
 
   <dependencies>

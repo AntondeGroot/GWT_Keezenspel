@@ -32,16 +32,10 @@
       <version>${project.version}</version>
       <classifier>sources</classifier>
     </dependency>
-      <dependency>
+    <dependency>
           <groupId>org.junit.jupiter</groupId>
           <artifactId>junit-jupiter</artifactId>
-          <scope>test</scope>
-      </dependency>
-    <dependency>
-      <groupId>ADG</groupId>
-      <artifactId>GWT_Keezenspel-shared</artifactId>
-      <version>1.0-SNAPSHOT</version>
-      <scope>compile</scope>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

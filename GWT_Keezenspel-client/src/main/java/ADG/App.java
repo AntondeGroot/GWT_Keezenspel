@@ -3,10 +3,8 @@ package ADG;
 import ADG.Games.Keezen.*;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.Label;
-import ADG.Games.Keezen.services.PollingService;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.

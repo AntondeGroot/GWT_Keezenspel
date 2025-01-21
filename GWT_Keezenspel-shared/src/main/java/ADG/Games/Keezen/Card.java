@@ -13,7 +13,7 @@ public class Card implements IsSerializable {
     }
 
     /**
-     * @param suit
+     * @param suit , suit
      * @param cardValue , value between 1 and 13 (ace,2,...,king)
      */
     public Card(int suit, int cardValue) {

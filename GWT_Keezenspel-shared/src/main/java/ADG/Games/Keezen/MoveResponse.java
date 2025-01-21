@@ -18,6 +18,8 @@ public class MoveResponse implements IsSerializable {
     private MessageType messageType;
     private MoveResult result;
 
+    public MoveResponse() {}
+
     public MoveResult getResult() {
         return result;
     }
