@@ -25,7 +25,11 @@ public class CardsDeck implements IsSerializable {
     }
 
     public static ArrayList<Card> getCardsForPlayer(String playerUUID) {
-        return playerHands.get(playerUUID).getHand();
+        if(playerHands.containsKey(playerUUID)){
+            return playerHands.get(playerUUID).getHand();
+        }else{
+            return new ArrayList<>();
+        }
     }
 
     public static void forfeitCardsForPlayer(String playerId) {
