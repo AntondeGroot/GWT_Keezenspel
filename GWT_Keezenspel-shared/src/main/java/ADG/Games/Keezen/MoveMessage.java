@@ -83,14 +83,14 @@ public class MoveMessage implements IsSerializable {
         @Override
         public String toString() {
                 return "MoveMessage{\n" +
-                        "    playerId=" + playerId +",\n"+
-                        "    pawnId1=" + pawnId1 +",\n"+
-                        "    pawnId2=" + pawnId2 +",\n"+
-                        "    moveType=" + moveType +",\n"+
-                        "    messageType=" + messageType +",\n"+
-                        "    stepsPawn1=" + stepsPawn1 +",\n"+
-                        "    stepsPawn2=" + stepsPawn2 +",\n"+
-                        "    card=" + card +",\n"+
+                        "    playerId = " + playerId +",\n"+
+                        "    pawnId 1 = " + pawnId1 +",\n"+
+                        "    pawnId 2 = " + pawnId2 +",\n"+
+                        "    moveType = " + moveType +",\n"+
+                        "    messageType = " + messageType +",\n"+
+                        "    steps Pawn 1 = " + stepsPawn1 +",\n"+
+                        "    steps Pawn 2 = " + stepsPawn2 +",\n"+
+                        "    card = " + card +",\n"+
                         '}';
         }
 }

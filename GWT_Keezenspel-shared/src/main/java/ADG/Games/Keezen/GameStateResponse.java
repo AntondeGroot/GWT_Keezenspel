@@ -5,6 +5,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class GameStateResponse implements IsSerializable {
     private ArrayList<Pawn> pawns;
@@ -86,8 +87,12 @@ public class GameStateResponse implements IsSerializable {
 
     @Override
     public String toString() {
+        ArrayList<Pawn> activePawns = pawns.stream()
+                .filter(c->c.getCurrentTileId().getTileNr() >= 0)
+                .collect(Collectors.toCollection(ArrayList::new));
+
         return "GameStateResponse{\n" +
-                "    pawns = " + pawns + ",\n"+
+                "    active pawns = " + activePawns + ",\n"+
                 "    playerIdTurn = " + playerIdTurn +",\n"+
                 "    nrPlayers = " + nrPlayers +",\n"+
                 "    activePlayers = " + activePlayers +",\n"+

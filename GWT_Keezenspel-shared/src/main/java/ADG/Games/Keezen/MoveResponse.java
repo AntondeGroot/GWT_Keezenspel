@@ -8,12 +8,15 @@ import java.util.ArrayList;
 @SuppressWarnings("serial")
 public class MoveResponse implements IsSerializable {
     // serializable messages cannot contain List but must use a concrete implementation like ArrayList or LinkedList
-    private Integer nextPlayerId;
     private PawnId pawnId1;
     private PawnId pawnId2;
+    private PawnId pawnIdKilled1;
+    private PawnId pawnIdKilled2;
     // deque is not supported by GWT
     private LinkedList<TileId> movePawn1;
     private LinkedList<TileId> movePawn2;
+    private LinkedList<TileId> moveKilledPawn1;
+    private LinkedList<TileId> moveKilledPawn2;
     private MoveType moveType;
     private MessageType messageType;
     private MoveResult result;
@@ -44,6 +47,21 @@ public class MoveResponse implements IsSerializable {
         this.pawnId2 = pawnId2;
     }
 
+    public PawnId getPawnIdKilled1() {
+        return pawnIdKilled1;
+    }
+
+    public PawnId getPawnIdKilled2(){
+        return pawnIdKilled2;
+    }
+
+    public void setPawnIdKilled1(PawnId pawnIdKilled) {
+        this.pawnIdKilled1 = pawnIdKilled;
+    }
+
+    public void setPawnIdKilled2(PawnId pawnIdKilled) {
+        this.pawnIdKilled2 = pawnIdKilled;
+    }
     public LinkedList<TileId> getMovePawn1() {
         return movePawn1;
     }
@@ -58,6 +76,30 @@ public class MoveResponse implements IsSerializable {
 
     public void setMovePawn2(LinkedList<TileId> movePawn2) {
         this.movePawn2 = movePawn2;
+    }
+
+    public LinkedList<TileId> getMoveKilledPawn1() {
+        return moveKilledPawn1;
+    }
+
+    public LinkedList<TileId> getMoveKilledPawn2() {
+        return moveKilledPawn2;
+    }
+
+    /**
+     * Only use this server side in OnMove to check if any pawn was killed
+     * when you want to communicate to the client that 2 pawns were killed
+     * then use SetMoveKilledPawn2 in OnSplit
+     */
+    public void setMoveKilledPawn1(LinkedList<TileId> moveKilledPawn) {
+        this.moveKilledPawn1 = moveKilledPawn;
+    }
+
+    /**
+     * Only use this when you use the OnSplit filling it in for the client
+     */
+    public void setMoveKilledPawn2(LinkedList<TileId> moveKilledPawn) {
+        this.moveKilledPawn2 = moveKilledPawn;
     }
 
     public MoveType getMoveType() {
@@ -79,14 +121,17 @@ public class MoveResponse implements IsSerializable {
     @Override
     public String toString() {
         return "MoveResponse{\n" +
-                "    result=" + result +",\n\n"+
-                "    nextPlayerId=" + nextPlayerId +",\n"+
-                "    pawnId1=" + pawnId1 +",\n"+
-                "    pawnId2=" + pawnId2 +",\n"+
-                "    movePawn1=" + movePawn1 +",\n"+
-                "    movePawn2=" + movePawn2 +",\n"+
-                "    moveType=" + moveType +",\n"+
-                "    messageType=" + messageType +",\n"+
+                "    result = " + result +",\n\n"+
+                "    pawnId 1 = " + pawnId1 +",\n"+
+                "    pawnId 2 = " + pawnId2 +",\n"+
+                "    pawnId Killed 1 = " + pawnIdKilled1 +",\n"+
+                "    pawnId Killed 2 = " + pawnIdKilled2 +",\n"+
+                "    movePawn 1 = " + movePawn1 +",\n"+
+                "    movePawn 2 = " + movePawn2 +",\n"+
+                "    moveKilledPawn 1 = " + moveKilledPawn1 +",\n"+
+                "    moveKilledPawn 2 = " + moveKilledPawn2 +",\n"+
+                "    moveType = " + moveType +",\n"+
+                "    messageType = " + messageType +",\n"+
                 '}';
     }
 }

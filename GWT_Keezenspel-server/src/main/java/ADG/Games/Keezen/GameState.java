@@ -341,11 +341,18 @@ public class GameState {
                 response.setMessageType(CHECK_MOVE);
             }
             response.setPawnId1(moveMessage.getPawnId1());
-            response.setPawnId2(moveMessage.getPawnId2());//todo: what else?
+            response.setPawnId2(moveMessage.getPawnId2());
             response.setMovePawn1(extrapolateMissingTiles(moveResponsePawn1.getMovePawn1()));
             response.setMovePawn2(extrapolateMissingTiles(moveResponsePawn2.getMovePawn1()));
+            if(moveResponsePawn1.getMoveKilledPawn1() != null){
+                response.setPawnIdKilled1(moveResponsePawn1.getPawnIdKilled1());// only the first one is filled in with a kill when you check only 1 pawn
+                response.setMoveKilledPawn1(moveResponsePawn1.getMoveKilledPawn1());
+            }
+            if(moveResponsePawn2.getMoveKilledPawn1() != null){
+                response.setPawnIdKilled2(moveResponsePawn2.getPawnIdKilled1());// only the first one is filled in with a kill when you check only 1 pawn
+                response.setMoveKilledPawn2(moveResponsePawn2.getMoveKilledPawn1());
+            }
             response.setResult(CAN_MAKE_MOVE);
-            // todo: fill in response
         }else{
             response.setResult(CANNOT_MAKE_MOVE);
         }
@@ -848,11 +855,12 @@ public class GameState {
         if(pawn != null){
             if(!Objects.equals(pawn.getPlayerId(), pawnId.getPlayerId())){
                 response.setPawnId1(pawnId);
-                response.setPawnId2(pawn.getPawnId());
+                response.setPawnId2(null);
                 LinkedList<TileId> move2 = new LinkedList<>();
                 move2.add(targetTileId);
                 move2.add(pawn.getNestTileId());
-                response.setMovePawn2(move2);
+                response.setPawnIdKilled1(pawn.getPawnId());
+                response.setMoveKilledPawn1(move2);
                 if(moveMessage.getMessageType() == MAKE_MOVE) {
                     movePawn(new Pawn(pawn.getPawnId(), pawn.getNestTileId()));
                 }

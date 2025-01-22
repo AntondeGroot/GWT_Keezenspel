@@ -167,34 +167,37 @@ public class Board {
 		return null;
 	}
 
+	// TODO: ONLY DRAW PAWNS WHEN IT IS NECESSARY// TODO: ONLY DRAW PAWNS WHEN IT IS NECESSARY
 	public void drawPawns(Context2d context){
-		// TODO: ONLY DRAW PAWNS WHEN IT IS NECESSARY
+		// sort the pawns vertically so that they don't overlap weirdly when drawn
 		pawns.sort(new PawnComparator());
 		for(Pawn pawn : pawns){
 			if (shouldBeAnimated(pawn)) {
 				Iterator<PawnAnimationMapping> iterator = animationMappings.iterator();
 				while (iterator.hasNext()) {
-					PawnAnimationMapping animationMappings1 = iterator.next();
+					PawnAnimationMapping animation_Pawn_i = iterator.next();
 					// only animate the killing of a pawn after all other moves of other pawns were animated
-					if(!animationMappings1.isAnimateLast()) {
-						if (pawn.equals(animationMappings1.getPawn())) {
-							if (animationMappings1.getPoints().isEmpty()) {
+					if(!animation_Pawn_i.isAnimateLast()) {
+						if (pawn.equals(animation_Pawn_i.getPawn())) {
+							if (animation_Pawn_i.getPoints().isEmpty()) {
 								iterator.remove(); // Remove the current element safely
 							} else {
-								LinkedList<Point> points = animationMappings1.getPoints();
+								LinkedList<Point> points = animation_Pawn_i.getPoints();
 								if (!points.isEmpty()) {
 									Point p = points.getFirst();
 									drawPawnAnimated(context, pawn, p);
+									GWT.log("draw animated : "+ pawn);
 									points.removeFirst(); // Remove the first element safely
 								}
 							}
 						}
 					}else{
+						GWT.log("draw statically : "+ animation_Pawn_i.getPawn());
 						// draw the pawn that is about to be killed statically
-						drawPawnAnimated(context, animationMappings1.getPawn(), animationMappings1.getPoints().getFirst());
+						drawPawnAnimated(context, animation_Pawn_i.getPawn(), animation_Pawn_i.getPoints().getFirst());
 						// if no other pawns to be drawn, start drawing this one.
-						if (animationMappings.size() == 1){
-							animationMappings1.setAnimateLast(false);
+						if (onlyPawnsToBeKilledAreLeft() && animation_Pawn_i.isAnimateLast()){
+							animation_Pawn_i.setAnimateLast(false);
 						}
 					}
 				}
@@ -202,6 +205,10 @@ public class Board {
 				drawPawn(context, pawn);
 			}
 		}
+	}
+
+	public static boolean onlyPawnsToBeKilledAreLeft(){
+		return animationMappings.stream().allMatch(PawnAnimationMapping::isAnimateLast);
 	}
 
 	public static void movePawn(Pawn pawn, LinkedList<TileId> movePawn, boolean animateLast) {
