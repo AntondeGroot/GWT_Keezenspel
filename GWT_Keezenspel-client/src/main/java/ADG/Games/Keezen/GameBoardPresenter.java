@@ -193,7 +193,8 @@ public class GameBoardPresenter{
                     GWT.log(result.toString());
                     CardsDeck.setCards(result.getCards());
                     CardsDeck.setNrCardsPerPlayer(result.getNrOfCardsPerPlayer());
-                    view.drawCards(CardsDeck.getCards(), result.getNrOfCardsPerPlayer());
+                    CardsDeck.setPlayedCards(result.getPlayedCards());
+                    view.drawCards(CardsDeck.getCards(), result.getNrOfCardsPerPlayer(), CardsDeck.getPlayedCards());
                     PlayerList.refresh();
                 }
             }

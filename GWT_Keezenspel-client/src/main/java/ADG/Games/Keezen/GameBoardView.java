@@ -431,7 +431,7 @@ public class GameBoardView extends Composite {
         }
     }
 
-    public void drawCards(List<Card> cards, HashMap<String, Integer> nrCardsPerPlayerUUID) {
+    public void drawCards(List<Card> cards, HashMap<String, Integer> nrCardsPerPlayerUUID, ArrayList<Card> playedCards) {
         // Create an image to represent the card deck
         Image img = new Image("/card-deck.png");
 
@@ -445,7 +445,7 @@ public class GameBoardView extends Composite {
                 GWT.log("\n\n\ndrawing cards");
                 drawPlayerCardsInHand(cards, img);
                 drawCardsIcons(nrCardsPerPlayerUUID, img);
-
+                drawPlayedCards(playedCards, img);
             }
         });
 
@@ -453,6 +453,47 @@ public class GameBoardView extends Composite {
         removeCardDeckImage();
         img.setVisible(false);
         RootPanel.get().add(img);
+    }
+
+    private void drawPlayedCards(ArrayList<Card> playedCards, Image spriteImage) {
+        // Loop through the cards to draw them
+        // the cards are drawn rotating with an angle of 45 degrees
+        // meaning that after 8 cards you will draw a card over a previous drawn card
+        // In order to not do any unnecessary drawing, we will skip the first N cards
+        // if more than 8 cards were drawn.
+        int angleDegrees = 45;
+        int startDrawingFromCardIndex = 0;
+        if(playedCards.size() > 8){
+            startDrawingFromCardIndex = playedCards.size() - 8;
+        }
+
+        for (int i = 0; i < playedCards.size(); i++) {
+            angleDegrees = angleDegrees + 45;
+
+            if(i >= startDrawingFromCardIndex) {
+                Card card = playedCards.get(i);
+                double angleRadians = Math.toRadians(angleDegrees);
+
+                // Define the source rectangle (from the sprite sheet)
+                double spriteWidth = 1920 / 13.0;
+                double spriteHeight = 1150 / 5.0;
+                double sourceX = spriteWidth * (card.getCardValue() - 1);
+                double sourceY = spriteHeight * card.getSuit();
+
+                // Define the destination rectangle (on the canvas)
+                double destWidth = 60.0; // Card width on canvas
+                double destHeight = destWidth / spriteWidth * spriteHeight; // Maintain aspect ratio
+                double destX = 300 - destWidth / 4 + 10 * Math.cos(angleRadians); // rotate for each card 45 degrees
+                double destY = 300 - destHeight / 2 + 10 * Math.sin(angleRadians);
+
+                // Draw the card image on the canvas
+                getCanvasCardsContext().drawImage(
+                        ImageElement.as(spriteImage.getElement()),
+                        sourceX, sourceY, spriteWidth, spriteHeight,
+                        destX, destY, destWidth, destHeight
+                );
+            }
+        }
     }
 
     private void drawRoundedRect(Context2d context, double x, double y, double width, double height, double radius) {

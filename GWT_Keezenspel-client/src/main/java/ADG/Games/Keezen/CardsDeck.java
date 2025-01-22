@@ -8,6 +8,7 @@ import java.util.List;
 public class CardsDeck {
 
     private static List<Card> cards = new ArrayList<>();
+    private static ArrayList<Card> playedCards = new ArrayList<>();
     private static HashMap<String, Integer> nrCardsPerPlayer = new HashMap<>();
 
     public static boolean areCardsDifferent(List<Card> otherCards){
@@ -28,6 +29,14 @@ public class CardsDeck {
 
     public static List<Card> getCards(){
         return cards;
+    }
+
+    public static void setPlayedCards(ArrayList<Card> playedCards){
+        CardsDeck.playedCards = playedCards;
+    }
+
+    public static ArrayList<Card> getPlayedCards(){
+        return playedCards;
     }
 
     public static Card pickCard(int i){

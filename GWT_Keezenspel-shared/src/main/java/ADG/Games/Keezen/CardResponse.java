@@ -10,12 +10,11 @@ public class CardResponse implements IsSerializable {
     // serializable messages cannot contain List but must use a concrete implementation like ArrayList or LinkedList
     String playerUUID;
     ArrayList<Card> cards;
+    ArrayList<Card> playedCards;
     HashMap<String, Integer> nrOfCardsPerPlayer;
 
     public CardResponse() {
     }
-
-
 
     public String getPlayerId() {
         return playerUUID;
@@ -31,6 +30,14 @@ public class CardResponse implements IsSerializable {
 
     public void setCards(ArrayList<Card> cards) {
         this.cards = cards;
+    }
+
+    public ArrayList<Card> getPlayedCards() {
+        return playedCards;
+    }
+
+    public void setPlayedCards(ArrayList<Card> playedCards) {
+        this.playedCards = playedCards;
     }
 
     public HashMap<String, Integer> getNrOfCardsPerPlayer() {
