@@ -177,8 +177,7 @@ public class GameBoardView extends Composite {
             double dx = 0-5/2;
             double dw = imagePixelSize+5;
             double dh = imagePixelSize+5;
-            GWT.log("source image is "+sx+","+sh+", playerId2: " + playerId);
-            GWT.log("card size = "+dh+","+dw);
+
             // for spritesheets dx dy
             ctx.drawImage(img, sx,sy,sw,sh,dx,dy,dw,dh);
             canvas.asWidget().setStyleName("profilepic");

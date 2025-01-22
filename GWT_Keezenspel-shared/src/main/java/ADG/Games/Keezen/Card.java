@@ -52,9 +52,18 @@ public class Card implements IsSerializable {
 
     @Override
     public String toString() {
+        String cardDescription;
+        switch (cardValue){
+            case 1: cardDescription = "Ace"; break;
+            case 11: cardDescription = "Jack"; break;
+            case 12: cardDescription = "Queen"; break;
+            case 13: cardDescription = "King"; break;
+            default: cardDescription = String.valueOf(cardValue);
+        }
+
         return "Card{" +
                 "suit=" + suit +
-                ", card=" + cardValue +
+                ", card=" + cardDescription +
                 '}';
     }
 }
