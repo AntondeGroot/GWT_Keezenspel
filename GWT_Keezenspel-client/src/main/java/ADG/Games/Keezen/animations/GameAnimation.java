@@ -34,7 +34,7 @@ public class GameAnimation {
         if(PawnAndCardSelection.getDrawCards()) {
             // todo: move to presenter
             GameBoardView gameBoardView = new GameBoardView();
-            gameBoardView.drawCards(CardsDeck.getCards());
+            gameBoardView.drawCards(CardsDeck.getCards(), CardsDeck.getNrCardsPerPlayer());
             PawnAndCardSelection.setCardsAreDrawn();
         }
         Board board = new Board();

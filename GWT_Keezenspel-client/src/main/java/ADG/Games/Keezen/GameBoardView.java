@@ -11,10 +11,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GameBoardView extends Composite {
@@ -359,7 +356,82 @@ public class GameBoardView extends Composite {
 //        pawn1.setCurrentTileId(movePawn.getLast());
     }
 
-    public void drawCards(List<Card> cards) {
+    public void drawCardsIcons(HashMap<String, Integer> nrCardsPerPlayerUUID, Image spriteImage){
+
+        for (Map.Entry<String, Integer> entry : nrCardsPerPlayerUUID.entrySet()) {
+            String uuid = entry.getKey();
+            ArrayList<Point> cardpoints = Board.getCardsDeckPointsForPlayer(uuid);
+            Point startPoint = cardpoints.get(0);
+            Point endPoint = cardpoints.get(1);
+            double dx = (endPoint.getX() - startPoint.getX()) / 4;
+            double dy = (endPoint.getY() - startPoint.getY()) / 4;
+            GWT.log("drawCardsIcons \n"+
+                    "PlayerUUID "+uuid+"\n"+
+                    "Start "+startPoint +"\n"+
+                    "End "+endPoint+"\n"+
+                    "dx "+dx+"\n"+
+                    "dy "+dy
+            );
+
+            Integer nrCards = entry.getValue();
+            for (int i = 0; i < nrCards; i++) {
+                // Define the source rectangle (from the sprite sheet): this image belongs to the backside image
+                double spriteWidth = 1920 / 13.0;
+                double spriteHeight = 1150 / 5.0;
+                double sourceX = spriteWidth * (2);
+                double sourceY = spriteHeight * 4;
+
+                // Define the destination rectangle (on the canvas)
+                double imageWidth = 20;
+                double destWidth = imageWidth; // Card width on canvas
+                double destHeight = destWidth / spriteWidth * spriteHeight; // Maintain aspect ratio
+                double destX = startPoint.getX() - destWidth/2 +dx*i; // Offset for each card
+                double destY = startPoint.getY() - destHeight/2 +dy*i;
+
+                // Draw the card image on the canvas
+                getCanvasCardsContext().drawImage(
+                        ImageElement.as(spriteImage.getElement()),
+                        sourceX, sourceY, spriteWidth, spriteHeight,
+                        destX, destY, destWidth, destHeight
+                );
+            }
+        }
+    }
+
+    private void drawPlayerCardsInHand(List<Card> cards, Image spriteImage){
+        // Loop through the cards to draw them
+        for (int i = 0; i < cards.size(); i++) {
+            Card card = cards.get(i);
+
+            // Define the source rectangle (from the sprite sheet)
+            double spriteWidth = 1920 / 13.0;
+            double spriteHeight = 1150 / 5.0;
+            double sourceX = spriteWidth * (card.getCardValue()-1);
+            double sourceY = spriteHeight * card.getSuit();
+
+            // Define the destination rectangle (on the canvas)
+            double destX = 10 + (100.0 + 10) * i; // Offset for each card
+            double destY = 600; // Fixed Y position
+            double destWidth = 100.0; // Card width on canvas
+            double destHeight = destWidth / spriteWidth * spriteHeight; // Maintain aspect ratio
+
+            // Draw the card image on the canvas
+            getCanvasCardsContext().drawImage(
+                    ImageElement.as(spriteImage.getElement()),
+                    sourceX, sourceY, spriteWidth, spriteHeight,
+                    destX, destY, destWidth, destHeight
+            );
+
+            // Highlight selected card, if any
+            if (PawnAndCardSelection.getCard() != null &&
+                    PawnAndCardSelection.getCard().equals(card) &&
+                    PawnAndCardSelection.getCardNr() == i) {
+                drawRoundedRect(getCanvasCardsContext(), destX - 1.5, destY - 1.5, destWidth + 3, destHeight + 3, 8);
+            }
+        }
+    }
+
+    public void drawCards(List<Card> cards, HashMap<String, Integer> nrCardsPerPlayerUUID) {
         // Create an image to represent the card deck
         Image img = new Image("/card-deck.png");
 
@@ -370,36 +442,10 @@ public class GameBoardView extends Composite {
                 // Clear the canvas to prepare for drawing new cards
                 getCanvasCardsContext().clearRect(0, 0, getCanvasCards().getWidth(), getCanvasCards().getHeight());
 
-                // Loop through the cards to draw them
-                for (int i = 0; i < cards.size(); i++) {
-                    Card card = cards.get(i);
+                GWT.log("\n\n\ndrawing cards");
+                drawPlayerCardsInHand(cards, img);
+                drawCardsIcons(nrCardsPerPlayerUUID, img);
 
-                    // Define the source rectangle (from the sprite sheet)
-                    double spriteWidth = 1920 / 13.0;
-                    double spriteHeight = 1150 / 5.0;
-                    double sourceX = spriteWidth * (card.getCardValue()-1);
-                    double sourceY = spriteHeight * card.getSuit();
-
-                    // Define the destination rectangle (on the canvas)
-                    double destX = 10 + (100.0 + 10) * i; // Offset for each card
-                    double destY = 600; // Fixed Y position
-                    double destWidth = 100.0; // Card width on canvas
-                    double destHeight = destWidth / spriteWidth * spriteHeight; // Maintain aspect ratio
-
-                    // Draw the card image on the canvas
-                    getCanvasCardsContext().drawImage(
-                            ImageElement.as(img.getElement()),
-                            sourceX, sourceY, spriteWidth, spriteHeight,
-                            destX, destY, destWidth, destHeight
-                    );
-
-                    // Highlight selected card, if any
-                    if (PawnAndCardSelection.getCard() != null &&
-                            PawnAndCardSelection.getCard().equals(card) &&
-                            PawnAndCardSelection.getCardNr() == i) {
-                        drawRoundedRect(getCanvasCardsContext(), destX - 1.5, destY - 1.5, destWidth + 3, destHeight + 3, 8);
-                    }
-                }
             }
         });
 

@@ -18,6 +18,15 @@ public class Board {
 	private static ArrayList<Pawn> pawns = new ArrayList<>();
 	private static double cellDistance;
 	private static ArrayList<Player> players;
+	private static HashMap<String, ArrayList<Point>> cardsDeckPointsPerPlayer = new HashMap<>();
+
+	public static ArrayList<Point> getCardsDeckPointsForPlayer(String UUID) {
+		if(!cardsDeckPointsPerPlayer.containsKey(UUID)) {
+			new ArrayList<>();
+		}
+
+		return cardsDeckPointsPerPlayer.get(UUID);
+	}
 
     public void createBoard(ArrayList<Player> players, double boardSize) {
 		// Clear the mappings list before creating a new board
@@ -27,13 +36,19 @@ public class Board {
 		cellDistance = CellDistance.getCellDistance(nrPlayers, boardSize);
 		Point startPoint = CellDistance.getStartPoint(nrPlayers, boardSize);
 
+		int lastPlayerInt = nrPlayers - 1;
 		// create normal tiles
 		for (int j = -9; j < 7; j++) {
 			// for construction purposes it is easier to take one board section that consists only of 90 degrees angles
+			//
 			// for game purposes it is easier that the starting point is position 0 and the last position is 15
-			// therefore the construction goes from the last playerId, from position 7 til 15 and then starts with playerId 1 position 0 to 6
-			// then all the tiles are rotated based on the number of players, where the playerId is updated based on the rotation.
-			int playerId = (j < 0) ? nrPlayers - 1 : 0;
+			//
+			// therefore the construction goes from the last playerId, from position 7 til 15 and then
+			// starts with playerId 0 from position 0 to 6
+			//
+			// then all the tiles are rotated based on the number of players,
+			// where the playerId is updated based on the rotation.
+			int playerId = (j < 0) ? lastPlayerInt : 0;
 			int tileNr = (j < 0) ? j + 16 : j;
 			tiles.add(new TileMapping(colorToUUID(playerId, players), tileNr, new Point(startPoint)));
 
@@ -50,16 +65,17 @@ public class Board {
 		}
 
 		// create finish tiles
-		Point point = new Point(getPosition(colorToUUID(nrPlayers-1, players),15));
+		Point point = new Point(getPosition(colorToUUID(lastPlayerInt, players),15));
 		for (int i = 1; i <= 4; i++) {
 			point.setY(point.getY() - cellDistance);
-			String playerUUID = colorToUUID(0, players);
+			String playerUUID = colorToUUID(0, players); //todo: colorToUUID does not make much sense here, int to UUID would
 			tiles.add(new TileMapping(playerUUID, 15+i, new Point(point)));
 		}
 
 		// create nest tiles
 		// they will be assigned negative values to distinguish them from the playing field
-		// they will be assigned different negative values to distinguish them from each other so that 2 pawns cannot end up on the same nest tile
+		// they will be assigned different negative values to distinguish them from each other
+		// so that 2 pawns cannot end up on the same nest tile
 		String playerUUID = colorToUUID(0, players);
 
 		point = new Point(getPosition(playerUUID,1));
@@ -78,10 +94,31 @@ public class Board {
 		for (TileMapping tile : tiles) {
 			for (int k = 1; k < nrPlayers; k++) {
 				int colorInt = (UUIDtoColor(tile.getPlayerId(), players)+k)%nrPlayers;
-				GWT.log("color int: " + colorInt);
 				playerId = colorToUUID(colorInt, players);
 				tempTiles.add(new TileMapping(playerId, tile.getTileNr(), tile.getPosition().rotate(new Point(300,300), 360.0/nrPlayers*k)));
 			}
+		}
+		// create "Tiles" for where the player's cards should be placed
+		ArrayList<Point> cardsDeckPoints = new ArrayList<>();
+		Point beginPoint = getPosition(playerUUID,1);
+		beginPoint = new Point(beginPoint.getX(), beginPoint.getY()+cellDistance+3);
+		Point endPoint = getPosition(colorToUUID(lastPlayerInt, players),13);
+		endPoint = new Point(endPoint.getX(), endPoint.getY()+cellDistance+3);
+		GWT.log("\n\n\n beginpoint" + beginPoint);
+		cardsDeckPoints.add(new Point(beginPoint.getX(),beginPoint.getY()));
+		cardsDeckPoints.add(new Point(endPoint.getX(), endPoint.getY()));
+		cardsDeckPointsPerPlayer.put(playerUUID, cardsDeckPoints);
+
+		// add points for cards
+		for(int k = 1; k < nrPlayers; k++) {
+			beginPoint = beginPoint.rotate(new Point(300,300), 360.0/nrPlayers);
+			GWT.log("\n\n\n rotated beginpoint"+beginPoint);
+			GWT.log("rotation angle = "+360.0/nrPlayers);
+			endPoint = endPoint.rotate(new Point(300,300), 360.0/nrPlayers);
+			ArrayList<Point> cardsDeckPoints2 = new ArrayList<>();
+			cardsDeckPoints2.add(beginPoint);
+			cardsDeckPoints2.add(endPoint);
+			cardsDeckPointsPerPlayer.put(colorToUUID(k, players), cardsDeckPoints2);
 		}
 
         tiles.addAll(tempTiles);
