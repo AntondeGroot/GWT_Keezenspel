@@ -7,6 +7,7 @@ import java.util.*;
 public class CardsDeck implements IsSerializable {
     private static int roundNr = 0;
     private static ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
+    private static ArrayList<Card> playedCards = new ArrayList<>();
     private static HashMap<String, PlayerHand> playerHands = new HashMap<>();
     private static ArrayList<String> activePlayers = new ArrayList<>();
 
@@ -33,6 +34,7 @@ public class CardsDeck implements IsSerializable {
     }
 
     public static void forfeitCardsForPlayer(String playerId) {
+        playedCards.addAll(playerHands.get(playerId).getHand());
         playerHands.get(playerId).dropCards();
 //        players.get(playerId).getHand().clear(); todo: method is different, does it work correctly?
     }
@@ -56,6 +58,7 @@ public class CardsDeck implements IsSerializable {
     public static boolean playerPlaysCard(String playerId, Card card) {
         if(card != null) {
             playerHands.get(playerId).getHand().remove(card);
+            playedCards.add(card);
             if(playerHands.get(playerId).getHand().isEmpty()){
                 return true;
             }
@@ -66,7 +69,7 @@ public class CardsDeck implements IsSerializable {
     public static void giveCardToPlayerForTesting(String playerId, Card card){
         // this way you can replace one card by another, play a card in a Test, and then know based on
         // the game whether the player should have 5 or 4 cards in their hand left.
-        playerHands.get(playerId).getHand().remove(0);
+        playerHands.get(playerId).getHand().removeFirst();
         setPlayerCard(playerId, card);
     }
 
@@ -75,7 +78,14 @@ public class CardsDeck implements IsSerializable {
     }
 
     public static void dealCards(){
-        int nrCards = (roundNr == 0) ? 5 : 4;
+        int nrCards;
+        if(roundNr == 0){
+            // new round so reset played cards stack
+            playedCards.clear();
+            nrCards = 5;
+        }else{
+            nrCards = 4;
+        }
 
         //todo: is this reset necessary?
         for(String playerId: playerHands.keySet() ){
@@ -105,5 +115,10 @@ public class CardsDeck implements IsSerializable {
         roundNr = 0;
         cardsDeque.clear();
         playerHands.clear();
+        playedCards.clear();
+    }
+
+    public static ArrayList<Card> getPlayedCards() {
+        return playedCards;
     }
 }

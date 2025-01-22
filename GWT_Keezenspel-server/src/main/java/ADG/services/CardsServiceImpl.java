@@ -15,6 +15,7 @@ public class CardsServiceImpl extends RemoteServiceServlet implements CardsServi
         CardResponse response = new CardResponse();
         response.setPlayerId(playerUUID);
         response.setCards(CardsDeck.getCardsForPlayer(playerUUID));
+        response.setPlayedCards(CardsDeck.getPlayedCards());
         response.setNrOfCardsPerPlayer(CardsDeck.getNrOfCardsForAllPlayers());
         return response;
     }

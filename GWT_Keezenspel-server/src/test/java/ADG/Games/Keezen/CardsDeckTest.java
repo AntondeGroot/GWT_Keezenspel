@@ -176,4 +176,62 @@ class CardsDeckTest {
 
         assertEquals(4,totalCards);
     }
+
+    @Test
+    void PlayedCardsDoNotResetDuringFirstRound() {
+        createGame_With_NPlayers(3);
+        GameState.setPlayerIdTurn("0");
+        for (int i = 0; i < 4; i++) {
+            sendValidMoveMessage("0");
+            sendValidMoveMessage("1");
+            sendValidMoveMessage("2");
+        }
+        assertEquals(3*4, CardsDeck.getPlayedCards().size());
+
+        GameState.tearDown();
+        CardsDeck.reset();
+    }
+
+    @Test
+    void PlayedCardsDoNotResetAfterFirstRound() {
+        createGame_With_NPlayers(3);
+        GameState.setPlayerIdTurn("0");
+        for (int i = 0; i < 5; i++) {
+            sendValidMoveMessage("0");
+            sendValidMoveMessage("1");
+            sendValidMoveMessage("2");
+        }
+        assertEquals(3*5, CardsDeck.getPlayedCards().size());
+
+        GameState.tearDown();
+        CardsDeck.reset();
+    }
+    @Test
+    void PlayedCardsDoNotResetAfterSecondRound() {
+        createGame_With_NPlayers(3);
+        GameState.setPlayerIdTurn("0");
+        for (int i = 0; i < 9; i++) {
+            sendValidMoveMessage("0");
+            sendValidMoveMessage("1");
+            sendValidMoveMessage("2");
+        }
+        assertEquals(3*5+3*4, CardsDeck.getPlayedCards().size());
+
+        GameState.tearDown();
+        CardsDeck.reset();
+    }
+    @Test
+    void PlayedCardsResetAfterThirdRound() {
+        createGame_With_NPlayers(3);
+        GameState.setPlayerIdTurn("0");
+        for (int i = 0; i < 13; i++) {
+            sendValidMoveMessage("0");
+            sendValidMoveMessage("1");
+            sendValidMoveMessage("2");
+        }
+        assertEquals(0, CardsDeck.getPlayedCards().size());
+
+        GameState.tearDown();
+        CardsDeck.reset();
+    }
 }
