@@ -78,10 +78,8 @@ public class GameBoardView extends Composite {
         return Integer.parseInt(stepsPawn2.getValue());
     }
 
-    public void hidePawnTextBoxes(){
-        pawnIntegerBoxes.setVisible(false);
-        stepsPawn1.setValue("");
-        stepsPawn2.setValue("");
+    public void showPawnTextBoxes(boolean show){
+        pawnIntegerBoxes.setVisible(show);
     }
 
     public Button getSendButton(){
