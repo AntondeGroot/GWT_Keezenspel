@@ -182,7 +182,6 @@ public class GameBoardPresenter{
     }
 
     private void pollServerForCards(){
-        // todo: this should actually only get the cards for the Cookie.playerId
         PawnAndCardSelection.setPlayerId(Cookie.getPlayerId());
         cardsService.getCards(Cookie.getPlayerId(), new AsyncCallback<CardResponse>() {
             public void onFailure(Throwable caught) {

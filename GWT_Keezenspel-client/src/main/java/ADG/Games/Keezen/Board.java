@@ -8,8 +8,7 @@ import ADG.Games.Keezen.util.PawnRect;
 
 import java.util.*;
 
-import static ADG.Games.Keezen.util.PlayerUUIDColor.colorToUUID;
-import static ADG.Games.Keezen.util.PlayerUUIDColor.UUIDtoColor;
+import static ADG.Games.Keezen.util.PlayerUUIDUtil.*;
 
 public class Board {
 
@@ -50,7 +49,7 @@ public class Board {
 			// where the playerId is updated based on the rotation.
 			int playerId = (j < 0) ? lastPlayerInt : 0;
 			int tileNr = (j < 0) ? j + 16 : j;
-			tiles.add(new TileMapping(colorToUUID(playerId, players), tileNr, new Point(startPoint)));
+			tiles.add(new TileMapping(playerIntToUUID(playerId, players), tileNr, new Point(startPoint)));
 
 			if( j < -3){
 				// move downwards for 6 tiles
@@ -65,10 +64,10 @@ public class Board {
 		}
 
 		// create finish tiles
-		Point point = new Point(getPosition(colorToUUID(lastPlayerInt, players),15));
+		Point point = new Point(getPosition(playerIntToUUID(lastPlayerInt, players),15));
 		for (int i = 1; i <= 4; i++) {
 			point.setY(point.getY() - cellDistance);
-			String playerUUID = colorToUUID(0, players); //todo: colorToUUID does not make much sense here, int to UUID would
+			String playerUUID = playerIntToUUID(0, players);
 			tiles.add(new TileMapping(playerUUID, 15+i, new Point(point)));
 		}
 
@@ -76,7 +75,7 @@ public class Board {
 		// they will be assigned negative values to distinguish them from the playing field
 		// they will be assigned different negative values to distinguish them from each other
 		// so that 2 pawns cannot end up on the same nest tile
-		String playerUUID = colorToUUID(0, players);
+		String playerUUID = playerIntToUUID(0, players);
 
 		point = new Point(getPosition(playerUUID,1));
 		point.setX(point.getX() - 1.5*cellDistance);
@@ -93,8 +92,8 @@ public class Board {
 		String playerId;
 		for (TileMapping tile : tiles) {
 			for (int k = 1; k < nrPlayers; k++) {
-				int colorInt = (UUIDtoColor(tile.getPlayerId(), players)+k)%nrPlayers;
-				playerId = colorToUUID(colorInt, players);
+				int colorInt = (UUIDtoInt(tile.getPlayerId(), players)+k)%nrPlayers;
+				playerId = playerIntToUUID(colorInt, players);
 				tempTiles.add(new TileMapping(playerId, tile.getTileNr(), tile.getPosition().rotate(new Point(300,300), 360.0/nrPlayers*k)));
 			}
 		}
@@ -102,7 +101,7 @@ public class Board {
 		ArrayList<Point> cardsDeckPoints = new ArrayList<>();
 		Point beginPoint = getPosition(playerUUID,1);
 		beginPoint = new Point(beginPoint.getX(), beginPoint.getY()+cellDistance+3);
-		Point endPoint = getPosition(colorToUUID(lastPlayerInt, players),13);
+		Point endPoint = getPosition(playerIntToUUID(lastPlayerInt, players),13);
 		endPoint = new Point(endPoint.getX(), endPoint.getY()+cellDistance+3);
 		GWT.log("\n\n\n beginpoint" + beginPoint);
 		cardsDeckPoints.add(new Point(beginPoint.getX(),beginPoint.getY()));
@@ -118,7 +117,7 @@ public class Board {
 			ArrayList<Point> cardsDeckPoints2 = new ArrayList<>();
 			cardsDeckPoints2.add(beginPoint);
 			cardsDeckPoints2.add(endPoint);
-			cardsDeckPointsPerPlayer.put(colorToUUID(k, players), cardsDeckPoints2);
+			cardsDeckPointsPerPlayer.put(playerIntToUUID(k, players), cardsDeckPoints2);
 		}
 
         tiles.addAll(tempTiles);
@@ -152,7 +151,7 @@ public class Board {
 			int tileNr = mapping.getTileNr();
 			// only player tiles get a color
 			if (tileNr <= 0 || tileNr >= 16) {
-				color = PlayerColors.getHexColor(UUIDtoColor(mapping.getPlayerId(), players));// todo: convert UUID string to int
+				color = PlayerColors.getHexColor(UUIDtoInt(mapping.getPlayerId(), players));
 			}
 			drawCircle(context, mapping.getPosition().getX(), mapping.getPosition().getY(), cellDistance/2, color);
 		}
@@ -274,7 +273,7 @@ public class Board {
 	private void drawPawn(Context2d context, Pawn pawn){
 		// Load an image and draw it to the canvas
 		String playerId = pawn.getPlayerId();
-		int playerInt = UUIDtoColor(playerId, players);
+		int playerInt = UUIDtoInt(playerId, players);
 		Image image = new Image("/pawn"+playerInt+".png");
 		Image image_outline = new Image("/pawn_outline.png");
 
@@ -301,7 +300,7 @@ public class Board {
 	private void drawPawnAnimated(Context2d context, Pawn pawn, Point point){
 		// Load an image and draw it to the canvas
 		String playerId = pawn.getPlayerId();
-		int playerInt = UUIDtoColor(playerId, players);
+		int playerInt = UUIDtoInt(playerId, players);
 		Image image = new Image("/pawn"+playerInt+".png");
 
 		double[] xywh = PawnRect.getRect(point);

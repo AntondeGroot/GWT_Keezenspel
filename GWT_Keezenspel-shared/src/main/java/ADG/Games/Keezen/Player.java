@@ -10,7 +10,7 @@ public class Player implements IsSerializable {
     private String name;
     private int place = -1;
     private String uuid;
-    private int color = 0;
+    private int index = 0;
 
     public Player() {}
 
@@ -20,23 +20,36 @@ public class Player implements IsSerializable {
         this.uuid = uuid;
     }
 
-    public void setColor(int color) {
-        this.color = color;
+    /**
+     * The client sends messages based on their UUID
+     * Index is used for drawing some stuff but not validating whether moves are legal
+     */
+    public void setIndex(int index) {
+        this.index = index;
     }
-
-    public int getColor(){
-        return color;
+    /**
+     * The client sends messages based on their UUID
+     * Index is used for drawing some stuff but not validating whether moves are legal
+     */
+    public int getIndex(){
+        return index;
     }
 
     public void setPlace(int place) {
         this.place = place;
         this.isActive = false;
     }
-
+    /**
+     * The client sends messages based on their UUID
+     * Index is used for drawing some stuff but not validating whether moves are legal
+     */
     public void setUUID(String uuid) {
         this.uuid = uuid;
     }
-
+    /**
+     * The client sends messages based on their UUID
+     * Index is used for drawing some stuff but not validating whether moves are legal
+     */
     public String getUUID(){return uuid;}
 
     public void setIsPlaying(boolean playing) {
@@ -74,12 +87,12 @@ public class Player implements IsSerializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Player player = (Player) o;
-        return isActive == player.isActive && isPlaying == player.isPlaying && place == player.place && color == player.color && Objects.equals(name, player.name) && Objects.equals(uuid, player.uuid);
+        return isActive == player.isActive && isPlaying == player.isPlaying && place == player.place && index == player.index && Objects.equals(name, player.name) && Objects.equals(uuid, player.uuid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isActive, isPlaying, name, place, uuid, color);
+        return Objects.hash(isActive, isPlaying, name, place, uuid, index);
     }
 
     @Override

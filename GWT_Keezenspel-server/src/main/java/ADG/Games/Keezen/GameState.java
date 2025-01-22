@@ -61,7 +61,7 @@ public class GameState {
 
     public static void addPlayer(Player player) {
         if(!players.contains(player) && players.size() < MAX_PLAYERS){
-            player.setColor(players.size());
+            player.setIndex(players.size());
             players.add(player);
         }
     }
