@@ -190,8 +190,10 @@ public class GameBoardPresenter{
             }
             public void onSuccess(CardResponse result) {
                 if(CardsDeck.areCardsDifferent(result.getCards())){
+                    GWT.log(result.toString());
                     CardsDeck.setCards(result.getCards());
-                    view.drawCards(CardsDeck.getCards());
+                    CardsDeck.setNrCardsPerPlayer(result.getNrOfCardsPerPlayer());
+                    view.drawCards(CardsDeck.getCards(), result.getNrOfCardsPerPlayer());
                     PlayerList.refresh();
                 }
             }
