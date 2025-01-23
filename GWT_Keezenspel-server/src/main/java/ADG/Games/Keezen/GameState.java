@@ -7,6 +7,7 @@ import static ADG.Games.Keezen.CardsDeck.playerDoesNotHaveCard;
 import static ADG.Games.Keezen.MessageType.*;
 import static ADG.Games.Keezen.MoveResult.*;
 import static ADG.Games.Keezen.MoveType.*;
+import static ADG.Games.Keezen.Util.CardValueCheck.*;
 import static ADG.Games.Keezen.logic.MissingTiles.extrapolateMissingTiles;
 import static ADG.Games.Keezen.logic.StartTileLogic.canPassStartTile;
 import static ADG.Games.Keezen.logic.WinnerLogic.checkForWinners;
@@ -290,7 +291,7 @@ public class GameState {
             return;
         }
 
-        if(card.getCardValue() != 7){
+        if(!isSeven(card)){
             response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
             return;
         }
@@ -399,7 +400,7 @@ public class GameState {
         }
 
         // Player cannot move an opponents pawn without playing a Jack
-        if(card.getCardValue() != 11){
+        if(!isJack(card)){
             if(moveMessage.getPawnId1() != null && !Objects.equals(moveMessage.getPawnId1().getPlayerId(), playerId)){
                 response.setResult(CANNOT_MAKE_MOVE);
                 return;
@@ -801,7 +802,7 @@ public class GameState {
 
         // cannot go onboard without an Ace or King
         int cardValue = card.getCardValue();
-        if(!(cardValue == 1 || cardValue == 13)){// todo: remove magic numbers
+        if(!(isAce(card) || isKing(card))){
             response.setResult(CANNOT_MAKE_MOVE);
             return;
         }
