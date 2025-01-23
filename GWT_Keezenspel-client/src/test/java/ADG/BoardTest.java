@@ -11,6 +11,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
+    // you should mock Cookie.getplayerId
     @Test
     void createBoardForTwoPlayers() {
         Board board = new Board();
@@ -18,7 +19,7 @@ class BoardTest {
         List<TileMapping> mappings =  Board.getTiles();
         assertEquals(24*2, mappings.size());
     }
-
+    // you should mock Cookie.getplayerId
     @Test
     void createBoardForEightPlayers() {
         Board board = new Board();

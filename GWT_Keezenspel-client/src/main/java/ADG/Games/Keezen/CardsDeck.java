@@ -11,10 +11,6 @@ public class CardsDeck {
     private static ArrayList<Card> playedCards = new ArrayList<>();
     private static HashMap<String, Integer> nrCardsPerPlayer = new HashMap<>();
 
-    public static boolean areCardsDifferent(List<Card> otherCards){
-        return !cards.equals(otherCards);
-    }
-
     public static HashMap<String, Integer> getNrCardsPerPlayer() {
         return nrCardsPerPlayer;
     }
