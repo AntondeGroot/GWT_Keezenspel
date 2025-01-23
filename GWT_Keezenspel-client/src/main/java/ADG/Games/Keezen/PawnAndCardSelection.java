@@ -1,6 +1,8 @@
 package ADG.Games.Keezen;
 
 import static ADG.Games.Keezen.MoveType.*;
+import static ADG.Games.Keezen.Util.CardValueCheck.isJack;
+import static ADG.Games.Keezen.Util.CardValueCheck.isSeven;
 
 public class PawnAndCardSelection {
     // todo: turn this into a model, do not use statics
@@ -234,7 +236,7 @@ public class PawnAndCardSelection {
         }
 
         // selection of card deselects second pawn when card is not 7 or jack
-        if(card.getCardValue() != 11 && card.getCardValue() != 7){
+        if(!isJack(card) && !isSeven(card)){
             pawn2 = resetPawn();
         }
     }

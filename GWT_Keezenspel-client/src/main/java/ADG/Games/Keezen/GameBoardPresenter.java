@@ -18,6 +18,7 @@ import ADG.Games.Keezen.handlers.SendHandler;
 import ADG.Games.Keezen.services.PollingService;
 
 import java.util.ArrayList;
+import static ADG.Games.Keezen.Util.CardValueCheck.isSeven;
 
 public class GameBoardPresenter {
     private final GameBoardModel model;
@@ -231,7 +232,7 @@ public class GameBoardPresenter {
         if (card == null) {
             return false;
         }
-        if (card.getCardValue() != 7) {
+        if (!isSeven(card)) {
             return false;
         }
         if (PawnAndCardSelection.getPawnId2() == null) {
