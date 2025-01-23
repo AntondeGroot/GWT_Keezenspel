@@ -5,6 +5,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class CardResponse implements IsSerializable {
     // serializable messages cannot contain List but must use a concrete implementation like ArrayList or LinkedList
@@ -46,6 +47,19 @@ public class CardResponse implements IsSerializable {
 
     public void setNrOfCardsPerPlayer(HashMap<String, Integer> nrOfCardsPerPlayer) {
         this.nrOfCardsPerPlayer = nrOfCardsPerPlayer;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CardResponse that = (CardResponse) o;
+        return Objects.equals(playerUUID, that.playerUUID) && Objects.equals(cards, that.cards) && Objects.equals(playedCards, that.playedCards) && Objects.equals(nrOfCardsPerPlayer, that.nrOfCardsPerPlayer);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(playerUUID, cards, playedCards, nrOfCardsPerPlayer);
     }
 
     @Override

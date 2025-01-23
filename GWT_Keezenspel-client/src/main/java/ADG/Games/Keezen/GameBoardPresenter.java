@@ -22,6 +22,7 @@ import static ADG.Games.Keezen.Util.CardValueCheck.isSeven;
 
 public class GameBoardPresenter {
     private final GameBoardModel model;
+    private CardResponse storedCardResponse;
     private Board boardModel;
     private final GameBoardView view;
     private final GameStateServiceAsync gameStateService;
@@ -36,6 +37,7 @@ public class GameBoardPresenter {
         this.gameStateService = gameStateService;
         this.cardsService = cardsService;
         this.pollingService = pollingService;
+        this.storedCardResponse = new CardResponse();
     }
 
     public void start() {
@@ -202,7 +204,9 @@ public class GameBoardPresenter {
             }
 
             public void onSuccess(CardResponse result) {
-                if (CardsDeck.areCardsDifferent(result.getCards())) {
+
+                if (!storedCardResponse.equals(result)) {
+                    storedCardResponse = result;
                     GWT.log(result.toString());
                     CardsDeck.setCards(result.getCards());
                     CardsDeck.setNrCardsPerPlayer(result.getNrOfCardsPerPlayer());

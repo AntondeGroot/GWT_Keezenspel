@@ -358,6 +358,11 @@ public class GameBoardView extends Composite {
 
         for (Map.Entry<String, Integer> entry : nrCardsPerPlayerUUID.entrySet()) {
             String uuid = entry.getKey();
+            if(uuid.equals(Cookie.getPlayerId())){
+                // skip drawing card icons for the current player, their hand is already drawn showing the cards
+                // so you don't need to draw the back side to indicate how many cards they currently have
+                continue;
+            }
             ArrayList<Point> cardpoints = Board.getCardsDeckPointsForPlayer(uuid);
             Point startPoint = cardpoints.get(0);
             Point endPoint = cardpoints.get(1);

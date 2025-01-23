@@ -121,6 +121,25 @@ public class Board {
 		}
 
         tiles.addAll(tempTiles);
+
+		// rotate all tiles based on player UUID
+		String uuid = Cookie.getPlayerId();
+		int playerint = UUIDtoInt(uuid, players);
+		for(TileMapping tile : tiles) {
+			tile.setPosition(
+					tile.getPosition().rotate(new Point(300,300), -360.0/nrPlayers*playerint)
+			);
+		}
+		// rotate all the points where all the players' cards should be displayed
+		for(Map.Entry<String, ArrayList<Point>> entry : cardsDeckPointsPerPlayer.entrySet()){
+			String uuid_i = entry.getKey();
+			ArrayList<Point> templist = new ArrayList<>();
+			for (Point p: entry.getValue()){
+				p = p.rotate(new Point(300,300), -360.0/nrPlayers*playerint);
+				templist.add(p);
+			}
+			cardsDeckPointsPerPlayer.put(uuid_i, templist);
+		}
     }
 
 	public static TileId getTileId(double x, double y) {
