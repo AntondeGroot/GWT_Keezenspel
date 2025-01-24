@@ -10,13 +10,10 @@ import ADG.Games.Keezen.PawnAndCardSelection;
 
 public class GameAnimation {
     private Context2d ctxPawns;
-    private Context2d ctxBoard;
-    private boolean isInitialized = false;
 
     public GameAnimation() {
         Document document = Document.get();
         ctxPawns = ((CanvasElement) document.getElementById("canvasPawns2")).getContext2d();
-        ctxBoard = ((CanvasElement) document.getElementById("canvasBoard2")).getContext2d();
     }
 
     public void update(){
@@ -39,9 +36,5 @@ public class GameAnimation {
         }
         Board board = new Board();
         board.drawPawns(ctxPawns);
-        if(!isInitialized){
-            board.drawBoard(ctxBoard);
-            isInitialized = true;
-        }
     }
 }

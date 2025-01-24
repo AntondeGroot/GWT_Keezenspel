@@ -73,17 +73,6 @@ h1 {
   margin: 15px 6px 6px;
 }
 
-#circle {
-  width: 400px;
-  height: 400px;
-  background-color: darkred;
-  border-radius: 50%;
-  display: inline-block;
-  text-align: center;
-  line-height: 40px;
-  margin: 2px;
-}
-
 #circle:hover {
   background-color: darkgray;
 }
@@ -140,4 +129,16 @@ h1 {
 }
 .TextBoxLabel{
   margin-right: 5px;
+}
+
+/*
+the circles of the game tiles are designed to be so called 'neumorphism'
+the design of which can be controlled and copy pasted into this CSS file by visiting the website:
+https://neumorphism.io/
+*/
+.circle{
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+  border-radius: 50%;
 }

@@ -167,7 +167,7 @@ public class GameBoardPresenter {
                     GWT.log(result.getPawns().toString());
                     GWT.log("poll server board.create" + result);
                     board.createBoard(result.getPlayers(), 600);
-                    board.drawBoard(view.getCanvasBoardContext()); // todo: make view.drawBoard(model);
+                    view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
                     board.drawPawns(view.getCanvasPawnsContext());
                     PlayerList.setNrPlayers(result.getNrPlayers());
                 }
