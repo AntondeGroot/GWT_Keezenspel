@@ -14,6 +14,9 @@ import com.google.gwt.user.client.ui.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ADG.Games.Keezen.PlayerColors.*;
+import static ADG.Games.Keezen.util.PlayerUUIDUtil.UUIDtoInt;
+
 public class GameBoardView extends Composite {
 
     private Document document;
@@ -40,6 +43,9 @@ public class GameBoardView extends Composite {
     //    a dom element which you could find by .findElementById()
     @UiField
     HTMLPanel canvasWrapper;
+
+    @UiField
+    HTMLPanel pawnBoard;
 
     @UiField
     HorizontalPanel pawnIntegerBoxes;
@@ -290,24 +296,18 @@ public class GameBoardView extends Composite {
         return false;
     }
 
-    public void drawBoard() {
-//        GWT.log("drawing board");
-//        double cellSize = 40.0;
-//        String color = "";
-//        int tileNr = 0;
-//
-//        for (TileMapping mapping : tiles) {
-//            color = "#D3D3D3";
-//            tileNr = mapping.getTileNr();
-//            // only player tiles get a color
-//            if (tileNr <= 0 || tileNr >= 16) {
-//                color = PlayerColors.getHexColor(mapping.getPlayerId());
-//            }
-//            GWT.log("drawing tile " + mapping.getPlayerId() + " " + tileNr + ", "+mapping.getPosition());
-//            drawCircle(mapping.getPosition().getX(), mapping.getPosition().getY(), cellDistance/2, color);
-//        }
-//        // todo: was this ever useful/necessary?
-//        //context.save();
+    public void drawBoard(List<TileMapping> tiles, ArrayList<Player> players, double cellDistance) {
+        GWT.log("drawing board");
+
+        for (TileMapping mapping : tiles) {
+            String color = "#f2f2f2";
+            int tileNr = mapping.getTileNr();
+            // only player tiles get a color
+            if (tileNr <= 0 || tileNr >= 16) {
+                color = PlayerColors.getHexColor(UUIDtoInt(mapping.getPlayerId(), players));
+            }
+            drawCircle(mapping.getPosition().getX()-cellDistance/2, mapping.getPosition().getY()-cellDistance/2, cellDistance/2, color);
+        }
     }
 
     public void enableButtons(Boolean enabled){
@@ -315,15 +315,33 @@ public class GameBoardView extends Composite {
         forfeitButton.setEnabled(enabled);
     }
 
-    private void drawCircle(double x, double y, double radius, String color) {
-//        Context2d context = ctxBoard;
-//        context.beginPath();
-//        context.arc(x, y, radius, 0, 2 * Math.PI);
-//        context.setFillStyle(color);
-//        context.fill();
-//        context.setStrokeStyle("#000000");
-//        context.stroke();
-//        context.closePath();
+    public void drawCircle(double x, double y, double radius, String color) {
+        // Create a new <div> element
+        DivElement circle = Document.get().createDivElement();
+
+        // Add the 'circle' class to the element
+        circle.setClassName("circle");
+
+        // Set the position using absolute coordinates relative to the container
+        circle.getStyle().setPosition(Style.Position.ABSOLUTE);
+        circle.getStyle().setLeft(x, Style.Unit.PX);
+        circle.getStyle().setTop(y, Style.Unit.PX);
+
+        // Set the size of the circle dynamically
+        //todo: by making the circle a little smaller '-3' the indicator for possible moves is no longer exactly aligned, this can be seen for larger values e.g. -5
+        circle.getStyle().setWidth(radius*2-3, Style.Unit.PX);
+        circle.getStyle().setHeight(radius*2-3, Style.Unit.PX);
+
+        // Ensure it remains a circle by setting border-radius to 50%
+        String darkColor = rgbToHex(darkenColor(hexToRgb(color)));
+        String lightColor = rgbToHex(lightenColor(hexToRgb(color)));
+        circle.getStyle().setProperty("backgroundColor", color);
+        circle.getStyle().setProperty("boxShadow", "inset 3px 3px 4px "+darkColor+"," +
+                "  inset -4px -4px 4px "+lightColor);
+        pawnBoard.setStyleName("pawnBoard");
+
+        // Append the circle to the container
+        pawnBoard.getElement().appendChild(circle);
     }
 
     private void drawPawnAnimated(Pawn pawn, Point point){

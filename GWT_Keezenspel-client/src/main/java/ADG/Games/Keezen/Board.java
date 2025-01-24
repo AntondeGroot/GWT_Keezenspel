@@ -162,21 +162,6 @@ public class Board {
 		}
 	}
 
-	public void drawBoard(Context2d context) {
-		GWT.log("drawing board");
-
-		for (TileMapping mapping : tiles) {
-			String color = "#D3D3D3";
-			int tileNr = mapping.getTileNr();
-			// only player tiles get a color
-			if (tileNr <= 0 || tileNr >= 16) {
-				color = PlayerColors.getHexColor(UUIDtoInt(mapping.getPlayerId(), players));
-			}
-			drawCircle(context, mapping.getPosition().getX(), mapping.getPosition().getY(), cellDistance/2, color);
-		}
-		context.save();
-	}
-
 	public static boolean isInitialized(){
         return !Board.getPawns().isEmpty();
     }
@@ -186,16 +171,6 @@ public class Board {
 			pawns.sort(new PawnComparator());
 			Board.pawns = pawns;
 		}
-	}
-
-	private void drawCircle(Context2d context, double x, double y, double radius, String color) {
-		context.beginPath();
-		context.arc(x, y, radius, 0, 2 * Math.PI);
-		context.setFillStyle(color);
-		context.fill();
-		context.setStrokeStyle("#000000");
-		context.stroke();
-		context.closePath();
 	}
 
 	public static Point getPosition(String playerId, int tileNr) {
