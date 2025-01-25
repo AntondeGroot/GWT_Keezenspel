@@ -9,6 +9,7 @@ public class Pawn implements IsSerializable {
     private TileId currentTileId;
     private TileId nestTileId;
     private String playerId;
+    private Integer colorInt; // on server side there will be 8 colors to chose from
 
     public Pawn() {
     }
@@ -18,6 +19,14 @@ public class Pawn implements IsSerializable {
         this.pawnId = pawnId;
         this.nestTileId = new TileId(nestTileId);
         this.currentTileId = nestTileId;
+    }
+
+    public Pawn(PawnId pawnId, TileId nestTileId, Integer colorInt) {
+        this.playerId = pawnId.getPlayerId();
+        this.pawnId = pawnId;
+        this.nestTileId = new TileId(nestTileId);
+        this.currentTileId = nestTileId;
+        this.colorInt = colorInt;
     }
 
     public PawnId getPawnId() {
@@ -34,6 +43,14 @@ public class Pawn implements IsSerializable {
 
     public void setPlayerId(String playerId) {
         this.playerId = playerId;
+    }
+
+    public Integer getColorInt() {
+        return colorInt;
+    }
+
+    public void setColorInt(Integer colorInt) {
+        this.colorInt = colorInt;
     }
 
     public TileId getCurrentTileId() {

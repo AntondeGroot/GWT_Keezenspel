@@ -1,10 +1,6 @@
 package ADG.Games.Keezen;
 
-import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.user.client.ui.Image;
-import ADG.Games.Keezen.util.PawnRect;
 
 import java.util.*;
 
@@ -13,7 +9,7 @@ import static ADG.Games.Keezen.util.PlayerUUIDUtil.*;
 public class Board {
 
     private static final ArrayList<TileMapping> tiles = new ArrayList<>();
-	private static ArrayList<PawnAnimationMapping> animationMappings = new ArrayList<>();
+	public static ArrayList<PawnAnimationMapping> animationMappings = new ArrayList<>();
 	private static ArrayList<Pawn> pawns = new ArrayList<>();
 	private static double cellDistance;
 	private static ArrayList<Player> players;
@@ -186,7 +182,7 @@ public class Board {
 		return tiles;
 	}
 
-	public static List<Pawn> getPawns() {return pawns;}
+	public static ArrayList<Pawn> getPawns() {return pawns;}
 
 	public static Pawn getPawn(PawnId pawnId) {
 		for (Pawn pawn : pawns) {
@@ -195,46 +191,6 @@ public class Board {
 			}
 		}
 		return null;
-	}
-
-	// TODO: ONLY DRAW PAWNS WHEN IT IS NECESSARY// TODO: ONLY DRAW PAWNS WHEN IT IS NECESSARY
-	public void drawPawns(Context2d context){
-		// sort the pawns vertically so that they don't overlap weirdly when drawn
-		pawns.sort(new PawnComparator());
-		for(Pawn pawn : pawns){
-			if (shouldBeAnimated(pawn)) {
-				Iterator<PawnAnimationMapping> iterator = animationMappings.iterator();
-				while (iterator.hasNext()) {
-					PawnAnimationMapping animation_Pawn_i = iterator.next();
-					// only animate the killing of a pawn after all other moves of other pawns were animated
-					if(!animation_Pawn_i.isAnimateLast()) {
-						if (pawn.equals(animation_Pawn_i.getPawn())) {
-							if (animation_Pawn_i.getPoints().isEmpty()) {
-								iterator.remove(); // Remove the current element safely
-							} else {
-								LinkedList<Point> points = animation_Pawn_i.getPoints();
-								if (!points.isEmpty()) {
-									Point p = points.getFirst();
-									drawPawnAnimated(context, pawn, p);
-									GWT.log("draw animated : "+ pawn);
-									points.removeFirst(); // Remove the first element safely
-								}
-							}
-						}
-					}else{
-						GWT.log("draw statically : "+ animation_Pawn_i.getPawn());
-						// draw the pawn that is about to be killed statically
-						drawPawnAnimated(context, animation_Pawn_i.getPawn(), animation_Pawn_i.getPoints().getFirst());
-						// if no other pawns to be drawn, start drawing this one.
-						if (onlyPawnsToBeKilledAreLeft() && animation_Pawn_i.isAnimateLast()){
-							animation_Pawn_i.setAnimateLast(false);
-						}
-					}
-				}
-			}else{
-				drawPawn(context, pawn);
-			}
-		}
 	}
 
 	public static boolean onlyPawnsToBeKilledAreLeft(){
@@ -250,54 +206,7 @@ public class Board {
 		}
 	}
 
-	public boolean shouldBeAnimated(Pawn pawn) {
-		if(animationMappings.isEmpty()){
-			return false;
-		}
-
-		for (PawnAnimationMapping animationMappings1 : animationMappings) {
-			if (pawn.equals(animationMappings1.getPawn())) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	//todo: do not draw the pawns too often
-	private void drawPawn(Context2d context, Pawn pawn){
-		// Load an image and draw it to the canvas
-		String playerId = pawn.getPlayerId();
-		int playerInt = UUIDtoInt(playerId, players);
-		Image image = new Image("/pawn"+playerInt+".png");
-		Image image_outline = new Image("/pawn_outline.png");
-
-		double desiredWidth = 40;
-		double desiredHeight = 40;
-		Point point = new Point(0,0);
-		// Draw the image on the canvas once it's loaded
-
-		for (TileMapping mapping : tiles) {
-			if(mapping.getTileId().equals(pawn.getCurrentTileId())){
-				point = mapping.getPosition();
-			}
-		}
-		context.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
-		if(PawnAndCardSelection.getPawn1().equals(pawn) || PawnAndCardSelection.getPawn2().equals(pawn)){
-			context.drawImage(ImageElement.as(image_outline.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
-		}
-	}
-
 	public static double getCellDistance() {
 		return cellDistance;
-	}
-
-	private void drawPawnAnimated(Context2d context, Pawn pawn, Point point){
-		// Load an image and draw it to the canvas
-		String playerId = pawn.getPlayerId();
-		int playerInt = UUIDtoInt(playerId, players);
-		Image image = new Image("/pawn"+playerInt+".png");
-
-		double[] xywh = PawnRect.getRect(point);
-		context.drawImage(ImageElement.as(image.getElement()), xywh[0], xywh[1], xywh[2], xywh[3] );
 	}
 }

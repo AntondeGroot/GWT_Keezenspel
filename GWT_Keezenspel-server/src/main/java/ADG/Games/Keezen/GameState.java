@@ -45,7 +45,8 @@ public class GameState {
                 for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
                     pawns.add(new Pawn(
                             new PawnId(player.getUUID(), pawnNr),
-                            new TileId(player.getUUID(),-1 - pawnNr)));
+                            new TileId(player.getUUID(),-1 - pawnNr),
+                            playerInt));
                 }
                 playerInt++;
             }

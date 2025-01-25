@@ -169,7 +169,7 @@ public class GameBoardPresenter {
                     GWT.log("poll server board.create" + result);
                     board.createBoard(result.getPlayers(), 600);
                     view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
-                    board.drawPawns(view.getCanvasPawnsContext());
+                    view.drawPawns(result.getPawns());
                     PlayerList.setNrPlayers(result.getNrPlayers());
                 }
                 // update model
@@ -260,8 +260,7 @@ public class GameBoardPresenter {
             view.drawCards(CardsDeck.getCards(), CardsDeck.getNrCardsPerPlayer(), CardsDeck.getPlayedCards());
             PawnAndCardSelection.setCardsAreDrawn();
         }
-        Board board = new Board();
-        board.drawPawns(view.getCanvasPawnsContext());
+        view.drawPawns(Board.getPawns());
     }
 
     public void drawStepsAnimation() {
