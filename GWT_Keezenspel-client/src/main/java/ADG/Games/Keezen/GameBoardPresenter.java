@@ -1,6 +1,5 @@
 package ADG.Games.Keezen;
 
-import ADG.Games.Keezen.animations.GameAnimation;
 import ADG.Games.Keezen.handlers.TestMoveHandler;
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.core.client.GWT;
@@ -28,7 +27,6 @@ public class GameBoardPresenter {
     private final GameStateServiceAsync gameStateService;
     private final CardsServiceAsync cardsService;
     private final PollingService pollingService;
-    private GameAnimation gameAnimation;
     private GameStateResponse gameStateResponseUpdate = new GameStateResponse();
 
     public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, GameStateServiceAsync gameStateService, CardsServiceAsync cardsService, PollingService pollingService) {
@@ -42,7 +40,6 @@ public class GameBoardPresenter {
 
     public void start() {
         // Start the game
-        gameAnimation = new GameAnimation();
         animate();
         bind();
 
@@ -220,8 +217,8 @@ public class GameBoardPresenter {
 
     public void animate() {
         view.getCanvasPawnsContext().clearRect(0, 0, view.getCanvasPawns().getWidth(), view.getCanvasPawns().getHeight());
-        gameAnimation.update();
-        gameAnimation.draw();
+        update(); // todo: improve
+        draw();   // todo: improve
         view.showPawnTextBoxes(showTextBoxes(PawnAndCardSelection.getCard()));
         AnimationScheduler.AnimationCallback animationCallback = new AnimationScheduler.AnimationCallback() {
             @Override
@@ -243,5 +240,24 @@ public class GameBoardPresenter {
             return false;
         }
         return true;
+    }
+
+    public void update(){
+        StepsAnimation.update();
+        view.getCanvasStepsContext().clearRect(0,0,600,600);//todo: make a clear function for all canvasses
+        if(PawnAndCardSelection.getDrawCards()) {
+            view.getCanvasCardsContext().clearRect(0,0, view.getCanvasCards().getWidth(), view.getCanvasCards().getHeight());
+        }
+    }
+
+    public void draw(){
+        StepsAnimation.draw();
+
+        if(PawnAndCardSelection.getDrawCards()) {
+            view.drawCards(CardsDeck.getCards(), CardsDeck.getNrCardsPerPlayer(), CardsDeck.getPlayedCards());
+            PawnAndCardSelection.setCardsAreDrawn();
+        }
+        Board board = new Board();
+        board.drawPawns(view.getCanvasPawnsContext());
     }
 }
