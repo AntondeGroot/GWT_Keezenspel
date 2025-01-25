@@ -9,7 +9,6 @@ import static ADG.Games.Keezen.util.PlayerUUIDUtil.*;
 public class Board {
 
     private static final ArrayList<TileMapping> tiles = new ArrayList<>();
-	public static ArrayList<PawnAnimationMapping> animationMappings = new ArrayList<>();
 	private static ArrayList<Pawn> pawns = new ArrayList<>();
 	private static double cellDistance;
 	private static ArrayList<Player> players;
@@ -191,10 +190,6 @@ public class Board {
 			}
 		}
 		return null;
-	}
-
-	public static boolean onlyPawnsToBeKilledAreLeft(){
-		return animationMappings.stream().allMatch(PawnAnimationMapping::isAnimateLast);
 	}
 
 	public static double getCellDistance() {

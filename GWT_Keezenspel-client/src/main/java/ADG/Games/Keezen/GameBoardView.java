@@ -12,8 +12,6 @@ import com.google.gwt.user.client.ui.*;
 
 import java.util.*;
 
-import static ADG.Games.Keezen.Board.animationMappings;
-import static ADG.Games.Keezen.Board.onlyPawnsToBeKilledAreLeft;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.createCircle;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.createPlayerGrid;
 import static ADG.Games.Keezen.util.PlayerUUIDUtil.UUIDtoInt;
@@ -130,7 +128,7 @@ public class GameBoardView extends Composite {
         pawns.sort(new PawnComparator());
         for(Pawn pawn : pawns){
             if (shouldBeAnimated(pawn)) {
-                Iterator<PawnAnimationMapping> iterator = animationMappings.iterator();
+                Iterator<PawnAnimationMapping> iterator = AnimationModel.animationMappings.iterator();
                 while (iterator.hasNext()) {
                     PawnAnimationMapping animation_Pawn_i = iterator.next();
                     // only animate the killing of a pawn after all other moves of other pawns were animated
@@ -153,7 +151,7 @@ public class GameBoardView extends Composite {
                         // draw the pawn that is about to be killed statically
                         drawPawnAnimated(context, animation_Pawn_i.getPawn(), animation_Pawn_i.getPoints().getFirst());
                         // if no other pawns to be drawn, start drawing this one.
-                        if (onlyPawnsToBeKilledAreLeft() && animation_Pawn_i.isAnimateLast()){
+                        if (AnimationModel.onlyPawnsToBeKilledAreLeft() && animation_Pawn_i.isAnimateLast()){
                             animation_Pawn_i.setAnimateLast(false);
                         }
                     }
@@ -421,11 +419,11 @@ public class GameBoardView extends Composite {
     }
 
     public boolean shouldBeAnimated(Pawn pawn) {
-        if(animationMappings.isEmpty()){
+        if(AnimationModel.animationMappings.isEmpty()){
             return false;
         }
 
-        for (PawnAnimationMapping animationMappings1 : animationMappings) {
+        for (PawnAnimationMapping animationMappings1 : AnimationModel.animationMappings) {
             if (pawn.equals(animationMappings1.getPawn())) {
                 return true;
             }
