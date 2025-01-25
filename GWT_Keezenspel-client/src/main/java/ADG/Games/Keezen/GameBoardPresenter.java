@@ -17,7 +17,10 @@ import ADG.Games.Keezen.handlers.SendHandler;
 import ADG.Games.Keezen.services.PollingService;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import static ADG.Games.Keezen.Util.CardValueCheck.isSeven;
+import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.drawTransparentCircle;
 
 public class GameBoardPresenter {
     private final GameBoardModel model;
@@ -28,6 +31,7 @@ public class GameBoardPresenter {
     private final CardsServiceAsync cardsService;
     private final PollingService pollingService;
     private GameStateResponse gameStateResponseUpdate = new GameStateResponse();
+    private double loopAlpha = 0.6;
 
     public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, GameStateServiceAsync gameStateService, CardsServiceAsync cardsService, PollingService pollingService) {
         this.model = gameBoardModel;
@@ -144,7 +148,7 @@ public class GameBoardPresenter {
     private void pollServerForGameState() {
         gameStateService.getGameState(new AsyncCallback<GameStateResponse>() {
             public void onFailure(Throwable caught) {
-                StepsAnimation.reset();
+                StepsAnimation.resetStepsAnimation();
             }
 
             public void onSuccess(GameStateResponse result) {
@@ -197,7 +201,7 @@ public class GameBoardPresenter {
         PawnAndCardSelection.setPlayerId(Cookie.getPlayerId());
         cardsService.getCards(Cookie.getPlayerId(), new AsyncCallback<CardResponse>() {
             public void onFailure(Throwable caught) {
-                StepsAnimation.reset();
+                StepsAnimation.resetStepsAnimation();
             }
 
             public void onSuccess(CardResponse result) {
@@ -243,7 +247,6 @@ public class GameBoardPresenter {
     }
 
     public void update(){
-        StepsAnimation.update();
         view.getCanvasStepsContext().clearRect(0,0,600,600);//todo: make a clear function for all canvasses
         if(PawnAndCardSelection.getDrawCards()) {
             view.getCanvasCardsContext().clearRect(0,0, view.getCanvasCards().getWidth(), view.getCanvasCards().getHeight());
@@ -251,7 +254,7 @@ public class GameBoardPresenter {
     }
 
     public void draw(){
-        StepsAnimation.draw();
+        drawStepsAnimation();
 
         if(PawnAndCardSelection.getDrawCards()) {
             view.drawCards(CardsDeck.getCards(), CardsDeck.getNrCardsPerPlayer(), CardsDeck.getPlayedCards());
@@ -259,5 +262,25 @@ public class GameBoardPresenter {
         }
         Board board = new Board();
         board.drawPawns(view.getCanvasPawnsContext());
+    }
+
+    public void drawStepsAnimation() {
+        if(StepsAnimation.tileIdsToBeHighlighted == null){return;}
+
+        view.getCanvasStepsContext().clearRect(0,0,600,600);
+
+        loopAlpha -= 0.005;
+        if (loopAlpha <= 0.0) {
+            loopAlpha = 0.6; // make transparency run from 0.6 to 0
+        }
+
+        List<TileMapping>  tiles = Board.getTiles();
+        for (TileId tileId : StepsAnimation.tileIdsToBeHighlighted) {
+            for (TileMapping mapping : tiles) {
+                if (mapping.getTileId().equals(tileId)) {
+                    drawTransparentCircle(view.getCanvasStepsContext(), mapping.getPosition().getX(), mapping.getPosition().getY(),Board.getCellDistance()/2, loopAlpha);// todo: replace Board.getcelldistance
+                }
+            }
+        }
     }
 }

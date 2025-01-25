@@ -39,14 +39,14 @@ public class SendHandler implements ClickHandler {
         }
         moveMessage.setPawnId2(PawnAndCardSelection.getPawnId2());
 
-        GWT.log("... Sending MoveMessage" + moveMessage);
+        GWT.log("Sending MoveMessage" + moveMessage);
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
             public void onFailure(Throwable caught) {
-                StepsAnimation.reset();
+                StepsAnimation.resetStepsAnimation();
             }
             public void onSuccess(MoveResponse result) {
-                StepsAnimation.reset();
+                StepsAnimation.resetStepsAnimation();
                 MoveController.movePawn(result);
                 PawnAndCardSelection.reset();
             }
