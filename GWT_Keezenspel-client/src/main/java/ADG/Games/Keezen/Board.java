@@ -197,15 +197,6 @@ public class Board {
 		return animationMappings.stream().allMatch(PawnAnimationMapping::isAnimateLast);
 	}
 
-	public static void movePawn(Pawn pawn, LinkedList<TileId> movePawn, boolean animateLast) {
-		for (Pawn pawn1 : pawns) {
-			if(pawn1.equals(pawn)){
-				animationMappings.add(new PawnAnimationMapping(pawn1, movePawn, animateLast));
-				pawn1.setCurrentTileId(movePawn.getLast());
-			}
-		}
-	}
-
 	public static double getCellDistance() {
 		return cellDistance;
 	}

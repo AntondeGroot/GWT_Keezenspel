@@ -24,22 +24,22 @@ public class MoveController {
 
         if(pawnId1 != null) {
             Pawn pawn1 = Board.getPawn(pawnId1);
-            Board.movePawn(pawn1, movePawn1, false);
+            AnimationModel.movePawn(pawn1, movePawn1, false);
         }
 
         if(pawnId2 != null) {
             Pawn pawn2 = Board.getPawn(pawnId2);
-            Board.movePawn(pawn2, movePawn2, false);
+            AnimationModel.movePawn(pawn2, movePawn2, false);
         }
 
         if(pawnIdKilled1 != null){
             Pawn pawnKilled1 = Board.getPawn(pawnIdKilled1);
-            Board.movePawn(pawnKilled1, moveKilledPawn1, true);
+            AnimationModel.movePawn(pawnKilled1, moveKilledPawn1, true);
         }
 
         if(pawnIdKilled2 != null){
             Pawn pawnKilled2 = Board.getPawn(pawnIdKilled2);
-            Board.movePawn(pawnKilled2, moveKilledPawn2, true);
+            AnimationModel.movePawn(pawnKilled2, moveKilledPawn2, true);
         }
 
     }

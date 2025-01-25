@@ -39,8 +39,14 @@ public class AnimationModel {
     }
 
     public static void movePawn(Pawn pawn, LinkedList<TileId> movePawn, boolean animateLast) {
-        animationMappings.add(new PawnAnimationMapping(pawn, movePawn, animateLast));
-        pawn.setCurrentTileId(movePawn.getLast());
+        Board.animationMappings.add(new PawnAnimationMapping(pawn, movePawn, animateLast));
+        ArrayList<Pawn> pawns = Board.getPawns();
+        for(Pawn pawn_i : pawns){
+            if(pawn.equals(pawn_i)){
+                pawn_i.setCurrentTileId(movePawn.getLast());
+            }
+        }
+        Board.setPawns(pawns);
     }
 
     public static ArrayList<AnimatedPawn> getAnimationSequence(){
