@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import static ADG.Games.Keezen.GameStateUtil.*;
 import static ADG.Games.Keezen.GameStateUtil.place4PawnsOnFinish;
@@ -524,5 +525,27 @@ public class TurnBasedTest {
 
         assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
         assertEquals("1", GameState.getPlayerIdTurn());
+    }
+
+    @Test
+    void ThreeRoundsArePlayed_NumberOfUniqueCards_39_bugfix(){
+         // I discovered that not enough kings and aces were given
+
+        // GIVEN, WHEN
+        ArrayList<Card> cards = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            GameState.setPlayerIdTurn("0");
+            cards.addAll(CardsDeck.getCardsForPlayer("0"));
+            sendForfeitMessage("0");
+            cards.addAll(CardsDeck.getCardsForPlayer("1"));
+            sendForfeitMessage("1");
+            cards.addAll(CardsDeck.getCardsForPlayer("2"));
+            sendForfeitMessage("2");
+        }
+
+        // THEN
+        HashSet<Card> cardSet = new HashSet<>(cards);
+        assertEquals(13*3, cards.size());
+        assertEquals(13*3, cardSet.size());
     }
 }

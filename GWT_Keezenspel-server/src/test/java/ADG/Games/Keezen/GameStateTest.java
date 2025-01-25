@@ -1,5 +1,6 @@
 package ADG.Games.Keezen;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +15,12 @@ public class GameStateTest {
     @BeforeEach
     void setUp() {
         GameState.stop();
+        GameState.tearDown();
+    }
+
+    @AfterEach
+    void tearDown() {
+        GameState.tearDown();
     }
 
     @Test
