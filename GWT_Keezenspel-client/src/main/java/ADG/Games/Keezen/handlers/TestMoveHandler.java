@@ -41,7 +41,7 @@ public class TestMoveHandler implements ClickHandler {
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
             public void onFailure(Throwable caught) {
-                StepsAnimation.reset();
+                StepsAnimation.resetStepsAnimation();
             }
             public void onSuccess(MoveResponse result) {
                 GWT.log("Test Move: "+result.toString());
@@ -55,9 +55,9 @@ public class TestMoveHandler implements ClickHandler {
                         // draw only where a pawn ends up
                         tileIds.add(result.getMovePawn1().getLast());
                     }
-                    StepsAnimation.update(tileIds);
+                    StepsAnimation.updateStepsAnimation(tileIds);
                 }else{
-                    StepsAnimation.reset();
+                    StepsAnimation.resetStepsAnimation();
                 }
             }
         } );

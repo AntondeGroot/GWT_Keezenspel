@@ -50,6 +50,21 @@ public class ViewDrawing {
         return circle;
     }
 
+    public static void drawTransparentCircle(Context2d context, double x, double y, double radius, double alpha) {
+        //todo: maybe change this to a div, and animate it with CSS
+        context.beginPath();
+        String fillColor = "rgba(255, 165, 0, " + alpha + ")";
+        String fillColorStroke = "rgba(0, 0, 0, " + alpha/2 + ")";
+        if(alpha >= 0){
+            context.arc(x, y, radius*2*alpha, 0, 2 * Math.PI);
+        }
+        context.setFillStyle(fillColor);
+        context.fill();
+        context.setStrokeStyle(fillColorStroke);
+        context.stroke();
+        context.closePath();
+    }
+
     public static Grid createPlayerGrid(ArrayList<Player> players){
         // todo: maybe check player whether they belong in column 1 or 2, so don't expand both when a winner has been declared
         List<Integer> column1 = Arrays.asList(0, 1, 2, 3);
