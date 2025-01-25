@@ -25,6 +25,7 @@ public class PawnAnimationTest {
     @AfterEach
     void tearDown() {
         GameState.tearDown();
+        CardsDeck.reset();
         moveMessage = null;
         moveResponse = null;
     }

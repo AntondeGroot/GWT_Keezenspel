@@ -39,9 +39,12 @@ public class CardsDeck implements IsSerializable {
 //        players.get(playerId).getHand().clear(); todo: method is different, does it work correctly?
     }
 
-    public static void shuffle(){
+    public static void shuffleIfFirstRound(){
+        if(roundNr != 0){
+            return;
+        }
+
         ArrayList<Card> cards = new ArrayList<>();
-//        players = new ArrayList<>(); //todo: does this need to be reset?
         activePlayers = GameState.getActivePlayers();
         // create cards
         for (int suit_i = 0; suit_i < activePlayers.size(); suit_i++) {
