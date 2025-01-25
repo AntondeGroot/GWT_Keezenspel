@@ -220,7 +220,7 @@ public class GameBoardPresenter {
     }
 
     public void animate() {
-        view.getCanvasPawnsContext().clearRect(0, 0, view.getCanvasPawns().getWidth(), view.getCanvasPawns().getHeight());
+        view.clearCanvasPawns();
         update(); // todo: improve
         draw();   // todo: improve
         view.showPawnTextBoxes(showTextBoxes(PawnAndCardSelection.getCard()));
@@ -247,9 +247,9 @@ public class GameBoardPresenter {
     }
 
     public void update(){
-        view.getCanvasStepsContext().clearRect(0,0,600,600);//todo: make a clear function for all canvasses
+        view.clearCanvasSteps();
         if(PawnAndCardSelection.getDrawCards()) {
-            view.getCanvasCardsContext().clearRect(0,0, view.getCanvasCards().getWidth(), view.getCanvasCards().getHeight());
+            view.clearCanvasCards();
         }
     }
 
@@ -267,7 +267,7 @@ public class GameBoardPresenter {
     public void drawStepsAnimation() {
         if(StepsAnimation.tileIdsToBeHighlighted == null){return;}
 
-        view.getCanvasStepsContext().clearRect(0,0,600,600);
+        view.clearCanvasSteps();
 
         loopAlpha -= 0.005;
         if (loopAlpha <= 0.0) {

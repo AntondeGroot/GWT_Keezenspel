@@ -1,7 +1,5 @@
 package ADG.Games.Keezen;
 
-import ADG.*;
-import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.*;
@@ -12,9 +10,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static ADG.Games.Keezen.PlayerColors.*;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.createCircle;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.createPlayerGrid;
 import static ADG.Games.Keezen.util.PlayerUUIDUtil.UUIDtoInt;
@@ -110,6 +106,10 @@ public class GameBoardView extends Composite {
     // todo: rename to canvasCards when old index.html is no longer used
     public CanvasElement getCanvasCards(){
         return (CanvasElement) document.getElementById("canvasCards2");
+    }
+
+    public CanvasElement getCanvasSteps(){
+        return (CanvasElement) document.getElementById("canvasSteps2");
     }
 
     public CanvasElement getCanvasPawns(){
@@ -422,4 +422,13 @@ public class GameBoardView extends Composite {
         GWT.log("Image not found in DOM.");
     }
 
+    public void clearCanvasSteps(){
+        getCanvasStepsContext().clearRect(0,0, getCanvasSteps().getWidth(), getCanvasSteps().getHeight());
+    }
+    public void clearCanvasCards(){
+        getCanvasCardsContext().clearRect(0,0,getCanvasCards().getWidth(),getCanvasCards().getWidth());
+    }
+    public void clearCanvasPawns(){
+        getCanvasPawnsContext().clearRect(0, 0, getCanvasPawns().getWidth(), getCanvasPawns().getHeight());
+    }
 }
