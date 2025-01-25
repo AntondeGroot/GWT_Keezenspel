@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 public class AnimationModel {
-    private static ArrayList<PawnAnimationMapping> animationMappings = new ArrayList<>();
+    public static ArrayList<PawnAnimationMapping> animationMappings = new ArrayList<>();//todo: change to private
     private static ArrayList<AnimatedPawn> animationSequence = new ArrayList<>();
     private static ArrayList<Pawn> staticPawns = new ArrayList<>();
 
@@ -21,7 +21,7 @@ public class AnimationModel {
         return staticPawns;
     }
 
-    private static boolean onlyPawnsToBeKilledAreLeft(){
+    public static boolean onlyPawnsToBeKilledAreLeft(){//todo: should be private
         return animationMappings.stream().allMatch(PawnAnimationMapping::isAnimateLast);
     }
 
@@ -39,7 +39,7 @@ public class AnimationModel {
     }
 
     public static void movePawn(Pawn pawn, LinkedList<TileId> movePawn, boolean animateLast) {
-        Board.animationMappings.add(new PawnAnimationMapping(pawn, movePawn, animateLast));
+        animationMappings.add(new PawnAnimationMapping(pawn, movePawn, animateLast));
         ArrayList<Pawn> pawns = Board.getPawns();
         for(Pawn pawn_i : pawns){
             if(pawn.equals(pawn_i)){
