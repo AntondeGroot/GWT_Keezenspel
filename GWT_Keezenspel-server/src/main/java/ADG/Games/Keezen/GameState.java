@@ -51,7 +51,7 @@ public class GameState {
             }
 
             CardsDeck.addPlayers(players);
-            CardsDeck.shuffle();
+            CardsDeck.shuffleIfFirstRound();
             CardsDeck.dealCards();
         }
     }
@@ -97,7 +97,7 @@ public class GameState {
 
         if(players.stream().noneMatch(Player::isActive)){
             resetActivePlayers();
-            CardsDeck.shuffle();
+            CardsDeck.shuffleIfFirstRound();// error
             CardsDeck.dealCards();
             nextRoundPlayer();
         }else {

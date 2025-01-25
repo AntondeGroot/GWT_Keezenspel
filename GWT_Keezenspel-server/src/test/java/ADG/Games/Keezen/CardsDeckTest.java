@@ -1,18 +1,13 @@
 package ADG.Games.Keezen;
 
-import ADG.Games.Keezen.CardsDeck;
-import ADG.Games.Keezen.Card;
 import ADG.Games.Keezen.logic.WinnerLogic;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
-import static ADG.Games.Keezen.GameStateUtil.*;
 import static ADG.Games.Keezen.GameStateUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -68,7 +63,7 @@ class CardsDeckTest {
 
         Assert.assertEquals(4, CardsDeck.getCardsForPlayer("0").size());
         CardsDeck.forfeitCardsForPlayer("0");
-        CardsDeck.shuffle();
+        CardsDeck.shuffleIfFirstRound();
         CardsDeck.dealCards();
 
         Assert.assertEquals(5, CardsDeck.getCardsForPlayer("0").size());
@@ -164,7 +159,7 @@ class CardsDeckTest {
         WinnerLogic.checkForWinners(new ArrayList<>());
         playRemainingCards("0");
 
-        CardsDeck.shuffle();
+        CardsDeck.shuffleIfFirstRound();
         CardsDeck.dealCards();
 
         // THEN
