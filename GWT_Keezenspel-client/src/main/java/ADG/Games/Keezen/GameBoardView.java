@@ -1,5 +1,6 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.util.PawnRect;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.*;
@@ -11,6 +12,8 @@ import com.google.gwt.user.client.ui.*;
 
 import java.util.*;
 
+import static ADG.Games.Keezen.Board.animationMappings;
+import static ADG.Games.Keezen.Board.onlyPawnsToBeKilledAreLeft;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.createCircle;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.createPlayerGrid;
 import static ADG.Games.Keezen.util.PlayerUUIDUtil.UUIDtoInt;
@@ -122,64 +125,43 @@ public class GameBoardView extends Composite {
     }
 
     public void drawPawns(ArrayList<Pawn> pawns){
-        // TODO: ONLY DRAW PAWNS WHEN IT IS NECESSARY
-//        pawns.sort(new PawnComparator());
-//        for(Pawn pawn : pawns){
-//            if (shouldBeAnimated(pawn)) {
-//                Iterator<PawnAnimationMapping> iterator = animationMappings.iterator();
-//                while (iterator.hasNext()) {
-//                    PawnAnimationMapping animationMappings1 = iterator.next();
-//                    // only animate the killing of a pawn after all other moves of other pawns were animated
-//                    if(!animationMappings1.isAnimateLast()) {
-//                        if (pawn.equals(animationMappings1.getPawn())) {
-//                            if (animationMappings1.getPoints().isEmpty()) {
-//                                iterator.remove(); // Remove the current element safely
-//                            } else {
-//                                LinkedList<Point> points = animationMappings1.getPoints();
-//                                if (!points.isEmpty()) {
-//                                    Point p = points.getFirst();
-//                                    drawPawnAnimated(pawn, p);
-//                                    points.removeFirst(); // Remove the first element safely
-//                                }
-//                            }
-//                        }
-//                    }else{
-//                        // draw the pawn that is about to be killed statically
-//                        drawPawnAnimated(animationMappings1.getPawn(), animationMappings1.getPoints().getFirst());
-//                        // if no other pawns to be drawn, start drawing this one.
-//                        if (animationMappings.size() == 1){
-//                            animationMappings1.setAnimateLast(false);
-//                        }
-//                    }
-//                }
-//            }else{
-//                drawPawn(pawn);
-//            }
-//        }
-    }
-
-    private void drawPawn(Pawn pawn){
-//        // Load an image and draw it to the canvas
-//        int playerId = pawn.getPlayerId();
-//        Image image = new Image("/pawn"+playerId+".png");
-//        Image image_outline = new Image("/pawn_outline.png");
-//
-//        int desiredWidth = 40;
-//        int desiredHeight = 40;
-//        Point point = new Point(0,0);
-//        // Draw the image on the canvas once it's loaded
-//
-//        for (TileMapping mapping : tiles) {
-//            if(mapping.getTileId().equals(pawn.getCurrentTileId())){
-//                point = mapping.getPosition();
-//            }
-//        }
-//        // draw  Pawn
-//        ctxPawns.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
-//        if(pawnWasSelected(pawn)){
-//            // draw outline
-//            ctxPawns.drawImage(ImageElement.as(image_outline.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
-//        }
+        // sort the pawns vertically so that they don't overlap weirdly when drawn
+        Context2d context = getCanvasPawnsContext();
+        pawns.sort(new PawnComparator());
+        for(Pawn pawn : pawns){
+            if (shouldBeAnimated(pawn)) {
+                Iterator<PawnAnimationMapping> iterator = animationMappings.iterator();
+                while (iterator.hasNext()) {
+                    PawnAnimationMapping animation_Pawn_i = iterator.next();
+                    // only animate the killing of a pawn after all other moves of other pawns were animated
+                    if(!animation_Pawn_i.isAnimateLast()) {
+                        if (pawn.equals(animation_Pawn_i.getPawn())) {
+                            if (animation_Pawn_i.getPoints().isEmpty()) {
+                                iterator.remove(); // Remove the current element safely
+                            } else {
+                                LinkedList<Point> points = animation_Pawn_i.getPoints();
+                                if (!points.isEmpty()) {
+                                    Point p = points.getFirst();
+                                    drawPawnAnimated(context, pawn, p);
+                                    GWT.log("draw animated : "+ pawn);
+                                    points.removeFirst(); // Remove the first element safely
+                                }
+                            }
+                        }
+                    }else{
+                        GWT.log("draw statically : "+ animation_Pawn_i.getPawn());
+                        // draw the pawn that is about to be killed statically
+                        drawPawnAnimated(context, animation_Pawn_i.getPawn(), animation_Pawn_i.getPoints().getFirst());
+                        // if no other pawns to be drawn, start drawing this one.
+                        if (onlyPawnsToBeKilledAreLeft() && animation_Pawn_i.isAnimateLast()){
+                            animation_Pawn_i.setAnimateLast(false);
+                        }
+                    }
+                }
+            }else{
+                drawPawn(context, pawn);
+            }
+        }
     }
 
     private boolean pawnWasSelected(Pawn pawn){
@@ -209,34 +191,6 @@ public class GameBoardView extends Composite {
     private void drawCircle(double x, double y, double radius, String color) {
         DivElement circle = createCircle(x, y, radius, color);
         pawnBoard.getElement().appendChild(circle);
-    }
-
-    private void drawPawnAnimated(Pawn pawn, Point point){
-//        // Load an image and draw it to the canvas
-//        int playerId = pawn.getPlayerId();
-//        Image image = new Image("/pawn"+playerId+".png");
-//
-//        double[] xywh = PawnRect.getRect(point);
-//        ctxPawns.drawImage(ImageElement.as(image.getElement()), xywh[0], xywh[1], xywh[2], xywh[3] );
-    }
-
-    public boolean shouldBeAnimated(Pawn pawn) {
-//        if(animationMappings.isEmpty()){
-//            return false;
-//        }
-//
-//        for (PawnAnimationMapping animationMappings1 : animationMappings) {
-//            if (pawn.equals(animationMappings1.getPawn())) {
-//                return true;
-//            }
-//        }
-        return false;
-    }
-
-    public static void movePawn(Pawn pawn, LinkedList<TileId> movePawn, boolean animateLast) {
-        //todo implement
-//        animationMappings.add(new PawnAnimationMapping(pawn, movePawn, animateLast));
-//        pawn1.setCurrentTileId(movePawn.getLast());
     }
 
     public void drawCardsIcons(HashMap<String, Integer> nrCardsPerPlayerUUID, Image spriteImage){
@@ -431,4 +385,52 @@ public class GameBoardView extends Composite {
     public void clearCanvasPawns(){
         getCanvasPawnsContext().clearRect(0, 0, getCanvasPawns().getWidth(), getCanvasPawns().getHeight());
     }
+//todo: move to util
+    private void drawPawnAnimated(Context2d context, Pawn pawn, Point point){
+        // Load an image and draw it to the canvas
+        String playerId = pawn.getPlayerId();
+        int colorInt = pawn.getColorInt();
+        Image image = new Image("/pawn"+colorInt+".png");
+
+        double[] xywh = PawnRect.getRect(point);
+        context.drawImage(ImageElement.as(image.getElement()), xywh[0], xywh[1], xywh[2], xywh[3] );
+    }
+
+    //todo: move to util
+    //todo: do not draw the pawns too often
+    private void drawPawn(Context2d context, Pawn pawn){
+        // Load an image and draw it to the canvas
+        int colorInt = pawn.getColorInt();
+        Image image = new Image("/pawn"+colorInt+".png");
+        Image image_outline = new Image("/pawn_outline.png");
+
+        double desiredWidth = 40;
+        double desiredHeight = 40;
+        Point point = new Point(0,0);
+        // Draw the image on the canvas once it's loaded
+
+        for (TileMapping mapping : Board.getTiles()) {
+            if(mapping.getTileId().equals(pawn.getCurrentTileId())){
+                point = mapping.getPosition();
+            }
+        }
+        context.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
+        if(PawnAndCardSelection.getPawn1().equals(pawn) || PawnAndCardSelection.getPawn2().equals(pawn)){
+            context.drawImage(ImageElement.as(image_outline.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
+        }
+    }
+
+    public boolean shouldBeAnimated(Pawn pawn) {
+        if(animationMappings.isEmpty()){
+            return false;
+        }
+
+        for (PawnAnimationMapping animationMappings1 : animationMappings) {
+            if (pawn.equals(animationMappings1.getPawn())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
