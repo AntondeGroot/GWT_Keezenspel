@@ -10,7 +10,7 @@ import java.util.List;
 public class CanvasClickHandler {
 
     public static void handleCanvasClick(ClickEvent event, int x, int y, int stepsPawn1Split, int stepsPawn2Split) {
-        if(y>600){
+        if(y>600){//todo: this will not work if the canvas size were changed
             handleOnCardsDeckClick(x,y, stepsPawn1Split, stepsPawn2Split);
         }else{
             handleOnBoardClick(x,y, stepsPawn1Split, stepsPawn2Split);

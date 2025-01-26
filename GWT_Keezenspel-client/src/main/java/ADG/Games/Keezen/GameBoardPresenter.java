@@ -71,7 +71,7 @@ public class GameBoardPresenter {
                         boardModel = new Board();
                         GWT.log("gameStateService getPlayers board.create");
 
-                        boardModel.createBoard(players, 600); // todo: make createBoard accept a list of players
+                        boardModel.createBoard(players, view.getBoardSize());
                     }
                 });
             }
@@ -167,7 +167,7 @@ public class GameBoardPresenter {
                     GWT.log("server created nr pawns: " + result.getPawns().size());
                     GWT.log(result.getPawns().toString());
                     GWT.log("poll server board.create" + result);
-                    board.createBoard(result.getPlayers(), 600);
+                    board.createBoard(result.getPlayers(), view.getBoardSize());
                     view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
                     view.drawPawns(result.getPawns());
                     PlayerList.setNrPlayers(result.getNrPlayers());

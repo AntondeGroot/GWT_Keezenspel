@@ -122,8 +122,8 @@ public class ViewDrawing {
             double sx = sw*(playerId%4);
             double sy = sh*(playerId > 3 ? 1:0);
             // destination
-            double dy = 0-5/2;
-            double dx = 0-5/2;
+            double dy = -5/2.0;
+            double dx = -5/2.0;
             double dw = imagePixelSize+5;
             double dh = imagePixelSize+5;
 
