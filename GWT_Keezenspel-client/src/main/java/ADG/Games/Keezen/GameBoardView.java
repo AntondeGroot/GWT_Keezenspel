@@ -74,6 +74,10 @@ public class GameBoardView extends Composite {
         return Integer.parseInt(stepsPawn1.getValue());
     }
 
+    public int getBoardSize(){
+        return getCanvasBoard().getHeight();
+    }
+
     public int getStepsPawn2() {
         if(stepsPawn2.getValue().isEmpty()) {
             return 0;
@@ -95,8 +99,7 @@ public class GameBoardView extends Composite {
 
     public VerticalPanel getPlayerListContainer(){return playerListContainer2;}
 
-    public Context2d getCanvasBoardContext(){return
-            ((CanvasElement) document.getElementById("canvasBoard2")).getContext2d();}
+
 
     public Context2d getCanvasPawnsContext(){return ((CanvasElement) document.getElementById("canvasPawns2")).getContext2d();}
 
@@ -105,6 +108,10 @@ public class GameBoardView extends Composite {
     public Context2d getCanvasCardsContext(){return ((CanvasElement) document.getElementById("canvasCards2")).getContext2d();}
 
     // todo: rename to canvasCards when old index.html is no longer used
+    public CanvasElement getCanvasBoard(){
+        return ((CanvasElement) document.getElementById("canvasBoard2"));
+    }
+
     public CanvasElement getCanvasCards(){
         return (CanvasElement) document.getElementById("canvasCards2");
     }
@@ -386,9 +393,7 @@ public class GameBoardView extends Composite {
 //todo: move to util
     private void drawPawnAnimated(Context2d context, Pawn pawn, Point point){
         // Load an image and draw it to the canvas
-        String playerId = pawn.getPlayerId();
-        int colorInt = pawn.getColorInt();
-        Image image = new Image("/pawn"+colorInt+".png");
+        Image image = new Image("/pawn"+pawn.getColorInt()+".png");
 
         double[] xywh = PawnRect.getRect(point);
         context.drawImage(ImageElement.as(image.getElement()), xywh[0], xywh[1], xywh[2], xywh[3] );
@@ -398,8 +403,7 @@ public class GameBoardView extends Composite {
     //todo: do not draw the pawns too often
     private void drawPawn(Context2d context, Pawn pawn){
         // Load an image and draw it to the canvas
-        int colorInt = pawn.getColorInt();
-        Image image = new Image("/pawn"+colorInt+".png");
+        Image image = new Image("/pawn"+pawn.getColorInt()+".png");
         Image image_outline = new Image("/pawn_outline.png");
 
         double desiredWidth = 40;
