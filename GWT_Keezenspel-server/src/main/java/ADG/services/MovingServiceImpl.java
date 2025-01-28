@@ -1,8 +1,7 @@
 package ADG.services;
 
-import ADG.Games.Keezen.GameState;
-import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import ADG.Games.Keezen.*;
+import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import jakarta.servlet.annotation.WebServlet;
 
 import java.util.Objects;

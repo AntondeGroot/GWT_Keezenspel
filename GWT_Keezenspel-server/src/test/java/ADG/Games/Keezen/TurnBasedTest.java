@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import static ADG.Games.Keezen.GameStateUtil.*;
-import static ADG.Games.Keezen.GameStateUtil.place4PawnsOnFinish;
 import static ADG.Games.Keezen.MoveResult.CAN_MAKE_MOVE;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;

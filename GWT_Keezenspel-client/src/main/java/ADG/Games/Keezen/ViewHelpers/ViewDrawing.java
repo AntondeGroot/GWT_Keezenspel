@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static ADG.Games.Keezen.PlayerColors.*;
-import static ADG.Games.Keezen.PlayerColors.hexToRgb;
 
 public class ViewDrawing {
     public static DivElement createCircle(double x, double y, double radius, String color){

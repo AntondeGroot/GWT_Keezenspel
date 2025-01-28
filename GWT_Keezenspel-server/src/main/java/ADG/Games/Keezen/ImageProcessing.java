@@ -1,13 +1,12 @@
 package ADG.Games.Keezen;
 
+import javax.imageio.ImageIO;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import javax.imageio.ImageIO;
-
-import java.awt.Color;
 
 public class ImageProcessing {
     public static void create(int colorId) {
