@@ -3,7 +3,6 @@ package ADG.Games.Keezen;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.LinkedList;
-import java.util.ArrayList;
 
 @SuppressWarnings("serial")
 public class MoveResponse implements IsSerializable {

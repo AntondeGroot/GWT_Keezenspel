@@ -1,6 +1,11 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.animations.*;
+import ADG.Games.Keezen.handlers.CanvasClickHandler;
+import ADG.Games.Keezen.handlers.ForfeitHandler;
+import ADG.Games.Keezen.handlers.SendHandler;
 import ADG.Games.Keezen.handlers.TestMoveHandler;
+import ADG.Games.Keezen.services.PollingService;
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
@@ -10,11 +15,6 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import ADG.Games.Keezen.animations.StepsAnimation;
-import ADG.Games.Keezen.handlers.CanvasClickHandler;
-import ADG.Games.Keezen.handlers.ForfeitHandler;
-import ADG.Games.Keezen.handlers.SendHandler;
-import ADG.Games.Keezen.services.PollingService;
 
 import java.util.ArrayList;
 import java.util.List;

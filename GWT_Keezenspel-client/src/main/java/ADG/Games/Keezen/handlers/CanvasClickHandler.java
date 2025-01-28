@@ -3,7 +3,6 @@ package ADG.Games.Keezen.handlers;
 import ADG.Games.Keezen.*;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import ADG.Games.Keezen.Card;
 
 import java.util.List;
 

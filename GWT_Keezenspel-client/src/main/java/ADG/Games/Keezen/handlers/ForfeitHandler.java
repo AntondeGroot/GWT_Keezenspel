@@ -1,8 +1,8 @@
 package ADG.Games.Keezen.handlers;
 
+import ADG.Games.Keezen.PawnAndCardSelection;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import ADG.Games.Keezen.PawnAndCardSelection;
 
 import static ADG.Games.Keezen.MoveType.FORFEIT;
 

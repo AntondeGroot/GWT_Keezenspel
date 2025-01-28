@@ -5,8 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import static ADG.Games.Keezen.GameStateUtil.*;
 
+import static ADG.Games.Keezen.GameStateUtil.*;
 import static ADG.Games.Keezen.logic.WinnerLogic.checkForWinners;
 import static org.junit.jupiter.api.Assertions.*;
 

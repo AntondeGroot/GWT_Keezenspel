@@ -1,6 +1,7 @@
 package ADG.Games.Keezen.animations;
 
 import ADG.Games.Keezen.TileId;
+
 import java.util.List;
 
 public class StepsAnimation {
