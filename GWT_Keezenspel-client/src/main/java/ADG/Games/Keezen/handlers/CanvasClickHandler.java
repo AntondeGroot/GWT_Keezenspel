@@ -48,8 +48,7 @@ public class CanvasClickHandler {
                     PawnAndCardSelection.setNrStepsPawn1(stepsPawn1Split);
                     PawnAndCardSelection.setNrStepsPawn2(stepsPawn2Split);
                 }
-                TestMoveHandler testMoveHandler = new TestMoveHandler();
-                testMoveHandler.sendMoveToServer();// todo: not an elegant way
+                TestMoveHandler.sendMoveToServer(PawnAndCardSelection.createTestMoveMessage());//todo: improve elegance
             }
         }
         else{
@@ -75,8 +74,7 @@ public class CanvasClickHandler {
                                 PawnAndCardSelection.setNrStepsPawn1(stepsPawn1Split);
                                 PawnAndCardSelection.setNrStepsPawn2(stepsPawn2Split);
                             }
-                            TestMoveHandler testMoveHandler = new TestMoveHandler();
-                            testMoveHandler.sendMoveToServer();
+                            TestMoveHandler.sendMoveToServer(PawnAndCardSelection.createTestMoveMessage());
                         }
                         break;
                     }

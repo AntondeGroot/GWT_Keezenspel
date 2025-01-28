@@ -25,7 +25,6 @@ public class GameStateTest {
 
     @Test
     void createDistinctPawnsFor2Players() {
-        GameState gameState = new GameState();
         GameState.addPlayer(new Player("0","0"));
         GameState.addPlayer(new Player("1","1"));
         GameState.start();
@@ -38,7 +37,6 @@ public class GameStateTest {
 
     @Test
     void createDistinctPawnsFor8Players() {
-        GameState gameState = new GameState();
         for (int i = 0; i < 8; i++) {
             GameState.addPlayer(new Player(String.valueOf(i),String.valueOf(i)));
         }

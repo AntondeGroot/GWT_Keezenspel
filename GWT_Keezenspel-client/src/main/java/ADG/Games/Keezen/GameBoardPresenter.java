@@ -136,7 +136,7 @@ public class GameBoardPresenter {
                 PawnAndCardSelection.setNrStepsPawn1(4);
                 PawnAndCardSelection.setNrStepsPawn2(3);
             }
-            new TestMoveHandler().sendMoveToServer();
+            new TestMoveHandler().sendMoveToServer(PawnAndCardSelection.createTestMoveMessage());
         });
     }
 

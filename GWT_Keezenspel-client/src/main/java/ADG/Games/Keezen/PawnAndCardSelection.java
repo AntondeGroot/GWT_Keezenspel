@@ -1,5 +1,6 @@
 package ADG.Games.Keezen;
 
+import static ADG.Games.Keezen.MessageType.MAKE_MOVE;
 import static ADG.Games.Keezen.MoveType.*;
 import static ADG.Games.Keezen.Util.CardValueCheck.isJack;
 import static ADG.Games.Keezen.Util.CardValueCheck.isSeven;
@@ -297,5 +298,32 @@ public class PawnAndCardSelection {
     }
     public static void setNrStepsPawn2(int steps){
         nrStepsPawn2 = steps;
+    }
+
+    public static MoveMessage createTestMoveMessage() {
+        MoveMessage moveMessage = createMessage();
+        moveMessage.setMessageType(MessageType.CHECK_MOVE);
+        return moveMessage;
+    }
+
+    public static MoveMessage createMoveMessage() {
+        MoveMessage moveMessage = createMessage();
+        moveMessage.setMessageType(MAKE_MOVE);
+        return moveMessage;
+    }
+
+    private static MoveMessage createMessage() {
+        MoveMessage moveMessage = new MoveMessage();
+        moveMessage.setPlayerId(playerId);
+        moveMessage.setPawnId1(getPawnId1());
+        moveMessage.setPawnId2(getPawnId2());
+        moveMessage.setCard(card);
+        moveMessage.setMoveType(moveType);
+        moveMessage.setStepsPawn1(nrStepsPawn1);
+        if(moveType.equals(SPLIT)){
+            moveMessage.setStepsPawn2(nrStepsPawn2);
+        }
+
+        return moveMessage;
     }
 }
