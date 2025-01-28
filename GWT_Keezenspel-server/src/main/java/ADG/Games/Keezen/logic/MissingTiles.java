@@ -17,7 +17,7 @@ public class MissingTiles {
         }
 
         LinkedList<TileId> output = new LinkedList<>();
-        LinkedList<TileId> output_cleanedUp = new LinkedList<>();
+        LinkedList<TileId> outputCleanedUp = new LinkedList<>();
         for (int i = 0; i < tileIds.size()-1; i++) {
             TileId currentTile = tileIds.get(i);
             TileId nextTile = tileIds.get(i+1);
@@ -35,12 +35,12 @@ public class MissingTiles {
 
         // clean up output
         for(TileId tile : output){
-            if(output_cleanedUp.isEmpty() || !output_cleanedUp.getLast().equals(tile)){
-                output_cleanedUp.add(tile);
+            if(outputCleanedUp.isEmpty() || !outputCleanedUp.getLast().equals(tile)){
+                outputCleanedUp.add(tile);
             }
         }
 
-        return output_cleanedUp;
+        return outputCleanedUp;
     }
 
     private static LinkedList<TileId> walkOverTiles(TileId start, TileId end, Boolean goesToFinish, int direction){

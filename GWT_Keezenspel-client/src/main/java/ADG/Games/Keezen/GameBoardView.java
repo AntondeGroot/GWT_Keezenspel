@@ -18,10 +18,10 @@ import static ADG.Games.Keezen.util.PlayerUUIDUtil.UUIDtoInt;
 
 public class GameBoardView extends Composite {
 
-    private Document document;
+    private final Document document;
 
     interface Binder extends UiBinder<Widget, GameBoardView> {}
-    private static Binder uiBinder = GWT.create(Binder.class);
+    private static final Binder uiBinder = GWT.create(Binder.class);
 //    private ArrayList<TileMapping> tiles = new ArrayList<>(); // todo: set tiles when view is constructed
 //    private double cellDistance;
 //    private static ArrayList<PawnAnimationMapping> animationMappings = new ArrayList<>();
@@ -109,7 +109,7 @@ public class GameBoardView extends Composite {
 
     // todo: rename to canvasCards when old index.html is no longer used
     public CanvasElement getCanvasBoard(){
-        return ((CanvasElement) document.getElementById("canvasBoard2"));
+        return (CanvasElement) document.getElementById("canvasBoard2");
     }
 
     public CanvasElement getCanvasCards(){
@@ -137,14 +137,14 @@ public class GameBoardView extends Composite {
             if (shouldBeAnimated(pawn)) {
                 Iterator<PawnAnimationMapping> iterator = AnimationModel.animationMappings.iterator();
                 while (iterator.hasNext()) {
-                    PawnAnimationMapping animation_Pawn_i = iterator.next();
+                    PawnAnimationMapping animationPawnI = iterator.next();
                     // only animate the killing of a pawn after all other moves of other pawns were animated
-                    if(!animation_Pawn_i.isAnimateLast()) {
-                        if (pawn.equals(animation_Pawn_i.getPawn())) {
-                            if (animation_Pawn_i.getPoints().isEmpty()) {
+                    if(!animationPawnI.isAnimateLast()) {
+                        if (pawn.equals(animationPawnI.getPawn())) {
+                            if (animationPawnI.getPoints().isEmpty()) {
                                 iterator.remove(); // Remove the current element safely
                             } else {
-                                LinkedList<Point> points = animation_Pawn_i.getPoints();
+                                LinkedList<Point> points = animationPawnI.getPoints();
                                 if (!points.isEmpty()) {
                                     Point p = points.getFirst();
                                     drawPawnAnimated(context, pawn, p);
@@ -154,12 +154,12 @@ public class GameBoardView extends Composite {
                             }
                         }
                     }else{
-                        GWT.log("draw statically : "+ animation_Pawn_i.getPawn());
+                        GWT.log("draw statically : "+ animationPawnI.getPawn());
                         // draw the pawn that is about to be killed statically
-                        drawPawnAnimated(context, animation_Pawn_i.getPawn(), animation_Pawn_i.getPoints().getFirst());
+                        drawPawnAnimated(context, animationPawnI.getPawn(), animationPawnI.getPoints().getFirst());
                         // if no other pawns to be drawn, start drawing this one.
-                        if (AnimationModel.onlyPawnsToBeKilledAreLeft() && animation_Pawn_i.isAnimateLast()){
-                            animation_Pawn_i.setAnimateLast(false);
+                        if (AnimationModel.onlyPawnsToBeKilledAreLeft() && animationPawnI.isAnimateLast()){
+                            animationPawnI.setAnimateLast(false);
                         }
                     }
                 }
@@ -225,7 +225,7 @@ public class GameBoardView extends Composite {
                 // Define the source rectangle (from the sprite sheet): this image belongs to the backside image
                 double spriteWidth = 1920 / 13.0;
                 double spriteHeight = 1150 / 5.0;
-                double sourceX = spriteWidth * (2);
+                double sourceX = spriteWidth * 2;
                 double sourceY = spriteHeight * 4;
 
                 // Define the destination rectangle (on the canvas)
@@ -404,7 +404,7 @@ public class GameBoardView extends Composite {
     private void drawPawn(Context2d context, Pawn pawn){
         // Load an image and draw it to the canvas
         Image image = new Image("/pawn"+pawn.getColorInt()+".png");
-        Image image_outline = new Image("/pawn_outline.png");
+        Image imageOutline = new Image("/pawn_outline.png");
 
         double desiredWidth = 40;
         double desiredHeight = 40;
@@ -418,7 +418,7 @@ public class GameBoardView extends Composite {
         }
         context.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
         if(PawnAndCardSelection.getPawn1().equals(pawn) || PawnAndCardSelection.getPawn2().equals(pawn)){
-            context.drawImage(ImageElement.as(image_outline.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
+            context.drawImage(ImageElement.as(imageOutline.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
         }
     }
 

@@ -11,7 +11,7 @@ public class PlayerList {
     private final GameStateServiceAsync gameStateService = GWT.create(GameStateService.class);
     private static ArrayList<String> activePlayers = new ArrayList<>();
     private static ArrayList<String> winners = new ArrayList<>();
-    private static boolean isUpToDate = false;
+    private static boolean isUpToDate;
     private static int nrPlayers;
 
     public static void refresh(){

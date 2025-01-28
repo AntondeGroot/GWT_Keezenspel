@@ -39,8 +39,12 @@ public class Card implements IsSerializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if(this == o) {
+            return true;
+        }
+        if(o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Card card1 = (Card) o;
         return suit == card1.suit && cardValue == card1.cardValue;
     }

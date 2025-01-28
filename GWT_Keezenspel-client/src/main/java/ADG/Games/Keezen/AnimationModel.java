@@ -8,8 +8,8 @@ import java.util.LinkedList;
 
 public class AnimationModel {
     public static ArrayList<PawnAnimationMapping> animationMappings = new ArrayList<>();//todo: change to private
-    private static ArrayList<AnimatedPawn> animationSequence = new ArrayList<>();
-    private static ArrayList<Pawn> staticPawns = new ArrayList<>();
+    private static final ArrayList<AnimatedPawn> animationSequence = new ArrayList<>();
+    private static final ArrayList<Pawn> staticPawns = new ArrayList<>();
 
     public static void reset(){
         animationMappings.clear();
@@ -41,9 +41,9 @@ public class AnimationModel {
     public static void movePawn(Pawn pawn, LinkedList<TileId> movePawn, boolean animateLast) {
         animationMappings.add(new PawnAnimationMapping(pawn, movePawn, animateLast));
         ArrayList<Pawn> pawns = Board.getPawns();
-        for(Pawn pawn_i : pawns){
-            if(pawn.equals(pawn_i)){
-                pawn_i.setCurrentTileId(movePawn.getLast());
+        for(Pawn pawnI : pawns){
+            if(pawn.equals(pawnI)){
+                pawnI.setCurrentTileId(movePawn.getLast());
             }
         }
         Board.setPawns(pawns);
@@ -61,14 +61,14 @@ public class AnimationModel {
             if (shouldBeAnimated(pawn)) {
                 Iterator<PawnAnimationMapping> iterator = animationMappings.iterator();
                 while (iterator.hasNext()) {
-                    PawnAnimationMapping animation_Pawn_i = iterator.next();
+                    PawnAnimationMapping animationPawnI = iterator.next();
                     // only animate the killing of a pawn after all other moves of other pawns were animated
-                    if(!animation_Pawn_i.isAnimateLast()) {
-                        if (pawn.equals(animation_Pawn_i.getPawn())) {
-                            if (animation_Pawn_i.getPoints().isEmpty()) {
+                    if(!animationPawnI.isAnimateLast()) {
+                        if (pawn.equals(animationPawnI.getPawn())) {
+                            if (animationPawnI.getPoints().isEmpty()) {
                                 iterator.remove(); // Remove the current element safely
                             } else {
-                                LinkedList<Point> points = animation_Pawn_i.getPoints();
+                                LinkedList<Point> points = animationPawnI.getPoints();
                                 if (!points.isEmpty()) {
                                     Point p = points.getFirst();
                                     animationSequence.add(new AnimatedPawn(pawn, p));
@@ -78,12 +78,12 @@ public class AnimationModel {
                             }
                         }
                     }else{
-                        GWT.log("draw statically : "+ animation_Pawn_i.getPawn());
+                        GWT.log("draw statically : "+ animationPawnI.getPawn());
                         // draw the pawn that is about to be killed statically
-                        animationSequence.add(new AnimatedPawn(animation_Pawn_i.getPawn(), animation_Pawn_i.getPoints().getFirst()));
+                        animationSequence.add(new AnimatedPawn(animationPawnI.getPawn(), animationPawnI.getPoints().getFirst()));
                         // if no other pawns to be drawn, start drawing this one.
-                        if (onlyPawnsToBeKilledAreLeft() && animation_Pawn_i.isAnimateLast()){
-                            animation_Pawn_i.setAnimateLast(false);
+                        if (onlyPawnsToBeKilledAreLeft() && animationPawnI.isAnimateLast()){
+                            animationPawnI.setAnimateLast(false);
                         }
                     }
                 }

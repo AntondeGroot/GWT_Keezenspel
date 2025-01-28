@@ -12,9 +12,9 @@ public class PawnComparator implements Comparator<Pawn> {
         TileId tile1 = p1.getCurrentTileId();
         TileId tile2 = p2.getCurrentTileId();
         if(tile1 != null && tile2 != null && Board.getPosition(tile1.getPlayerId(), tile1.getTileNr()) != null){
-            double pawn1_Y = Board.getPosition(tile1.getPlayerId(), tile1.getTileNr()).getY();
-            double pawn2_Y = Board.getPosition(tile2.getPlayerId(), tile2.getTileNr()).getY();
-            return Double.compare(pawn1_Y, pawn2_Y);
+            double pawn1Y = Board.getPosition(tile1.getPlayerId(), tile1.getTileNr()).getY();
+            double pawn2Y = Board.getPosition(tile2.getPlayerId(), tile2.getTileNr()).getY();
+            return Double.compare(pawn1Y, pawn2Y);
         }
         return 0;
     }

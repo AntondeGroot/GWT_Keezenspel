@@ -6,7 +6,7 @@ public class PlayerHand {
     private ArrayList<Card> hand;
 
     public PlayerHand() {
-        hand = new ArrayList<Card>();
+        hand = new ArrayList<>();
     }
 
     public boolean hasCard(Card card) {

@@ -74,8 +74,12 @@ public class GameStateResponse implements IsSerializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if(this == o) {
+            return true;
+        }
+        if(o == null || getClass() != o.getClass()) {
+            return false;
+        }
         GameStateResponse that = (GameStateResponse) o;
         return nrPlayers == that.nrPlayers && Objects.equals(pawns, that.pawns) && Objects.equals(players, that.players) && Objects.equals(playerColors, that.playerColors) && Objects.equals(playerIdTurn, that.playerIdTurn) && Objects.equals(activePlayers, that.activePlayers) && Objects.equals(winners, that.winners);
     }

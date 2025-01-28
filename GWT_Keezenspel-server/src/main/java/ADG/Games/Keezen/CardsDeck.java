@@ -5,10 +5,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.*;
 
 public class CardsDeck implements IsSerializable {
-    private static int roundNr = 0;
+    private static int roundNr;
     private static ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
-    private static ArrayList<Card> playedCards = new ArrayList<>();
-    private static HashMap<String, PlayerHand> playerHands = new HashMap<>();
+    private static final ArrayList<Card> playedCards = new ArrayList<>();
+    private static final HashMap<String, PlayerHand> playerHands = new HashMap<>();
     private static ArrayList<String> activePlayers = new ArrayList<>();
 
     public static void addPlayers(ArrayList<Player> players) {

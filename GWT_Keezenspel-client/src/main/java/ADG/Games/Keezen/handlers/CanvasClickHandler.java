@@ -61,7 +61,7 @@ public class CanvasClickHandler {
         StringBuilder logMsg = new StringBuilder();
         List<TileMapping> tiles = Board.getTiles();
         List<Pawn> pawns = Board.getPawns();
-        logMsg.append("clicked on Board : ("+x+","+y+")\n");
+        logMsg.append("clicked on Board : (").append(x).append(",").append(y).append(")\n");
         for (Pawn pawn : pawns) {
             TileId tileOfPawn = pawn.getCurrentTileId();
             for (TileMapping tile : tiles) {
@@ -69,7 +69,7 @@ public class CanvasClickHandler {
                     if(isWithinDistance(tile.getPosition(), new Point(x,y))){
                         PawnAndCardSelection.addPawn(pawn);
                         // for debugging
-                        logMsg.append("You clicked on pawn"+pawn.getPawnId()+" position: "+tile.getPosition());
+                        logMsg.append("You clicked on pawn").append(pawn.getPawnId()).append(" position: ").append(tile.getPosition());
                         if(PawnAndCardSelection.getPawn1() != null && PawnAndCardSelection.getCard() != null){
                             if(PawnAndCardSelection.getMoveType()==MoveType.SPLIT){
                                 PawnAndCardSelection.setNrStepsPawn1(stepsPawn1Split);
