@@ -10,7 +10,7 @@ public class ForfeitHandler implements ClickHandler {
     // todo: is this all still useful?
     public void sendMoveToServer(){
         PawnAndCardSelection.setMoveType(FORFEIT);
-        new SendHandler().sendMoveToServer();
+        new SendHandler().sendMoveToServer(PawnAndCardSelection.createMoveMessage());
     }
 
     @Override

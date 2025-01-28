@@ -11,31 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TestMoveHandler implements ClickHandler {
-    private final MovingServiceAsync movingService = GWT.create(MovingService.class);
+    private static final MovingServiceAsync movingService = GWT.create(MovingService.class);
     /**
      * Fired when the user clicks on the sendButton.
      */
     public void onClick(ClickEvent event) {
-        sendMoveToServer();
+        sendMoveToServer(PawnAndCardSelection.createTestMoveMessage());
     }
 
     /**
      * Send the MoveMessage to the server and wait for a response.
      */
-    public void sendMoveToServer() {
-        MoveMessage moveMessage = new MoveMessage();
-        moveMessage.setPlayerId(PawnAndCardSelection.getPlayerId());
-        moveMessage.setMoveType(PawnAndCardSelection.getMoveType());
-        moveMessage.setCard(PawnAndCardSelection.getCard());
+    public static void sendMoveToServer(MoveMessage moveMessage) {
         GWT.log("test card: "+PawnAndCardSelection.getCard());
-        moveMessage.setPawnId1(PawnAndCardSelection.getPawnId1());
-        moveMessage.setMessageType(MessageType.CHECK_MOVE);
-        moveMessage.setStepsPawn1(PawnAndCardSelection.getNrStepsPawn1());
-        if(PawnAndCardSelection.getMoveType()==MoveType.SPLIT){
-            moveMessage.setStepsPawn2(PawnAndCardSelection.getNrStepsPawn2());
-        }
-        moveMessage.setPawnId2(PawnAndCardSelection.getPawnId2());
-
         GWT.log(moveMessage.toString());
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
@@ -43,6 +31,7 @@ public class TestMoveHandler implements ClickHandler {
                 StepsAnimation.resetStepsAnimation();
             }
             public void onSuccess(MoveResponse result) {
+                // todo: maybe place the following in the presenter
                 GWT.log("Test Move: "+result.toString());
                 List<TileId> tileIds = new ArrayList<>();
                 if(result.getMovePawn1() != null){
