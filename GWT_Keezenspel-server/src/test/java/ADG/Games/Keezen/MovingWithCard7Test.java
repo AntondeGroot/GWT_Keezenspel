@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MovingWithCard7Test {
     private MoveMessage moveMessage = new MoveMessage();
     private MoveResponse moveResponse = new MoveResponse();
-    private Card sevenCard = new Card(0, 7);
+    private final Card sevenCard = new Card(0, 7);
 
     @BeforeEach
     void setUp() {

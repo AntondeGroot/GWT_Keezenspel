@@ -51,8 +51,12 @@ public class CardResponse implements IsSerializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if(this == o) {
+            return true;
+        }
+        if(o == null || getClass() != o.getClass()) {
+            return false;
+        }
         CardResponse that = (CardResponse) o;
         return Objects.equals(playerUUID, that.playerUUID) && Objects.equals(cards, that.cards) && Objects.equals(playedCards, that.playedCards) && Objects.equals(nrOfCardsPerPlayer, that.nrOfCardsPerPlayer);
     }

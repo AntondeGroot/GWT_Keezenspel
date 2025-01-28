@@ -3,7 +3,7 @@ package ADG.Games.Keezen;
 import ADG.Games.Keezen.TileId;
 
 public class TileMapping {
-    private TileId tileId;
+    private final TileId tileId;
     private Point position;
 
     public TileMapping(String playerId, int tileNr, Point position) {

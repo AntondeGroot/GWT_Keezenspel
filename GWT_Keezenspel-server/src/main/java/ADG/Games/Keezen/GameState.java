@@ -37,7 +37,7 @@ public class GameState {
         playerIdTurn = players.getFirst().getUUID();
         playerIdStartingRound = playerIdTurn;
         if (pawns.isEmpty()) {
-            pawns = new ArrayList<Pawn>();
+            pawns = new ArrayList<>();
             int playerInt = 0;
             for(Player player : players) {
                 activePlayers.add(player.getUUID());
@@ -167,7 +167,7 @@ public class GameState {
     }
 
     private static boolean isPawnOnFinish(PawnId pawnId, TileId tileId){
-        return (Objects.equals(pawnId.getPlayerId(), tileId.getPlayerId()) && tileId.getTileNr() > 15);
+        return Objects.equals(pawnId.getPlayerId(), tileId.getPlayerId()) && tileId.getTileNr() > 15;
     }
 
     private static boolean isPawnClosedInFromBehind(PawnId pawnId, TileId tileId){
@@ -216,7 +216,7 @@ public class GameState {
         }
 
         if(tileId.getTileNr() == 17
-                && !canMoveToTile(pawnId,new TileId(pawnId.getPlayerId(), 18))
+                && !canMoveToTile(pawnId, new TileId(pawnId.getPlayerId(), 18))
                 && !canMoveToTile(pawnId,new TileId(pawnId.getPlayerId(), 16))){
             return true;
         }
@@ -435,7 +435,7 @@ public class GameState {
                 if(next > 7){moves.add(new TileId(playerIdOfTile, 7));}
             }else { // or turn back
                 System.out.println("GameState: OnMove: normal route is blocked by a start tile, move backwards");
-                next = (15 - next%15);
+                next = 15 - next%15;
                 moves.add(new TileId(playerIdOfTile, 15));
                 if(next < 13){moves.add(new TileId(playerIdOfTile, 13));}
                 if(next < 7){moves.add(new TileId(playerIdOfTile, 7));}
@@ -579,7 +579,7 @@ public class GameState {
             return;
         }
 
-        if((next > 15 && isPawnOnLastSection(playerId, playerIdOfTile))){
+        if(next > 15 && isPawnOnLastSection(playerId, playerIdOfTile)){
             System.out.println("GameState: OnMove: pawn is on last section and goes into finish");
             if(currentTileId.getTileNr() < 7){moves.add(new TileId(currentTileId.getPlayerId(), 7));}
             if(currentTileId.getTileNr() < 13){moves.add(new TileId(currentTileId.getPlayerId(), 13));}
@@ -609,7 +609,6 @@ public class GameState {
             moves.add(targetTileId);
             response.setMovePawn1(moves);
             processMove(pawnId1, targetTileId, moveMessage, response, goToNextPlayer);
-            return;
         }
     }
 
@@ -725,7 +724,7 @@ public class GameState {
             return;
         }
         // You can't switch two opponents
-        if((!playerId.equals(selectedPawnPlayerId1) && (!playerId.equals(selectedPawnPlayerId2)))){
+        if(!playerId.equals(selectedPawnPlayerId1) && (!playerId.equals(selectedPawnPlayerId2))){
             moveResponse.setResult(CANNOT_MAKE_MOVE);
             return;
         }

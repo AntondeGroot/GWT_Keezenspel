@@ -6,13 +6,15 @@ public class PlayerColors {
             "#6A5ACD", "#FF8C00", "#008B8B", "#8B008B"
     };
 
-    private static double lightenFactor = 0.5; // 20% lighter
+    private static final double lightenFactor = 0.5; // 20% lighter
 
     public static int[] lightenColor(String hex, double factor) {
         int[] rgb = hexToRgb(hex);
         for (int i = 0; i < 3; i++) {
             rgb[i] = (int) (rgb[i] + (255 - rgb[i]) * factor);
-            if (rgb[i] > 255) rgb[i] = 255;
+            if(rgb[i] > 255) {
+                rgb[i] = 255;
+            }
         }
         return rgb;
     }

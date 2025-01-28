@@ -29,7 +29,7 @@ class BoardTest {
     }
 
     private ArrayList<Player> createPlayers(int nr){
-        ArrayList<Player> players = new ArrayList<Player>();
+        ArrayList<Player> players = new ArrayList<>();
         for (int i = 0; i < nr; i++) {
             players.add(new Player(String.valueOf(i), String.valueOf(i)));
         }

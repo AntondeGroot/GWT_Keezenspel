@@ -12,7 +12,7 @@ public class ImageProcessing {
     public static void create(int colorId) {
         // Use the correct path to access the image file in the resources directory
         String resourcePath = "/public/pawn.png"; // Relative to the resources folder
-        int[] RGB = PlayerColors.getRGBColor(colorId);
+        int[] rgb = PlayerColors.getRGBColor(colorId);
         try {
             // Load the image from the resources folder
             URL resourceUrl = ImageProcessing.class.getResource(resourcePath);
@@ -44,7 +44,7 @@ public class ImageProcessing {
                     // Check if the pixel is white
                     if (color.getRed() == 255 && color.getGreen() == 255 && color.getBlue() == 255) {
                         // Replace with red
-                        Color newColor = new Color(RGB[0], RGB[1], RGB[2], color.getAlpha()); // Red color with original alpha
+                        Color newColor = new Color(rgb[0], rgb[1], rgb[2], color.getAlpha()); // Red color with original alpha
                         processedImage.setRGB(x, y, newColor.getRGB());
                     } else {
                         processedImage.setRGB(x, y, pixel);

@@ -12,7 +12,7 @@ public class Board {
 	private static ArrayList<Pawn> pawns = new ArrayList<>();
 	private static double cellDistance;
 	private static ArrayList<Player> players;
-	private static HashMap<String, ArrayList<Point>> cardsDeckPointsPerPlayer = new HashMap<>();
+    private static final HashMap<String, ArrayList<Point>> cardsDeckPointsPerPlayer = new HashMap<>();
 
 	public static ArrayList<Point> getCardsDeckPointsForPlayer(String UUID) {
 		if(!cardsDeckPointsPerPlayer.containsKey(UUID)) {
@@ -42,8 +42,8 @@ public class Board {
 			//
 			// then all the tiles are rotated based on the number of players,
 			// where the playerId is updated based on the rotation.
-			int playerId = (j < 0) ? lastPlayerInt : 0;
-			int tileNr = (j < 0) ? j + 16 : j;
+			int playerId = j < 0 ? lastPlayerInt : 0;
+			int tileNr = j < 0 ? j + 16 : j;
 			tiles.add(new TileMapping(playerIntToUUID(playerId, players), tileNr, new Point(startPoint)));
 
 			if( j < -3){
@@ -127,13 +127,13 @@ public class Board {
 		}
 		// rotate all the points where all the players' cards should be displayed
 		for(Map.Entry<String, ArrayList<Point>> entry : cardsDeckPointsPerPlayer.entrySet()){
-			String uuid_i = entry.getKey();
+			String uuidI = entry.getKey();
 			ArrayList<Point> templist = new ArrayList<>();
 			for (Point p: entry.getValue()){
 				p = p.rotate(new Point(300,300), -360.0/nrPlayers*playerint);
 				templist.add(p);
 			}
-			cardsDeckPointsPerPlayer.put(uuid_i, templist);
+			cardsDeckPointsPerPlayer.put(uuidI, templist);
 		}
     }
 

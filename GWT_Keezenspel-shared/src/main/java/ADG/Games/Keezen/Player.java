@@ -10,7 +10,7 @@ public class Player implements IsSerializable {
     private String name;
     private int place = -1;
     private String uuid;
-    private int index = 0;
+    private int index;
 
     public Player() {}
 
@@ -84,8 +84,12 @@ public class Player implements IsSerializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if(this == o) {
+            return true;
+        }
+        if(o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Player player = (Player) o;
         return isActive == player.isActive && isPlaying == player.isPlaying && place == player.place && index == player.index && Objects.equals(name, player.name) && Objects.equals(uuid, player.uuid);
     }

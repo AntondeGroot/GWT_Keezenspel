@@ -167,7 +167,7 @@ public class ViewDrawing {
             hp.add(canvas.asWidget());
             hp.add(playerName);
             int row = playerId % 4;
-            int col = (playerId > 3) ? 1 : 0;
+            int col = playerId > 3 ? 1 : 0;
             grid.setWidget(row, col, hp);
 
             playerId++;

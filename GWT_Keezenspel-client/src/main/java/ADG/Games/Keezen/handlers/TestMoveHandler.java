@@ -44,7 +44,7 @@ public class TestMoveHandler implements ClickHandler {
             }
             public void onSuccess(MoveResponse result) {
                 GWT.log("Test Move: "+result.toString());
-                List<TileId> tileIds = new ArrayList<TileId>();
+                List<TileId> tileIds = new ArrayList<>();
                 if(result.getMovePawn1() != null){
                     if(result.getMoveType()==MoveType.SPLIT){
                         // draw only where a pawn ends up

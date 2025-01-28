@@ -46,8 +46,12 @@ public class TileId implements IsSerializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if(this == o) {
+            return true;
+        }
+        if(o == null || getClass() != o.getClass()) {
+            return false;
+        }
         TileId tileId = (TileId) o;
         return tileNr == tileId.tileNr && Objects.equals(playerId, tileId.playerId);
     }

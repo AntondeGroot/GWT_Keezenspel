@@ -8,14 +8,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class PawnAnimationMapping {
-    private Pawn pawn;
-    private LinkedList<Point> points = new LinkedList<>();
+    private final Pawn pawn;
+    private final LinkedList<Point> points = new LinkedList<>();
     private boolean animateLast;
 
     public PawnAnimationMapping(Pawn pawn, LinkedList<TileId> tileIdList, boolean animateLast) {
         this.pawn = pawn;
         this.animateLast = animateLast;
-        ArrayList<Point> tempResult = new ArrayList<Point>();
+        ArrayList<Point> tempResult = new ArrayList<>();
 
         for (int i = 0; i < tileIdList.size()-1 ; i++) {
             Point pointFrom = convertTileIdToPoint(tileIdList.get(i));
