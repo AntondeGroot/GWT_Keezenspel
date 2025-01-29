@@ -8,8 +8,20 @@ import java.util.Objects;
 public class Card implements IsSerializable {
     private int suit;
     private int cardValue;
+    private int uniqueCardNumber;
 
     public Card() {
+    }
+
+    /**
+     * @param suit , suit
+     * @param cardValue , value between 1 and 13 (ace,2,...,king)
+     * @param uniqueCardNumber , to distinguish between 2 otherwise identical cards like 8♣, this happens when more than 4 players play
+     */
+    public Card(int suit, int cardValue, int uniqueCardNumber) {
+        this.suit = suit;
+        this.cardValue = cardValue;
+        this.uniqueCardNumber = uniqueCardNumber;
     }
 
     /**
@@ -39,19 +51,15 @@ public class Card implements IsSerializable {
 
     @Override
     public boolean equals(Object o) {
-        if(this == o) {
-            return true;
-        }
-        if(o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Card card1 = (Card) o;
-        return suit == card1.suit && cardValue == card1.cardValue;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Card card = (Card) o;
+        return suit == card.suit && cardValue == card.cardValue && uniqueCardNumber == card.uniqueCardNumber;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(suit, cardValue);
+        return Objects.hash(suit, cardValue, uniqueCardNumber);
     }
 
     @Override
