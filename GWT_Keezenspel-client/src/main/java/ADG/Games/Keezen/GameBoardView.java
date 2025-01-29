@@ -129,7 +129,7 @@ public class GameBoardView extends Composite {
         playerListContainer2.add(createPlayerGrid(players));
     }
 
-    public void drawPawns(ArrayList<Pawn> pawns){
+    public void drawPawns(ArrayList<Pawn> pawns, PawnAndCardSelection pawnAndCardSelection){
         // sort the pawns vertically so that they don't overlap weirdly when drawn
         Context2d context = getCanvasPawnsContext();
         pawns.sort(new PawnComparator());
@@ -164,7 +164,7 @@ public class GameBoardView extends Composite {
                     }
                 }
             }else{
-                drawPawn(context, pawn);
+                drawPawn(context, pawn, pawnAndCardSelection);
             }
         }
     }
@@ -245,7 +245,7 @@ public class GameBoardView extends Composite {
         }
     }
 
-    private void drawPlayerCardsInHand(List<Card> cards, Image spriteImage){
+    private void drawPlayerCardsInHand(List<Card> cards, Card selectedCard, Image spriteImage){
         // Loop through the cards to draw them
         for (int i = 0; i < cards.size(); i++) {
             Card card = cards.get(i);
@@ -270,13 +270,13 @@ public class GameBoardView extends Composite {
             );
 
             // Highlight selected card, if any
-            if (Objects.equals(card, PawnAndCardSelection.getCard())) {
+            if (Objects.equals(card, selectedCard)) {
                 drawRoundedRect(getCanvasCardsContext(), destX - 1.5, destY - 1.5, destWidth + 3, destHeight + 3, 8);
             }
         }
     }
 
-    public void drawCards(List<Card> cards, HashMap<String, Integer> nrCardsPerPlayerUUID, ArrayList<Card> playedCards) {
+    public void drawCards(List<Card> cards, HashMap<String, Integer> nrCardsPerPlayerUUID, ArrayList<Card> playedCards, Card selectedCard) {
         // Create an image to represent the card deck
         Image img = new Image("/card-deck.png");
 
@@ -288,7 +288,7 @@ public class GameBoardView extends Composite {
                 getCanvasCardsContext().clearRect(0, 0, getCanvasCards().getWidth(), getCanvasCards().getHeight());
 
                 GWT.log("\n\ndrawing cards");
-                drawPlayerCardsInHand(cards, img);
+                drawPlayerCardsInHand(cards, selectedCard, img);
                 drawCardsIcons(nrCardsPerPlayerUUID, img);
                 drawPlayedCards(playedCards, img);
             }
@@ -399,7 +399,7 @@ public class GameBoardView extends Composite {
 
     //todo: move to util
     //todo: do not draw the pawns too often
-    private void drawPawn(Context2d context, Pawn pawn){
+    private void drawPawn(Context2d context, Pawn pawn, PawnAndCardSelection pawnAndCardSelection){
         // Load an image and draw it to the canvas
         Image image = new Image("/pawn"+pawn.getColorInt()+".png");
         Image imageOutline = new Image("/pawn_outline.png");
@@ -415,7 +415,7 @@ public class GameBoardView extends Composite {
             }
         }
         context.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
-        if(PawnAndCardSelection.getPawn1().equals(pawn) || PawnAndCardSelection.getPawn2().equals(pawn)){
+        if(pawnAndCardSelection.getPawn1().equals(pawn) || pawnAndCardSelection.getPawn2().equals(pawn)){
             context.drawImage(ImageElement.as(imageOutline.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
         }
     }

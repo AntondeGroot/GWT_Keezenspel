@@ -14,10 +14,11 @@ public class PawnAndCardSelectionKingTest {
     private Pawn otherPawnOnNest;
     private Pawn otherPawnOnFinish;
     private Card kingCard;
+    private PawnAndCardSelection pawnAndCardSelection;
 
     @BeforeEach
     void setup(){
-        PawnAndCardSelection.reset();
+        pawnAndCardSelection = new PawnAndCardSelection();
 
         // pawns player playing
         ownPawnOnBoard = new Pawn(new PawnId("1", 1), new TileId("1", 0));
@@ -34,67 +35,67 @@ public class PawnAndCardSelectionKingTest {
     @Test
     public void test_SetKing_SelectPawnOffBoard_MoveOnBoard(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.setCard(kingCard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.setCard(kingCard);
 
         // WHEN
-        PawnAndCardSelection.addPawn(ownPawnOnNest);
+        pawnAndCardSelection.addPawn(ownPawnOnNest);
 
         // THEN
-        assertEquals(MoveType.ONBOARD, PawnAndCardSelection.getMoveType());
+        assertEquals(MoveType.ONBOARD, pawnAndCardSelection.getMoveType());
     }
 
     // TEST: NEST
     @Test
     public void test_SelectPawnOffBoard_SetKing_MoveOnBoard(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.addPawn(ownPawnOnNest);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.addPawn(ownPawnOnNest);
 
         // WHEN
-        PawnAndCardSelection.setCard(kingCard);
+        pawnAndCardSelection.setCard(kingCard);
 
         // THEN
-        assertEquals(MoveType.ONBOARD, PawnAndCardSelection.getMoveType());
+        assertEquals(MoveType.ONBOARD, pawnAndCardSelection.getMoveType());
     }
 
     @Test
     public void test_SetKing_SelectOtherPawnOnNest_NotPossible(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.setCard(kingCard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.setCard(kingCard);
 
         // WHEN
-        PawnAndCardSelection.addPawn(otherPawnOnNest);
+        pawnAndCardSelection.addPawn(otherPawnOnNest);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId1());
-        assertNull(PawnAndCardSelection.getPawnId2());
+        assertNull(pawnAndCardSelection.getPawnId1());
+        assertNull(pawnAndCardSelection.getPawnId2());
     }
 
     @Test
     public void test_SetKing_SelectOtherPawnOnFinish_NotPossible(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.setCard(kingCard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.setCard(kingCard);
 
         // WHEN
-        PawnAndCardSelection.addPawn(otherPawnOnFinish);
+        pawnAndCardSelection.addPawn(otherPawnOnFinish);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId1());
-        assertNull(PawnAndCardSelection.getPawnId2());
+        assertNull(pawnAndCardSelection.getPawnId1());
+        assertNull(pawnAndCardSelection.getPawnId2());
     }
     @Test
     public void test_SelectOwnPawnOnFinish_SetKing_NotPossible(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.addPawn(ownPawnOnFinish);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.addPawn(ownPawnOnFinish);
 
         // WHEN
-        PawnAndCardSelection.setCard(kingCard);
+        pawnAndCardSelection.setCard(kingCard);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId1());// todo: or should the card be empty?
+        assertNull(pawnAndCardSelection.getPawnId1());// todo: or should the card be empty?
     }
 }
