@@ -46,58 +46,14 @@ public class GameBoardPresenter {
     }
 
     public void start() {
-        // Start the game
         animate();
-        bind();
+        bindEventHandlers();
+        startPollingServer();
+        initializeGame();
+    }
 
+    private void startPollingServer() {
         pollingService.startPolling(200, this::pollServerForUpdates);
-
-        //todo: bind startGame method to a button
-        gameStateService.startGame(new AsyncCallback<Void>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                GWT.log("Game is already running");
-            }
-
-            @Override
-            public void onSuccess(Void o) {
-                gameStateService.getPlayers(new AsyncCallback<ArrayList<Player>>() {
-                    @Override
-                    public void onFailure(Throwable throwable) {
-                    }
-
-                    @Override
-                    public void onSuccess(ArrayList<Player> players) {
-                        GWT.log("players = " + players);
-                        model.setPlayers(players);
-                        view.drawPlayers(model.getPlayers());
-                        boardModel = new Board();
-                        GWT.log("gameStateService getPlayers board.create");
-
-                        boardModel.createBoard(players, view.getBoardSize());
-                    }
-                });
-            }
-        });
-
-        view.canvasWrapper.addDomHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                // todo: replace getAbsoluteLeft / getAbsoluteTop by a non-deprecated way
-                int canvasLeft = DOM.getAbsoluteLeft(view.getCanvasCards()) - Window.getScrollLeft();
-                int canvasTop = DOM.getAbsoluteTop(view.getCanvasCards()) - Window.getScrollTop();
-                int x = event.getClientX() - canvasLeft;
-                int y = event.getClientY() - canvasTop + 30;
-
-                GWT.log("Clicked at: (" + x + ", " + y + ")");
-                TileId tileId = Board.getTileId(x, y);
-                if (tileId != null) {
-                    GWT.log("you clicked TileId: " + tileId);
-                }
-                // todo: maybe replace x,y parameters
-                CanvasClickHandler.handleCanvasClick(event, x, y, view.getStepsPawn1(), view.getStepsPawn2(), pawnAndCardSelection);
-            }
-        }, ClickEvent.getType());
     }
 
     public void stop() {
@@ -105,7 +61,7 @@ public class GameBoardPresenter {
         pollingService.stopPolling();
     }
 
-    private void bind() {
+    private void bindEventHandlers() {
         view.getSendButton().addDomHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
@@ -143,6 +99,20 @@ public class GameBoardPresenter {
 
             new TestMoveHandler().sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());
         });
+
+        view.canvasWrapper.addDomHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                // todo: replace getAbsoluteLeft / getAbsoluteTop by a non-deprecated way
+                int canvasLeft = DOM.getAbsoluteLeft(view.getCanvasCards()) - Window.getScrollLeft();
+                int canvasTop = DOM.getAbsoluteTop(view.getCanvasCards()) - Window.getScrollTop();
+                int x = event.getClientX() - canvasLeft;
+                int y = event.getClientY() - canvasTop + 30;
+
+                // todo: maybe replace x,y parameters
+                CanvasClickHandler.handleCanvasClick(event, x, y, view.getStepsPawn1(), view.getStepsPawn2(), pawnAndCardSelection);
+            }
+        }, ClickEvent.getType());
     }
 
     private void pollServerForUpdates() {
@@ -164,37 +134,72 @@ public class GameBoardPresenter {
                     // todo: maybe skip something down below,
 //                    return;
                 }
+
                 // only set the board when empty, e.g.
                 // when the browser was refreshed or when you join the game for the first time
                 if (!Board.isInitialized()) {
-                    Board board = new Board();
-                    Board.setPawns(result.getPawns());
-                    GWT.log("server created nr pawns: " + result.getPawns().size());
-                    GWT.log(result.getPawns().toString());
-                    GWT.log("poll server board.create" + result);
-                    model.setPlayers(result.getPlayers());
-                    board.createBoard(model.getPlayers(), view.getBoardSize());
-                    view.drawBoard(Board.getTiles(), model.getPlayers(), Board.getCellDistance());
-                    view.drawPawns(result.getPawns(), pawnAndCardSelection);
+                    initializeBoardState(result);
                 }
-                // update model
-                playerList.setPlayers(result.getPlayers());
-                if (!playerList.isIsUpToDate()) {
-                    gameStateService.getPlayers(new AsyncCallback<ArrayList<Player>>() {
-                        @Override
-                        public void onFailure(Throwable throwable) {
-                        }
-
-                        @Override
-                        public void onSuccess(ArrayList<Player> players) {
-                            GWT.log("Players were updated: " + players);
-                            model.setPlayers(players);
-                            view.getPlayerListContainer().clear();
-                            view.drawPlayers(model.getPlayers());
-                        }
-                    });
-                }
+                updatePlayerList(result);
                 view.enableButtons(currentPlayerIsPlaying(result));
+            }
+        });
+    }
+
+    private void initializeBoardState(GameStateResponse result) {
+        Board board = new Board();
+        Board.setPawns(result.getPawns());
+        board.createBoard(result.getPlayers(), view.getBoardSize());
+        view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
+        view.drawPawns(result.getPawns(), pawnAndCardSelection);
+    }
+
+    private void updatePlayerList(GameStateResponse result) {
+        playerList.setPlayers(result.getPlayers());
+        if (!playerList.isIsUpToDate()) {
+            gameStateService.getPlayers(new AsyncCallback<ArrayList<Player>>() {
+                @Override
+                public void onFailure(Throwable throwable) {}
+
+                @Override
+                public void onSuccess(ArrayList<Player> players) {
+                    GWT.log("Players were updated: " + players);
+                    model.setPlayers(players);
+                    view.drawPlayers(model.getPlayers());
+                }
+            });
+        }
+    }
+
+    private void initializeGame() {
+        gameStateService.startGame(new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+                GWT.log("Game is already running");
+            }
+
+            @Override
+            public void onSuccess(Void o) {
+                fetchAndInitializePlayers();
+            }
+        });
+    }
+
+    private void fetchAndInitializePlayers(){
+        gameStateService.getPlayers(new AsyncCallback<ArrayList<Player>>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+            }
+
+            @Override
+            public void onSuccess(ArrayList<Player> players) {
+                GWT.log("players = " + players);
+                model.setPlayers(players);
+                view.drawPlayers(model.getPlayers());
+                boardModel = new Board();
+                GWT.log("gameStateService getPlayers board.create");
+
+                boardModel.createBoard(players, view.getBoardSize());
             }
         });
     }
