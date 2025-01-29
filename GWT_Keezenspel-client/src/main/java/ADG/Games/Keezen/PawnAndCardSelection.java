@@ -285,6 +285,15 @@ public class PawnAndCardSelection {
     public void setNrStepsPawn1(int steps){
         nrStepsPawn1 = steps;
     }
+    public void setNrStepsPawn1ForSplit(String stepsPawn1){
+        if (Integer.parseInt(stepsPawn1) > 7 || Integer.parseInt(stepsPawn1) < 0) {
+            nrStepsPawn1 = 4;
+            nrStepsPawn2 = 3;
+        } else {
+            nrStepsPawn1 = Integer.parseInt(stepsPawn1);
+            nrStepsPawn2 = 7 - nrStepsPawn1;
+        }
+    }
     public void setNrStepsPawn2(int steps){
         nrStepsPawn2 = steps;
     }
