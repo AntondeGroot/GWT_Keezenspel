@@ -32,7 +32,8 @@ public class GameBoardPresenter {
     private final PollingService pollingService;
     private GameStateResponse gameStateResponseUpdate = new GameStateResponse();
     private double loopAlpha = 0.6;
-    private PawnAndCardSelection pawnAndCardSelection;
+    private final PawnAndCardSelection pawnAndCardSelection;
+    private final PlayerList playerList = new PlayerList();
 
     public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, GameStateServiceAsync gameStateService, CardsServiceAsync cardsService, PollingService pollingService) {
         this.model = gameBoardModel;
@@ -69,7 +70,7 @@ public class GameBoardPresenter {
                     public void onSuccess(ArrayList<Player> players) {
                         GWT.log("players = " + players);
                         model.setPlayers(players);
-                        view.drawPlayers(players);
+                        view.drawPlayers(model.getPlayers());
                         boardModel = new Board();
                         GWT.log("gameStateService getPlayers board.create");
 
@@ -132,26 +133,14 @@ public class GameBoardPresenter {
 
         view.stepsPawn1.addChangeHandler(event -> {
             String value = view.stepsPawn1.getValue(); // Get the current value of the TextBox
-
             // Check if the value is of length 1 and numerical
-            if (value.length() == 1 && value.matches("\\d")) {
-                if (Integer.parseInt(value) > 7 || Integer.parseInt(value) < 0) {
-                    view.stepsPawn1.setValue("4");
-                    view.stepsPawn2.setValue("3");
-                    pawnAndCardSelection.setNrStepsPawn1(4);
-                    pawnAndCardSelection.setNrStepsPawn2(3);
-                } else {
-                    view.stepsPawn2.setValue(String.valueOf(7 - Integer.parseInt(value)));
-                    pawnAndCardSelection.setNrStepsPawn1(Integer.parseInt(value));
-                    pawnAndCardSelection.setNrStepsPawn2(7 - Integer.parseInt(value));
-                }
-            } else {
-                // Invalid input
-                view.stepsPawn1.setValue("4");
-                view.stepsPawn2.setValue("3");
-                pawnAndCardSelection.setNrStepsPawn1(4);
-                pawnAndCardSelection.setNrStepsPawn2(3);
+            if (!(value.length() == 1 && value.matches("\\d"))) {
+                value = "4";
             }
+            pawnAndCardSelection.setNrStepsPawn1ForSplit(value);
+            view.stepsPawn1.setValue(String.valueOf(pawnAndCardSelection.getNrStepsPawn1()));
+            view.stepsPawn2.setValue(String.valueOf(pawnAndCardSelection.getNrStepsPawn2()));
+
             new TestMoveHandler().sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());
         });
     }
@@ -183,16 +172,14 @@ public class GameBoardPresenter {
                     GWT.log("server created nr pawns: " + result.getPawns().size());
                     GWT.log(result.getPawns().toString());
                     GWT.log("poll server board.create" + result);
-                    board.createBoard(result.getPlayers(), view.getBoardSize());
-                    view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
+                    model.setPlayers(result.getPlayers());
+                    board.createBoard(model.getPlayers(), view.getBoardSize());
+                    view.drawBoard(Board.getTiles(), model.getPlayers(), Board.getCellDistance());
                     view.drawPawns(result.getPawns(), pawnAndCardSelection);
-                    PlayerList.setNrPlayers(result.getNrPlayers());
                 }
                 // update model
-                PlayerList playerList = new PlayerList();
-                PlayerList.setActivePlayers(result.getActivePlayers());
-                PlayerList.setWinners(result.getWinners());
-                if (!PlayerList.isIsUpToDate()) {
+                playerList.setPlayers(result.getPlayers());
+                if (!playerList.isIsUpToDate()) {
                     gameStateService.getPlayers(new AsyncCallback<ArrayList<Player>>() {
                         @Override
                         public void onFailure(Throwable throwable) {
@@ -207,8 +194,7 @@ public class GameBoardPresenter {
                         }
                     });
                 }
-                playerList.setPlayerIdPlayingAndDrawPlayerList(result.getPlayerIdTurn());// todo: old
-                view.enableButtons(result.getPlayerIdTurn().equals(Cookie.getPlayerId()));
+                view.enableButtons(currentPlayerIsPlaying(result));
             }
         });
     }
@@ -229,7 +215,7 @@ public class GameBoardPresenter {
                     CardsDeck.setNrCardsPerPlayer(result.getNrOfCardsPerPlayer());
                     CardsDeck.setPlayedCards(result.getPlayedCards());
                     view.drawCards(CardsDeck.getCards(), result.getNrOfCardsPerPlayer(), CardsDeck.getPlayedCards(), pawnAndCardSelection.getCard());
-                    PlayerList.refresh();
+                    playerList.refresh();
                 }
             }
         });
@@ -297,5 +283,9 @@ public class GameBoardPresenter {
                 }
             }
         }
+    }
+
+    private boolean currentPlayerIsPlaying(GameStateResponse result){
+        return result.getPlayerIdTurn().equals(Cookie.getPlayerId());
     }
 }
