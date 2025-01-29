@@ -47,9 +47,11 @@ public class CardsDeck implements IsSerializable {
         ArrayList<Card> cards = new ArrayList<>();
         activePlayers = GameState.getActivePlayers();
         // create cards
-        for (int suit_i = 0; suit_i < activePlayers.size(); suit_i++) {
-            for (int card_j = 1; card_j < 14; card_j++) {
-                cards.add(new Card(suit_i % 4, card_j));
+        int uniqueCardNr = 0;
+        for (int suit = 0; suit < activePlayers.size(); suit++) {
+            for (int cardValue = 1; cardValue < 14; cardValue++) {
+                cards.add(new Card(suit % 4, cardValue, uniqueCardNr));
+                uniqueCardNr++;
             }
         }
 

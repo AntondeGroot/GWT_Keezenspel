@@ -270,9 +270,7 @@ public class GameBoardView extends Composite {
             );
 
             // Highlight selected card, if any
-            if (PawnAndCardSelection.getCard() != null &&
-                    PawnAndCardSelection.getCard().equals(card) &&
-                    PawnAndCardSelection.getCardNr() == i) {
+            if (Objects.equals(card, PawnAndCardSelection.getCard())) {
                 drawRoundedRect(getCanvasCardsContext(), destX - 1.5, destY - 1.5, destWidth + 3, destHeight + 3, 8);
             }
         }

@@ -15,9 +15,6 @@ public class PawnAndCardSelection {
     private static MoveType moveType;
     private static int nrStepsPawn1;
     private static int nrStepsPawn2;
-    private static int cardNr; // for selecting which card in your hand you picked
-    // if you have more than 4 players you will have 1 suit that is a double, if you have a hand with two of the same card
-    // if you then pick one, both cards would otherwise be highlighted
 
     public static void setPlayerId(String id) {
         playerId = id;
@@ -276,14 +273,6 @@ public class PawnAndCardSelection {
         if (nrStepsPawn1 == 4) {
             nrStepsPawn1 = -4;
         }
-    }
-
-    public static int getCardNr() {
-        return cardNr;
-    }
-
-    public static void setCardNr(int cardNr) {
-        PawnAndCardSelection.cardNr = cardNr;
     }
 
     public static int getNrStepsPawn1() {

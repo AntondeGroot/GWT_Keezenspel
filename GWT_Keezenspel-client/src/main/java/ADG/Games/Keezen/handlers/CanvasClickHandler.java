@@ -37,11 +37,9 @@ public class CanvasClickHandler {
         GWT.log("Clicked on CardsDeck : "+x+","+y+"\n"+"CardNr: "+cardNr);
         if(cardNr > -1){
             Card card = CardsDeck.pickCard(cardNr);
-            PawnAndCardSelection.setCardNr(cardNr); // to distinguish when you have multiple identical cards
             if(card == null){return;}
 
             PawnAndCardSelection.setCard(card);
-            PawnAndCardSelection.setCardNr(cardNr);
 
             if(PawnAndCardSelection.getPawn1() != null && PawnAndCardSelection.getCard() != null){
                 if(PawnAndCardSelection.getMoveType()==MoveType.SPLIT){
