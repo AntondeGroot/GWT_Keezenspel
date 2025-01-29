@@ -7,30 +7,30 @@ import static ADG.Games.Keezen.Util.CardValueCheck.isSeven;
 
 public class PawnAndCardSelection {
     // todo: turn this into a model, do not use statics
-    private static String playerId;
-    private static Pawn pawn1 = resetPawn();
-    private static Pawn pawn2 = resetPawn();
-    private static Card card;
-    private static boolean drawCards = true;
-    private static MoveType moveType;
-    private static int nrStepsPawn1;
-    private static int nrStepsPawn2;
+    private String playerId;
+    private Pawn pawn1 = resetPawn();
+    private Pawn pawn2 = resetPawn();
+    private Card card;
+    private boolean drawCards = true;
+    private MoveType moveType;
+    private int nrStepsPawn1;
+    private int nrStepsPawn2;
 
-    public static void setPlayerId(String id) {
+    public void setPlayerId(String id) {
         playerId = id;
     }
 
-    public static String getPlayerId(){
+    public String getPlayerId(){
         return playerId;
     }
 
-    public static void addPawn(Pawn pawn) {
+    public void addPawn(Pawn pawn) {
         validateSelectionBasedOnPlayerID(pawn); // not accounting for if they are on nest/board/finish
         validateSelectionBasedOnLocation();     // validate if they are on nest/board/finish
         validateMoveType();
     }
 
-    private static void validateSelectionBasedOnLocation() {
+    private void validateSelectionBasedOnLocation() {
         if(card == null){
             return;
         }
@@ -43,7 +43,7 @@ public class PawnAndCardSelection {
         }
     }
 
-    private static void validateAllPawnsAreOnBoard() {
+    private void validateAllPawnsAreOnBoard() {
         if(!pawn1.equals(resetPawn())){
             if(!(pawn1.getCurrentTileId().getTileNr() >= 0 && pawn1.getCurrentTileId().getTileNr() < 16)){// reset when not on board
                 pawn1 = resetPawn();
@@ -56,7 +56,7 @@ public class PawnAndCardSelection {
         }
     }
 
-    private static void validateAllPawnsAreOnBoardOrFinish() {
+    private void validateAllPawnsAreOnBoardOrFinish() {
         if(!pawn1.equals(resetPawn())){
             if(pawn1.getCurrentTileId().getTileNr() < 0){// reset when on nest
                 pawn1 = resetPawn();
@@ -69,7 +69,7 @@ public class PawnAndCardSelection {
         }
     }
 
-    private static void validateAllPawnsAreOnNest() {
+    private void validateAllPawnsAreOnNest() {
         if(!pawn1.equals(resetPawn())){
             if(pawn1.getCurrentTileId().getTileNr() > 0){
                 pawn1 = resetPawn();
@@ -82,7 +82,7 @@ public class PawnAndCardSelection {
         }
     }
 
-    private static boolean aPawnWasNotDeselected(Pawn pawn) {
+    private boolean aPawnWasNotDeselected(Pawn pawn) {
         if (pawn1.equals(pawn)) {
             // this moves pawn 2 to pawn1 and resets pawn2
             // if pawn 2 was already reset, this changes nothing but clears pawn1
@@ -100,7 +100,7 @@ public class PawnAndCardSelection {
         return true;
     }
 
-    private static void handlePlayerCanSelect2Pawns(Pawn pawn) {
+    private void handlePlayerCanSelect2Pawns(Pawn pawn) {
         if(aPawnWasNotDeselected(pawn)){
             if (!playerId.equals(pawn.getPlayerId())) {
                 return;
@@ -115,7 +115,7 @@ public class PawnAndCardSelection {
         }
     }
 
-    private static void handlePlayerCanSelect1Pawn(Pawn pawn) {
+    private void handlePlayerCanSelect1Pawn(Pawn pawn) {
         if(aPawnWasNotDeselected(pawn)){
             if (playerId.equals(pawn.getPlayerId())) {
                 pawn1 = pawn;
@@ -123,7 +123,7 @@ public class PawnAndCardSelection {
         }
     }
 
-    private static void handlePlayerCanSelectTheirOwnAndOpponentsPawn(Pawn pawn) {
+    private void handlePlayerCanSelectTheirOwnAndOpponentsPawn(Pawn pawn) {
        if(aPawnWasNotDeselected(pawn)){
             // select pawn1
             if (playerId.equals(pawn.getPlayerId())) {
@@ -137,7 +137,7 @@ public class PawnAndCardSelection {
        }
     }
 
-    private static void validateSelectionBasedOnPlayerID(Pawn pawn) {
+    private void validateSelectionBasedOnPlayerID(Pawn pawn) {
         if(card == null){
             handlePlayerCanSelect1Pawn(pawn);
             return;
@@ -150,7 +150,7 @@ public class PawnAndCardSelection {
         }
     }
 
-    public static void setCard(Card p_card) {
+    public void setCard(Card p_card) {
         card = p_card;
         validateMoveType();
         validateSelectionBasedOnPlayerID(pawn2);
@@ -158,23 +158,23 @@ public class PawnAndCardSelection {
         drawCards = true;
     }
 
-    public static Pawn getPawn1() {
+    public Pawn getPawn1() {
         return pawn1;
     }
 
-    public static PawnId getPawnId1(){
+    public PawnId getPawnId1(){
         if(pawn1.equals(resetPawn())){
             return null;
         }
         return pawn1.getPawnId();
     }
 
-    public static MoveType getMoveType() {
+    public MoveType getMoveType() {
         return moveType;
     }
 
-    public static void setMoveType(MoveType moveType) {
-        PawnAndCardSelection.moveType = moveType;
+    public void setMoveType(MoveType moveType) {
+        this.moveType = moveType;
         if(moveType == FORFEIT){
             pawn1 = resetPawn();
             pawn2 = resetPawn();
@@ -182,34 +182,34 @@ public class PawnAndCardSelection {
         }
     }
 
-    public static PawnId getPawnId2(){
+    public PawnId getPawnId2(){
         if(pawn2.equals(resetPawn())){
             return null;
         }
         return pawn2.getPawnId();
     }
 
-    public static Pawn getPawn2() {
+    public Pawn getPawn2() {
         return pawn2;
     }
 
-    public static Card getCard() {
+    public Card getCard() {
         return card;
     }
 
-    public static void setCardsAreDrawn(){
+    public void setCardsAreDrawn(){
         drawCards = false;
     }
 
-    public static boolean getDrawCards(){
+    public boolean getDrawCards(){
         return drawCards;
     }
 
-    private static Pawn resetPawn(){
+    private Pawn resetPawn(){
         return new Pawn(new PawnId("-1",-1),new TileId("-1",90));//todo: improve reset
     }
 
-    public static void reset(){
+    public void reset(){
         // do not reset playerId
         pawn1 = resetPawn();
         pawn2 = resetPawn();
@@ -220,7 +220,7 @@ public class PawnAndCardSelection {
         nrStepsPawn2 = 0;
     }
 
-    private static void validateMoveType(){
+    private void validateMoveType(){
         if(card == null){
             return;
         }
@@ -239,7 +239,7 @@ public class PawnAndCardSelection {
         }
     }
 
-    private static void handleAce() {
+    private void handleAce() {
         if (pawn1.getCurrentTileId().getTileNr() < 0) {
             setMoveType(ONBOARD);
         } else {
@@ -248,7 +248,7 @@ public class PawnAndCardSelection {
         }
     }
 
-    private static void handleSeven() {
+    private void handleSeven() {
         if (!pawn1.equals(resetPawn()) && !pawn2.equals(resetPawn())) {
             setMoveType(SPLIT);
             //todo: set nr steps when 7 splits
@@ -259,15 +259,15 @@ public class PawnAndCardSelection {
         }
     }
 
-    private static void handleJack() {
+    private void handleJack() {
         setMoveType(SWITCH);
     }
 
-    private static void handleKing() {
+    private void handleKing() {
         setMoveType(ONBOARD);
     }
 
-    private static void handleDefaultCard() {
+    private void handleDefaultCard() {
         setMoveType(MOVE);
         nrStepsPawn1 = card.getCardValue();
         if (nrStepsPawn1 == 4) {
@@ -275,33 +275,33 @@ public class PawnAndCardSelection {
         }
     }
 
-    public static int getNrStepsPawn1() {
+    public int getNrStepsPawn1() {
         return nrStepsPawn1;
     }
-    public static int getNrStepsPawn2() {
+    public int getNrStepsPawn2() {
         return nrStepsPawn2;
     }
 
-    public static void setNrStepsPawn1(int steps){
+    public void setNrStepsPawn1(int steps){
         nrStepsPawn1 = steps;
     }
-    public static void setNrStepsPawn2(int steps){
+    public void setNrStepsPawn2(int steps){
         nrStepsPawn2 = steps;
     }
 
-    public static MoveMessage createTestMoveMessage() {
+    public MoveMessage createTestMoveMessage() {
         MoveMessage moveMessage = createMessage();
         moveMessage.setMessageType(MessageType.CHECK_MOVE);
         return moveMessage;
     }
 
-    public static MoveMessage createMoveMessage() {
+    public MoveMessage createMoveMessage() {
         MoveMessage moveMessage = createMessage();
         moveMessage.setMessageType(MAKE_MOVE);
         return moveMessage;
     }
 
-    private static MoveMessage createMessage() {
+    private MoveMessage createMessage() {
         MoveMessage moveMessage = new MoveMessage();
         moveMessage.setPlayerId(playerId);
         moveMessage.setPawnId1(getPawnId1());

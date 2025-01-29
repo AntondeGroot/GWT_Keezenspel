@@ -2,7 +2,6 @@ package ADG.Games.Keezen;
 
 import ADG.Games.Keezen.animations.*;
 import ADG.Games.Keezen.handlers.CanvasClickHandler;
-import ADG.Games.Keezen.handlers.ForfeitHandler;
 import ADG.Games.Keezen.handlers.SendHandler;
 import ADG.Games.Keezen.handlers.TestMoveHandler;
 import ADG.Games.Keezen.services.PollingService;
@@ -19,6 +18,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ADG.Games.Keezen.MoveType.FORFEIT;
 import static ADG.Games.Keezen.Util.CardValueCheck.isSeven;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.drawTransparentCircle;
 
@@ -32,6 +32,7 @@ public class GameBoardPresenter {
     private final PollingService pollingService;
     private GameStateResponse gameStateResponseUpdate = new GameStateResponse();
     private double loopAlpha = 0.6;
+    private PawnAndCardSelection pawnAndCardSelection;
 
     public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, GameStateServiceAsync gameStateService, CardsServiceAsync cardsService, PollingService pollingService) {
         this.model = gameBoardModel;
@@ -40,6 +41,7 @@ public class GameBoardPresenter {
         this.cardsService = cardsService;
         this.pollingService = pollingService;
         this.storedCardResponse = new CardResponse();
+        pawnAndCardSelection = new PawnAndCardSelection();
     }
 
     public void start() {
@@ -92,7 +94,7 @@ public class GameBoardPresenter {
                     GWT.log("you clicked TileId: " + tileId);
                 }
                 // todo: maybe replace x,y parameters
-                CanvasClickHandler.handleCanvasClick(event, x, y, view.getStepsPawn1(), view.getStepsPawn2());
+                CanvasClickHandler.handleCanvasClick(event, x, y, view.getStepsPawn1(), view.getStepsPawn2(), pawnAndCardSelection);
             }
         }, ClickEvent.getType());
     }
@@ -103,8 +105,22 @@ public class GameBoardPresenter {
     }
 
     private void bind() {
-        view.getSendButton().addClickHandler(new SendHandler());
-        view.getForfeitButton().addClickHandler(new ForfeitHandler());
+        view.getSendButton().addDomHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                // new sendhandler
+                new SendHandler().sendMoveToServer(pawnAndCardSelection.createMoveMessage());
+            }
+        }, ClickEvent.getType());
+
+        view.getForfeitButton().addDomHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                pawnAndCardSelection.setMoveType(FORFEIT);
+                new SendHandler().sendMoveToServer(pawnAndCardSelection.createMoveMessage());
+            }
+        }, ClickEvent.getType());
+
 
         Element canvasElement = view.getCanvasCards();
         DOM.sinkEvents(canvasElement, Event.ONCLICK);
@@ -122,21 +138,21 @@ public class GameBoardPresenter {
                 if (Integer.parseInt(value) > 7 || Integer.parseInt(value) < 0) {
                     view.stepsPawn1.setValue("4");
                     view.stepsPawn2.setValue("3");
-                    PawnAndCardSelection.setNrStepsPawn1(4);
-                    PawnAndCardSelection.setNrStepsPawn2(3);
+                    pawnAndCardSelection.setNrStepsPawn1(4);
+                    pawnAndCardSelection.setNrStepsPawn2(3);
                 } else {
                     view.stepsPawn2.setValue(String.valueOf(7 - Integer.parseInt(value)));
-                    PawnAndCardSelection.setNrStepsPawn1(Integer.parseInt(value));
-                    PawnAndCardSelection.setNrStepsPawn2(7 - Integer.parseInt(value));
+                    pawnAndCardSelection.setNrStepsPawn1(Integer.parseInt(value));
+                    pawnAndCardSelection.setNrStepsPawn2(7 - Integer.parseInt(value));
                 }
             } else {
                 // Invalid input
                 view.stepsPawn1.setValue("4");
                 view.stepsPawn2.setValue("3");
-                PawnAndCardSelection.setNrStepsPawn1(4);
-                PawnAndCardSelection.setNrStepsPawn2(3);
+                pawnAndCardSelection.setNrStepsPawn1(4);
+                pawnAndCardSelection.setNrStepsPawn2(3);
             }
-            new TestMoveHandler().sendMoveToServer(PawnAndCardSelection.createTestMoveMessage());
+            new TestMoveHandler().sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());
         });
     }
 
@@ -169,7 +185,7 @@ public class GameBoardPresenter {
                     GWT.log("poll server board.create" + result);
                     board.createBoard(result.getPlayers(), view.getBoardSize());
                     view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
-                    view.drawPawns(result.getPawns());
+                    view.drawPawns(result.getPawns(), pawnAndCardSelection);
                     PlayerList.setNrPlayers(result.getNrPlayers());
                 }
                 // update model
@@ -198,7 +214,7 @@ public class GameBoardPresenter {
     }
 
     private void pollServerForCards() {
-        PawnAndCardSelection.setPlayerId(Cookie.getPlayerId());
+        pawnAndCardSelection.setPlayerId(Cookie.getPlayerId());
         cardsService.getCards(Cookie.getPlayerId(), new AsyncCallback<CardResponse>() {
             public void onFailure(Throwable caught) {
                 StepsAnimation.resetStepsAnimation();
@@ -212,7 +228,7 @@ public class GameBoardPresenter {
                     CardsDeck.setCards(result.getCards());
                     CardsDeck.setNrCardsPerPlayer(result.getNrOfCardsPerPlayer());
                     CardsDeck.setPlayedCards(result.getPlayedCards());
-                    view.drawCards(CardsDeck.getCards(), result.getNrOfCardsPerPlayer(), CardsDeck.getPlayedCards());
+                    view.drawCards(CardsDeck.getCards(), result.getNrOfCardsPerPlayer(), CardsDeck.getPlayedCards(), pawnAndCardSelection.getCard());
                     PlayerList.refresh();
                 }
             }
@@ -223,7 +239,7 @@ public class GameBoardPresenter {
         view.clearCanvasPawns();
         update(); // todo: improve
         draw();   // todo: improve
-        view.showPawnTextBoxes(showTextBoxes(PawnAndCardSelection.getCard()));
+        view.showPawnTextBoxes(showTextBoxes(pawnAndCardSelection.getCard()));
         AnimationScheduler.AnimationCallback animationCallback = new AnimationScheduler.AnimationCallback() {
             @Override
             public void execute(double v) {
@@ -240,7 +256,7 @@ public class GameBoardPresenter {
         if (!isSeven(card)) {
             return false;
         }
-        if (PawnAndCardSelection.getPawnId2() == null) {
+        if (pawnAndCardSelection.getPawnId2() == null) {
             return false;
         }
         return true;
@@ -248,7 +264,7 @@ public class GameBoardPresenter {
 
     public void update(){
         view.clearCanvasSteps();
-        if(PawnAndCardSelection.getDrawCards()) {
+        if(pawnAndCardSelection.getDrawCards()) {
             view.clearCanvasCards();
         }
     }
@@ -256,11 +272,11 @@ public class GameBoardPresenter {
     public void draw(){
         drawStepsAnimation();
 
-        if(PawnAndCardSelection.getDrawCards()) {
-            view.drawCards(CardsDeck.getCards(), CardsDeck.getNrCardsPerPlayer(), CardsDeck.getPlayedCards());
-            PawnAndCardSelection.setCardsAreDrawn();
+        if(pawnAndCardSelection.getDrawCards()) {
+            view.drawCards(CardsDeck.getCards(), CardsDeck.getNrCardsPerPlayer(), CardsDeck.getPlayedCards(), pawnAndCardSelection.getCard());
+            pawnAndCardSelection.setCardsAreDrawn();
         }
-        view.drawPawns(Board.getPawns());
+        view.drawPawns(Board.getPawns(), pawnAndCardSelection);
     }
 
     public void drawStepsAnimation() {

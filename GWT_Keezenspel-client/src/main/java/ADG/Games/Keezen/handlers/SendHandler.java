@@ -3,18 +3,10 @@ package ADG.Games.Keezen.handlers;
 import ADG.Games.Keezen.*;
 import ADG.Games.Keezen.animations.StepsAnimation;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public class SendHandler implements ClickHandler {
+public class SendHandler {
     private static final MovingServiceAsync movingService = GWT.create(MovingService.class);
-    /**
-     * Fired when the user clicks on the sendButton.
-     */
-    public void onClick(ClickEvent event) {
-        sendMoveToServer(PawnAndCardSelection.createMoveMessage());
-    }
 
     /**
      * Send the MoveMessage to the server and wait for a response.
@@ -29,7 +21,10 @@ public class SendHandler implements ClickHandler {
             public void onSuccess(MoveResponse result) {
                 StepsAnimation.resetStepsAnimation();
                 MoveController.movePawn(result);
-                PawnAndCardSelection.reset();
+                //PawnAndCardSelection.reset();
+                // todo: uncomment or remove
+                // it used to reset after each player played his move, however when only 1 player is left you might want to keep playing
+                // but after playing a jack it will still show the opponents pawn until you select a different card
             }
         } );
     }

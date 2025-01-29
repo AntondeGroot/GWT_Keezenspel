@@ -17,10 +17,11 @@ public class PawnAndCardSelectionJackTest {
     private Pawn otherPawnOnFinish;
     private Card jackCard;
     private Card nonJackCard;
+    private PawnAndCardSelection pawnAndCardSelection;
 
     @BeforeEach
     void setup(){
-        PawnAndCardSelection.reset();
+        pawnAndCardSelection = new PawnAndCardSelection();
 
         // pawns player playing
         ownPawnOnBoard = new Pawn(new PawnId("1", 1), new TileId("1", 0));
@@ -39,238 +40,238 @@ public class PawnAndCardSelectionJackTest {
     @Test
     public void test_SetJack_SelectNestPawn_NotPossible(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.setCard(jackCard);
 
         // WHEN
-        PawnAndCardSelection.addPawn(ownPawnOnNest);
+        pawnAndCardSelection.addPawn(ownPawnOnNest);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId1());
+        assertNull(pawnAndCardSelection.getPawnId1());
     }
     @Test
     public void test_SelectNestPawn_SetJack_NotPossible(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.addPawn(ownPawnOnNest);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.addPawn(ownPawnOnNest);
 
         // WHEN
-        PawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.setCard(jackCard);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId1());
+        assertNull(pawnAndCardSelection.getPawnId1());
     }
     // other player on nest
     @Test
     public void test_SetJack_SelectPawnOnBoard_SelectPawnOnNest_NotPossible(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.setCard(jackCard);
-        PawnAndCardSelection.addPawn(ownPawnOnBoard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.addPawn(ownPawnOnBoard);
 
         // WHEN
-        PawnAndCardSelection.addPawn(otherPawnOnNest);
+        pawnAndCardSelection.addPawn(otherPawnOnNest);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId2());
+        assertNull(pawnAndCardSelection.getPawnId2());
     }
     // other player on finish
     @Test
     public void test_SelectPawnOnBoard_SelectPawnOnFinish_NotPossible(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.addPawn(ownPawnOnBoard);
-        PawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.addPawn(ownPawnOnBoard);
+        pawnAndCardSelection.setCard(jackCard);
 
         // WHEN
-        PawnAndCardSelection.addPawn(otherPawnOnFinish);
+        pawnAndCardSelection.addPawn(otherPawnOnFinish);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId2());
+        assertNull(pawnAndCardSelection.getPawnId2());
     }
 
     // TEST: OWN PAWN ON BOARD
     @Test
     public void test_SetJack_SelectPawnOnBoard_MoveOnSwitch(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.setCard(jackCard);
 
         // WHEN
-        PawnAndCardSelection.addPawn(ownPawnOnBoard);
+        pawnAndCardSelection.addPawn(ownPawnOnBoard);
 
         // THEN
-        assertEquals(MoveType.SWITCH, PawnAndCardSelection.getMoveType());
+        assertEquals(MoveType.SWITCH, pawnAndCardSelection.getMoveType());
     }
     @Test
     public void test_SelectPawnOnBoard_SetJack_MoveOnSwitch(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.addPawn(ownPawnOnBoard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.addPawn(ownPawnOnBoard);
 
         // WHEN
-        PawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.setCard(jackCard);
 
         // THEN
-        assertEquals(MoveType.SWITCH, PawnAndCardSelection.getMoveType());
+        assertEquals(MoveType.SWITCH, pawnAndCardSelection.getMoveType());
     }
     // TEST: FINISH
     @Test
     public void test_SetJack_SelectPawnOnFinish_NotPossible(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.setCard(jackCard);
 
         // WHEN
-        PawnAndCardSelection.addPawn(ownPawnOnFinish);
+        pawnAndCardSelection.addPawn(ownPawnOnFinish);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId1());
+        assertNull(pawnAndCardSelection.getPawnId1());
     }
     @Test
     public void test_SelectPawnOnFinish_SelectJack_NotPossible(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.addPawn(ownPawnOnFinish);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.addPawn(ownPawnOnFinish);
 
         // WHEN
-        PawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.setCard(jackCard);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId1());
+        assertNull(pawnAndCardSelection.getPawnId1());
     }
     // TEST: FORFEIT
     @Test
     public void test_SelectJack_ThenForfeit(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.addPawn(ownPawnOnBoard);
-        PawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.addPawn(ownPawnOnBoard);
+        pawnAndCardSelection.setCard(jackCard);
 
         // WHEN
-        PawnAndCardSelection.setMoveType(FORFEIT);
+        pawnAndCardSelection.setMoveType(FORFEIT);
 
         // THEN
-        assertEquals(FORFEIT, PawnAndCardSelection.getMoveType());
-        assertNull(PawnAndCardSelection.getCard());
-        assertNull(PawnAndCardSelection.getPawnId1());
+        assertEquals(FORFEIT, pawnAndCardSelection.getMoveType());
+        assertNull(pawnAndCardSelection.getCard());
+        assertNull(pawnAndCardSelection.getPawnId1());
     }
     // TEST: DESELECT BY SELECTING TWICE
     @Test
     public void test_SelectPawnTwice_Deselects(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.addPawn(ownPawnOnBoard);
-        PawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.addPawn(ownPawnOnBoard);
+        pawnAndCardSelection.setCard(jackCard);
 
         // WHEN
-        PawnAndCardSelection.addPawn(ownPawnOnBoard);
+        pawnAndCardSelection.addPawn(ownPawnOnBoard);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId1());
+        assertNull(pawnAndCardSelection.getPawnId1());
     }
 
     @Test
     void test_SetJack_clickOnOtherPawn_Possible(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.setPlayerId("1");
 
         // WHEN
-        PawnAndCardSelection.setCard(jackCard);
-        PawnAndCardSelection.addPawn(otherPawnOnBoard);
+        pawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.addPawn(otherPawnOnBoard);
 
         // THEN
-        assertNotEquals(otherPawnOnBoard.getPawnId(), PawnAndCardSelection.getPawnId1());
-        assertEquals(otherPawnOnBoard.getPawnId(), PawnAndCardSelection.getPawnId2());
+        assertNotEquals(otherPawnOnBoard.getPawnId(), pawnAndCardSelection.getPawnId1());
+        assertEquals(otherPawnOnBoard.getPawnId(), pawnAndCardSelection.getPawnId2());
     }
     @Test
     void test_SetNonJack_clickOnOtherPawn_NotPossible(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.setPlayerId("1");
 
         // WHEN
-        PawnAndCardSelection.setCard(nonJackCard);
-        PawnAndCardSelection.addPawn(otherPawnOnBoard);
+        pawnAndCardSelection.setCard(nonJackCard);
+        pawnAndCardSelection.addPawn(otherPawnOnBoard);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId1());
-        assertNull(PawnAndCardSelection.getPawnId2());
+        assertNull(pawnAndCardSelection.getPawnId1());
+        assertNull(pawnAndCardSelection.getPawnId2());
     }
     @Test
     void test_selectTwoPawnsWithJack_OtherCardSelected_OnlyOwnPawnIsSelected(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.setPlayerId("1");
 
         // WHEN
-        PawnAndCardSelection.addPawn(ownPawnOnBoard);
-        PawnAndCardSelection.setCard(jackCard);
-        PawnAndCardSelection.addPawn(otherPawnOnBoard);
+        pawnAndCardSelection.addPawn(ownPawnOnBoard);
+        pawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.addPawn(otherPawnOnBoard);
 
         // THEN
-        assertEquals(otherPawnOnBoard.getPawnId(), PawnAndCardSelection.getPawnId2());
+        assertEquals(otherPawnOnBoard.getPawnId(), pawnAndCardSelection.getPawnId2());
 
         // WHEN
-        PawnAndCardSelection.setCard(nonJackCard);
+        pawnAndCardSelection.setCard(nonJackCard);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId2());
+        assertNull(pawnAndCardSelection.getPawnId2());
     }
     @Test
     public void test_SetJack_AddOtherPawn_AddOtherPawn_Deselects() {
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.addPawn(ownPawnOnBoard);
-        PawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.addPawn(ownPawnOnBoard);
+        pawnAndCardSelection.setCard(jackCard);
 
         // WHEN
-        PawnAndCardSelection.addPawn(otherPawnOnBoard);
+        pawnAndCardSelection.addPawn(otherPawnOnBoard);
 
         // THEN
-        assertEquals(otherPawnOnBoard, PawnAndCardSelection.getPawn2());
+        assertEquals(otherPawnOnBoard, pawnAndCardSelection.getPawn2());
 
         // WHEN
-        PawnAndCardSelection.addPawn(otherPawnOnBoard);
+        pawnAndCardSelection.addPawn(otherPawnOnBoard);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId2());
+        assertNull(pawnAndCardSelection.getPawnId2());
     }
 
     @Test
     public void test_SetNonJack_DeselectsOtherPawn() {
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.addPawn(ownPawnOnBoard);
-        PawnAndCardSelection.setCard(jackCard);
-        PawnAndCardSelection.addPawn(otherPawnOnBoard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.addPawn(ownPawnOnBoard);
+        pawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.addPawn(otherPawnOnBoard);
 
         // WHEN
-        PawnAndCardSelection.setCard(nonJackCard);
+        pawnAndCardSelection.setCard(nonJackCard);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId2());
+        assertNull(pawnAndCardSelection.getPawnId2());
     }
     @Test
     public void test_SetJack_SelectOtherPawnOnNest_NotPossible(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.setCard(jackCard);
 
         // WHEN
-        PawnAndCardSelection.addPawn(otherPawnOnNest);
+        pawnAndCardSelection.addPawn(otherPawnOnNest);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId2());
+        assertNull(pawnAndCardSelection.getPawnId2());
     }
     @Test
     public void test_SetJack_SelectOtherPawnOnFinish_NotPossible(){
         // GIVEN
-        PawnAndCardSelection.setPlayerId("1");
-        PawnAndCardSelection.setCard(jackCard);
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.setCard(jackCard);
 
         // WHEN
-        PawnAndCardSelection.addPawn(otherPawnOnFinish);
+        pawnAndCardSelection.addPawn(otherPawnOnFinish);
 
         // THEN
-        assertNull(PawnAndCardSelection.getPawnId2());
+        assertNull(pawnAndCardSelection.getPawnId2());
     }
 }

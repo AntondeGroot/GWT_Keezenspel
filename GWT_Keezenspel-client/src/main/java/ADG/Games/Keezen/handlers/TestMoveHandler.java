@@ -10,20 +10,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestMoveHandler implements ClickHandler {
+public class TestMoveHandler{// todo: is no longer a handler
     private static final MovingServiceAsync movingService = GWT.create(MovingService.class);
-    /**
-     * Fired when the user clicks on the sendButton.
-     */
-    public void onClick(ClickEvent event) {
-        sendMoveToServer(PawnAndCardSelection.createTestMoveMessage());
-    }
-
     /**
      * Send the MoveMessage to the server and wait for a response.
      */
     public static void sendMoveToServer(MoveMessage moveMessage) {
-        GWT.log("test card: "+PawnAndCardSelection.getCard());
         GWT.log(moveMessage.toString());
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
