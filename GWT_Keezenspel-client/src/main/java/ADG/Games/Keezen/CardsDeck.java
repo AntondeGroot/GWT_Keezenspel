@@ -8,35 +8,35 @@ import java.util.List;
 
 public class CardsDeck {
 
-    private static List<Card> cards = new ArrayList<>();
-    private static ArrayList<Card> playedCards = new ArrayList<>();
-    private static HashMap<String, Integer> nrCardsPerPlayer = new HashMap<>();
+    private List<Card> cards = new ArrayList<>();
+    private ArrayList<Card> playedCards = new ArrayList<>();
+    private HashMap<String, Integer> nrCardsPerPlayer = new HashMap<>();
 
-    public static HashMap<String, Integer> getNrCardsPerPlayer() {
+    public HashMap<String, Integer> getNrCardsPerPlayer() {
         return nrCardsPerPlayer;
     }
 
-    public static void setNrCardsPerPlayer(HashMap<String, Integer> nrCardsPerPlayer) {
-        CardsDeck.nrCardsPerPlayer = nrCardsPerPlayer;
+    public void setNrCardsPerPlayer(HashMap<String, Integer> nrCardsPerPlayer) {
+        this.nrCardsPerPlayer = nrCardsPerPlayer;
     }
 
-    public static void setCards(List<Card> cards){
-        CardsDeck.cards = cards;
+    public void setCards(List<Card> cards){
+        this.cards = cards;
     }
 
-    public static List<Card> getCards(){
+    public List<Card> getCards(){
         return cards;
     }
 
-    public static void setPlayedCards(ArrayList<Card> playedCards){
-        CardsDeck.playedCards = playedCards;
+    public void setPlayedCards(ArrayList<Card> playedCards){
+        this.playedCards = playedCards;
     }
 
-    public static ArrayList<Card> getPlayedCards(){
+    public ArrayList<Card> getPlayedCards(){
         return playedCards;
     }
 
-    public static Card pickCard(int i){
+    public Card pickCard(int i){
         if(!cards.isEmpty() && i > -1 && i < cards.size()){
             return cards.get(i);
         }
@@ -46,7 +46,7 @@ public class CardsDeck {
         return null;
     }
 
-    public static void processCardResponse(CardResponse cardResponse){
+    public void processCardResponse(CardResponse cardResponse){
         setCards(cardResponse.getCards());
         setNrCardsPerPlayer(cardResponse.getNrOfCardsPerPlayer());
         setPlayedCards(cardResponse.getPlayedCards());
