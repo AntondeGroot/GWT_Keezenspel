@@ -8,15 +8,10 @@ import java.util.List;
 
 public class CanvasClickHandler {
 
-    public static void handleCanvasClick(ClickEvent event, int x, int y, int stepsPawn1Split, int stepsPawn2Split, PawnAndCardSelection pawnAndCardSelection) {
-        if(y>600){//todo: this will not work if the canvas size were changed
-            handleOnCardsDeckClick(x,y, stepsPawn1Split, stepsPawn2Split, pawnAndCardSelection);
-        }else{
-            handleOnBoardClick(x,y, stepsPawn1Split, stepsPawn2Split, pawnAndCardSelection);
-        }
-    }
+    public static void handleOnCardsDeckClick(Point point, PawnAndCardSelection pawnAndCardSelection){
+        double x = point.getX();
+        double y = point.getY();
 
-    private static void handleOnCardsDeckClick(int x, int y, int stepsPawn1Split, int stepsPawn2Split, PawnAndCardSelection pawnAndCardSelection){
         int padding = 10;
         int start;
         int end;
@@ -42,10 +37,6 @@ public class CanvasClickHandler {
             pawnAndCardSelection.setCard(card);
 
             if(pawnAndCardSelection.getPawn1() != null && pawnAndCardSelection.getCard() != null){
-                if(pawnAndCardSelection.getMoveType()==MoveType.SPLIT){
-                    pawnAndCardSelection.setNrStepsPawn1(stepsPawn1Split);
-                    pawnAndCardSelection.setNrStepsPawn2(stepsPawn2Split);
-                }
                 TestMoveHandler.sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());//todo: improve elegance
             }
         }
@@ -54,7 +45,10 @@ public class CanvasClickHandler {
         }
     }
 
-    private static void handleOnBoardClick(int x, int y, int stepsPawn1Split, int stepsPawn2Split, PawnAndCardSelection pawnAndCardSelection){
+    public static void handleOnBoardClick(Point point, PawnAndCardSelection pawnAndCardSelection){
+        double x = point.getX();
+        double y = point.getY();
+
         StringBuilder logMsg = new StringBuilder();
         List<TileMapping> tiles = Board.getTiles();
         List<Pawn> pawns = Board.getPawns();
@@ -68,10 +62,6 @@ public class CanvasClickHandler {
                         // for debugging
                         logMsg.append("You clicked on pawn").append(pawn.getPawnId()).append(" position: ").append(tile.getPosition());
                         if(pawnAndCardSelection.getPawn1() != null && pawnAndCardSelection.getCard() != null){
-                            if(pawnAndCardSelection.getMoveType()==MoveType.SPLIT){
-                                pawnAndCardSelection.setNrStepsPawn1(stepsPawn1Split);
-                                pawnAndCardSelection.setNrStepsPawn2(stepsPawn2Split);
-                            }
                             TestMoveHandler.sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());
                         }
                         break;

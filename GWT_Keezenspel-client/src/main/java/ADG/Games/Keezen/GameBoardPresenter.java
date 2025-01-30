@@ -21,6 +21,9 @@ import java.util.List;
 import static ADG.Games.Keezen.MoveType.FORFEIT;
 import static ADG.Games.Keezen.Util.CardValueCheck.isSeven;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.drawTransparentCircle;
+import static ADG.Games.Keezen.handlers.CanvasClickHandler.handleOnBoardClick;
+import static ADG.Games.Keezen.handlers.CanvasClickHandler.handleOnCardsDeckClick;
+import static java.lang.String.valueOf;
 
 public class GameBoardPresenter {
     private final GameBoardModel model;
@@ -88,14 +91,11 @@ public class GameBoardPresenter {
         });
 
         view.stepsPawn1.addChangeHandler(event -> {
-            String value = view.stepsPawn1.getValue(); // Get the current value of the TextBox
-            // Check if the value is of length 1 and numerical
-            if (!(value.length() == 1 && value.matches("\\d"))) {
-                value = "4";
-            }
-            pawnAndCardSelection.setNrStepsPawn1ForSplit(value);
-            view.stepsPawn1.setValue(String.valueOf(pawnAndCardSelection.getNrStepsPawn1()));
-            view.stepsPawn2.setValue(String.valueOf(pawnAndCardSelection.getNrStepsPawn2()));
+            // validate entry
+            pawnAndCardSelection.setNrStepsPawn1ForSplit(view.stepsPawn1.getValue());
+            // split entry over the 2 text boxes
+            view.stepsPawn1.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn1()));
+            view.stepsPawn2.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn2()));
 
             new TestMoveHandler().sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());
         });
@@ -103,14 +103,12 @@ public class GameBoardPresenter {
         view.canvasWrapper.addDomHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                // todo: replace getAbsoluteLeft / getAbsoluteTop by a non-deprecated way
-                int canvasLeft = DOM.getAbsoluteLeft(view.getCanvasCards()) - Window.getScrollLeft();
-                int canvasTop = DOM.getAbsoluteTop(view.getCanvasCards()) - Window.getScrollTop();
-                int x = event.getClientX() - canvasLeft;
-                int y = event.getClientY() - canvasTop + 30;
-
-                // todo: maybe replace x,y parameters
-                CanvasClickHandler.handleCanvasClick(event, x, y, view.getStepsPawn1(), view.getStepsPawn2(), pawnAndCardSelection);
+                Point point = getPointClicked(event);
+                if(point.getY() <= view.getCanvasBoard().getHeight()){
+                    handleOnBoardClick(point, pawnAndCardSelection);
+                }else{
+                    handleOnCardsDeckClick(point, pawnAndCardSelection);
+                }
             }
         }, ClickEvent.getType());
     }
@@ -128,11 +126,8 @@ public class GameBoardPresenter {
 
             public void onSuccess(GameStateResponse result) {
                 if (!gameStateResponseUpdate.equals(result)) {
-                    GWT.log("\n" + result.toString());
+                    GWT.log(result.toString());
                     gameStateResponseUpdate = result;
-                } else {
-                    // todo: maybe skip something down below,
-//                    return;
                 }
 
                 // only set the board when empty, e.g.
@@ -292,5 +287,13 @@ public class GameBoardPresenter {
 
     private boolean currentPlayerIsPlaying(GameStateResponse result){
         return result.getPlayerIdTurn().equals(Cookie.getPlayerId());
+    }
+
+    private Point getPointClicked(ClickEvent event){
+        int canvasLeft = view.getCanvasBoard().getAbsoluteLeft() - Window.getScrollLeft();
+        int canvasTop = view.getCanvasBoard().getAbsoluteTop() - Window.getScrollTop();
+        int x = event.getClientX() - canvasLeft;
+        int y = event.getClientY() - canvasTop + 30;
+        return new Point(x,y);
     }
 }
