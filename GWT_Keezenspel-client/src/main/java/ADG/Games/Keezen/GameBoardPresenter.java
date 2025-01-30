@@ -1,18 +1,13 @@
 package ADG.Games.Keezen;
 
 import ADG.Games.Keezen.animations.*;
-import ADG.Games.Keezen.handlers.CanvasClickHandler;
 import ADG.Games.Keezen.handlers.SendHandler;
 import ADG.Games.Keezen.handlers.TestMoveHandler;
 import ADG.Games.Keezen.services.PollingService;
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import java.util.ArrayList;
@@ -68,8 +63,7 @@ public class GameBoardPresenter {
         view.getSendButton().addDomHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                // new sendhandler
-                new SendHandler().sendMoveToServer(pawnAndCardSelection.createMoveMessage());
+                SendHandler.sendMoveToServer(pawnAndCardSelection.createMoveMessage());
             }
         }, ClickEvent.getType());
 
@@ -77,18 +71,9 @@ public class GameBoardPresenter {
             @Override
             public void onClick(ClickEvent event) {
                 pawnAndCardSelection.setMoveType(FORFEIT);
-                new SendHandler().sendMoveToServer(pawnAndCardSelection.createMoveMessage());
+                SendHandler.sendMoveToServer(pawnAndCardSelection.createMoveMessage());
             }
         }, ClickEvent.getType());
-
-
-        Element canvasElement = view.getCanvasCards();
-        DOM.sinkEvents(canvasElement, Event.ONCLICK);
-        DOM.setEventListener(canvasElement, event -> {
-            if (DOM.eventGetType(event) == Event.ONCLICK) {
-                new CanvasClickHandler();
-            }
-        });
 
         view.stepsPawn1.addChangeHandler(event -> {
             // validate entry
@@ -97,13 +82,13 @@ public class GameBoardPresenter {
             view.stepsPawn1.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn1()));
             view.stepsPawn2.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn2()));
 
-            new TestMoveHandler().sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());
+            TestMoveHandler.sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());
         });
 
         view.canvasWrapper.addDomHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                Point point = getPointClicked(event);
+                Point point = view.getPointClicked(event);
                 if(point.getY() <= view.getCanvasBoard().getHeight()){
                     handleOnBoardClick(point, pawnAndCardSelection);
                 }else{
@@ -209,12 +194,15 @@ public class GameBoardPresenter {
             public void onSuccess(CardResponse result) {
 
                 if (!storedCardResponse.equals(result)) {
-                    storedCardResponse = result;
                     GWT.log(result.toString());
-                    CardsDeck.setCards(result.getCards());
-                    CardsDeck.setNrCardsPerPlayer(result.getNrOfCardsPerPlayer());
-                    CardsDeck.setPlayedCards(result.getPlayedCards());
-                    view.drawCards(CardsDeck.getCards(), result.getNrOfCardsPerPlayer(), CardsDeck.getPlayedCards(), pawnAndCardSelection.getCard());
+                    storedCardResponse = result;
+                    CardsDeck.processCardResponse(result);
+                    //todo: make Cardsdeck non-static and pass as parameter
+                    view.drawCards(
+                            CardsDeck.getCards(),
+                            CardsDeck.getNrCardsPerPlayer(),
+                            CardsDeck.getPlayedCards(),
+                            pawnAndCardSelection.getCard());
                     playerList.refresh();
                 }
             }
@@ -287,13 +275,5 @@ public class GameBoardPresenter {
 
     private boolean currentPlayerIsPlaying(GameStateResponse result){
         return result.getPlayerIdTurn().equals(Cookie.getPlayerId());
-    }
-
-    private Point getPointClicked(ClickEvent event){
-        int canvasLeft = view.getCanvasBoard().getAbsoluteLeft() - Window.getScrollLeft();
-        int canvasTop = view.getCanvasBoard().getAbsoluteTop() - Window.getScrollTop();
-        int x = event.getClientX() - canvasLeft;
-        int y = event.getClientY() - canvasTop + 30;
-        return new Point(x,y);
     }
 }

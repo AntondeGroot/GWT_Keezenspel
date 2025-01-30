@@ -45,4 +45,10 @@ public class CardsDeck {
         }
         return null;
     }
+
+    public static void processCardResponse(CardResponse cardResponse){
+        setCards(cardResponse.getCards());
+        setNrCardsPerPlayer(cardResponse.getNrOfCardsPerPlayer());
+        setPlayedCards(cardResponse.getPlayedCards());
+    }
 }
