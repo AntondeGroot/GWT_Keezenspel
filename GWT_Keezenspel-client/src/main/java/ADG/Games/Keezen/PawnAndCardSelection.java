@@ -286,12 +286,19 @@ public class PawnAndCardSelection {
         nrStepsPawn1 = steps;
     }
     public void setNrStepsPawn1ForSplit(String stepsPawn1){
-        if (Integer.parseInt(stepsPawn1) > 7 || Integer.parseInt(stepsPawn1) < 0) {
-            nrStepsPawn1 = 4;
-            nrStepsPawn2 = 3;
-        } else {
+        // Check if the value is of length 1 and numerical
+        if (!(stepsPawn1.length() == 1 && stepsPawn1.matches("\\d"))) {
+            stepsPawn1 = "4";
+        }
+        // validate such that the total number of steps is always 7
+        if (Integer.parseInt(stepsPawn1) <= 7 && Integer.parseInt(stepsPawn1) >= 0) {
             nrStepsPawn1 = Integer.parseInt(stepsPawn1);
             nrStepsPawn2 = 7 - nrStepsPawn1;
+        } else {
+            // the choice for 4 and 3 is arbitrary, but better than 7 and 0 so that
+            // it is easy for the user to see that 7 is split over 2 pawns.
+            nrStepsPawn1 = 4;
+            nrStepsPawn2 = 3;
         }
     }
     public void setNrStepsPawn2(int steps){
