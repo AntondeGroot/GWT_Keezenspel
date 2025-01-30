@@ -8,7 +8,7 @@ import java.util.List;
 
 public class CanvasClickHandler {
 
-    public static void handleOnCardsDeckClick(Point point, PawnAndCardSelection pawnAndCardSelection){
+    public static void handleOnCardsDeckClick(Point point, PawnAndCardSelection pawnAndCardSelection, CardsDeck cardsDeck){
         double x = point.getX();
         double y = point.getY();
 
@@ -31,7 +31,7 @@ public class CanvasClickHandler {
         }
         GWT.log("Clicked on CardsDeck : "+x+","+y+"\n"+"CardNr: "+cardNr);
         if(cardNr > -1){
-            Card card = CardsDeck.pickCard(cardNr);
+            Card card = cardsDeck.pickCard(cardNr);
             if(card == null){return;}
 
             pawnAndCardSelection.setCard(card);

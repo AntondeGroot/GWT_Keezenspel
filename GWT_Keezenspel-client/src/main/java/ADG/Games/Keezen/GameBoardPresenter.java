@@ -32,6 +32,7 @@ public class GameBoardPresenter {
     private double loopAlpha = 0.6;
     private final PawnAndCardSelection pawnAndCardSelection;
     private final PlayerList playerList = new PlayerList();
+    private final CardsDeck cardsDeck = new CardsDeck();
 
     public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, GameStateServiceAsync gameStateService, CardsServiceAsync cardsService, PollingService pollingService) {
         this.model = gameBoardModel;
@@ -92,7 +93,7 @@ public class GameBoardPresenter {
                 if(point.getY() <= view.getCanvasBoard().getHeight()){
                     handleOnBoardClick(point, pawnAndCardSelection);
                 }else{
-                    handleOnCardsDeckClick(point, pawnAndCardSelection);
+                    handleOnCardsDeckClick(point, pawnAndCardSelection, cardsDeck);
                 }
             }
         }, ClickEvent.getType());
@@ -196,12 +197,9 @@ public class GameBoardPresenter {
                 if (!storedCardResponse.equals(result)) {
                     GWT.log(result.toString());
                     storedCardResponse = result;
-                    CardsDeck.processCardResponse(result);
-                    //todo: make Cardsdeck non-static and pass as parameter
+                    cardsDeck.processCardResponse(result);
                     view.drawCards(
-                            CardsDeck.getCards(),
-                            CardsDeck.getNrCardsPerPlayer(),
-                            CardsDeck.getPlayedCards(),
+                            cardsDeck,
                             pawnAndCardSelection.getCard());
                     playerList.refresh();
                 }
@@ -247,7 +245,9 @@ public class GameBoardPresenter {
         drawStepsAnimation();
 
         if(pawnAndCardSelection.getDrawCards()) {
-            view.drawCards(CardsDeck.getCards(), CardsDeck.getNrCardsPerPlayer(), CardsDeck.getPlayedCards(), pawnAndCardSelection.getCard());
+            view.drawCards(
+                    cardsDeck,
+                    pawnAndCardSelection.getCard());
             pawnAndCardSelection.setCardsAreDrawn();
         }
         view.drawPawns(Board.getPawns(), pawnAndCardSelection);

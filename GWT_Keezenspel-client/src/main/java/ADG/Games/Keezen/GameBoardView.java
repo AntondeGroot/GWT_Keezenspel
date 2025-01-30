@@ -278,7 +278,11 @@ public class GameBoardView extends Composite {
         }
     }
 
-    public void drawCards(List<Card> cards, HashMap<String, Integer> nrCardsPerPlayerUUID, ArrayList<Card> playedCards, Card selectedCard) {
+    public void drawCards(CardsDeck cardsDeck, Card selectedCard){
+        List<Card> cards = cardsDeck.getCards();
+        HashMap<String, Integer> nrCardsPerPlayerUUID = cardsDeck.getNrCardsPerPlayer();
+        ArrayList<Card> playedCards = cardsDeck.getPlayedCards();
+
         // Create an image to represent the card deck
         Image img = new Image("/card-deck.png");
 
