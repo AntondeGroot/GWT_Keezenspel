@@ -4,10 +4,12 @@ import ADG.Games.Keezen.util.PawnRect;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.*;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 
 import java.util.*;
@@ -433,4 +435,11 @@ public class GameBoardView extends Composite {
         return false;
     }
 
+    public Point getPointClicked(ClickEvent event){
+        int canvasLeft = getCanvasBoard().getAbsoluteLeft() - Window.getScrollLeft();
+        int canvasTop = getCanvasBoard().getAbsoluteTop() - Window.getScrollTop();
+        int x = event.getClientX() - canvasLeft;
+        int y = event.getClientY() - canvasTop + 30;
+        return new Point(x,y);
+    }
 }
