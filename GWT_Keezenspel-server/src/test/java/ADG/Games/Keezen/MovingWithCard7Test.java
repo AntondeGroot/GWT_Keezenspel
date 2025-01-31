@@ -9,6 +9,7 @@ import java.util.LinkedList;
 
 import static ADG.Games.Keezen.GameStateUtil.*;
 import static ADG.Games.Keezen.MessageType.CHECK_MOVE;
+import static ADG.Games.Keezen.MoveResult.CANNOT_MAKE_MOVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MovingWithCard7Test {
@@ -85,6 +86,59 @@ public class MovingWithCard7Test {
         assertEquals(createExpectedMovement(0,3), moveResponse.getMovePawn1());
         assertEquals(createExpectedMovement(14,4), moveResponse.getMovePawn2());
     }
+    @Test
+    void test_moveTwoPawns_Pawn1WasOnFinish_OldPositionDoesNotBlockTestMovePawn2(){
+        // bugfix, test move did not show it correctly, however when playing the card it did place the
+        // pawns correctly. Assume the first pawn selected moves first
+
+        // GIVEN
+        givePlayerSeven(0);
+        Pawn pawn1 = placePawnOnBoard(new PawnId("0", 1),new TileId("0",16));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("0", 2),new TileId("7",14));
+
+        // WHEN
+        createSplitMessage(moveMessage, pawn1, 3, pawn2,4, sevenCard);
+        moveMessage.setMessageType(CHECK_MOVE);
+        GameState.processOnSplit(moveMessage, moveResponse);
+
+        // THEN
+        assertEquals(new TileId("0",19), moveResponse.getMovePawn1().getLast());
+        assertEquals(new TileId("0",18), moveResponse.getMovePawn2().getLast());
+    }
+
+    @Test
+    void CheckMove_moveTwoPawns_EndOnSameTile_CannotMove(){
+        // GIVEN
+        givePlayerSeven(0);
+        Pawn pawn1 = placePawnOnBoard(new PawnId("0", 1),new TileId("0",5));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("0", 2),new TileId("0",2));
+
+        // WHEN
+        createSplitMessage(moveMessage, pawn1, 2, pawn2,5, sevenCard);
+        moveMessage.setMessageType(CHECK_MOVE);
+        GameState.processOnSplit(moveMessage, moveResponse);
+
+        // THEN
+        assertEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
+    }
+
+    @Test
+    void MakeMove_moveTwoPawns_EndOnSameTile_CannotMove(){
+        // GIVEN
+        givePlayerSeven(0);
+        Pawn pawn1 = placePawnOnBoard(new PawnId("0", 1),new TileId("0",5));
+        Pawn pawn2 = placePawnOnBoard(new PawnId("0", 2),new TileId("0",2));
+
+        // WHEN
+        createSplitMessage(moveMessage, pawn1, 2, pawn2,5, sevenCard);
+        GameState.processOnSplit(moveMessage, moveResponse);
+
+        // THEN
+        assertEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
+        assertEquals(new TileId("0",5), GameState.getPawn(pawn1).getCurrentTileId());
+        assertEquals(new TileId("0",2), GameState.getPawn(pawn2).getCurrentTileId());
+    }
+
 
     private ArrayList<TileId> createExpectedMovement(int startTileNr, int nrSteps){
         ArrayList<TileId> expectedMoves = new ArrayList<>();
