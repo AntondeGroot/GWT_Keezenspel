@@ -3,6 +3,10 @@ package ADG.Games.Keezen;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import static ADG.Games.Keezen.MessageType.CHECK_MOVE;
+import static ADG.Games.Keezen.MessageType.MAKE_MOVE;
+import static ADG.Games.Keezen.MoveType.*;
+
 public class GameStateUtil {
 
     public static Pawn placePawnOnNest(String playerId, TileId currentTileId){
@@ -63,31 +67,31 @@ public class GameStateUtil {
         moveMessage.setStepsPawn1(nrSteps1);
         moveMessage.setStepsPawn2(nrSteps2);
         moveMessage.setPawnId2(pawn2.getPawnId());
-        moveMessage.setMoveType(MoveType.SPLIT);
+        moveMessage.setMoveType(SPLIT);
         moveMessage.setCard(card);
-        moveMessage.setMessageType(MessageType.MAKE_MOVE);
+        moveMessage.setMessageType(MAKE_MOVE);
     }
     public static void createMoveMessage(MoveMessage moveMessage, Pawn pawn, Card card){
         moveMessage.setPlayerId(pawn.getPlayerId());
         moveMessage.setPawnId1(pawn.getPawnId());
-        moveMessage.setMoveType(MoveType.MOVE);
+        moveMessage.setMoveType(MOVE);
         moveMessage.setStepsPawn1(card.getCardValue());
         moveMessage.setCard(card);
-        moveMessage.setMessageType(MessageType.MAKE_MOVE);
+        moveMessage.setMessageType(MAKE_MOVE);
     }
     public static void createSwitchMessage(MoveMessage moveMessage, Pawn pawn1, Pawn pawn2, Card card){
         moveMessage.setPlayerId(pawn1.getPlayerId());
         moveMessage.setPawnId1(pawn1.getPawnId());
         moveMessage.setPawnId2(pawn2.getPawnId());
         moveMessage.setCard(card);
-        moveMessage.setMoveType(MoveType.SWITCH);
-        moveMessage.setMessageType(MessageType.MAKE_MOVE);
+        moveMessage.setMoveType(SWITCH);
+        moveMessage.setMessageType(MAKE_MOVE);
     }
     public static void sendForfeitMessage(String playerId){
         MoveMessage moveMessage = new MoveMessage();
         moveMessage.setPlayerId(playerId);
         moveMessage.setMoveType(MoveType.FORFEIT);
-        moveMessage.setMessageType(MessageType.MAKE_MOVE);
+        moveMessage.setMessageType(MAKE_MOVE);
         GameState.processOnForfeit(moveMessage);
     }
     public static void sendValidMoveMessage(String playerId){
@@ -107,10 +111,10 @@ public class GameStateUtil {
         MoveMessage moveMessage = new MoveMessage();
         moveMessage.setPlayerId(playerId);
         moveMessage.setPawnId1(pawn.getPawnId());
-        moveMessage.setMoveType(MoveType.MOVE);
+        moveMessage.setMoveType(MOVE);
         moveMessage.setStepsPawn1(card.getCardValue());
         moveMessage.setCard(card);
-        moveMessage.setMessageType(MessageType.MAKE_MOVE);
+        moveMessage.setMessageType(MAKE_MOVE);
 
         // process
         MoveResponse moveResponse = new MoveResponse();

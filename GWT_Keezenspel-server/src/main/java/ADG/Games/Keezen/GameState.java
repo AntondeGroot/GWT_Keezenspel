@@ -301,19 +301,18 @@ public class GameState {
             response.setResult(INVALID_SELECTION);
             return;
         }
-        //todo: fill in to test move
         MoveMessage moveMessagePawn1 = new MoveMessage();
         MoveMessage moveMessagePawn2 = new MoveMessage();
         // pawn1
         moveMessagePawn1.setPlayerId(playerId);
-        moveMessagePawn1.setCard(card); // todo: this will be problematic if you want to make a move twice
+        moveMessagePawn1.setCard(card);
         moveMessagePawn1.setStepsPawn1(nrStepsPawn1);
         moveMessagePawn1.setPawnId1(moveMessage.getPawnId1());
         moveMessagePawn1.setMessageType(CHECK_MOVE);
         moveMessagePawn1.setMoveType(SPLIT);
         // pawn2
         moveMessagePawn2.setPlayerId(playerId);
-        moveMessagePawn2.setCard(card); // todo: this will be problematic if you want to make a move twice
+        moveMessagePawn2.setCard(card);
         moveMessagePawn2.setStepsPawn1(nrStepsPawn2);
         moveMessagePawn2.setPawnId1(moveMessage.getPawnId2());
         moveMessagePawn2.setMessageType(CHECK_MOVE);
@@ -322,11 +321,34 @@ public class GameState {
         MoveResponse moveResponsePawn1 = new MoveResponse();
         MoveResponse moveResponsePawn2 = new MoveResponse();
 
-        processOnMove(moveMessagePawn1, moveResponsePawn1);// TODO: figure out a way to exclude if one pawn ends on the other pawn who moves
-        processOnMove(moveMessagePawn2, moveResponsePawn2);// todo: test when the other pawn moves back on the same spot as the other pawn it still can't move
-        // todo: for example when it moves back.
+        // the following is a bit convoluted
+        // 1. backup Pawn1
+        // 2. move Pawn1 as if it were already done for real
+        // 3. check move Pawn2
+        // 4. move Pawn1 back to its original place
+        // 5. then if the movetype is MAKE_MOVE then do it for real.
+        // make sure to use new Pawn(), otherwise it will refer to the same memory and the backup would be updated!
+        Pawn backupPawn1 = new Pawn(pawnId1, GameState.getPawn(moveMessagePawn1.getPawnId1()).getCurrentTileId());
+
+        processOnMove(moveMessagePawn1, moveResponsePawn1);
+        if(moveResponsePawn1.getResult().equals(CANNOT_MAKE_MOVE)){
+            response.setResult(CANNOT_MAKE_MOVE);
+            return;
+        }
+
+        // temporarily move Pawn1
+        GameState.movePawn(new Pawn(pawnId1, moveResponsePawn1.getMovePawn1().getLast()));
+
+        // check Pawn2, this time it will take in account the new position of Pawn1
+        processOnMove(moveMessagePawn2, moveResponsePawn2);
+        //restore and move Pawn1 back to where it originally was
+        GameState.movePawn(new Pawn(pawnId1, backupPawn1.getCurrentTileId()));
+        if(moveResponsePawn2.getResult().equals(CANNOT_MAKE_MOVE)){
+            response.setResult(CANNOT_MAKE_MOVE);
+            return;
+        }
+
         if(moveResponsePawn1.getResult() == CAN_MAKE_MOVE && moveResponsePawn2.getResult() == CAN_MAKE_MOVE){
-            // todo fill in to move for real
             if(moveMessage.getMessageType() == MAKE_MOVE){
                 if(moveMessage.getStepsPawn1() + moveMessage.getStepsPawn2() != 7){
                     response.setResult(INVALID_SELECTION);
@@ -416,7 +438,9 @@ public class GameState {
         next = currentTileId.getTileNr() + moveMessage.getStepsPawn1();
 
          // regular route
-        if (next > 15 && !isPawnOnLastSection(playerId, playerIdOfTile) && !isPawnOnFinish(pawnId1, currentTileId) ) {
+        if (next > 15 &&
+                !isPawnOnLastSection(playerId, playerIdOfTile) &&
+                !isPawnOnFinish(pawnId1, currentTileId) ) {
             System.out.println("GameState: OnMove: normal route between 0,15 but could move to next section");
             // check
 
@@ -453,7 +477,9 @@ public class GameState {
         }
 
         // normal route within section
-        if(next > 0 && next <= 15 && !isPawnOnFinish(pawnId1, currentTileId)){
+        if(next > 0 &&
+                next <= 15 &&
+                !isPawnOnFinish(pawnId1, currentTileId)){
             System.out.println("GameState: OnMove: normal route between 0,15");
             // check if you can kill an opponent
             TileId nextTileId = new TileId(playerIdOfTile, next);
@@ -579,7 +605,8 @@ public class GameState {
             return;
         }
 
-        if(next > 15 && isPawnOnLastSection(playerId, playerIdOfTile)){
+        if(next > 15 &&
+                isPawnOnLastSection(playerId, playerIdOfTile)){
             System.out.println("GameState: OnMove: pawn is on last section and goes into finish");
             if(currentTileId.getTileNr() < 7){moves.add(new TileId(currentTileId.getPlayerId(), 7));}
             if(currentTileId.getTileNr() < 13){moves.add(new TileId(currentTileId.getPlayerId(), 13));}
