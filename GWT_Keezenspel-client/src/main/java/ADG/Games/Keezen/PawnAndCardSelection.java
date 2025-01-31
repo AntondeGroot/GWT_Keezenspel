@@ -6,7 +6,6 @@ import static ADG.Games.Keezen.Util.CardValueCheck.isJack;
 import static ADG.Games.Keezen.Util.CardValueCheck.isSeven;
 
 public class PawnAndCardSelection {
-    // todo: turn this into a model, do not use statics
     private String playerId;
     private Pawn pawn1 = resetPawn();
     private Pawn pawn2 = resetPawn();
@@ -251,7 +250,6 @@ public class PawnAndCardSelection {
     private void handleSeven() {
         if (!pawn1.equals(resetPawn()) && !pawn2.equals(resetPawn())) {
             setMoveType(SPLIT);
-            //todo: set nr steps when 7 splits
         } else {
             setMoveType(MOVE);
             nrStepsPawn1 = 7;

@@ -1,8 +1,8 @@
 package ADG.Games.Keezen;
 
 public class Point {
-    private double x;
-    private double y;
+    private double x = 0;
+    private double y = 0;
 
     public Point(double x, double y) {
         this.x = roundedValue(x);
