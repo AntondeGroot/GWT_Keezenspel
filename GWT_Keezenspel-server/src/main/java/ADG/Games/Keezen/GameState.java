@@ -348,38 +348,34 @@ public class GameState {
             return;
         }
 
-        if(moveResponsePawn1.getResult() == CAN_MAKE_MOVE && moveResponsePawn2.getResult() == CAN_MAKE_MOVE){
-            if(moveMessage.getMessageType() == MAKE_MOVE){
-                if(moveMessage.getStepsPawn1() + moveMessage.getStepsPawn2() != 7){
-                    response.setResult(INVALID_SELECTION);
-                    return;
-                }
-                // DO IT AGAIN NOW FOR REAL
-                moveMessagePawn1.setMessageType(MAKE_MOVE);
-                CardsDeck.setPlayerCard(playerId, card); // duplicate the 7 card so that the player can play both pawns with 1 card
-                moveMessagePawn2.setMessageType(MAKE_MOVE);
-                processOnMove(moveMessagePawn1, moveResponsePawn1, false);
-                processOnMove(moveMessagePawn2, moveResponsePawn2, true);
-                response.setMessageType(MAKE_MOVE);
-            }else{
-                response.setMessageType(CHECK_MOVE);
+        if(moveMessage.getMessageType() == MAKE_MOVE){
+            if(moveMessage.getStepsPawn1() + moveMessage.getStepsPawn2() != 7){
+                response.setResult(INVALID_SELECTION);
+                return;
             }
-            response.setPawnId1(moveMessage.getPawnId1());
-            response.setPawnId2(moveMessage.getPawnId2());
-            response.setMovePawn1(extrapolateMissingTiles(moveResponsePawn1.getMovePawn1()));
-            response.setMovePawn2(extrapolateMissingTiles(moveResponsePawn2.getMovePawn1()));
-            if(moveResponsePawn1.getMoveKilledPawn1() != null){
-                response.setPawnIdKilled1(moveResponsePawn1.getPawnIdKilled1());// only the first one is filled in with a kill when you check only 1 pawn
-                response.setMoveKilledPawn1(moveResponsePawn1.getMoveKilledPawn1());
-            }
-            if(moveResponsePawn2.getMoveKilledPawn1() != null){
-                response.setPawnIdKilled2(moveResponsePawn2.getPawnIdKilled1());// only the first one is filled in with a kill when you check only 1 pawn
-                response.setMoveKilledPawn2(moveResponsePawn2.getMoveKilledPawn1());
-            }
-            response.setResult(CAN_MAKE_MOVE);
+            // DO IT AGAIN NOW FOR REAL
+            moveMessagePawn1.setMessageType(MAKE_MOVE);
+            CardsDeck.setPlayerCard(playerId, card); // duplicate the 7 card so that the player can play both pawns with 1 card
+            moveMessagePawn2.setMessageType(MAKE_MOVE);
+            processOnMove(moveMessagePawn1, moveResponsePawn1, false);
+            processOnMove(moveMessagePawn2, moveResponsePawn2, true);
+            response.setMessageType(MAKE_MOVE);
         }else{
-            response.setResult(CANNOT_MAKE_MOVE);
+            response.setMessageType(CHECK_MOVE);
         }
+        response.setPawnId1(moveMessage.getPawnId1());
+        response.setPawnId2(moveMessage.getPawnId2());
+        response.setMovePawn1(extrapolateMissingTiles(moveResponsePawn1.getMovePawn1()));
+        response.setMovePawn2(extrapolateMissingTiles(moveResponsePawn2.getMovePawn1()));
+        if(moveResponsePawn1.getMoveKilledPawn1() != null){
+            response.setPawnIdKilled1(moveResponsePawn1.getPawnIdKilled1());// only the first one is filled in with a kill when you check only 1 pawn
+            response.setMoveKilledPawn1(moveResponsePawn1.getMoveKilledPawn1());
+        }
+        if(moveResponsePawn2.getMoveKilledPawn1() != null){
+            response.setPawnIdKilled2(moveResponsePawn2.getPawnIdKilled1());// only the first one is filled in with a kill when you check only 1 pawn
+            response.setMoveKilledPawn2(moveResponsePawn2.getMoveKilledPawn1());
+        }
+        response.setResult(CAN_MAKE_MOVE);
         response.setMoveType(SPLIT);
     }
 
