@@ -8,9 +8,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class SendHandler {
     private static final MovingServiceAsync movingService = GWT.create(MovingService.class);
 
-    /**
-     * Send the MoveMessage to the server and wait for a response.
-     */
     public static void sendMoveToServer(MoveMessage moveMessage) {
         GWT.log("Sending MoveMessage" + moveMessage);
 
@@ -20,11 +17,6 @@ public class SendHandler {
             }
             public void onSuccess(MoveResponse result) {
                 StepsAnimation.resetStepsAnimation();
-                MoveController.movePawn(result);
-                //PawnAndCardSelection.reset();
-                // todo: uncomment or remove
-                // it used to reset after each player played his move, however when only 1 player is left you might want to keep playing
-                // but after playing a jack it will still show the opponents pawn until you select a different card
             }
         } );
     }

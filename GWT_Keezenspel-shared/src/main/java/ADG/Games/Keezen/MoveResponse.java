@@ -3,6 +3,7 @@ package ADG.Games.Keezen;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.LinkedList;
+import java.util.Objects;
 
 @SuppressWarnings("serial")
 public class MoveResponse implements IsSerializable {
@@ -132,5 +133,18 @@ public class MoveResponse implements IsSerializable {
                 "    moveType = " + moveType +",\n"+
                 "    messageType = " + messageType +",\n"+
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MoveResponse that = (MoveResponse) o;
+        return Objects.equals(pawnId1, that.pawnId1) && Objects.equals(pawnId2, that.pawnId2) && Objects.equals(pawnIdKilled1, that.pawnIdKilled1) && Objects.equals(pawnIdKilled2, that.pawnIdKilled2) && Objects.equals(movePawn1, that.movePawn1) && Objects.equals(movePawn2, that.movePawn2) && Objects.equals(moveKilledPawn1, that.moveKilledPawn1) && Objects.equals(moveKilledPawn2, that.moveKilledPawn2) && moveType == that.moveType && messageType == that.messageType && result == that.result;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pawnId1, pawnId2, pawnIdKilled1, pawnIdKilled2, movePawn1, movePawn2, moveKilledPawn1, moveKilledPawn2, moveType, messageType, result);
     }
 }

@@ -10,6 +10,7 @@ public class GameModule {
     private final GameStateServiceAsync gameStateService = GWT.create(GameStateService.class);
     private final CardsServiceAsync cardsService = GWT.create(CardsService.class);
     private final PollingService pollingService = GWT.create(PollingService.class);
+    private static final MovingServiceAsync movingService = GWT.create(MovingService.class);
     private GameBoardView gameBoardView;
 
     public void onStart() {
@@ -24,7 +25,7 @@ public class GameModule {
         RootPanel.get().clear();
         RootPanel.get().add(gameBoardView);
         //todo add model
-        GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(new GameBoardModel(), gameBoardView, gameStateService, cardsService, pollingService);
+        GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(new GameBoardModel(), gameBoardView, gameStateService, cardsService, movingService, pollingService);
         gameBoardPresenter.start();
     }
 }
