@@ -5,5 +5,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("move")
 public interface MovingService extends RemoteService {
-    MoveResponse makeMove(MoveMessage name) throws IllegalArgumentException;
+    MoveResponse makeMove(MoveMessage name);
+    MoveResponse getMove();
 }

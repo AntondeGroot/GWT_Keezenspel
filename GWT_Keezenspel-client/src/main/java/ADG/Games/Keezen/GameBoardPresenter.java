@@ -27,6 +27,7 @@ public class GameBoardPresenter {
     private final GameBoardView view;
     private final GameStateServiceAsync gameStateService;
     private final CardsServiceAsync cardsService;
+    private final MovingServiceAsync movingService;
     private final PollingService pollingService;
     private GameStateResponse gameStateResponseUpdate = new GameStateResponse();
     private double loopAlpha = 0.6;
@@ -34,11 +35,14 @@ public class GameBoardPresenter {
     private final PlayerList playerList = new PlayerList();
     private final CardsDeck cardsDeck = new CardsDeck();
 
-    public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, GameStateServiceAsync gameStateService, CardsServiceAsync cardsService, PollingService pollingService) {
+    private MoveResponse storedMoveResponse = new MoveResponse();
+
+    public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, GameStateServiceAsync gameStateService, CardsServiceAsync cardsService, MovingServiceAsync movingService, PollingService pollingService) {
         this.model = gameBoardModel;
         this.view = gameBoardView;
         this.gameStateService = gameStateService;
         this.cardsService = cardsService;
+        this.movingService = movingService;
         this.pollingService = pollingService;
         this.storedCardResponse = new CardResponse();
         pawnAndCardSelection = new PawnAndCardSelection();
@@ -102,6 +106,23 @@ public class GameBoardPresenter {
     private void pollServerForUpdates() {
         pollServerForGameState();
         pollServerForCards();
+        pollServerForMove();
+    }
+
+    private void pollServerForMove(){
+        movingService.getMove(new AsyncCallback<MoveResponse>() {
+            @Override public void onFailure(Throwable throwable) {}
+
+            @Override
+            public void onSuccess(MoveResponse moveResponse) {
+                if(!moveResponse.equals(storedMoveResponse) && !moveResponse.equals(new MoveResponse())){
+                    StepsAnimation.resetStepsAnimation();
+                    MoveController.movePawn(moveResponse);
+                    GWT.log(moveResponse.toString());
+                    storedMoveResponse = moveResponse;
+                }
+            }
+        });
     }
 
     private void pollServerForGameState() {

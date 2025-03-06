@@ -12,9 +12,7 @@ import java.util.List;
 
 public class TestMoveHandler{// todo: is no longer a handler
     private static final MovingServiceAsync movingService = GWT.create(MovingService.class);
-    /**
-     * Send the MoveMessage to the server and wait for a response.
-     */
+
     public static void sendMoveToServer(MoveMessage moveMessage) {
         GWT.log(moveMessage.toString());
 
