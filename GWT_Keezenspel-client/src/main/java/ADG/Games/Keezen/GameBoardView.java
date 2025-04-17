@@ -14,8 +14,7 @@ import com.google.gwt.user.client.ui.*;
 
 import java.util.*;
 
-import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.createCircle;
-import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.createPlayerGrid;
+import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.*;
 import static ADG.Games.Keezen.util.PlayerUUIDUtil.UUIDtoInt;
 
 public class GameBoardView extends Composite {
@@ -26,6 +25,7 @@ public class GameBoardView extends Composite {
     private static final Binder uiBinder = GWT.create(Binder.class);
 //    private ArrayList<TileMapping> tiles = new ArrayList<>(); // todo: set tiles when view is constructed
 //    private double cellDistance;
+
 //    private static ArrayList<PawnAnimationMapping> animationMappings = new ArrayList<>();
 
     @UiField
@@ -44,6 +44,9 @@ public class GameBoardView extends Composite {
     //    a dom element which you could find by .findElementById()
     @UiField
     HTMLPanel canvasWrapper;
+
+    @UiField
+    HTMLPanel tileBoard;
 
     @UiField
     HTMLPanel pawnBoard;
@@ -100,8 +103,6 @@ public class GameBoardView extends Composite {
     }
 
     public VerticalPanel getPlayerListContainer(){return playerListContainer2;}
-
-
 
     public Context2d getCanvasPawnsContext(){return ((CanvasElement) document.getElementById("canvasPawns2")).getContext2d();}
 
@@ -197,7 +198,27 @@ public class GameBoardView extends Composite {
 
     private void drawCircle(double x, double y, double radius, String color) {
         DivElement circle = createCircle(x, y, radius, color);
-        pawnBoard.getElement().appendChild(circle);
+        tileBoard.getElement().appendChild(circle);
+    }
+
+    public void createPawns(ArrayList<Pawn> pawns){
+        double desiredWidth = 40;
+        double desiredHeight = 40;
+        Point point = new Point(0,0);
+
+        for (Pawn pawn : pawns) {
+           DivElement pawnElement = createPawn(pawn);
+
+            for (TileMapping mapping : Board.getTiles()) {
+                if(mapping.getTileId().equals(pawn.getCurrentTileId())){
+                    point = mapping.getPosition();
+                }
+            }
+            pawnElement.getStyle().setLeft(point.getX() - desiredWidth/2, Style.Unit.PX);
+            pawnElement.getStyle().setTop(point.getY() - desiredHeight/2 - 15, Style.Unit.PX);
+
+            pawnBoard.getElement().appendChild(pawnElement);
+        }
     }
 
     public void drawCardsIcons(HashMap<String, Integer> nrCardsPerPlayerUUID, Image spriteImage){

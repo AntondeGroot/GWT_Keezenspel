@@ -153,6 +153,7 @@ public class GameBoardPresenter {
         Board.setPawns(result.getPawns());
         board.createBoard(result.getPlayers(), view.getBoardSize());
         view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
+        view.createPawns(result.getPawns());
         view.drawPawns(result.getPawns(), pawnAndCardSelection);
     }
 
