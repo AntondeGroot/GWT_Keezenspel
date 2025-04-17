@@ -1,5 +1,6 @@
 package ADG.Games.Keezen.ViewHelpers;
 
+import ADG.Games.Keezen.Pawn;
 import ADG.Games.Keezen.Player;
 import ADG.Games.Keezen.PlayerColors;
 import com.google.gwt.canvas.client.Canvas;
@@ -9,10 +10,11 @@ import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.user.client.ui.Grid;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.EventListener;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +24,52 @@ import java.util.stream.Collectors;
 import static ADG.Games.Keezen.PlayerColors.*;
 
 public class ViewDrawing {
+
+    public static DivElement createPawn(Pawn pawn){
+        // Create new <div> Element
+        DivElement pawnElement = Document.get().createDivElement();
+        // set Class and Id
+        pawnElement.setClassName("pawnDiv");
+        pawnElement.setId(pawn.getPawnId().toString());
+
+        // set image
+        pawnElement.getStyle().setProperty("backgroundImage", "url(pawn"+pawn.getColorInt()+".png)");
+        pawnElement.getStyle().setProperty("backgroundSize", "contain");     // Scale image to fit div
+        pawnElement.getStyle().setProperty("backgroundRepeat", "no-repeat"); // Prevent tiling
+        pawnElement.getStyle().setProperty("backgroundPosition", "center");  // Center image
+
+        // set overlay for when you want to select the pawn
+        ImageElement overlayImage = Document.get().createImageElement();
+        overlayImage.setSrc("/pawn_outline.png");
+        overlayImage.setClassName(pawn.getPawnId()+"Overlay");
+        overlayImage.getStyle().setPosition(Style.Position.ABSOLUTE);
+        overlayImage.getStyle().setTop(0, Style.Unit.PX);
+        overlayImage.getStyle().setLeft(0, Style.Unit.PX);
+        overlayImage.getStyle().setWidth(100, Style.Unit.PCT);
+        overlayImage.getStyle().setHeight(100, Style.Unit.PCT);
+        overlayImage.getStyle().setVisibility(Style.Visibility.HIDDEN);
+
+        // set position
+        pawnElement.getStyle().setPosition(Style.Position.ABSOLUTE);
+        pawnElement.appendChild(overlayImage);
+
+        // set width
+        pawnElement.getStyle().setHeight(40, Style.Unit.PX);
+        pawnElement.getStyle().setWidth(40, Style.Unit.PX);
+
+        Event.sinkEvents(pawnElement, Event.ONCLICK);
+        Event.setEventListener(pawnElement, new EventListener() {
+            @Override
+            public void onBrowserEvent(Event event) {
+                if (DOM.eventGetType(event) == Event.ONCLICK) {
+                    Window.alert("Clicked pawn: " + pawn.getPawnId());
+                }
+            }
+        });
+
+        return pawnElement;
+    }
+
     public static DivElement createCircle(double x, double y, double radius, String color){
         // Create a new <div> element
         DivElement circle = Document.get().createDivElement();

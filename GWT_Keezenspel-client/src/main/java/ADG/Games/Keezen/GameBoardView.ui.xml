@@ -6,11 +6,12 @@
                 <g:HTMLPanel ui:field="canvasWrapper" styleName="canvasWrapper">
                     <!-- for canvas use regular id="" -->
                     <!-- do not use ui:field, see below: -->
+                    <g:HTMLPanel ui:field="tileBoard" width="700" height="600"/>
                     <g:HTMLPanel ui:field="pawnBoard" width="700" height="600"/>
                     <canvas id="canvasBoard2" width="700" height="600"/>
                     <canvas id="canvasSteps2" width="700" height="600"/>
-                    <canvas id="canvasPawns2" width="700" height="600"/>
                     <canvas id="canvasCards2" width="700" height="800"/>
+                    <canvas id="canvasPawns2" width="700" height="600"/>
                 </g:HTMLPanel>
                 <g:Label styleName="errorLabel" ui:field="errorLabel"/>
                 <g:VerticalPanel styleName="buttonContainer">
