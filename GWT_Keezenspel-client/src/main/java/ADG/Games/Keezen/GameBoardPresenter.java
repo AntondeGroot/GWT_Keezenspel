@@ -17,7 +17,6 @@ import static ADG.Games.Keezen.MoveType.FORFEIT;
 import static ADG.Games.Keezen.Util.CardValueCheck.isSeven;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.drawTransparentCircle;
 import static ADG.Games.Keezen.handlers.CanvasClickHandler.handleOnBoardClick;
-import static ADG.Games.Keezen.handlers.CanvasClickHandler.handleOnCardsDeckClick;
 import static java.lang.String.valueOf;
 
 public class GameBoardPresenter {
@@ -96,8 +95,6 @@ public class GameBoardPresenter {
                 Point point = view.getPointClicked(event);
                 if(point.getY() <= view.getCanvasBoard().getHeight()){
                     handleOnBoardClick(point, pawnAndCardSelection);
-                }else{
-                    handleOnCardsDeckClick(point, pawnAndCardSelection, cardsDeck);
                 }
             }
         }, ClickEvent.getType());
@@ -222,7 +219,7 @@ public class GameBoardPresenter {
                     cardsDeck.processCardResponse(result);
                     view.drawCards(
                             cardsDeck,
-                            pawnAndCardSelection.getCard());
+                            pawnAndCardSelection);
                     playerList.refresh();
                 }
             }
@@ -269,7 +266,7 @@ public class GameBoardPresenter {
         if(pawnAndCardSelection.getDrawCards()) {
             view.drawCards(
                     cardsDeck,
-                    pawnAndCardSelection.getCard());
+                    pawnAndCardSelection);
             pawnAndCardSelection.setCardsAreDrawn();
         }
         view.drawPawns(Board.getPawns(), pawnAndCardSelection);

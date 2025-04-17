@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 import static ADG.Games.Keezen.FrontEnd.TestUtils.getDriver;
+import static ADG.Games.Keezen.FrontEnd.TestUtils.setPlayerIdPlaying;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BoardTest {
@@ -38,5 +39,10 @@ class BoardTest {
     assertEquals(12, driver.findElements(By.className("pawn")).size());
   }
 
+  @Test
+  public void verifyNumberOfCardsForPlayer1(){
+    setPlayerIdPlaying(driver,"0");
 
+    assertEquals(5, driver.findElements(By.className("cardDiv")).size());
+  }
 }

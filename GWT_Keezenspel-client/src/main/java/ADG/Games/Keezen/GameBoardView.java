@@ -1,5 +1,6 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.handlers.TestMoveHandler;
 import ADG.Games.Keezen.util.PawnRect;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
@@ -9,6 +10,8 @@ import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 
@@ -50,6 +53,9 @@ public class GameBoardView extends Composite {
 
     @UiField
     HTMLPanel pawnBoard;
+
+    @UiField
+    FlowPanel cardsContainer;
 
     @UiField
     HorizontalPanel pawnIntegerBoxes;
@@ -268,38 +274,84 @@ public class GameBoardView extends Composite {
         }
     }
 
-    private void drawPlayerCardsInHand(List<Card> cards, Card selectedCard, Image spriteImage){
-        // Loop through the cards to draw them
-        for (int i = 0; i < cards.size(); i++) {
-            Card card = cards.get(i);
+    private void drawPlayerCardsInHand(List<Card> cards, PawnAndCardSelection pawnAndCardSelection, Image spriteImage){
+        Card selectedCard = pawnAndCardSelection.getCard();
+        // create divs
+        cardsContainer.getElement().removeAllChildren();
 
-            // Define the source rectangle (from the sprite sheet)
-            double spriteWidth = 1920 / 13.0;
-            double spriteHeight = 1150 / 5.0;
+        int j =0;
+        GWT.log("cards = "+cards);
+        for (Card card : cards) {
+            // Define sprite dimensions
+            double spriteWidth = 1920 / 13.0; // One card's width in sprite
+            double spriteHeight = 1150 / 5.0; // One card's height in sprite
+            double destWidth = 100.0; // Final width on screen
+            double factor = destWidth / spriteWidth;
+            double destHeight = factor * spriteHeight; // Maintain aspect ratio
+
+            // Calculate correct sprite offset (WITHOUT scaling)
             double sourceX = spriteWidth * (card.getCardValue()-1);
             double sourceY = spriteHeight * card.getSuit();
 
-            // Define the destination rectangle (on the canvas)
-            double destX = 10 + (100.0 + 10) * i; // Offset for each card
-            double destY = 600; // Fixed Y position
-            double destWidth = 100.0; // Card width on canvas
-            double destHeight = destWidth / spriteWidth * spriteHeight; // Maintain aspect ratio
+            // Create the card element
+            DivElement cardElement = Document.get().createDivElement();
+            cardElement.setClassName("cardDiv");
+            cardElement.setId("card" + j++);
 
-            // Draw the card image on the canvas
-            getCanvasCardsContext().drawImage(
-                    ImageElement.as(spriteImage.getElement()),
-                    sourceX, sourceY, spriteWidth, spriteHeight,
-                    destX, destY, destWidth, destHeight
-            );
+            // Apply background styles
+            cardElement.getStyle().setProperty("backgroundImage", "url('card-deck.png')");
+            cardElement.getStyle().setProperty("backgroundRepeat", "no-repeat");
+            cardElement.getStyle().setProperty("backgroundPosition",  -sourceX * factor + "px " + -sourceY * factor + "px");
 
+            // fix adding the cards, otherwise they stack vertically
+            cardElement.getStyle().setProperty("display", "inline-block");
+            cardElement.getStyle().setProperty("marginRight", "5px");
+            cardElement.getStyle().setProperty("marginLeft", "5px");
+
+            // Scale entire sprite sheet
+            GWT.log("scale spritesheet = "+factor);
+            cardElement.getStyle().setProperty("backgroundSize", (1920 * factor) + "px " + (1150 * factor) + "px");
+
+            // Set visible card size
+            cardElement.getStyle().setProperty("width", destWidth + "px");
+            cardElement.getStyle().setProperty("height", destHeight + "px");
+
+            Event.sinkEvents(cardElement, Event.ONCLICK);
+            Event.setEventListener(cardElement, new com.google.gwt.user.client.EventListener() {
+                @Override
+                public void onBrowserEvent(Event event) {
+                    if (DOM.eventGetType(event) == Event.ONCLICK) {
+                        pawnAndCardSelection.setCard(card);
+                        if(pawnAndCardSelection.getPawn1() != null && pawnAndCardSelection.getCard() != null){
+                            TestMoveHandler.sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());//todo: improve elegance
+                        }
+                    }
+                }
+            });
+
+            // HorizontalPanel manages layout only for widgets added via add(...),
+            // not for raw DOM elements added via getElement().appendChild(...).
+            // By manually appending DivElements, you're not triggering the horizontal layout behavior —
+            // so the browser defaults to stacking them vertically like block elements.
+            // to solve this I used inline-block, but this might not be the most elegant solution
             // Highlight selected card, if any
             if (Objects.equals(card, selectedCard)) {
-                drawRoundedRect(getCanvasCardsContext(), destX - 1.5, destY - 1.5, destWidth + 3, destHeight + 3, 8);
+                cardElement.getStyle().setBorderWidth(3, Style.Unit.PX);
+                cardElement.getStyle().setBorderColor("red");
+                cardElement.getStyle().setBorderStyle(Style.BorderStyle.SOLID);
+                cardElement.getStyle().setProperty("borderRadius", "8px");
+            } else {
+                cardElement.getStyle().setBorderWidth(0, Style.Unit.PX);
+                cardElement.getStyle().clearBorderColor();
+                cardElement.getStyle().clearBorderStyle();
             }
+
+            cardsContainer.getElement().appendChild(cardElement);
         }
     }
 
-    public void drawCards(CardsDeck cardsDeck, Card selectedCard){
+    public void drawCards(CardsDeck cardsDeck, PawnAndCardSelection pawnAndCardSelection){
+        Card selectedCard = pawnAndCardSelection.getCard();
         List<Card> cards = cardsDeck.getCards();
         HashMap<String, Integer> nrCardsPerPlayerUUID = cardsDeck.getNrCardsPerPlayer();
         ArrayList<Card> playedCards = cardsDeck.getPlayedCards();
@@ -315,7 +367,7 @@ public class GameBoardView extends Composite {
                 getCanvasCardsContext().clearRect(0, 0, getCanvasCards().getWidth(), getCanvasCards().getHeight());
 
                 GWT.log("\n\ndrawing cards");
-                drawPlayerCardsInHand(cards, selectedCard, img);
+                drawPlayerCardsInHand(cards, pawnAndCardSelection, img);
                 drawCardsIcons(nrCardsPerPlayerUUID, img);
                 drawPlayedCards(playedCards, img);
             }

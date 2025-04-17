@@ -64,6 +64,10 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
         // check if time in seconds has passed
         // don't show animation when too much time has passed, for example when refreshing browser
         Instant currentTime = Instant.now();
+        if(saveTime == null){
+            saveTime = currentTime;
+        }
+
         if (Duration.between(saveTime, currentTime).getSeconds() > 10) {
             return new MoveResponse();
         }

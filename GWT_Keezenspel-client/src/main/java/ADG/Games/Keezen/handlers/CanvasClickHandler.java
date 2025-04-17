@@ -7,44 +7,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import java.util.List;
 
 public class CanvasClickHandler {
-
-    public static void handleOnCardsDeckClick(Point point, PawnAndCardSelection pawnAndCardSelection, CardsDeck cardsDeck){
-        double x = point.getX();
-        double y = point.getY();
-
-        int padding = 10;
-        int start;
-        int end;
-        int cardNr = -1;
-
-        //TODO: make it independent on hard coded values
-        for (int i = 0; i < 5; i++) {
-            start = (100+padding)*i;
-            end = start + 100;
-            if(start < x && end > x){
-                cardNr = i;
-                break;
-            }
-        }
-        if(y < 620 || y>620+158){
-            cardNr = -1;
-        }
-        GWT.log("Clicked on CardsDeck : "+x+","+y+"\n"+"CardNr: "+cardNr);
-        if(cardNr > -1){
-            Card card = cardsDeck.pickCard(cardNr);
-            if(card == null){return;}
-
-            pawnAndCardSelection.setCard(card);
-
-            if(pawnAndCardSelection.getPawn1() != null && pawnAndCardSelection.getCard() != null){
-                TestMoveHandler.sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());//todo: improve elegance
-            }
-        }
-        else{
-            pawnAndCardSelection.reset();
-        }
-    }
-
     public static void handleOnBoardClick(Point point, PawnAndCardSelection pawnAndCardSelection){
         double x = point.getX();
         double y = point.getY();
