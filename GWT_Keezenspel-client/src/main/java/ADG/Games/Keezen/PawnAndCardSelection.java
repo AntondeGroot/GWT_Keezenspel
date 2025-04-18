@@ -157,11 +157,18 @@ public class PawnAndCardSelection {
     }
 
     public void setCard(Card p_card) {
+        drawCards = true;
+
+        // deselect when clicked twice
+        if(card != null && card.equals(p_card)){
+            card = null;
+            return;
+        }
+
         card = p_card;
         validateMoveType();
         validateSelectionBasedOnPlayerID(pawn2);
         validateSelectionBasedOnLocation();
-        drawCards = true;
     }
 
     public Pawn getPawn1() {
