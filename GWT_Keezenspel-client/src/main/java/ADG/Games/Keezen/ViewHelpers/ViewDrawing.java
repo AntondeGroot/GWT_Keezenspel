@@ -1,19 +1,23 @@
 package ADG.Games.Keezen.ViewHelpers;
 
+import ADG.Games.Keezen.PawnAndCardSelection;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.Player.PlayerColors;
+import ADG.Games.Keezen.handlers.TestMoveHandler;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.EventListener;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 
 import java.util.ArrayList;
@@ -25,18 +29,23 @@ import static ADG.Games.Keezen.Player.PlayerColors.*;
 
 public class ViewDrawing {
 
-    public static DivElement createPawn(Pawn pawn){
+    public static DivElement createPawn(Pawn pawn, PawnAndCardSelection pawnAndCardSelection){
         // Create new <div> Element
         DivElement pawnElement = Document.get().createDivElement();
-        // set Class and Id
         pawnElement.setClassName("pawnDiv");
-        pawnElement.setId(pawn.getPawnId().toString());
+        pawnElement.getStyle().setPosition(Position.ABSOLUTE);
+        pawnElement.getStyle().setZIndex(10); // put it on top of any canvas elements
+
+        // Create new <div> Element
+        DivElement pawnImage = Document.get().createDivElement();
+        // set Class and Id
+        pawnImage.setId(pawn.getPawnId().toString());
 
         // set image
-        pawnElement.getStyle().setProperty("backgroundImage", "url(pawn"+pawn.getColorInt()+".png)");
-        pawnElement.getStyle().setProperty("backgroundSize", "contain");     // Scale image to fit div
-        pawnElement.getStyle().setProperty("backgroundRepeat", "no-repeat"); // Prevent tiling
-        pawnElement.getStyle().setProperty("backgroundPosition", "center");  // Center image
+        pawnImage.getStyle().setProperty("backgroundImage", "url(pawn"+pawn.getColorInt()+".png)");
+        pawnImage.getStyle().setProperty("backgroundSize", "contain");     // Scale image to fit div
+        pawnImage.getStyle().setProperty("backgroundRepeat", "no-repeat"); // Prevent tiling
+        pawnImage.getStyle().setProperty("backgroundPosition", "center");  // Center image
 
         // set overlay for when you want to select the pawn
         ImageElement overlayImage = Document.get().createImageElement();
@@ -50,19 +59,53 @@ public class ViewDrawing {
         overlayImage.getStyle().setVisibility(Style.Visibility.HIDDEN);
 
         // set position
-        pawnElement.getStyle().setPosition(Style.Position.ABSOLUTE);
-        pawnElement.appendChild(overlayImage);
+        pawnImage.getStyle().setPosition(Style.Position.ABSOLUTE);
+        pawnImage.appendChild(overlayImage);
 
         // set width
-        pawnElement.getStyle().setHeight(40, Style.Unit.PX);
-        pawnElement.getStyle().setWidth(40, Style.Unit.PX);
+        pawnImage.getStyle().setHeight(40, Style.Unit.PX);
+        pawnImage.getStyle().setWidth(40, Style.Unit.PX);
+
+
+        //combine
+        pawnImage.appendChild(overlayImage);  // add overlay inside pawnImage
+        pawnElement.appendChild(pawnImage);  // add pawnImage to outer container
+        pawnElement.getStyle().setZIndex(10); // put it on top of any canvas elements
 
         Event.sinkEvents(pawnElement, Event.ONCLICK);
         Event.setEventListener(pawnElement, new EventListener() {
             @Override
             public void onBrowserEvent(Event event) {
                 if (DOM.eventGetType(event) == Event.ONCLICK) {
-                    Window.alert("Clicked pawn: " + pawn.getPawnId());
+                    // select the pawn when you click on the div
+                    pawnAndCardSelection.addPawn(pawn);
+
+                    // each time you click on a pawn, you need to check all other pawns
+                    // whether they should be selected or not.
+                    // there is logic in pawnAndCardSelection so it might have unselected a pawn
+                    // in the model.
+                    NodeList<Element> overlayImages = Document.get().getElementsByTagName("img");
+                    for (int i = 0; i < overlayImages.getLength(); i++) {
+                        Element element = overlayImages.getItem(i);
+                        String className = element.getClassName(); // e.g., "PawnId{0,0}Overlay"
+
+                        // Extract pawnId by removing "Overlay" suffix
+                        if (className.endsWith("Overlay")) {
+                            String pawnId = className.substring(0, className.length() - "Overlay".length());
+                            // compare with selected pawns
+                            boolean isSelected = false;
+                            if (pawnAndCardSelection.getPawn1() != null && pawnAndCardSelection.getPawn1().getPawnId().toString().equals(pawnId)) {
+                                isSelected = true;
+                            } else if (pawnAndCardSelection.getPawn2() != null && pawnAndCardSelection.getPawn2().getPawnId().toString().equals(pawnId)) {
+                                isSelected = true;
+                            }
+
+                            element.getStyle().setVisibility(isSelected ? Style.Visibility.VISIBLE : Style.Visibility.HIDDEN);
+                        }
+                    }
+
+                    // after you have clicked on a pawn you will test whether it can move
+                    TestMoveHandler.sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());
                 }
             }
         });
