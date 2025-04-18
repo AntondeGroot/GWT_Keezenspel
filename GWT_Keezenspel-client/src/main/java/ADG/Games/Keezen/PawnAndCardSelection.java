@@ -337,7 +337,7 @@ public class PawnAndCardSelection {
         moveMessage.setCard(card);
         moveMessage.setMoveType(moveType);
         moveMessage.setStepsPawn1(nrStepsPawn1);
-        if(moveType.equals(SPLIT)){
+        if(moveType == SPLIT){ // comparing Enums with == is null safe
             moveMessage.setStepsPawn2(nrStepsPawn2);
         }
 

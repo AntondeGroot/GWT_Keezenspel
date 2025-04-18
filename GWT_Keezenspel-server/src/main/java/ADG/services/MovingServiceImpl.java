@@ -24,9 +24,10 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
     @Override
     public MoveResponse makeMove(MoveMessage message){
         // Verify that the input is valid.
+        // the movetype can be null when the player only selected a pawn
+        // return an empty response, since nothing will be done and no error occured.
         if (message.getMoveType() == null) {
-            throw new IllegalArgumentException(
-                    "The selected move was invalid");
+            return new MoveResponse();
         }
 
         if(!Objects.equals(message.getPlayerId(), GameState.getPlayerIdTurn())){
