@@ -1,5 +1,13 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.Cards.CardResponse;
+import ADG.Games.Keezen.Cards.CardsServiceAsync;
+import ADG.Games.Keezen.State.GameStateResponse;
+import ADG.Games.Keezen.State.GameStateServiceAsync;
+import ADG.Games.Keezen.Move.MoveResponse;
+import ADG.Games.Keezen.Move.MovingServiceAsync;
+import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.animations.*;
 import ADG.Games.Keezen.handlers.SendHandler;
 import ADG.Games.Keezen.handlers.TestMoveHandler;
@@ -13,8 +21,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ADG.Games.Keezen.MoveType.FORFEIT;
-import static ADG.Games.Keezen.Util.CardValueCheck.isSeven;
+import static ADG.Games.Keezen.Move.MoveType.FORFEIT;
+import static ADG.Games.Keezen.Cards.CardValueCheck.isSeven;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.drawTransparentCircle;
 import static ADG.Games.Keezen.handlers.CanvasClickHandler.handleOnBoardClick;
 import static java.lang.String.valueOf;

@@ -1,5 +1,7 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.State;
 
+import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Player.Player;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.ArrayList;

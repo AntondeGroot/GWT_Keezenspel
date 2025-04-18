@@ -1,5 +1,10 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.Move.MoveMessage;
+import ADG.Games.Keezen.Move.MoveResponse;
+import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Player.PawnId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import java.util.LinkedList;
 
 import static ADG.Games.Keezen.GameStateUtil.*;
-import static ADG.Games.Keezen.MessageType.CHECK_MOVE;
 import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

@@ -1,8 +1,8 @@
 package ADG.Games.Keezen.handlers;
 
 import ADG.Games.Keezen.*;
+import ADG.Games.Keezen.Player.Pawn;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 
 import java.util.List;
 

@@ -1,11 +1,11 @@
 package ADG.Games.Keezen.logic;
 
+import static ADG.Games.Keezen.GameState.nextPlayerId;
+import static ADG.Games.Keezen.GameState.previousPlayerId;
+
 import ADG.Games.Keezen.TileId;
 
 import java.util.LinkedList;
-
-import static ADG.Games.Keezen.GameState.nextPlayerId;
-import static ADG.Games.Keezen.GameState.previousPlayerId;
 
 public class MissingTiles {
     // todo: maybe this is completely useless. It was first designed to highlight all 7 tiles when two pawns were selected with a 7

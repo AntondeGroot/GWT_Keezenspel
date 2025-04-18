@@ -1,5 +1,6 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.Player.Pawn;
 import com.google.gwt.core.client.GWT;
 
 import java.util.ArrayList;

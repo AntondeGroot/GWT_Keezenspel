@@ -1,8 +1,8 @@
 package ADG.services;
 
-import ADG.Games.Keezen.CardResponse;
+import ADG.Games.Keezen.Cards.CardResponse;
 import ADG.Games.Keezen.CardsDeck;
-import ADG.Games.Keezen.CardsService;
+import ADG.Games.Keezen.Cards.CardsService;
 import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import jakarta.servlet.annotation.WebServlet;
 

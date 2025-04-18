@@ -1,7 +1,7 @@
 package ADG.Games.Keezen.logic;
 
 import ADG.Games.Keezen.GameState;
-import ADG.Games.Keezen.Player;
+import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.TileId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

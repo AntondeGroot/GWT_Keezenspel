@@ -1,5 +1,6 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.Cards.Card;
 import java.util.ArrayList;
 
 public class PlayerHand {

@@ -1,5 +1,9 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Player.Player;
+import ADG.Games.Keezen.Player.PlayerColors;
 import ADG.Games.Keezen.handlers.TestMoveHandler;
 import ADG.Games.Keezen.util.PawnRect;
 import com.google.gwt.canvas.dom.client.Context2d;

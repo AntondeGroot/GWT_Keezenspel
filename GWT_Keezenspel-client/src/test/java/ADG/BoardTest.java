@@ -1,7 +1,7 @@
 package ADG;
 
 import ADG.Games.Keezen.Board;
-import ADG.Games.Keezen.Player;
+import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.TileMapping;
 import org.junit.jupiter.api.Test;
 

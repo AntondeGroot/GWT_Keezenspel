@@ -1,5 +1,7 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.Move;
 
+import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.Player.PawnId;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 @SuppressWarnings("serial")

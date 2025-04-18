@@ -1,6 +1,10 @@
 package ADG;
 
 import ADG.Games.Keezen.*;
+import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.Move.MoveType;
+import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Player.PawnId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

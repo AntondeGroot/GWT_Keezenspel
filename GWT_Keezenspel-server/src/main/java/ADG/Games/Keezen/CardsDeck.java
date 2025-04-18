@@ -1,5 +1,7 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.Player.Player;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.*;

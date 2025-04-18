@@ -1,4 +1,4 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.Player;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 

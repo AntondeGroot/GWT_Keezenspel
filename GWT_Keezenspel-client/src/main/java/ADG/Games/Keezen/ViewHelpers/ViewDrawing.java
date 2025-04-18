@@ -1,8 +1,8 @@
 package ADG.Games.Keezen.ViewHelpers;
 
-import ADG.Games.Keezen.Pawn;
-import ADG.Games.Keezen.Player;
-import ADG.Games.Keezen.PlayerColors;
+import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Player.Player;
+import ADG.Games.Keezen.Player.PlayerColors;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ADG.Games.Keezen.PlayerColors.*;
+import static ADG.Games.Keezen.Player.PlayerColors.*;
 
 public class ViewDrawing {
 

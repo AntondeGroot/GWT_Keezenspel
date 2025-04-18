@@ -1,7 +1,7 @@
 package ADG.Games.Keezen;
 
-import ADG.Games.Keezen.Card;
-
+import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.Cards.CardResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

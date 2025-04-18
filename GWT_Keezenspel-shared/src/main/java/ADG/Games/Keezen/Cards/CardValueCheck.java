@@ -1,6 +1,4 @@
-package ADG.Games.Keezen.Util;
-
-import ADG.Games.Keezen.Card;
+package ADG.Games.Keezen.Cards;
 
 public class CardValueCheck {
 

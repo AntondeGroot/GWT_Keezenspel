@@ -1,5 +1,6 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.Player.PlayerColors;
 import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
