@@ -336,4 +336,18 @@ public class PawnAndCardSelection {
 
         return moveMessage;
     }
+
+    @Override
+    public String toString() {
+        return "PawnAndCardSelection{" +
+            "playerId='" + playerId + '\'' +
+            ", pawn1=" + pawn1 +
+            ", pawn2=" + pawn2 +
+            ", card=" + card +
+            ", drawCards=" + drawCards +
+            ", moveType=" + moveType +
+            ", nrStepsPawn1=" + nrStepsPawn1 +
+            ", nrStepsPawn2=" + nrStepsPawn2 +
+            '}';
+    }
 }

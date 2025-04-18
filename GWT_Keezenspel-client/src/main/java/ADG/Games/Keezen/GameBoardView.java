@@ -176,8 +176,6 @@ public class GameBoardView extends Composite {
                         }
                     }
                 }
-            }else{
-                drawPawn(context, pawn, pawnAndCardSelection);
             }
         }
     }
@@ -211,13 +209,13 @@ public class GameBoardView extends Composite {
         tileBoard.getElement().appendChild(circle);
     }
 
-    public void createPawns(ArrayList<Pawn> pawns){
+    public void createPawns(ArrayList<Pawn> pawns, PawnAndCardSelection pawnAndCardSelection){
         double desiredWidth = 40;
         double desiredHeight = 40;
         Point point = new Point(0,0);
 
         for (Pawn pawn : pawns) {
-           DivElement pawnElement = createPawn(pawn);
+           DivElement pawnElement = createPawn(pawn, pawnAndCardSelection);
 
             for (TileMapping mapping : Board.getTiles()) {
                 if(mapping.getTileId().equals(pawn.getCurrentTileId())){
@@ -424,23 +422,6 @@ public class GameBoardView extends Composite {
         }
     }
 
-    private void drawRoundedRect(Context2d context, double x, double y, double width, double height, double radius) {
-        context.beginPath();
-        context.moveTo(x + radius, y);
-        context.lineTo(x + width - radius, y);
-        context.quadraticCurveTo(x + width, y, x + width, y + radius);
-        context.lineTo(x + width, y + height - radius);
-        context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-        context.lineTo(x + radius, y + height);
-        context.quadraticCurveTo(x, y + height, x, y + height - radius);
-        context.lineTo(x, y + radius);
-        context.quadraticCurveTo(x, y, x + radius, y);
-        context.closePath();
-        context.setStrokeStyle("red");
-        context.setLineWidth(2);
-        context.stroke();
-    }
-
     public void removeCardDeckImage() {
         // todo: can this be done any other way? how was it done for the pawns? There it didn't need a loadHandler
         // Get the parent element (e.g., RootPanel)
@@ -480,29 +461,6 @@ public class GameBoardView extends Composite {
         context.drawImage(ImageElement.as(image.getElement()), xywh[0], xywh[1], xywh[2], xywh[3] );
     }
 
-    //todo: move to util
-    //todo: do not draw the pawns too often
-    private void drawPawn(Context2d context, Pawn pawn, PawnAndCardSelection pawnAndCardSelection){
-        // Load an image and draw it to the canvas
-        Image image = new Image("/pawn"+pawn.getColorInt()+".png");
-        Image imageOutline = new Image("/pawn_outline.png");
-
-        double desiredWidth = 40;
-        double desiredHeight = 40;
-        Point point = new Point(0,0);
-        // Draw the image on the canvas once it's loaded
-
-        for (TileMapping mapping : Board.getTiles()) {
-            if(mapping.getTileId().equals(pawn.getCurrentTileId())){
-                point = mapping.getPosition();
-            }
-        }
-        context.drawImage(ImageElement.as(image.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
-        if(pawnAndCardSelection.getPawn1().equals(pawn) || pawnAndCardSelection.getPawn2().equals(pawn)){
-            context.drawImage(ImageElement.as(imageOutline.getElement()), point.getX()-desiredWidth/2, point.getY()-desiredHeight/2-15, desiredWidth,desiredHeight);
-        }
-    }
-
     public boolean shouldBeAnimated(Pawn pawn) {
         if(AnimationModel.animationMappings.isEmpty()){
             return false;
@@ -514,13 +472,5 @@ public class GameBoardView extends Composite {
             }
         }
         return false;
-    }
-
-    public Point getPointClicked(ClickEvent event){
-        int canvasLeft = getCanvasBoard().getAbsoluteLeft() - Window.getScrollLeft();
-        int canvasTop = getCanvasBoard().getAbsoluteTop() - Window.getScrollTop();
-        int x = event.getClientX() - canvasLeft;
-        int y = event.getClientY() - canvasTop + 30;
-        return new Point(x,y);
     }
 }
