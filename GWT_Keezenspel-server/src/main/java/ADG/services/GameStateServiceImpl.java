@@ -1,6 +1,9 @@
 package ADG.services;
 
-import ADG.Games.Keezen.*;
+import ADG.Games.Keezen.GameState;
+import ADG.Games.Keezen.State.GameStateService;
+import ADG.Games.Keezen.Player.Player;
+import ADG.Games.Keezen.State.GameStateResponse;
 import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import jakarta.servlet.annotation.WebServlet;
 
@@ -36,8 +39,10 @@ public class GameStateServiceImpl extends RemoteServiceServlet implements GameSt
     @Override
     public void startGame() throws IllegalStateException {
         //todo: remove testdata
+        int NrPlayers = 3;
+
         if(GameState.getPawns().isEmpty()){
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < NrPlayers; i++) {
                 Player player = new Player("player"+i,String.valueOf(i));
                 if(i==0){
                     player.setIsPlaying(true);

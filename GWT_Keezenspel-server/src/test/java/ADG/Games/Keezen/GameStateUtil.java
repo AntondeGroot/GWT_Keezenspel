@@ -1,11 +1,17 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.Move.MoveMessage;
+import ADG.Games.Keezen.Move.MoveResponse;
+import ADG.Games.Keezen.Move.MoveType;
+import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Player.PawnId;
+import ADG.Games.Keezen.Player.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static ADG.Games.Keezen.MessageType.CHECK_MOVE;
-import static ADG.Games.Keezen.MessageType.MAKE_MOVE;
-import static ADG.Games.Keezen.MoveType.*;
+import static ADG.Games.Keezen.Move.MessageType.MAKE_MOVE;
+import static ADG.Games.Keezen.Move.MoveType.*;
 
 public class GameStateUtil {
 

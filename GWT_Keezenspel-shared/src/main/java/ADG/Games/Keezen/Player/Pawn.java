@@ -1,5 +1,6 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.Player;
 
+import ADG.Games.Keezen.TileId;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.Objects;

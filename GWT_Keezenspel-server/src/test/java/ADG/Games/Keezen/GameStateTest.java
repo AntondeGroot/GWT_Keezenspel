@@ -1,5 +1,7 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Player.Player;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

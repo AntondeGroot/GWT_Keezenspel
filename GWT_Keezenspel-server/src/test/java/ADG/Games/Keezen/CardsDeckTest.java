@@ -1,5 +1,6 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.Cards.Card;
 import ADG.Games.Keezen.logic.WinnerLogic;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;

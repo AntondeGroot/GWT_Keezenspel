@@ -1,13 +1,20 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.Move.MoveMessage;
+import ADG.Games.Keezen.Move.MoveResponse;
+import ADG.Games.Keezen.Move.MoveType;
+import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Player.PawnId;
+import ADG.Games.Keezen.Player.Player;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static ADG.Games.Keezen.CardsDeck.playerDoesNotHaveCard;
-import static ADG.Games.Keezen.MessageType.*;
-import static ADG.Games.Keezen.MoveResult.*;
-import static ADG.Games.Keezen.MoveType.*;
-import static ADG.Games.Keezen.Util.CardValueCheck.*;
+import static ADG.Games.Keezen.Move.MessageType.*;
+import static ADG.Games.Keezen.Move.MoveResult.*;
+import static ADG.Games.Keezen.Move.MoveType.*;
+import static ADG.Games.Keezen.Cards.CardValueCheck.*;
 import static ADG.Games.Keezen.logic.MissingTiles.extrapolateMissingTiles;
 import static ADG.Games.Keezen.logic.StartTileLogic.canPassStartTile;
 import static ADG.Games.Keezen.logic.WinnerLogic.checkForWinners;

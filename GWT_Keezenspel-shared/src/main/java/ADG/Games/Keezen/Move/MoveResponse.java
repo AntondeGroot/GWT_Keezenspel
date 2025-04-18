@@ -1,5 +1,7 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.Move;
 
+import ADG.Games.Keezen.Player.PawnId;
+import ADG.Games.Keezen.TileId;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.LinkedList;

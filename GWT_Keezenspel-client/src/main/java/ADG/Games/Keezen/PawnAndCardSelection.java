@@ -1,9 +1,16 @@
 package ADG.Games.Keezen;
 
-import static ADG.Games.Keezen.MessageType.MAKE_MOVE;
-import static ADG.Games.Keezen.MoveType.*;
-import static ADG.Games.Keezen.Util.CardValueCheck.isJack;
-import static ADG.Games.Keezen.Util.CardValueCheck.isSeven;
+import static ADG.Games.Keezen.Move.MessageType.MAKE_MOVE;
+import static ADG.Games.Keezen.Move.MoveType.*;
+import static ADG.Games.Keezen.Cards.CardValueCheck.isJack;
+import static ADG.Games.Keezen.Cards.CardValueCheck.isSeven;
+
+import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.Move.MessageType;
+import ADG.Games.Keezen.Move.MoveMessage;
+import ADG.Games.Keezen.Move.MoveType;
+import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Player.PawnId;
 
 public class PawnAndCardSelection {
     private String playerId;

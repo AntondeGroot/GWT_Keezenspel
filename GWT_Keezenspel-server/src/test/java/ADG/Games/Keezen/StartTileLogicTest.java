@@ -1,5 +1,7 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.logic.StartTileLogic;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;

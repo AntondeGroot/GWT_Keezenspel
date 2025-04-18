@@ -1,7 +1,7 @@
 package ADG.Games.Keezen.logic;
 
-import ADG.Games.Keezen.Pawn;
-import ADG.Games.Keezen.PawnId;
+import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.TileId;
 
 import java.util.Objects;

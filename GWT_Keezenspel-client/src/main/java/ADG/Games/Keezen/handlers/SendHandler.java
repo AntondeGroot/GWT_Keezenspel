@@ -1,6 +1,9 @@
 package ADG.Games.Keezen.handlers;
 
-import ADG.Games.Keezen.*;
+import ADG.Games.Keezen.Move.MoveMessage;
+import ADG.Games.Keezen.Move.MoveResponse;
+import ADG.Games.Keezen.Move.MovingService;
+import ADG.Games.Keezen.Move.MovingServiceAsync;
 import ADG.Games.Keezen.animations.StepsAnimation;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;

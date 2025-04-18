@@ -1,8 +1,8 @@
 package ADG.Games.Keezen.logic;
 
 import ADG.Games.Keezen.GameState;
-import ADG.Games.Keezen.Pawn;
-import ADG.Games.Keezen.Player;
+import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Player.Player;
 
 import java.util.ArrayList;
 

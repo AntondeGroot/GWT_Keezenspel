@@ -1,4 +1,4 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.Player;
 
 public class PlayerColors {
     private static final String[] colors = {

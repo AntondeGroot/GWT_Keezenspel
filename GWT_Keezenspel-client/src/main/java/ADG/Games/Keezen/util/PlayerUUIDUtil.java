@@ -1,6 +1,6 @@
 package ADG.Games.Keezen.util;
 
-import ADG.Games.Keezen.Player;
+import ADG.Games.Keezen.Player.Player;
 
 import java.util.ArrayList;
 

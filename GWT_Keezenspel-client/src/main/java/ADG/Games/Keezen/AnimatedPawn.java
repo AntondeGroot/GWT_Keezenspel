@@ -1,5 +1,7 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.Player.Pawn;
+
 public class AnimatedPawn {
     private final Pawn pawn;
     private final Point point;

@@ -1,6 +1,8 @@
 package ADG.Games.Keezen;
 
-import ADG.*;
+import ADG.Games.Keezen.Move.MoveResponse;
+import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Player.PawnId;
 import com.google.gwt.core.client.GWT;
 
 import java.util.LinkedList;

@@ -1,5 +1,11 @@
 package ADG.Games.Keezen;
 
+import ADG.Games.Keezen.Cards.CardsService;
+import ADG.Games.Keezen.Cards.CardsServiceAsync;
+import ADG.Games.Keezen.State.GameStateService;
+import ADG.Games.Keezen.State.GameStateServiceAsync;
+import ADG.Games.Keezen.Move.MovingService;
+import ADG.Games.Keezen.Move.MovingServiceAsync;
 import ADG.Games.Keezen.services.PollingService;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.core.client.GWT;

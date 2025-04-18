@@ -1,5 +1,6 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.State;
 
+import ADG.Games.Keezen.Player.Player;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import java.util.ArrayList;
