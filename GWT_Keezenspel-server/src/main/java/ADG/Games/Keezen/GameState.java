@@ -403,11 +403,9 @@ public class GameState {
         String playerId = pawnId1.getPlayerId();
         TileId currentTileId = getPawnTileId(pawnId1);
         int nrSteps = moveMessage.getStepsPawn1();
-        int next = 0;
+        int next;
         String playerIdOfTile = currentTileId.getPlayerId();
         System.out.println("moveMessage = "+moveMessage);
-        int direction = 1;
-        int tileNrToCheck = currentTileId.getTileNr();
         LinkedList<TileId> moves = new LinkedList<>();
         response.setMoveType(MOVE);
         System.out.println("GameState: OnMove: received msg: " + moveMessage);
@@ -831,7 +829,6 @@ public class GameState {
         }
 
         // cannot go onboard without an Ace or King
-        int cardValue = card.getCardValue();
         if(!(isAce(card) || isKing(card))){
             response.setResult(CANNOT_MAKE_MOVE);
             return;

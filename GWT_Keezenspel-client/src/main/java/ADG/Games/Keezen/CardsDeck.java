@@ -36,16 +36,6 @@ public class CardsDeck {
         return playedCards;
     }
 
-    public Card pickCard(int i){
-        if(!cards.isEmpty() && i > -1 && i < cards.size()){
-            return cards.get(i);
-        }
-        if(!cards.isEmpty() && i == -1){
-            cards = null;
-        }
-        return null;
-    }
-
     public void processCardResponse(CardResponse cardResponse){
         setCards(cardResponse.getCards());
         setNrCardsPerPlayer(cardResponse.getNrOfCardsPerPlayer());

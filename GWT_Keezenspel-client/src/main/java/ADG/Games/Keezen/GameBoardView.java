@@ -180,11 +180,6 @@ public class GameBoardView extends Composite {
         }
     }
 
-    private boolean pawnWasSelected(Pawn pawn){
-//        return PawnAndCardSelection.getPawn1().equals(pawn) || PawnAndCardSelection.getPawn2().equals(pawn);
-        return false;
-    }
-
     public void drawBoard(List<TileMapping> tiles, ArrayList<Player> players, double cellDistance) {
         GWT.log("drawing board");
 
@@ -353,7 +348,6 @@ public class GameBoardView extends Composite {
     }
 
     public void drawCards(CardsDeck cardsDeck, PawnAndCardSelection pawnAndCardSelection){
-        Card selectedCard = pawnAndCardSelection.getCard();
         List<Card> cards = cardsDeck.getCards();
         HashMap<String, Integer> nrCardsPerPlayerUUID = cardsDeck.getNrCardsPerPlayer();
         ArrayList<Card> playedCards = cardsDeck.getPlayedCards();
