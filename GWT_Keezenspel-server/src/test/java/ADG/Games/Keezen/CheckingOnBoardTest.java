@@ -53,7 +53,6 @@ public class CheckingOnBoardTest {
     void checkOnBoard_WrongCard_DoesNotShow() {
         // GIVEN
         Card card = givePlayerCard(0,3);
-        int nrCards = CardsDeck.getCardsForPlayer("0").size();
         Pawn pawn1 = new Pawn(new PawnId("0",1), new TileId("0", -1));
 
         // WHEN
