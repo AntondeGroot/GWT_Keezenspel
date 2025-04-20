@@ -12,7 +12,6 @@ import ADG.Games.Keezen.animations.*;
 import ADG.Games.Keezen.handlers.SendHandler;
 import ADG.Games.Keezen.handlers.TestMoveHandler;
 import ADG.Games.Keezen.services.PollingService;
-import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -55,7 +54,6 @@ public class GameBoardPresenter {
     }
 
     public void start() {
-        animate();
         bindEventHandlers();
         startPollingServer();
         initializeGame();
@@ -112,6 +110,7 @@ public class GameBoardPresenter {
                 if(!moveResponse.equals(storedMoveResponse) && !moveResponse.equals(new MoveResponse())){
                     StepsAnimation.resetStepsAnimation();
                     MoveController.movePawn(moveResponse);
+                    draw();
                     GWT.log(moveResponse.toString());
                     storedMoveResponse = moveResponse;
                 }
@@ -148,7 +147,7 @@ public class GameBoardPresenter {
         board.createBoard(result.getPlayers(), view.getBoardSize());
         view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
         view.createPawns(result.getPawns(), pawnAndCardSelection);
-        view.drawPawns(result.getPawns(), pawnAndCardSelection);
+        view.animatePawns();
     }
 
     private void updatePlayerList(GameStateResponse result) {
@@ -223,20 +222,6 @@ public class GameBoardPresenter {
         });
     }
 
-    public void animate() {
-        view.clearCanvasPawns();
-        update(); // todo: improve
-        draw();   // todo: improve
-        view.showPawnTextBoxes(showTextBoxes(pawnAndCardSelection.getCard()));
-        AnimationScheduler.AnimationCallback animationCallback = new AnimationScheduler.AnimationCallback() {
-            @Override
-            public void execute(double v) {
-                animate();
-            }
-        };
-        AnimationScheduler.get().requestAnimationFrame(animationCallback);
-    }
-
     private boolean showTextBoxes(Card card) {
         if (card == null) {
             return false;
@@ -266,7 +251,7 @@ public class GameBoardPresenter {
                     pawnAndCardSelection);
             pawnAndCardSelection.setCardsAreDrawn();
         }
-        view.drawPawns(Board.getPawns(), pawnAndCardSelection);
+        view.animatePawns();
     }
 
     public void drawStepsAnimation() {

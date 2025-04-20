@@ -9,14 +9,12 @@ import ADG.Games.Keezen.util.PawnRect;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.*;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 
 import java.util.*;
@@ -142,42 +140,14 @@ public class GameBoardView extends Composite {
         playerListContainer2.add(createPlayerGrid(players));
     }
 
-    public void drawPawns(ArrayList<Pawn> pawns, PawnAndCardSelection pawnAndCardSelection){
-        // sort the pawns vertically so that they don't overlap weirdly when drawn
-        Context2d context = getCanvasPawnsContext();
-        pawns.sort(new PawnComparator());
-        for(Pawn pawn : pawns){
-            if (shouldBeAnimated(pawn)) {
-                Iterator<PawnAnimationMapping> iterator = AnimationModel.animationMappings.iterator();
-                while (iterator.hasNext()) {
-                    PawnAnimationMapping animationPawnI = iterator.next();
-                    // only animate the killing of a pawn after all other moves of other pawns were animated
-                    if(!animationPawnI.isAnimateLast()) {
-                        if (pawn.equals(animationPawnI.getPawn())) {
-                            if (animationPawnI.getPoints().isEmpty()) {
-                                iterator.remove(); // Remove the current element safely
-                            } else {
-                                LinkedList<Point> points = animationPawnI.getPoints();
-                                if (!points.isEmpty()) {
-                                    Point p = points.getFirst();
-                                    drawPawnAnimated(context, pawn, p);
-                                    GWT.log("draw animated : "+ pawn);
-                                    points.removeFirst(); // Remove the first element safely
-                                }
-                            }
-                        }
-                    }else{
-                        GWT.log("draw statically : "+ animationPawnI.getPawn());
-                        // draw the pawn that is about to be killed statically
-                        drawPawnAnimated(context, animationPawnI.getPawn(), animationPawnI.getPoints().getFirst());
-                        // if no other pawns to be drawn, start drawing this one.
-                        if (AnimationModel.onlyPawnsToBeKilledAreLeft() && animationPawnI.isAnimateLast()){
-                            animationPawnI.setAnimateLast(false);
-                        }
-                    }
-                }
-            }
-        }
+    public void animatePawns(){
+        //pawns.sort(new PawnComparator()); // todo: will pawns be drawn incorrectly when on finish tile?
+        GWT.log("view.animatepawns");
+        PawnAnimation animation = new PawnAnimation();
+        animation.animateSequence(AnimationSequence.getFirst());
+        animation.animateSequence(AnimationSequence.getLast());
+        animation.clearPawnDivStyles();
+        AnimationSequence.reset();
     }
 
     public void drawBoard(List<TileMapping> tiles, ArrayList<Player> players, double cellDistance) {
@@ -322,6 +292,8 @@ public class GameBoardView extends Composite {
                         if(pawnAndCardSelection.getPawn1() != null && pawnAndCardSelection.getCard() != null){
                             TestMoveHandler.sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());//todo: improve elegance
                         }
+
+                        drawPlayerCardsInHand(cards, pawnAndCardSelection, spriteImage);
                     }
                 }
             });
@@ -453,18 +425,5 @@ public class GameBoardView extends Composite {
 
         double[] xywh = PawnRect.getRect(point);
         context.drawImage(ImageElement.as(image.getElement()), xywh[0], xywh[1], xywh[2], xywh[3] );
-    }
-
-    public boolean shouldBeAnimated(Pawn pawn) {
-        if(AnimationModel.animationMappings.isEmpty()){
-            return false;
-        }
-
-        for (PawnAnimationMapping animationMappings1 : AnimationModel.animationMappings) {
-            if (pawn.equals(animationMappings1.getPawn())) {
-                return true;
-            }
-        }
-        return false;
     }
 }
