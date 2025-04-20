@@ -10,7 +10,7 @@ import java.util.LinkedList;
 public class MoveController {
 
     public static void movePawn(MoveResponse moveResponse) {
-        GWT.log(moveResponse.toString());
+        GWT.log("move response :\n"+moveResponse.toString());
 
         PawnId pawnId1 = moveResponse.getPawnId1();
         PawnId pawnId2 = moveResponse.getPawnId2();
@@ -26,23 +26,22 @@ public class MoveController {
 
         if(pawnId1 != null) {
             Pawn pawn1 = Board.getPawn(pawnId1);
-            AnimationModel.movePawn(pawn1, movePawn1, false);
+            AnimationSequence.movePawn(pawn1, movePawn1, true);
         }
 
         if(pawnId2 != null) {
             Pawn pawn2 = Board.getPawn(pawnId2);
-            AnimationModel.movePawn(pawn2, movePawn2, false);
+            AnimationSequence.movePawn(pawn2, movePawn2, true);
         }
 
         if(pawnIdKilled1 != null){
             Pawn pawnKilled1 = Board.getPawn(pawnIdKilled1);
-            AnimationModel.movePawn(pawnKilled1, moveKilledPawn1, true);
+            AnimationSequence.movePawn(pawnKilled1, moveKilledPawn1, false);
         }
 
         if(pawnIdKilled2 != null){
             Pawn pawnKilled2 = Board.getPawn(pawnIdKilled2);
-            AnimationModel.movePawn(pawnKilled2, moveKilledPawn2, true);
+            AnimationSequence.movePawn(pawnKilled2, moveKilledPawn2, false);
         }
-
     }
 }
