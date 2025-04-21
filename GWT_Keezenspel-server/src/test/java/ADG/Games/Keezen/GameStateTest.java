@@ -18,6 +18,7 @@ public class GameStateTest {
     void setUp() {
         GameState.stop();
         GameState.tearDown();
+        CardsDeck.reset();
     }
 
     @AfterEach

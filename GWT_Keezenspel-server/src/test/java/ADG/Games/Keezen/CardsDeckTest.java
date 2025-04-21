@@ -16,6 +16,7 @@ class CardsDeckTest {
     @BeforeEach
     void setup(){
         CardsDeck.reset();
+        GameState.tearDown();
     }
 
     @AfterEach
