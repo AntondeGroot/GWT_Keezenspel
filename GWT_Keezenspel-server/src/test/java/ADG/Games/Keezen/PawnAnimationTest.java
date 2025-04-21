@@ -269,6 +269,38 @@ public class PawnAnimationTest {
     }
 
     @Test
+    void pawnSwitchesWithOpponent() {
+        // setup
+        GameState.tearDown();
+        createGame_With_NPlayers(3);
+
+        // GIVEN
+        Card card = givePlayerJack(0);
+        TileId tile1 = new TileId("2",12);
+        TileId tile2 = new TileId("0",5);
+        Pawn pawn1 = placePawnOnBoard(new PawnId("0",1) , tile1);
+        Pawn pawn2 = placePawnOnBoard(new PawnId("1",2) , tile2);
+
+        // WHEN
+        createSwitchMessage(moveMessage, pawn1, pawn2, card);
+        GameState.processOnSwitch(moveMessage, moveResponse);
+
+        // THEN
+        LinkedList<TileId> expectedMovementPawn1 = new LinkedList<>();
+        expectedMovementPawn1.add(tile1);
+        expectedMovementPawn1.add(tile2);
+
+        LinkedList<TileId> expectedMovementPawn2 = new LinkedList<>();
+        expectedMovementPawn2.add(tile2);
+        expectedMovementPawn2.add(tile1);
+
+        // response message is correct
+        assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+        assertEquals(expectedMovementPawn2, moveResponse.getMovePawn2());
+        assertEquals(expectedMovementPawn1, moveResponse.getMovePawn1());
+    }
+
+    @Test
     void pawnMoves_FinishIsFull_AnimateToRightTile_BugFix() {
         /**
          * When the finish tile (1,16) is taken for player1

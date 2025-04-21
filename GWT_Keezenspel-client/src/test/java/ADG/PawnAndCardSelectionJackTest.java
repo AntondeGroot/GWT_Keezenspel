@@ -278,4 +278,15 @@ public class PawnAndCardSelectionJackTest {
         // THEN
         assertNull(pawnAndCardSelection.getPawnId2());
     }
+    @Test
+    public void test_SetCardThenJack_ResetsStepsPawn1(){
+        // GIVEN
+        pawnAndCardSelection.setCard(new Card(0,5));
+
+        // WHEN
+        pawnAndCardSelection.setCard(jackCard);
+
+        // THEN
+        assertEquals(0, pawnAndCardSelection.getNrStepsPawn1());
+    }
 }

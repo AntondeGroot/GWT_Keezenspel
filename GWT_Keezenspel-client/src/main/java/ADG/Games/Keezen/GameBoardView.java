@@ -5,7 +5,6 @@ import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.Player.PlayerColors;
 import ADG.Games.Keezen.handlers.TestMoveHandler;
-import ADG.Games.Keezen.util.PawnRect;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.*;
@@ -263,7 +262,7 @@ public class GameBoardView extends Composite {
             // Create the card element
             DivElement cardElement = Document.get().createDivElement();
             cardElement.setClassName("cardDiv");
-            cardElement.setId("card" + j++);
+            cardElement.setId(card.toString());
 
             // Apply background styles
             cardElement.getStyle().setProperty("backgroundImage", "url('card-deck.png')");
@@ -414,16 +413,5 @@ public class GameBoardView extends Composite {
     }
     public void clearCanvasCards(){
         getCanvasCardsContext().clearRect(0,0,getCanvasCards().getWidth(),getCanvasCards().getWidth());
-    }
-    public void clearCanvasPawns(){
-        getCanvasPawnsContext().clearRect(0, 0, getCanvasPawns().getWidth(), getCanvasPawns().getHeight());
-    }
-//todo: move to util
-    private void drawPawnAnimated(Context2d context, Pawn pawn, Point point){
-        // Load an image and draw it to the canvas
-        Image image = new Image("/pawn"+pawn.getColorInt()+".png");
-
-        double[] xywh = PawnRect.getRect(point);
-        context.drawImage(ImageElement.as(image.getElement()), xywh[0], xywh[1], xywh[2], xywh[3] );
     }
 }

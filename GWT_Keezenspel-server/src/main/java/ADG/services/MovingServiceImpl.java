@@ -1,10 +1,11 @@
 package ADG.services;
 
+import static ADG.Games.Keezen.Move.MessageType.MAKE_MOVE;
+import static ADG.Games.Keezen.Move.MoveResult.CAN_MAKE_MOVE;
+
 import ADG.Games.Keezen.*;
-import ADG.Games.Keezen.Move.MessageType;
 import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveResponse;
-import ADG.Games.Keezen.Move.MoveResult;
 import ADG.Games.Keezen.Move.MovingService;
 import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import jakarta.servlet.annotation.WebServlet;
@@ -54,8 +55,8 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
                 break;
         }
 
-        if(response.getResult().equals(MoveResult.CAN_MAKE_MOVE) && response.getMessageType().equals(
-            MessageType.MAKE_MOVE)){
+        if(Objects.equals(response.getResult(), CAN_MAKE_MOVE)
+            && Objects.equals(response.getMessageType(), MAKE_MOVE)){
             saveTime = Instant.now();
             moves.add(response);
             if(moves.size() > 1){

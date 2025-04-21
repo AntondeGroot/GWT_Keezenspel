@@ -12,8 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static ADG.Games.Keezen.GameStateUtil.*;
+import static ADG.Games.Keezen.Move.MessageType.MAKE_MOVE;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MovingOnSwitchTest {
@@ -92,6 +92,7 @@ class MovingOnSwitchTest {
         GameState.processOnSwitch(moveMessage, moveResponse);
 
         // THEN: response message is correct
+        assertEquals(MAKE_MOVE, moveResponse.getMessageType());
         assertEquals(tileId2, moveResponse.getMovePawn1().getLast());
         assertEquals(tileId1, moveResponse.getMovePawn2().getLast());
         // THEN: GameState is correct
@@ -114,6 +115,7 @@ class MovingOnSwitchTest {
         GameState.processOnSwitch(moveMessage, moveResponse);
 
         // THEN: response message is correct
+        assertEquals(MAKE_MOVE, moveResponse.getMessageType());
         assertEquals(tileId2, moveResponse.getMovePawn1().getLast());
         assertEquals(tileId1, moveResponse.getMovePawn2().getLast());
         // THEN: GameState is correct
@@ -226,6 +228,7 @@ class MovingOnSwitchTest {
         GameState.processOnSwitch(moveMessage, moveResponse);
 
         // THEN: response message is correct
+        assertEquals(MAKE_MOVE, moveResponse.getMessageType());
         assertEquals(tileId2, moveResponse.getMovePawn1().getLast());
         assertEquals(tileId1, moveResponse.getMovePawn2().getLast());
         // THEN: GameState is correct

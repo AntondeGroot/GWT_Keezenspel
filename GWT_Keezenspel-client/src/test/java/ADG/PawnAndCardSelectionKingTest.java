@@ -102,4 +102,16 @@ public class PawnAndCardSelectionKingTest {
         // THEN
         assertNull(pawnAndCardSelection.getPawnId1());// todo: or should the card be empty?
     }
+
+    @Test
+    public void test_SetCardThenKing_ResetsStepsPawn1(){
+        // GIVEN
+        pawnAndCardSelection.setCard(new Card(0,5));
+
+        // WHEN
+        pawnAndCardSelection.setCard(kingCard);
+
+        // THEN
+        assertEquals(0, pawnAndCardSelection.getNrStepsPawn1());
+    }
 }

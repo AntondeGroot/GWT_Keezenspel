@@ -731,6 +731,7 @@ public class GameState {
     }
 
     public static void processOnSwitch(MoveMessage moveMessage, MoveResponse moveResponse){
+
         PawnId pawnId1 = moveMessage.getPawnId1();
         PawnId pawnId2 = moveMessage.getPawnId2();
         Card card = moveMessage.getCard();
@@ -764,8 +765,7 @@ public class GameState {
         Pawn pawn1 = getPawn(pawnId1);
         Pawn pawn2 = getPawn(pawnId2);
 
-        // player 1 cannot move from EndTile or from NestTile
-        // player 2 cannot move from endtile or from nesttile
+        // pawns cannot move from EndTile or from NestTile
         int tileNr1 = pawn1.getCurrentTileId().getTileNr();
         int tileNr2 = pawn2.getCurrentTileId().getTileNr();
         String tilePlayerId2 = pawn2.getCurrentTileId().getPlayerId();
@@ -794,6 +794,8 @@ public class GameState {
         moveResponse.setMovePawn2(move2);
         moveResponse.setPawnId1(pawn1.getPawnId());
         moveResponse.setPawnId2(pawn2.getPawnId());
+        moveResponse.setResult(CAN_MAKE_MOVE);
+        moveResponse.setMessageType(moveMessage.getMessageType());
 
         TileId tileId1 = new TileId(pawn1.getCurrentTileId());
         TileId tileId2 = new TileId(pawn2.getCurrentTileId());

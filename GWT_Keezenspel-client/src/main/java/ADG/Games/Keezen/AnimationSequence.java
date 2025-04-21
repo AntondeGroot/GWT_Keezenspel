@@ -19,12 +19,7 @@ public class AnimationSequence {
     }
 
     public static void movePawn(Pawn pawn, LinkedList<TileId> movePawn, boolean animateFirst) {
-        if(animateFirst){
-            sequenceFirst.add(new AnimatePawnPoints(pawn, movePawn));
-        }else{
-            sequenceLast.add(new AnimatePawnPoints(pawn, movePawn));
-        }
-
+        // move the pawn in the model
         ArrayList<Pawn> pawns = Board.getPawns();
         for(Pawn pawnI : pawns){
             if(pawn.equals(pawnI)){
@@ -32,5 +27,13 @@ public class AnimationSequence {
             }
         }
         Board.setPawns(pawns);
+
+        // animate the movement of the pawn
+        if(animateFirst){
+            sequenceFirst.add(new AnimatePawnPoints(pawn, movePawn));
+        }else{
+            sequenceLast.add(new AnimatePawnPoints(pawn, movePawn));
+        }
+
     }
 }
