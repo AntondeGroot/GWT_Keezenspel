@@ -19,8 +19,8 @@ public class PawnAndCardSelection {
     private Card card;
     private boolean drawCards = true;
     private MoveType moveType;
-    private int nrStepsPawn1;
-    private int nrStepsPawn2;
+    private int nrStepsPawn1 = 0;
+    private int nrStepsPawn2 = 0;
 
     public void setPlayerId(String id) {
         playerId = id;
@@ -254,10 +254,11 @@ public class PawnAndCardSelection {
 
     private void handleAce() {
         if (pawn1.getCurrentTileId().getTileNr() < 0) {
+            nrStepsPawn1 = 0;
             setMoveType(ONBOARD);
         } else {
-            setMoveType(MOVE);
             nrStepsPawn1 = 1;
+            setMoveType(MOVE);
         }
     }
 
@@ -272,10 +273,14 @@ public class PawnAndCardSelection {
     }
 
     private void handleJack() {
+        nrStepsPawn1 = 0;
+        nrStepsPawn2 = 0;
         setMoveType(SWITCH);
     }
 
     private void handleKing() {
+        nrStepsPawn1 = 0;
+        nrStepsPawn2 = 0;
         setMoveType(ONBOARD);
     }
 

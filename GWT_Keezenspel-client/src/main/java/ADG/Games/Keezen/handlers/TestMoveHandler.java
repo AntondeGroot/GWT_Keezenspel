@@ -34,7 +34,10 @@ public class TestMoveHandler{// todo: is no longer a handler
                         tileIds.add(result.getMovePawn2().getLast());
                     }else{
                         // draw only where a pawn ends up
-                        tileIds.add(result.getMovePawn1().getLast());
+                        // an invalid selection is still "successfully" returned
+                        if(result.getMovePawn1() != null){
+                            tileIds.add(result.getMovePawn1().getLast());
+                        }
                     }
                     StepsAnimation.updateStepsAnimation(tileIds);
                 }else{

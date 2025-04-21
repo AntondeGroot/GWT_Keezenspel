@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static ADG.Games.Keezen.Move.MoveType.FORFEIT;
+import static ADG.Games.Keezen.Move.MoveType.ONBOARD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -134,5 +135,23 @@ public class PawnAndCardSelectionAceTest {
 
         // THEN
         assertNull(pawnAndCardSelection.getPawnId1());
+    }
+    @Test
+    public void test_SetCardThenKing_ResetsStepsPawn1(){
+        // GIVEN
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.setCard(aceCard);
+        pawnAndCardSelection.addPawn(ownPawnOnNest);
+        pawnAndCardSelection.setCard(new Card(0,5));
+        // giving a non ace card deselects the pawn, but when you select an Ace and the pawn
+        // you should no longer see nrStepsPawn1 as 5.
+
+        // WHEN
+        pawnAndCardSelection.setCard(aceCard);
+        pawnAndCardSelection.addPawn(ownPawnOnNest);
+
+        // THEN
+        assertEquals(ONBOARD, pawnAndCardSelection.getMoveType());
+        assertEquals(0, pawnAndCardSelection.getNrStepsPawn1());
     }
 }
