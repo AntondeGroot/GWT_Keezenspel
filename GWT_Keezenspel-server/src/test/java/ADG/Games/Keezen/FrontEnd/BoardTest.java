@@ -36,7 +36,7 @@ class BoardTest {
 
   @Test
   public void verifyNumberOfPawnsFor3Players(){
-    assertEquals(12, driver.findElements(By.className("pawn")).size());
+    assertEquals(12, driver.findElements(By.className("pawnDiv")).size());
   }
 
   @Test
