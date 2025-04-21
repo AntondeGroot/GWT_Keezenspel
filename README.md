@@ -12,3 +12,4 @@ This project is used to learn
 - HTML and CSS
 - Unit testing
 - Selenium automated browser testing
+- Mockito
