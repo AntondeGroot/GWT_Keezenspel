@@ -1,8 +1,9 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.animations;
 
 import static java.lang.Math.max;
 
 import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Point;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;

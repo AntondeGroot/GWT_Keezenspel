@@ -1,7 +1,9 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.animations;
 
+import ADG.Games.Keezen.Board;
 import ADG.Games.Keezen.Player.Pawn;
 
+import ADG.Games.Keezen.TileId;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -20,6 +22,7 @@ public class AnimationSequence {
 
     public static void movePawn(Pawn pawn, LinkedList<TileId> movePawn, boolean animateFirst) {
         // move the pawn in the model
+        // todo: instead of doing this request the server for a current state of the pawns
         ArrayList<Pawn> pawns = Board.getPawns();
         for(Pawn pawnI : pawns){
             if(pawn.equals(pawnI)){

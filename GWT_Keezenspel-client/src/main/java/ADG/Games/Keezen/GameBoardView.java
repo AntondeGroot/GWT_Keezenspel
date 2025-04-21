@@ -4,6 +4,8 @@ import ADG.Games.Keezen.Cards.Card;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.Player.PlayerColors;
+import ADG.Games.Keezen.animations.AnimationSequence;
+import ADG.Games.Keezen.animations.PawnAnimation;
 import ADG.Games.Keezen.handlers.TestMoveHandler;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
@@ -27,10 +29,6 @@ public class GameBoardView extends Composite {
 
     interface Binder extends UiBinder<Widget, GameBoardView> {}
     private static final Binder uiBinder = GWT.create(Binder.class);
-//    private ArrayList<TileMapping> tiles = new ArrayList<>(); // todo: set tiles when view is constructed
-//    private double cellDistance;
-
-//    private static ArrayList<PawnAnimationMapping> animationMappings = new ArrayList<>();
 
     @UiField
     Button sendButton;
@@ -111,8 +109,6 @@ public class GameBoardView extends Composite {
 
     public VerticalPanel getPlayerListContainer(){return playerListContainer2;}
 
-    public Context2d getCanvasPawnsContext(){return ((CanvasElement) document.getElementById("canvasPawns2")).getContext2d();}
-
     public Context2d getCanvasStepsContext(){return ((CanvasElement) document.getElementById("canvasSteps2")).getContext2d();}
 
     public Context2d getCanvasCardsContext(){return ((CanvasElement) document.getElementById("canvasCards2")).getContext2d();}
@@ -128,10 +124,6 @@ public class GameBoardView extends Composite {
 
     public CanvasElement getCanvasSteps(){
         return (CanvasElement) document.getElementById("canvasSteps2");
-    }
-
-    public CanvasElement getCanvasPawns(){
-        return (CanvasElement) document.getElementById("canvasPawns2");
     }
 
     public void drawPlayers(ArrayList<Player> players){
@@ -245,7 +237,6 @@ public class GameBoardView extends Composite {
         // create divs
         cardsContainer.getElement().removeAllChildren();
 
-        int j =0;
         GWT.log("cards = "+cards);
         for (Card card : cards) {
             // Define sprite dimensions
@@ -412,6 +403,6 @@ public class GameBoardView extends Composite {
         getCanvasStepsContext().clearRect(0,0, getCanvasSteps().getWidth(), getCanvasSteps().getHeight());
     }
     public void clearCanvasCards(){
-        getCanvasCardsContext().clearRect(0,0,getCanvasCards().getWidth(),getCanvasCards().getWidth());
+        getCanvasCardsContext().clearRect(0,0,getCanvasCards().getWidth(),getCanvasCards().getHeight());
     }
 }

@@ -3,6 +3,7 @@ package ADG.Games.Keezen;
 import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
+import ADG.Games.Keezen.animations.AnimationSequence;
 import com.google.gwt.core.client.GWT;
 
 import java.util.LinkedList;

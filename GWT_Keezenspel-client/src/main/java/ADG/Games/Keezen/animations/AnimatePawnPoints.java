@@ -1,6 +1,10 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.animations;
 
+import ADG.Games.Keezen.Board;
 import ADG.Games.Keezen.Player.Pawn;
+import ADG.Games.Keezen.Point;
+import ADG.Games.Keezen.TileId;
+import ADG.Games.Keezen.TileMapping;
 import com.google.gwt.core.client.GWT;
 
 import java.util.ArrayList;
