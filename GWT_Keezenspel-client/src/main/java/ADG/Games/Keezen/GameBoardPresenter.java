@@ -235,13 +235,6 @@ public class GameBoardPresenter {
         return true;
     }
 
-    public void update(){
-        view.clearCanvasSteps();
-        if(pawnAndCardSelection.getDrawCards()) {
-            view.clearCanvasCards();
-        }
-    }
-
     public void draw(){
         drawStepsAnimation();
 
