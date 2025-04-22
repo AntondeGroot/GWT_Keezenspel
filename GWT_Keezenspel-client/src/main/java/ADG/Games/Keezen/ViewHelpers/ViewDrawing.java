@@ -170,8 +170,6 @@ public class ViewDrawing {
                 .filter(player -> player.getPlace() > -1)
                 .collect(Collectors.toList());
 
-        GWT.log("winners: " + winners);
-        GWT.log("players: " + players);
         int playerId = 0;
         for (Player player : players) {
             int imagePixelSize = 50;
@@ -179,13 +177,9 @@ public class ViewDrawing {
             ImageElement img = Document.get().createImageElement();
             img.setSrc("/profilepics.png");
             HorizontalPanel hp = new HorizontalPanel();
-            Label playerName = new Label(player.getName());
-
-            if(player.isActive()){
-                playerName.getElement().addClassName("activePlayerName");
-            }else{
-                playerName.getElement().addClassName("inactivePlayerName");
-            }
+            hp.getElement().setId(player.getName());
+            Label playerNameLabel = new Label(player.getName());
+            playerNameLabel.getElement().setId(player.getName()+"Label");
 
             hp.setHorizontalAlignment(HorizontalPanel.ALIGN_LEFT);
             hp.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
@@ -196,13 +190,7 @@ public class ViewDrawing {
             canvas.setCoordinateSpaceWidth(imagePixelSize);
             canvas.setCoordinateSpaceHeight(imagePixelSize);
             canvas.setStyleName("profilepic");
-
-            if(player.isActive()){
-                canvas.getElement().getStyle().setBorderColor(PlayerColors.getHexColor(playerId));
-            }else{
-//                canvas.getElement().addClassName("inactivePlayer"); //todo: this did not work
-                canvas.getElement().getStyle().setBorderColor("#c2bfb6");
-            }
+            canvas.getElement().setId(player.getName()+"Pic");
 
             Context2d ctx = canvas.getContext2d();
             // source image
@@ -228,6 +216,7 @@ public class ViewDrawing {
             // todo: the following text is not implemented
             // winners can be in either column 1 or 2: only add a medal to the winner,
             // but add an empty canvas to the other players in that column so that they are aligned
+            // todo: medals are now not implemented
             if(!winners.isEmpty()){
                 Canvas canvasMedal = Canvas.createIfSupported();
                 canvasMedal.setWidth(imagePixelSize + "px");
@@ -257,7 +246,7 @@ public class ViewDrawing {
                 hp.add(canvasMedal.asWidget());
             }
             hp.add(canvas.asWidget());
-            hp.add(playerName);
+            hp.add(playerNameLabel);
             int row = playerId % 4;
             int col = playerId > 3 ? 1 : 0;
             grid.setWidget(row, col, hp);
@@ -266,5 +255,32 @@ public class ViewDrawing {
         }
         grid.getElement().getStyle().setMargin(50, Style.Unit.PX);
         return grid;
+    }
+
+    public static void updatePlayerProfileUI(ArrayList<Player> players){
+        GWT.log("Players were updated: " + players);
+        for(Player player: players){
+            // set color of border around profile pic:
+            String playerColor = PlayerColors.getHexColor(player.getIndex());
+            String INACTIVE_GREY = "#c2bfb6";
+            Document.get()
+                .getElementById(player.getName()+"Pic")
+                .getStyle()
+                .setBorderColor(
+                    player.isActive() ? playerColor :  INACTIVE_GREY);
+
+            // set player name label : there's a strikethrough when player is not active
+            Document.get()
+                .getElementById(player.getName()+"Label")
+                .setClassName(
+                    player.isActive() ? "activePlayerName" : "inactivePlayerName");
+
+            // set border for Horizontal Panel
+            Document.get()
+                .getElementById(player.getName())
+                .setClassName(
+                    player.isPlaying() ?
+                        "playerPlaying" : "playerNotPlaying");
+        }
     }
 }

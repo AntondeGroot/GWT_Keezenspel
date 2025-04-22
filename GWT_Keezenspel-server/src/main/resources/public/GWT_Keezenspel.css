@@ -101,7 +101,6 @@ h1 {
 }
 .playerPlaying{
   border-radius: 10px;
-  border-color: darkred;
   border: 3px double darkred;
 }
 

@@ -126,7 +126,7 @@ public class GameBoardView extends Composite {
         return (CanvasElement) document.getElementById("canvasSteps2");
     }
 
-    public void drawPlayers(ArrayList<Player> players){
+    public void createPlayerList(ArrayList<Player> players){
         playerListContainer2.clear();
         playerListContainer2.add(createPlayerGrid(players));
     }
