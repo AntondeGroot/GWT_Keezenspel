@@ -5,18 +5,25 @@ import static ADG.Games.Keezen.FrontEnd.TestUtils.setPlayerIdPlaying;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.By.ById;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-// Todo: do not exclude selenium tests in CI
-@Tag("selenium")
 public class PawnTest {
   WebDriver driver;
+
+  @BeforeAll
+  public static void skipIfDisabled() {
+    // Todo: do not exclude selenium tests in CI
+    if (Boolean.getBoolean("skip.selenium")) {
+      Assumptions.assumeTrue(false, "Skipping Selenium tests");
+    }
+  }
 
   @BeforeEach
   public void setUp() {
