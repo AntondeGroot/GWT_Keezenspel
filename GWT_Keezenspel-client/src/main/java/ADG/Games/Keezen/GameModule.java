@@ -31,7 +31,7 @@ public class GameModule {
         RootPanel.get().clear();
         RootPanel.get().add(gameBoardView);
         //todo add model
-        GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(new GameBoardModel(), gameBoardView, gameStateService, cardsService, movingService, pollingService);
+        GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(gameBoardView, gameStateService, cardsService, movingService, pollingService);
         gameBoardPresenter.start();
     }
 }

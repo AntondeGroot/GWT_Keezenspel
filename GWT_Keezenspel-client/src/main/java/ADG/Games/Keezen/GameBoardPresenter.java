@@ -3,16 +3,19 @@ package ADG.Games.Keezen;
 import ADG.Games.Keezen.Cards.Card;
 import ADG.Games.Keezen.Cards.CardResponse;
 import ADG.Games.Keezen.Cards.CardsServiceAsync;
+import ADG.Games.Keezen.Player.PlayerColors;
 import ADG.Games.Keezen.State.GameStateResponse;
 import ADG.Games.Keezen.State.GameStateServiceAsync;
 import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Move.MovingServiceAsync;
 import ADG.Games.Keezen.Player.Player;
+import ADG.Games.Keezen.ViewHelpers.ViewDrawing;
 import ADG.Games.Keezen.animations.*;
 import ADG.Games.Keezen.handlers.SendHandler;
 import ADG.Games.Keezen.handlers.TestMoveHandler;
 import ADG.Games.Keezen.services.PollingService;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -23,10 +26,10 @@ import java.util.List;
 import static ADG.Games.Keezen.Move.MoveType.FORFEIT;
 import static ADG.Games.Keezen.Cards.CardValueCheck.isSeven;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.drawTransparentCircle;
+import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.updatePlayerProfileUI;
 import static java.lang.String.valueOf;
 
 public class GameBoardPresenter {
-    private final GameBoardModel model;
     private CardResponse storedCardResponse;
     private Board boardModel;
     private final GameBoardView view;
@@ -42,8 +45,7 @@ public class GameBoardPresenter {
 
     private MoveResponse storedMoveResponse = new MoveResponse();
 
-    public GameBoardPresenter(GameBoardModel gameBoardModel, GameBoardView gameBoardView, GameStateServiceAsync gameStateService, CardsServiceAsync cardsService, MovingServiceAsync movingService, PollingService pollingService) {
-        this.model = gameBoardModel;
+    public GameBoardPresenter(GameBoardView gameBoardView, GameStateServiceAsync gameStateService, CardsServiceAsync cardsService, MovingServiceAsync movingService, PollingService pollingService) {
         this.view = gameBoardView;
         this.gameStateService = gameStateService;
         this.cardsService = cardsService;
@@ -159,9 +161,7 @@ public class GameBoardPresenter {
 
                 @Override
                 public void onSuccess(ArrayList<Player> players) {
-                    GWT.log("Players were updated: " + players);
-                    model.setPlayers(players);
-                    view.drawPlayers(model.getPlayers());
+                    updatePlayerProfileUI(players);
                 }
             });
         }
@@ -190,8 +190,7 @@ public class GameBoardPresenter {
             @Override
             public void onSuccess(ArrayList<Player> players) {
                 GWT.log("players = " + players);
-                model.setPlayers(players);
-                view.drawPlayers(model.getPlayers());
+                view.createPlayerList(players);
                 boardModel = new Board();
                 GWT.log("gameStateService getPlayers board.create");
 
