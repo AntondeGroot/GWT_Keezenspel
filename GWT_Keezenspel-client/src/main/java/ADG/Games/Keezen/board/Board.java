@@ -1,8 +1,13 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.board;
 
+import ADG.Games.Keezen.util.CellDistance;
+import ADG.Games.Keezen.PawnComparator;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Player.Player;
+import ADG.Games.Keezen.Point;
+import ADG.Games.Keezen.TileMapping;
+import ADG.Games.Keezen.util.Cookie;
 import com.google.gwt.core.client.GWT;
 
 import java.util.*;

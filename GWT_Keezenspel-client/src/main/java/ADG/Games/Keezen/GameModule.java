@@ -6,6 +6,8 @@ import ADG.Games.Keezen.State.GameStateService;
 import ADG.Games.Keezen.State.GameStateServiceAsync;
 import ADG.Games.Keezen.Move.MovingService;
 import ADG.Games.Keezen.Move.MovingServiceAsync;
+import ADG.Games.Keezen.board.GameBoardPresenter;
+import ADG.Games.Keezen.board.GameBoardView;
 import ADG.Games.Keezen.services.PollingService;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.core.client.GWT;
