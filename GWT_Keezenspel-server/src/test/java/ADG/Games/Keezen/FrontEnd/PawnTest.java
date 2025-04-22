@@ -27,7 +27,10 @@ public class PawnTest {
 
   @AfterEach
   public void tearDown() {
-    driver.quit();
+    // needed for skipping the selenium tests in CI
+    if(driver != null){
+      driver.quit();
+    }
   }
 
   @Test
