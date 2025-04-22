@@ -5,6 +5,7 @@ import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
+import ADG.Log;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -429,7 +430,7 @@ public class PawnAnimationTest {
 
         ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),9);
         // THEN
-        System.out.println(actualMovement);
+        Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);
     }
 
@@ -454,7 +455,7 @@ public class PawnAnimationTest {
 
         ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
         // THEN
-        System.out.println(actualMovement);
+        Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);
     }
 
@@ -479,7 +480,7 @@ public class PawnAnimationTest {
 
         ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
         // THEN
-        System.out.println(actualMovement);
+        Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);
     }
 
@@ -503,7 +504,7 @@ public class PawnAnimationTest {
 
         ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
         // THEN
-        System.out.println(actualMovement);
+        Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);
     }
 
@@ -530,7 +531,7 @@ public class PawnAnimationTest {
 
         ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
         // THEN
-        System.out.println(actualMovement);
+        Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);
     }
 }

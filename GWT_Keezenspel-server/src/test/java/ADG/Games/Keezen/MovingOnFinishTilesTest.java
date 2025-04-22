@@ -5,6 +5,7 @@ import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
+import ADG.Log;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -235,7 +236,7 @@ class MovingOnFinishTilesTest {
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
         GameState.processOnMove(moveMessage, moveResponse);
-        System.out.println(CardsDeck.getCardsForPlayer("1").toString());
+        Log.info(CardsDeck.getCardsForPlayer("1").toString());
 
         // THEN response message is correct
         assertEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());

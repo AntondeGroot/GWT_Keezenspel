@@ -1,6 +1,7 @@
 package ADG.Games.Keezen;
 
 import ADG.Games.Keezen.Player.PlayerColors;
+import ADG.Log;
 import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -60,7 +61,7 @@ public class ImageProcessing {
             // Save the modified image
             ImageIO.write(processedImage, "png", outputFile);
 
-            System.out.println("Image processing completed. The output image is saved at: " + outputImagePath);
+            Log.info("Image processing completed. The output image is saved at: " + outputImagePath);
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
