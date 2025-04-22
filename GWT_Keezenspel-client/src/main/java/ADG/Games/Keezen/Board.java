@@ -138,26 +138,6 @@ public class Board {
 			}
 			cardsDeckPointsPerPlayer.put(uuidI, templist);
 		}
-    }
-
-	public static TileId getTileId(double x, double y) {
-		double distance = Double.MAX_VALUE;
-		TileMapping closestTile = null;
-		for(TileMapping tile : tiles) {
-			// todo: I do not know why y should be lowered by cellDistance for it to select the correct tile
-			double tempDistance = Math.sqrt(Math.pow((x-tile.getPosition().getX()),2) + Math.pow((y - tile.getPosition().getY())-cellDistance,2));
-			if(tempDistance < distance) {
-				distance = tempDistance;
-				closestTile = tile;
-			}
-		}
-
-		if(distance < cellDistance/2 && closestTile != null){
-			GWT.log("closest tile: " + closestTile.getPlayerId());
-			return closestTile.getTileId();
-		}else{
-			return null;
-		}
 	}
 
 	public static boolean isInitialized(){
