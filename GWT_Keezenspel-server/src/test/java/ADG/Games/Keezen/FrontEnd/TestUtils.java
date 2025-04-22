@@ -15,9 +15,9 @@ public class TestUtils {
 
   public static WebDriver getDriver(){
     ChromeOptions options = new ChromeOptions();
-//    options.addArguments("--headless=new");
-//    options.addArguments("--no-sandbox");
-//    options.addArguments("--disable-dev-shm-usage");
+    options.addArguments("--headless=new");
+    options.addArguments("--no-sandbox");
+    options.addArguments("--disable-dev-shm-usage");
 
     // this line is here to fix a CI error
     options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.nanoTime());
