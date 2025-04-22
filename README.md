@@ -13,4 +13,4 @@ This project is used to learn
 - Unit testing
 - Selenium automated browser testing
 - Mockito
-- CI
+- Continuous Integration
