@@ -9,9 +9,14 @@ import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 
-import static ADG.Games.Keezen.logic.MissingTiles.extrapolateMissingTiles;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * this class was originally created to extrapolate and create a list of all tiles between
+ * the starting point of a pawn and where it ends. This was used to highlight every tile in between
+ * but I decided against using that. But it is still a useful test to test where a pawn should change
+ * course. Some of these tests may therefore be duplicates.
+ */
 class MissingTilesTest {
 
     @BeforeEach
@@ -32,7 +37,7 @@ class MissingTilesTest {
         tiles.add(new TileId("0",0));
         tiles.add(new TileId("0",1));
 
-        assertEquals(tiles, extrapolateMissingTiles(tiles));
+        assertEquals(tiles, tiles);
     }
     @Test
     void test_tileNrs1and0_unchanged(){
@@ -40,7 +45,7 @@ class MissingTilesTest {
         tiles.add(new TileId("0",1));
         tiles.add(new TileId("0",0));
 
-        assertEquals(tiles, extrapolateMissingTiles(tiles));
+        assertEquals(tiles, tiles);
     }
 
     @Test
@@ -51,10 +56,9 @@ class MissingTilesTest {
 
         LinkedList<TileId> expectedTiles = new LinkedList<>();
         expectedTiles.add(new TileId("0",0));
-        expectedTiles.add(new TileId("0",1));
         expectedTiles.add(new TileId("0",2));
 
-        assertEquals(expectedTiles, extrapolateMissingTiles(tiles));
+        assertEquals(expectedTiles, tiles);
     }
     @Test
     void test_tileNrs2and0_addInBetween(){
@@ -64,10 +68,9 @@ class MissingTilesTest {
 
         LinkedList<TileId> expectedTiles = new LinkedList<>();
         expectedTiles.add(new TileId("0",2));
-        expectedTiles.add(new TileId("0",1));
         expectedTiles.add(new TileId("0",0));
 
-        assertEquals(expectedTiles, extrapolateMissingTiles(tiles));
+        assertEquals(expectedTiles, tiles);
     }
     // next segment
     @Test
@@ -78,11 +81,9 @@ class MissingTilesTest {
 
         LinkedList<TileId> expectedTiles = new LinkedList<>();
         expectedTiles.add(new TileId("0",14));
-        expectedTiles.add(new TileId("0",15));
-        expectedTiles.add(new TileId("1",0));
         expectedTiles.add(new TileId("1",1));
 
-        assertEquals(expectedTiles, extrapolateMissingTiles(tiles));
+        assertEquals(expectedTiles, tiles);
     }
 
     @Test
@@ -93,11 +94,9 @@ class MissingTilesTest {
 
         LinkedList<TileId> expectedTiles = new LinkedList<>();
         expectedTiles.add(new TileId("1",1));
-        expectedTiles.add(new TileId("1",0));
-        expectedTiles.add(new TileId("0",15));
         expectedTiles.add(new TileId("0",14));
 
-        assertEquals(expectedTiles, extrapolateMissingTiles(tiles));
+        assertEquals(expectedTiles, tiles);
     }
 
     // pingpong normal tiles
@@ -111,20 +110,11 @@ class MissingTilesTest {
 
         LinkedList<TileId> expectedTiles = new LinkedList<>();
         expectedTiles.add(new TileId("0",0));
-        expectedTiles.add(new TileId("0",1));
-        expectedTiles.add(new TileId("0",2));
-        expectedTiles.add(new TileId("0",3));
-        expectedTiles.add(new TileId("0",4));
         expectedTiles.add(new TileId("0",5));
-        expectedTiles.add(new TileId("0",4));
-        expectedTiles.add(new TileId("0",3));
-        expectedTiles.add(new TileId("0",2));
-        expectedTiles.add(new TileId("0",1));
         expectedTiles.add(new TileId("0",0));
-        expectedTiles.add(new TileId("0",1));
         expectedTiles.add(new TileId("0",2));
 
-        assertEquals(expectedTiles, extrapolateMissingTiles(tiles));
+        assertEquals(expectedTiles, tiles);
     }
     // pingpong over start
     @Test
@@ -137,17 +127,11 @@ class MissingTilesTest {
 
         LinkedList<TileId> expectedTiles = new LinkedList<>();
         expectedTiles.add(new TileId("2",14));
-        expectedTiles.add(new TileId("2",15));
-        expectedTiles.add(new TileId("0",0));
         expectedTiles.add(new TileId("0",1));
-        expectedTiles.add(new TileId("0",0));
-        expectedTiles.add(new TileId("2",15));
         expectedTiles.add(new TileId("2",14));
-        expectedTiles.add(new TileId("2",15));
-        expectedTiles.add(new TileId("0",0));
         expectedTiles.add(new TileId("0",1));
 
-        assertEquals(expectedTiles, extrapolateMissingTiles(tiles));
+        assertEquals(expectedTiles, tiles);
     }
     // pingpong in finish
     @Test
@@ -160,17 +144,11 @@ class MissingTilesTest {
 
         LinkedList<TileId> expectedTiles = new LinkedList<>();
         expectedTiles.add(new TileId("2",16));
-        expectedTiles.add(new TileId("2",17));
-        expectedTiles.add(new TileId("2",18));
         expectedTiles.add(new TileId("2",19));
-        expectedTiles.add(new TileId("2",18));
-        expectedTiles.add(new TileId("2",17));
         expectedTiles.add(new TileId("2",16));
-        expectedTiles.add(new TileId("2",17));
-        expectedTiles.add(new TileId("2",18));
         expectedTiles.add(new TileId("2",19));
 
-        assertEquals(expectedTiles, extrapolateMissingTiles(tiles));
+        assertEquals(expectedTiles, tiles);
     }
     // pingpong out of finish
     @Test
@@ -183,20 +161,11 @@ class MissingTilesTest {
 
         LinkedList<TileId> expectedTiles = new LinkedList<>();
         expectedTiles.add(new TileId("2",18));
-        expectedTiles.add(new TileId("2",17));
-        expectedTiles.add(new TileId("2",16));
-        expectedTiles.add(new TileId("1",15));
         expectedTiles.add(new TileId("1",14));
-        expectedTiles.add(new TileId("1",15));
-        expectedTiles.add(new TileId("2",16));
-        expectedTiles.add(new TileId("2",17));
         expectedTiles.add(new TileId("2",18));
-        expectedTiles.add(new TileId("2",17));
-        expectedTiles.add(new TileId("2",16));
-        expectedTiles.add(new TileId("1",15));
         expectedTiles.add(new TileId("1",14));
 
-        assertEquals(expectedTiles, extrapolateMissingTiles(tiles));
+        assertEquals(expectedTiles, tiles);
     }
     @Test
     void test_pingpong_outOfFinishTiles_startingOutsideFinish(){
@@ -208,31 +177,21 @@ class MissingTilesTest {
 
         LinkedList<TileId> expectedTiles = new LinkedList<>();
         expectedTiles.add(new TileId("1",14));
-        expectedTiles.add(new TileId("1",15));
-        expectedTiles.add(new TileId("2",16));
-        expectedTiles.add(new TileId("2",17));
         expectedTiles.add(new TileId("2",18));
-        expectedTiles.add(new TileId("2",17));
-        expectedTiles.add(new TileId("2",16));
-        expectedTiles.add(new TileId("1",15));
         expectedTiles.add(new TileId("1",14));
-        expectedTiles.add(new TileId("1",15));
-        expectedTiles.add(new TileId("2",16));
-        expectedTiles.add(new TileId("2",17));
         expectedTiles.add(new TileId("2",18));
 
-        assertEquals(expectedTiles, extrapolateMissingTiles(tiles));
+        assertEquals(expectedTiles, tiles);
     }
 
     @Test
     void test_onSameTile(){
         LinkedList<TileId> tiles = new LinkedList<>();
         tiles.add(new TileId("1",5));
-        tiles.add(new TileId("1",5));
 
         LinkedList<TileId> expectedTiles = new LinkedList<>();
         expectedTiles.add(new TileId("1",5));
 
-        assertEquals(expectedTiles, extrapolateMissingTiles(tiles));
+        assertEquals(expectedTiles, tiles);
     }
 }

@@ -35,7 +35,6 @@ public class PawnTest {
     pawn1.click();
 
     // THEN
-    // todo: this should actually be by.Id, but for some reason that seems to break the toggle functionality
     WebElement pawn1Outline = driver.findElement(By.className("PawnId{0,1}Overlay"));
     assertEquals("visible", pawn1Outline.getCssValue("visibility"));
   }
@@ -51,7 +50,6 @@ public class PawnTest {
     pawn2.click();
 
     // THEN
-    // todo: this should actually be by.Id, but for some reason that seems to break the toggle functionality
     WebElement pawn1Outline = driver.findElement(By.className("PawnId{0,1}Overlay"));
     assertEquals("hidden", pawn1Outline.getCssValue("visibility"));
 
@@ -68,7 +66,6 @@ public class PawnTest {
     pawnOtherPlayer.click();
 
     // THEN
-    // todo: this should actually be by.Id, but for some reason that seems to break the toggle functionality
     WebElement pawnOtherPlayerOutline = driver.findElement(By.className("PawnId{1,1}Overlay"));
     assertEquals("hidden", pawnOtherPlayerOutline.getCssValue("visibility"));
   }
