@@ -15,7 +15,6 @@ import static ADG.Games.Keezen.Move.MessageType.*;
 import static ADG.Games.Keezen.Move.MoveResult.*;
 import static ADG.Games.Keezen.Move.MoveType.*;
 import static ADG.Games.Keezen.Cards.CardValueCheck.*;
-import static ADG.Games.Keezen.logic.MissingTiles.extrapolateMissingTiles;
 import static ADG.Games.Keezen.logic.StartTileLogic.canPassStartTile;
 import static ADG.Games.Keezen.logic.WinnerLogic.checkForWinners;
 
@@ -372,8 +371,8 @@ public class GameState {
         }
         response.setPawnId1(moveMessage.getPawnId1());
         response.setPawnId2(moveMessage.getPawnId2());
-        response.setMovePawn1(extrapolateMissingTiles(moveResponsePawn1.getMovePawn1()));
-        response.setMovePawn2(extrapolateMissingTiles(moveResponsePawn2.getMovePawn1()));
+        response.setMovePawn1(moveResponsePawn1.getMovePawn1());
+        response.setMovePawn2(moveResponsePawn2.getMovePawn1());
         if(moveResponsePawn1.getMoveKilledPawn1() != null){
             response.setPawnIdKilled1(moveResponsePawn1.getPawnIdKilled1());// only the first one is filled in with a kill when you check only 1 pawn
             response.setMoveKilledPawn1(moveResponsePawn1.getMoveKilledPawn1());

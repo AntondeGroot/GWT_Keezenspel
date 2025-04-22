@@ -5,6 +5,7 @@ import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
+import java.util.LinkedList;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,9 +70,19 @@ public class MovingWithCard7Test {
         moveMessage.setMessageType(CHECK_MOVE);
         GameState.processOnSplit(moveMessage, moveResponse);
 
+        LinkedList<TileId> expectedTilesPawn1 = new LinkedList<>();
+        expectedTilesPawn1.add(new TileId("0",0));
+        expectedTilesPawn1.add(new TileId("0",1));
+        expectedTilesPawn1.add(new TileId("0",7));
+
+        LinkedList<TileId> expectedTilesPawn2 = new LinkedList<>();
+        expectedTilesPawn2.add(new TileId("0",5));
+        expectedTilesPawn2.add(new TileId("0",7));
+        expectedTilesPawn2.add(new TileId("0",12));
+
         // THEN
-        assertEquals(createExpectedMovement(0,7), moveResponse.getMovePawn1());
-        assertEquals(createExpectedMovement(5,7), moveResponse.getMovePawn2());
+        assertEquals(expectedTilesPawn1, moveResponse.getMovePawn1());
+        assertEquals(expectedTilesPawn2, moveResponse.getMovePawn2());
     }
 
     @Test
@@ -86,9 +97,20 @@ public class MovingWithCard7Test {
         moveMessage.setMessageType(CHECK_MOVE);
         GameState.processOnSplit(moveMessage, moveResponse);
 
+        LinkedList<TileId> expectedTilesPawn1 = new LinkedList<>();
+        expectedTilesPawn1.add(new TileId("0",0));
+        expectedTilesPawn1.add(new TileId("0",1));
+        expectedTilesPawn1.add(new TileId("0",3));
+
+        LinkedList<TileId> expectedTilesPawn2 = new LinkedList<>();
+        expectedTilesPawn2.add(new TileId("0",14));
+        expectedTilesPawn2.add(new TileId("0",15));
+        expectedTilesPawn2.add(new TileId("1",1));
+        expectedTilesPawn2.add(new TileId("1",2));
+
         // THEN
-        assertEquals(createExpectedMovement(0,3), moveResponse.getMovePawn1());
-        assertEquals(createExpectedMovement(14,4), moveResponse.getMovePawn2());
+        assertEquals(expectedTilesPawn1, moveResponse.getMovePawn1());
+        assertEquals(expectedTilesPawn2, moveResponse.getMovePawn2());
     }
     @Test
     void test_moveTwoPawns_Pawn1WasOnFinish_OldPositionDoesNotBlockTestMovePawn2(){
@@ -142,21 +164,4 @@ public class MovingWithCard7Test {
         assertEquals(new TileId("0",5), GameState.getPawn(pawn1).getCurrentTileId());
         assertEquals(new TileId("0",2), GameState.getPawn(pawn2).getCurrentTileId());
     }
-
-
-    private ArrayList<TileId> createExpectedMovement(int startTileNr, int nrSteps){
-        ArrayList<TileId> expectedMoves = new ArrayList<>();
-        Integer playerId = 0;
-        int tileNr = startTileNr;
-        for (int i = 0; i <= nrSteps; i++) {
-            expectedMoves.add(new TileId(playerId.toString(),tileNr));
-            tileNr++;
-            if(tileNr > 15){
-                tileNr = tileNr % 16;
-                playerId++;
-            }
-        }
-        return expectedMoves;
-    }
-
 }
