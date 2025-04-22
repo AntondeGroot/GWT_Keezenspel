@@ -1,4 +1,4 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.util;
 
 public class UUID {
     public native static String get() /*-{

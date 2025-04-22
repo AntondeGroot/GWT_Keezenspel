@@ -1,5 +1,6 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.util;
 
+import ADG.Games.Keezen.Point;
 import com.google.gwt.core.client.GWT;
 
 public class CellDistance {

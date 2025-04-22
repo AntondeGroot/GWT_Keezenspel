@@ -2,6 +2,7 @@ package ADG.Games.Keezen;
 
 import ADG.Games.Keezen.Player.Pawn;
 
+import ADG.Games.Keezen.board.Board;
 import java.util.Comparator;
 
 public class PawnComparator implements Comparator<Pawn> {

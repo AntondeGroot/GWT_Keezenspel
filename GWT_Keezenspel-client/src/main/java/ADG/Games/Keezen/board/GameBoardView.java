@@ -1,12 +1,17 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.board;
 
 import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.CardsDeck;
+import ADG.Games.Keezen.PawnAndCardSelection;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.Player.PlayerColors;
+import ADG.Games.Keezen.Point;
+import ADG.Games.Keezen.TileMapping;
 import ADG.Games.Keezen.animations.AnimationSequence;
 import ADG.Games.Keezen.animations.PawnAnimation;
 import ADG.Games.Keezen.handlers.TestMoveHandler;
+import ADG.Games.Keezen.util.Cookie;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.*;

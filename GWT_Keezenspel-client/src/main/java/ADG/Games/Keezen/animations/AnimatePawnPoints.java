@@ -1,6 +1,6 @@
 package ADG.Games.Keezen.animations;
 
-import ADG.Games.Keezen.Board;
+import ADG.Games.Keezen.board.Board;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Point;
 import ADG.Games.Keezen.TileId;
