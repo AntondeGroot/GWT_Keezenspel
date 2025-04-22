@@ -17,16 +17,9 @@ import org.openqa.selenium.WebElement;
 public class CardTest {
   WebDriver driver;
 
-  @BeforeAll
-  public static void skipIfDisabled() {
-    // Todo: do not exclude selenium tests in CI
-    if (Boolean.getBoolean("skip.selenium")) {
-      Assumptions.assumeTrue(false, "Skipping Selenium tests");
-    }
-  }
-
   @BeforeEach
   public void setUp() {
+    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     driver = getDriver();
     setPlayerIdPlaying(driver,"0");
   }
