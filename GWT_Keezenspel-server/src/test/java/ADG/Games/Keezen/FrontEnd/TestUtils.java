@@ -8,12 +8,15 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class TestUtils {
 
   public static WebDriver getDriver(){
-    WebDriver driver = new ChromeDriver();
+    ChromeOptions options = new ChromeOptions();
+    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
+    WebDriver driver = new ChromeDriver(options);
     driver.get("http://localhost:4200/");
     driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
     return driver;
