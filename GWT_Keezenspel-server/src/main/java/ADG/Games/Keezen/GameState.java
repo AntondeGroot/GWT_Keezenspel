@@ -7,6 +7,7 @@ import ADG.Games.Keezen.Move.MoveType;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Player.Player;
+import ADG.Log;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -243,7 +244,7 @@ public class GameState {
             return false;
         }
         Pawn pawn = getPawn(nextTileId);
-        System.out.println("found pawn on start tile: "+pawn);
+        Log.info("found pawn on start tile: "+pawn);
         if(pawn != null) {
             if(pawn.getPawnId().equals(selectedPawnId)){
                 return true;
@@ -404,10 +405,10 @@ public class GameState {
         int nrSteps = moveMessage.getStepsPawn1();
         int next;
         String playerIdOfTile = currentTileId.getPlayerId();
-        System.out.println("moveMessage = "+moveMessage);
+        Log.info("moveMessage = "+moveMessage);
         LinkedList<TileId> moves = new LinkedList<>();
         response.setMoveType(MOVE);
-        System.out.println("GameState: OnMove: received msg: " + moveMessage);
+        Log.info("GameState: OnMove: received msg: " + moveMessage);
         TileId startTileId;
 
         // You cannot move from nest tiles
@@ -441,7 +442,7 @@ public class GameState {
         if (next > 15 &&
                 !isPawnOnLastSection(playerId, playerIdOfTile) &&
                 !isPawnOnFinish(pawnId1, currentTileId) ) {
-            System.out.println("GameState: OnMove: normal route between 0,15 but could move to next section");
+            Log.info("GameState: OnMove: normal route between 0,15 but could move to next section");
             // check
 
             if(currentTileId.getTileNr() < 1){moves.add(new TileId(currentTileId.getPlayerId(), 1));}
@@ -451,14 +452,14 @@ public class GameState {
 
             startTileId = new TileId(nextPlayerId(playerIdOfTile), 0);
             if (canPassStartTile(pawnId1, startTileId)){
-                System.out.println("GameState: OnMove: can move past StartTile "+new TileId(playerIdOfTile+1,0));
-                System.out.println("GameState: OnMove: normal route can move to the next section");
+                Log.info("GameState: OnMove: can move past StartTile "+new TileId(playerIdOfTile+1,0));
+                Log.info("GameState: OnMove: normal route can move to the next section");
                 next = next % 16;
                 playerIdOfTile = nextPlayerId(playerIdOfTile);
                 if(next > 1){moves.add(new TileId(playerIdOfTile, 1));}
                 if(next > 7){moves.add(new TileId(playerIdOfTile, 7));}
             }else { // or turn back
-                System.out.println("GameState: OnMove: normal route is blocked by a start tile, move backwards");
+                Log.info("GameState: OnMove: normal route is blocked by a start tile, move backwards");
                 next = 15 - next%15;
                 moves.add(new TileId(playerIdOfTile, 15));
                 if(next < 13){moves.add(new TileId(playerIdOfTile, 13));}
@@ -480,7 +481,7 @@ public class GameState {
         if(next > 0 &&
                 next <= 15 &&
                 !isPawnOnFinish(pawnId1, currentTileId)){
-            System.out.println("GameState: OnMove: normal route between 0,15");
+            Log.info("GameState: OnMove: normal route between 0,15");
             // check if you can kill an opponent
             TileId nextTileId = new TileId(playerIdOfTile, next);
 
@@ -515,7 +516,7 @@ public class GameState {
 
         // you go negative
         if(next < 0){
-            System.out.println("GameState: OnMove: pawn goes backwards");
+            Log.info("GameState: OnMove: pawn goes backwards");
             if(currentTileId.getTileNr() > 1){moves.add(new TileId(playerIdOfTile, 1));}
 
             // check if you can pass || otherwise turn back i.e. forward
@@ -525,7 +526,7 @@ public class GameState {
                 playerIdOfTile = previousPlayerId(playerIdOfTile);
                 if(next < 13){moves.add(new TileId(playerIdOfTile, 13));}
             }else { // or turn back (forwards since next is negative)
-                System.out.println("GameState: OnMove: pawn wants to go backwards but is blocked by a start tile, goes forwards");
+                Log.info("GameState: OnMove: pawn wants to go backwards but is blocked by a start tile, goes forwards");
                 next = -next+2; // +1 : you can't move on tile 0 and would then move on tile 1 twice.
             }
 
@@ -542,7 +543,7 @@ public class GameState {
 
         // when moving backwards and ending exactly on the starttile
         if(next == 0){
-            System.out.println("GameState: OnMove: pawn ends exactly on start tile");
+            Log.info("GameState: OnMove: pawn ends exactly on start tile");
             if(currentTileId.getTileNr() > 1){moves.add(new TileId(playerIdOfTile, 1));}
             if (canMoveToTile(pawnId1, new TileId(playerIdOfTile,0))) {
                 moves.add(new TileId(playerIdOfTile, 0));
@@ -570,7 +571,7 @@ public class GameState {
 
         // pawn is already on finish
         if (isPawnOnFinish(pawnId1, currentTileId)){
-            System.out.println("GameState: OnMove: pawn is already on the finish");
+            Log.info("GameState: OnMove: pawn is already on the finish");
             // moving is not possible when the pawn is directly between two other pawns
             if (isPawnTightlyClosedIn(pawnId1, currentTileId)){
                 response.setResult(CANNOT_MAKE_MOVE);
@@ -591,7 +592,7 @@ public class GameState {
             if(nrSteps > 0){
                 tileHighestTileNr = checkHighestTileNrYouCanMoveTo(pawnId1, currentTileId, nrSteps);
                 if (tileHighestTileNr > targetTileId.getTileNr()) {
-                    System.out.println("GameState: OnMove: pawn moves out of the finish");
+                    Log.info("GameState: OnMove: pawn moves out of the finish");
                     moves.add(new TileId(playerIdOfTile, tileHighestTileNr));
                 }
             }
@@ -607,7 +608,7 @@ public class GameState {
 
         if(next > 15 &&
                 isPawnOnLastSection(playerId, playerIdOfTile)){
-            System.out.println("GameState: OnMove: pawn is on last section and goes into finish");
+            Log.info("GameState: OnMove: pawn is on last section and goes into finish");
             if(currentTileId.getTileNr() < 7){moves.add(new TileId(currentTileId.getPlayerId(), 7));}
             if(currentTileId.getTileNr() < 13){moves.add(new TileId(currentTileId.getPlayerId(), 13));}
             if(currentTileId.getTileNr() < 15){moves.add(new TileId(currentTileId.getPlayerId(), 15));}
@@ -913,7 +914,7 @@ public class GameState {
 
         response.setMessageType(moveMessage.getMessageType());
         response.setResult(CAN_MAKE_MOVE);
-        System.out.println("GameState: pawn moves to "+targetTileId +", with response "+response);
+        Log.info("GameState: pawn moves to "+targetTileId +", with response "+response);
     }
 
     public static void movePawn(Pawn selectedPawn){

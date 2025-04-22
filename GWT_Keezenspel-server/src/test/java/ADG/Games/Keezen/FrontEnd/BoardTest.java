@@ -1,6 +1,8 @@
 package ADG.Games.Keezen.FrontEnd;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -16,12 +18,16 @@ class BoardTest {
 
   @BeforeEach
   public void setUp() {
+    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     driver = getDriver();
   }
 
   @AfterEach
   public void tearDown() {
-    driver.quit();
+    // needed for skipping the selenium tests in CI
+    if(driver != null){
+      driver.quit();
+    }
   }
 
   @Test
