@@ -19,7 +19,7 @@ public class TestUtils {
     options.addArguments("--no-sandbox");
     options.addArguments("--disable-dev-shm-usage");
 
-// ✅ Add this line to fix the CI error:
+    // this line is here to fix a CI error
     options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.nanoTime());
 
     WebDriver driver = new ChromeDriver(options);
