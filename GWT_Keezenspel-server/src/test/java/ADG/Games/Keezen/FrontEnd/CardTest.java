@@ -8,10 +8,13 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+// Todo: do not exclude selenium tests in CI
+@Tag("selenium")
 public class CardTest {
   WebDriver driver;
 

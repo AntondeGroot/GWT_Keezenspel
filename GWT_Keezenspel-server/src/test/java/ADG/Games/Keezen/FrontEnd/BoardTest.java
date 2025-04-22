@@ -2,6 +2,7 @@ package ADG.Games.Keezen.FrontEnd;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -10,6 +11,8 @@ import static ADG.Games.Keezen.FrontEnd.TestUtils.getDriver;
 import static ADG.Games.Keezen.FrontEnd.TestUtils.setPlayerIdPlaying;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+// Todo: do not exclude selenium tests in CI
+@Tag("selenium")
 class BoardTest {
 
   WebDriver driver;
