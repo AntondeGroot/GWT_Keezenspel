@@ -13,8 +13,7 @@ import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Move.MovingServiceAsync;
 import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.animations.*;
-import ADG.Games.Keezen.handlers.SendHandler;
-import ADG.Games.Keezen.handlers.TestMoveHandler;
+import ADG.Games.Keezen.moving.Move;
 import ADG.Games.Keezen.services.PollingService;
 import ADG.Games.Keezen.util.Cookie;
 import com.google.gwt.core.client.GWT;
@@ -73,7 +72,7 @@ public class GameBoardPresenter {
         view.getSendButton().addDomHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                SendHandler.sendMoveToServer(pawnAndCardSelection.createMoveMessage());
+                Move.makeMove(pawnAndCardSelection.createMoveMessage());
             }
         }, ClickEvent.getType());
 
@@ -81,7 +80,7 @@ public class GameBoardPresenter {
             @Override
             public void onClick(ClickEvent event) {
                 pawnAndCardSelection.setMoveType(FORFEIT);
-                SendHandler.sendMoveToServer(pawnAndCardSelection.createMoveMessage());
+                Move.makeMove(pawnAndCardSelection.createMoveMessage());
             }
         }, ClickEvent.getType());
 
@@ -92,7 +91,7 @@ public class GameBoardPresenter {
             view.stepsPawn1.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn1()));
             view.stepsPawn2.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn2()));
 
-            TestMoveHandler.sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());
+            Move.testMove(pawnAndCardSelection.createTestMoveMessage());
         });
     }
 

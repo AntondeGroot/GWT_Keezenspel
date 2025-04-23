@@ -1,9 +1,8 @@
-package ADG.Games.Keezen.handlers;
+package ADG.Games.Keezen.moving;
 
 import ADG.Games.Keezen.*;
 import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveResponse;
-import ADG.Games.Keezen.Move.MoveType;
 import ADG.Games.Keezen.Move.MovingService;
 import ADG.Games.Keezen.Move.MovingServiceAsync;
 import ADG.Games.Keezen.animations.StepsAnimation;
@@ -13,10 +12,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestMoveHandler{// todo: is no longer a handler
+public class Move {
     private static final MovingServiceAsync movingService = GWT.create(MovingService.class);
 
-    public static void sendMoveToServer(MoveMessage moveMessage) {
+    public static void testMove(MoveMessage moveMessage) {
         GWT.log(moveMessage.toString());
 
         movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
@@ -28,21 +27,27 @@ public class TestMoveHandler{// todo: is no longer a handler
                 GWT.log("Test Move: "+result.toString());
                 List<TileId> tileIds = new ArrayList<>();
                 if(result.getMovePawn1() != null){
-                    if(result.getMoveType()== MoveType.SPLIT){
-                        // draw only where a pawn ends up
-                        tileIds.add(result.getMovePawn1().getLast());
+                    tileIds.add(result.getMovePawn1().getLast());
+                    if(result.getMovePawn2() != null){
                         tileIds.add(result.getMovePawn2().getLast());
-                    }else{
-                        // draw only where a pawn ends up
-                        // an invalid selection is still "successfully" returned
-                        if(result.getMovePawn1() != null){
-                            tileIds.add(result.getMovePawn1().getLast());
-                        }
                     }
                     StepsAnimation.updateStepsAnimation(tileIds);
                 }else{
                     StepsAnimation.resetStepsAnimation();
                 }
+            }
+        } );
+    }
+
+    public static void makeMove(MoveMessage moveMessage) {
+        GWT.log("Sending MoveMessage" + moveMessage);
+
+        movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
+            public void onFailure(Throwable caught) {
+                StepsAnimation.resetStepsAnimation();
+            }
+            public void onSuccess(MoveResponse result) {
+                StepsAnimation.resetStepsAnimation();
             }
         } );
     }
