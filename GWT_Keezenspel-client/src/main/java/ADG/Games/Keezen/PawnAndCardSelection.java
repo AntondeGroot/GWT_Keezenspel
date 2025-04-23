@@ -11,6 +11,8 @@ import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveType;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Style.Visibility;
 
 public class PawnAndCardSelection {
     private String playerId;
@@ -21,6 +23,11 @@ public class PawnAndCardSelection {
     private MoveType moveType;
     private int nrStepsPawn1 = 0;
     private int nrStepsPawn2 = 0;
+    private boolean uiEnabled = true;
+
+    public void disableUIForTests() {
+        this.uiEnabled = false;
+    }
 
     public void setPlayerId(String id) {
         playerId = id;
@@ -231,6 +238,7 @@ public class PawnAndCardSelection {
         moveType = null;
         nrStepsPawn1 = 0;
         nrStepsPawn2 = 0;
+        setSplitBoxesVisibility(Visibility.HIDDEN);
     }
 
     private void validateMoveType(){
@@ -238,6 +246,8 @@ public class PawnAndCardSelection {
             return;
         }
 
+        // hide boxes used to split a 7 over two pawns
+        setSplitBoxesVisibility(Visibility.HIDDEN);
         switch (card.getCardValue()) {
             case 1: handleAce(); break;
             case 7: handleSeven(); break;
@@ -265,6 +275,8 @@ public class PawnAndCardSelection {
     private void handleSeven() {
         if (!pawn1.equals(resetPawn()) && !pawn2.equals(resetPawn())) {
             setMoveType(SPLIT);
+            // show boxes used to split a 7 over two pawns
+            setSplitBoxesVisibility(Visibility.VISIBLE);
         } else {
             setMoveType(MOVE);
             nrStepsPawn1 = 7;
@@ -347,6 +359,13 @@ public class PawnAndCardSelection {
         }
 
         return moveMessage;
+    }
+
+    private void setSplitBoxesVisibility(Visibility visibility){
+        if (!uiEnabled) return;
+        try {
+            Document.get().getElementById("pawnIntegerBoxes").getStyle().setVisibility(visibility);
+        } catch (Exception ignored) {}
     }
 
     @Override

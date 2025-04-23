@@ -37,7 +37,7 @@ class BoardTest {
 
   @Test
   public void verifyNumberOfTilesFor3Players(){
-    assertEquals(24*3, driver.findElements(By.className("circle")).size());
+    assertEquals(24*3, driver.findElements(By.className("tile")).size());
   }
 
   @Test

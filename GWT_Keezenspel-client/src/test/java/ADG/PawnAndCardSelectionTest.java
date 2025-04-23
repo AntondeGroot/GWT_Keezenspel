@@ -22,6 +22,7 @@ class PawnAndCardSelectionTest {
     @BeforeEach
     void setup(){
         pawnAndCardSelection = new PawnAndCardSelection();
+        pawnAndCardSelection.disableUIForTests();
 
         ownPawnOnBoard = new Pawn(new PawnId("1", 1), new TileId("1", 0));
         ownPawnOnBoard2 = new Pawn(new PawnId("1", 2), new TileId("1", 5));

@@ -80,6 +80,7 @@ public class GameBoardView extends Composite {
         document = Document.get();
         stepsPawn1.setValue("7");
         stepsPawn2.setValue("0");
+        pawnIntegerBoxes.getElement().setId("pawnIntegerBoxes");
     }
 
     public int getStepsPawn1() {

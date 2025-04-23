@@ -108,22 +108,32 @@ h1 {
 }
 .inactivePlayerName{
   text-decoration: line-through;
-  margin-right: 30px;
-  margin-left: 10px;
+  font-weight: normal;
+  font-style: italic;
 }
 .activePlayerName{
   font-weight: bold;
-  font-size: 16px;
+}
+.playerName{
+  font-size: 14pt;
+  font-family: "Helvetica Neue";
   margin-right: 30px;
   margin-left: 10px;
 }
 
 .TextBoxForPawnSteps{
+  font-family: "Helvetica Neue";
+  font-size: 12pt;
   width: 20px;
   margin-right: 5px;
+  text-align: center;
 }
 .TextBoxLabel{
-  margin-right: 5px;
+  font-size: 14pt;
+  font-family: "Helvetica Neue";
+  white-space: nowrap;
+  margin-right: 8px;
+  margin-left: 10px;
 }
 
 /*
@@ -167,4 +177,14 @@ https://neumorphism.io/
   left: 50%;
   transform: translate(-50%, -50%); /* Center it */
   animation: yellowPulse 1s ease infinite;
+}
+
+.pawnIntegerBoxes{
+  border-radius: 8px;
+  border-style: solid;
+  border-width: 4px;
+  border-color: orange;
+  padding: 4px;
+  background-color: #ffe4ad;
+  visibility: hidden;
 }

@@ -5,12 +5,13 @@ import static ADG.Games.Keezen.FrontEnd.TestUtils.getDriver;
 import static ADG.Games.Keezen.FrontEnd.TestUtils.setPlayerIdPlaying;
 import static ADG.Games.Keezen.FrontEnd.TestUtils.waitUntilDOMElementUpdates;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -87,5 +88,11 @@ public class CardTest {
     WebElement updatedCard0 = findCardByIndex(driver, "cardDiv", 0);
     assertEquals("0px", updatedCard0.getCssValue("border-width"));
     assertEquals("rgb(0, 0, 0)", updatedCard0.getCssValue("border-color"));
+  }
+
+  @Test
+  public void splitBoxes_DefaultNotShown(){
+    WebElement pawnIntegerBox = driver.findElement(By.className("pawnIntegerBoxes"));
+    assertFalse(pawnIntegerBox.isDisplayed());
   }
 }
