@@ -281,10 +281,9 @@ public class ViewDrawing {
                     player.isActive() ? playerColor :  INACTIVE_GREY);
 
             // set player name label : there's a strikethrough when player is not active
-            Document.get()
-                .getElementById(player.getName()+"Label")
-                .setClassName(
-                    player.isActive() ? "activePlayerName" : "inactivePlayerName");
+            Element playerLabel = Document.get().getElementById(player.getName()+"Label");
+            playerLabel.setClassName(player.isActive() ? "activePlayerName" : "inactivePlayerName");
+            playerLabel.addClassName("playerName");
 
             // set border for Horizontal Panel
             Document.get()

@@ -18,7 +18,7 @@
                 <g:VerticalPanel styleName="buttonContainer">
                     <g:Button ui:field="sendButton" styleName="sendButton">Play Card</g:Button>
                     <g:Button ui:field="forfeitButton" styleName="forfeitButton">Forfeit</g:Button>
-                    <g:HorizontalPanel ui:field="pawnIntegerBoxes">
+                    <g:HorizontalPanel ui:field="pawnIntegerBoxes" styleName="pawnIntegerBoxes">
                         <g:Label styleName="TextBoxLabel">Pawn 1</g:Label>
                         <g:TextBox ui:field="stepsPawn1" styleName="TextBoxForPawnSteps"/>
                         <g:Label styleName="TextBoxLabel">Pawn 2</g:Label>
