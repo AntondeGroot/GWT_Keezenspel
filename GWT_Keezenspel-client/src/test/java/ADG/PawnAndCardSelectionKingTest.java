@@ -23,6 +23,7 @@ public class PawnAndCardSelectionKingTest {
     @BeforeEach
     void setup(){
         pawnAndCardSelection = new PawnAndCardSelection();
+        pawnAndCardSelection.disableUIForTests();
 
         // pawns player playing
         ownPawnOnBoard = new Pawn(new PawnId("1", 1), new TileId("1", 0));

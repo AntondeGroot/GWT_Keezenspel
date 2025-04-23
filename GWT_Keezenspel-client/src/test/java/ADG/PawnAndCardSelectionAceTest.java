@@ -23,6 +23,7 @@ public class PawnAndCardSelectionAceTest {
     @BeforeEach
     void setup(){
         pawnAndCardSelection = new PawnAndCardSelection();
+        pawnAndCardSelection.disableUIForTests();
 
         ownPawnOnBoard = new Pawn(new PawnId("1", 1), new TileId("1", 0));
         ownPawnOnNest = new Pawn(new PawnId("1", 2), new TileId("1", -1));
