@@ -10,7 +10,7 @@ import ADG.Games.Keezen.Point;
 import ADG.Games.Keezen.TileMapping;
 import ADG.Games.Keezen.animations.AnimationSequence;
 import ADG.Games.Keezen.animations.PawnAnimation;
-import ADG.Games.Keezen.handlers.TestMoveHandler;
+import ADG.Games.Keezen.moving.Move;
 import ADG.Games.Keezen.util.Cookie;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
@@ -275,7 +275,7 @@ public class GameBoardView extends Composite {
                     if (DOM.eventGetType(event) == Event.ONCLICK) {
                         pawnAndCardSelection.setCard(card);
                         if(pawnAndCardSelection.getPawn1() != null && pawnAndCardSelection.getCard() != null){
-                            TestMoveHandler.sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());//todo: improve elegance
+                            Move.testMove(pawnAndCardSelection.createTestMoveMessage());//todo: improve elegance
                         }
 
                         drawPlayerCardsInHand(cards, pawnAndCardSelection, spriteImage);

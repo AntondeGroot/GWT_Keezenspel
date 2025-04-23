@@ -5,7 +5,7 @@ import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.Player.PlayerColors;
 import ADG.Games.Keezen.TileId;
-import ADG.Games.Keezen.handlers.TestMoveHandler;
+import ADG.Games.Keezen.moving.Move;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
@@ -108,7 +108,7 @@ public class ViewDrawing {
                     }
 
                     // after you have clicked on a pawn you will test whether it can move
-                    TestMoveHandler.sendMoveToServer(pawnAndCardSelection.createTestMoveMessage());
+                    Move.testMove(pawnAndCardSelection.createTestMoveMessage());
                 }
             }
         });
