@@ -2,16 +2,28 @@ package ADG.Games.Keezen.animations;
 
 import ADG.Games.Keezen.TileId;
 
+import com.google.gwt.dom.client.Document;
+import java.util.ArrayList;
 import java.util.List;
 
 public class StepsAnimation {
-    public static List<TileId> tileIdsToBeHighlighted;
+    private static ArrayList<String> ids = new ArrayList<>();
+    private static final String CLASS_ANIMATION = "tile-highlight-pulse";
 
     public static void updateStepsAnimation(List<TileId> tileIds){
-        StepsAnimation.tileIdsToBeHighlighted = tileIds;
+        resetStepsAnimation();
+
+        for(TileId tileId: tileIds) {
+            String id = tileId+"Highlight";
+            ids.add(id);
+            Document.get().getElementById(id).addClassName(CLASS_ANIMATION);
+        }
     }
 
-    public static void resetStepsAnimation(){
-        tileIdsToBeHighlighted = null;
+    public static void resetStepsAnimation() {
+        for(String id: ids){
+            Document.get().getElementById(id).removeClassName(CLASS_ANIMATION);
+        }
+        ids.clear();
     }
 }

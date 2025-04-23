@@ -4,6 +4,7 @@ import ADG.Games.Keezen.PawnAndCardSelection;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.Player.PlayerColors;
+import ADG.Games.Keezen.TileId;
 import ADG.Games.Keezen.handlers.TestMoveHandler;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -15,6 +16,7 @@ import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Position;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.EventListener;
@@ -114,31 +116,40 @@ public class ViewDrawing {
         return pawnElement;
     }
 
-    public static DivElement createCircle(double x, double y, double radius, String color){
+    public static DivElement createCircle(TileId tileId, double x, double y, double radius, String color){
         // Create a new <div> element
-        DivElement circle = Document.get().createDivElement();
+        DivElement tileElement = Document.get().createDivElement();
+        DivElement tileHighlight = Document.get().createDivElement();
+        tileHighlight.getStyle().setPosition(Position.ABSOLUTE);
+        tileHighlight.getStyle().setWidth(100, Unit.PCT);
+        tileHighlight.getStyle().setHeight(100,Unit.PCT);
+        tileHighlight.addClassName("tile-highlight");
+        tileHighlight.setId(tileId+"Highlight");
+        DivElement tile = Document.get().createDivElement();
 
         // Add the 'circle' class to the element
-        circle.setClassName("circle");
+        tile.setClassName("tile");
 
         // Set the position using absolute coordinates relative to the container
-        circle.getStyle().setPosition(Style.Position.ABSOLUTE);
-        circle.getStyle().setLeft(x, Style.Unit.PX);
-        circle.getStyle().setTop(y, Style.Unit.PX);
+        tileElement.getStyle().setPosition(Position.ABSOLUTE);
+        tileElement.getStyle().setLeft(x, Style.Unit.PX);
+        tileElement.getStyle().setTop(y, Style.Unit.PX);
 
         // Set the size of the circle dynamically
         //todo: by making the circle a little smaller '-3' the indicator for possible moves is no longer exactly aligned, this can be seen for larger values e.g. -5
-        circle.getStyle().setWidth(radius*2-3, Style.Unit.PX);
-        circle.getStyle().setHeight(radius*2-3, Style.Unit.PX);
+        tile.getStyle().setWidth(radius*2-3, Style.Unit.PX);
+        tile.getStyle().setHeight(radius*2-3, Style.Unit.PX);
 
         // Ensure it remains a circle by setting border-radius to 50%
         String darkColor = rgbToHex(darkenColor(hexToRgb(color)));
         String lightColor = rgbToHex(lightenColor(hexToRgb(color)));
-        circle.getStyle().setProperty("backgroundColor", color);
-        circle.getStyle().setProperty("boxShadow", "inset 3px 3px 4px "+darkColor+"," +
+        tile.getStyle().setProperty("backgroundColor", color);
+        tile.getStyle().setProperty("boxShadow", "inset 3px 3px 4px "+darkColor+"," +
                 "  inset -4px -4px 4px "+lightColor);
 
-        return circle;
+        tileElement.appendChild(tileHighlight);
+        tileElement.appendChild(tile);
+        return tileElement;
     }
 
     public static void drawTransparentCircle(Context2d context, double x, double y, double radius, double alpha) {

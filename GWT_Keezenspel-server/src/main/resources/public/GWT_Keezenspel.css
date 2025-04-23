@@ -73,10 +73,6 @@ h1 {
   margin: 15px 6px 6px;
 }
 
-#circle:hover {
-  background-color: darkgray;
-}
-
 .columnscontainer {
   display: flex;
 }
@@ -131,13 +127,44 @@ h1 {
 }
 
 /*
-the circles of the game tiles are designed to be so called 'neumorphism'
+the tiles of the game are designed to be so called 'neumorphism'
 the design of which can be controlled and copy pasted into this CSS file by visiting the website:
 https://neumorphism.io/
 */
-.circle{
+.tile{
   border-width: 1px;
   border-style: solid;
   border-color: black;
   border-radius: 50%;
+}
+
+.tile-highlight {
+  background-color: rgba(255, 165, 0, 0); /* yellow, fully transparent */
+  transition: background-color 0.25s linear;
+  border-radius: 50%;
+}
+.tile-highlight-active {
+  background-color: rgba(255, 165, 0, 0.6); /* yellow, semi-transparent */
+  border-radius: 50%;
+}
+
+@keyframes yellowPulse {
+  0% {
+    background-color: rgba(255, 165, 0, 0);
+    width: 0%;
+    height: 0%;
+  }
+  100% {
+    background-color: rgba(255, 165, 0, 0.6);
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.tile-highlight-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center it */
+  animation: yellowPulse 1s ease infinite;
 }
