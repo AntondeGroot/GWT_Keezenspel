@@ -114,8 +114,6 @@ public class GameBoardView extends Composite {
 
     public VerticalPanel getPlayerListContainer(){return playerListContainer2;}
 
-    public Context2d getCanvasStepsContext(){return ((CanvasElement) document.getElementById("canvasSteps2")).getContext2d();}
-
     public Context2d getCanvasCardsContext(){return ((CanvasElement) document.getElementById("canvasCards2")).getContext2d();}
 
     // todo: rename to canvasCards when old index.html is no longer used
@@ -125,10 +123,6 @@ public class GameBoardView extends Composite {
 
     public CanvasElement getCanvasCards(){
         return (CanvasElement) document.getElementById("canvasCards2");
-    }
-
-    public CanvasElement getCanvasSteps(){
-        return (CanvasElement) document.getElementById("canvasSteps2");
     }
 
     public void createPlayerList(ArrayList<Player> players){
@@ -156,18 +150,14 @@ public class GameBoardView extends Composite {
             if (tileNr <= 0 || tileNr >= 16) {
                 color = PlayerColors.getHexColor(UUIDtoInt(mapping.getPlayerId(), players));
             }
-            drawCircle(mapping.getPosition().getX()-cellDistance/2, mapping.getPosition().getY()-cellDistance/2, cellDistance/2, color);
+            DivElement circle = createCircle(mapping.getTileId(), mapping.getPosition().getX()-cellDistance/2, mapping.getPosition().getY()-cellDistance/2, cellDistance/2, color);
+            tileBoard.getElement().appendChild(circle);
         }
     }
 
     public void enableButtons(Boolean enabled){
         sendButton.setEnabled(enabled);
         forfeitButton.setEnabled(enabled);
-    }
-
-    private void drawCircle(double x, double y, double radius, String color) {
-        DivElement circle = createCircle(x, y, radius, color);
-        tileBoard.getElement().appendChild(circle);
     }
 
     public void createPawns(ArrayList<Pawn> pawns, PawnAndCardSelection pawnAndCardSelection){
@@ -402,10 +392,6 @@ public class GameBoardView extends Composite {
         }
 
         GWT.log("Image not found in DOM.");
-    }
-
-    public void clearCanvasSteps(){
-        getCanvasStepsContext().clearRect(0,0, getCanvasSteps().getWidth(), getCanvasSteps().getHeight());
     }
     public void clearCanvasCards(){
         getCanvasCardsContext().clearRect(0,0,getCanvasCards().getWidth(),getCanvasCards().getHeight());

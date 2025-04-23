@@ -12,8 +12,6 @@ import ADG.Games.Keezen.State.GameStateServiceAsync;
 import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Move.MovingServiceAsync;
 import ADG.Games.Keezen.Player.Player;
-import ADG.Games.Keezen.TileId;
-import ADG.Games.Keezen.TileMapping;
 import ADG.Games.Keezen.animations.*;
 import ADG.Games.Keezen.handlers.SendHandler;
 import ADG.Games.Keezen.handlers.TestMoveHandler;
@@ -25,11 +23,9 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static ADG.Games.Keezen.Move.MoveType.FORFEIT;
 import static ADG.Games.Keezen.Cards.CardValueCheck.isSeven;
-import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.drawTransparentCircle;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.updatePlayerProfileUI;
 import static java.lang.String.valueOf;
 
@@ -42,7 +38,6 @@ public class GameBoardPresenter {
     private final MovingServiceAsync movingService;
     private final PollingService pollingService;
     private GameStateResponse gameStateResponseUpdate = new GameStateResponse();
-    private double loopAlpha = 0.6;
     private final PawnAndCardSelection pawnAndCardSelection;
     private final PlayerList playerList = new PlayerList();
     private final CardsDeck cardsDeck = new CardsDeck();
@@ -239,7 +234,6 @@ public class GameBoardPresenter {
     }
 
     public void draw(){
-        drawStepsAnimation();
 
         if(pawnAndCardSelection.getDrawCards()) {
             view.drawCards(
@@ -248,26 +242,6 @@ public class GameBoardPresenter {
             pawnAndCardSelection.setCardsAreDrawn();
         }
         view.animatePawns();
-    }
-
-    public void drawStepsAnimation() {
-        if(StepsAnimation.tileIdsToBeHighlighted == null){return;}
-
-        view.clearCanvasSteps();
-
-        loopAlpha -= 0.005;
-        if (loopAlpha <= 0.0) {
-            loopAlpha = 0.6; // make transparency run from 0.6 to 0
-        }
-
-        List<TileMapping>  tiles = Board.getTiles();
-        for (TileId tileId : StepsAnimation.tileIdsToBeHighlighted) {
-            for (TileMapping mapping : tiles) {
-                if (mapping.getTileId().equals(tileId)) {
-                    drawTransparentCircle(view.getCanvasStepsContext(), mapping.getPosition().getX(), mapping.getPosition().getY(),Board.getCellDistance()/2, loopAlpha);// todo: replace Board.getcelldistance
-                }
-            }
-        }
     }
 
     private boolean currentPlayerIsPlaying(GameStateResponse result){
