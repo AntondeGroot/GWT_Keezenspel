@@ -124,16 +124,17 @@ public class GameBoardPresenter {
             }
 
             public void onSuccess(GameStateResponse result) {
-                if (!gameStateResponseUpdate.equals(result)) {
-                    GWT.log(result.toString());
-                    gameStateResponseUpdate = result;
-                }
-
-                // only set the board when empty, e.g.
-                // when the browser was refreshed or when you join the game for the first time
                 if (!Board.isInitialized()) {
                     initializeBoardState(result);
                 }
+
+                if (!gameStateResponseUpdate.equals(result)) {
+                    GWT.log(result.toString());
+                    gameStateResponseUpdate = result;
+                    Board.setPawns(result.getPawns());
+                }
+                // only set the board when empty, e.g.
+                // when the browser was refreshed or when you join the game for the first time
                 updatePlayerList(result);
                 view.enableButtons(currentPlayerIsPlaying(result));
             }
