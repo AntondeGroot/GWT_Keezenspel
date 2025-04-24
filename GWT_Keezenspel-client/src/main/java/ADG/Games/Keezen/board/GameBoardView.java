@@ -90,10 +90,6 @@ public class GameBoardView extends Composite {
         return Integer.parseInt(stepsPawn1.getValue());
     }
 
-    public int getBoardSize(){
-        return getCanvasBoard().getHeight();
-    }
-
     public int getStepsPawn2() {
         if(stepsPawn2.getValue().isEmpty()) {
             return 0;
@@ -116,11 +112,6 @@ public class GameBoardView extends Composite {
     public VerticalPanel getPlayerListContainer(){return playerListContainer2;}
 
     public Context2d getCanvasCardsContext(){return ((CanvasElement) document.getElementById("canvasCards2")).getContext2d();}
-
-    // todo: rename to canvasCards when old index.html is no longer used
-    public CanvasElement getCanvasBoard(){
-        return (CanvasElement) document.getElementById("canvasBoard2");
-    }
 
     public CanvasElement getCanvasCards(){
         return (CanvasElement) document.getElementById("canvasCards2");
@@ -250,19 +241,9 @@ public class GameBoardView extends Composite {
             DivElement cardElement = Document.get().createDivElement();
             cardElement.setClassName("cardDiv");
             cardElement.setId(card.toString());
-
-            // Apply background styles
-            cardElement.getStyle().setProperty("backgroundImage", "url('card-deck.png')");
-            cardElement.getStyle().setProperty("backgroundRepeat", "no-repeat");
             cardElement.getStyle().setProperty("backgroundPosition",  -sourceX * factor + "px " + -sourceY * factor + "px");
 
-            // fix adding the cards, otherwise they stack vertically
-            cardElement.getStyle().setProperty("display", "inline-block");
-            cardElement.getStyle().setProperty("marginRight", "5px");
-            cardElement.getStyle().setProperty("marginLeft", "5px");
-
             // Scale entire sprite sheet
-            GWT.log("scale spritesheet = "+factor);
             cardElement.getStyle().setProperty("backgroundSize", (1920 * factor) + "px " + (1150 * factor) + "px");
 
             // Set visible card size

@@ -12,8 +12,14 @@ h1 {
 
 .canvasWrapper {
   position: relative;
-  width: 600px;
+  width: 650px;
   height: 600px;
+}
+.canvasCards2{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center it */
 }
 .columnWrapper {
   position: relative;
@@ -27,18 +33,12 @@ h1 {
   left: 0;
 }
 
-.buttonContainer {
-  position: absolute;
-  top: 600px;
-  left: 575px;
-}
-
 .sendButton {
   font-size: 16pt;
   border-radius: 5px;
   background-color: #96ff8c;
   border-color: black;
-  margin: 10px;
+  margin-bottom: 10px;
 }
 .sendButton:active {
   background-color: #51fc42;
@@ -49,7 +49,7 @@ h1 {
   border-radius: 5px;
   background-color: #ffe4ad;
   border-color: black;
-  margin: 10px;
+  margin-bottom: 10px;
 }
 .forfeitButton:active{
   background-color: orange;
@@ -181,10 +181,39 @@ https://neumorphism.io/
 
 .pawnIntegerBoxes{
   border-radius: 8px;
-  border-style: solid;
-  border-width: 4px;
-  border-color: orange;
   padding: 4px;
   background-color: #ffe4ad;
   visibility: hidden;
+}
+.buttonContainer{
+  border-radius: 20px;
+  border-width: 4px;
+  border-style: solid;
+  border-color: #ffe4ad;
+  background-color: darkorange;
+  padding: 10px;
+  position: absolute;
+  top: 600px;
+  left: 600px;
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3); /* Shadow effect */
+}
+.pawnDiv{
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  z-index: 10;
+}
+.cardDiv{
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3); /* Shadow effect */
+  background-image: url("card-deck.png");
+  background-repeat: no-repeat;
+
+  display: inline-block; /*fixes adding the cards, otherwise they stack vertically*/
+  margin-right: 5px;
+  margin-left: 5px;
+}
+.pawnImage{
+  background-size: contain; /* scale image to fit in div */
+  background-repeat: no-repeat;
+  background-position: center;
 }
