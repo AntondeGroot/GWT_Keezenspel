@@ -1,5 +1,7 @@
 package ADG.Games.Keezen.logic;
 
+import static ADG.Games.Keezen.logic.BoardLogic.isPawnOnFinish;
+
 import ADG.Games.Keezen.GameState;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.Player;
@@ -16,7 +18,7 @@ public class WinnerLogic {
             int nrPawnsFinished = 0;
             String playerId = player.getUUID();
             for (Pawn pawn: pawns){
-                if(playerId.equals(pawn.getPlayerId()) && pawn.getCurrentTileId().getTileNr() > 15){
+                if(playerId.equals(pawn.getPlayerId()) && isPawnOnFinish(pawn)){
                     nrPawnsFinished++;
                 }
             }
