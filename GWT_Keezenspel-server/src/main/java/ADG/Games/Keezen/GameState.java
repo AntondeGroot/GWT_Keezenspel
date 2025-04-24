@@ -16,6 +16,8 @@ import static ADG.Games.Keezen.Move.MessageType.*;
 import static ADG.Games.Keezen.Move.MoveResult.*;
 import static ADG.Games.Keezen.Move.MoveType.*;
 import static ADG.Games.Keezen.Cards.CardValueCheck.*;
+import static ADG.Games.Keezen.logic.BoardLogic.isPawnOnFinish;
+import static ADG.Games.Keezen.logic.BoardLogic.isPawnOnNest;
 import static ADG.Games.Keezen.logic.StartTileLogic.canPassStartTile;
 import static ADG.Games.Keezen.logic.WinnerLogic.checkForWinners;
 
@@ -171,10 +173,6 @@ public class GameState {
         return playerColors.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(previousPlayerInt))
                 .map(HashMap.Entry::getKey).findFirst().orElse("0");
-    }
-
-    private static boolean isPawnOnFinish(PawnId pawnId, TileId tileId){
-        return Objects.equals(pawnId.getPlayerId(), tileId.getPlayerId()) && tileId.getTileNr() > 15;
     }
 
     private static boolean isPawnClosedInFromBehind(PawnId pawnId, TileId tileId){
@@ -394,6 +392,7 @@ public class GameState {
     public static void processOnMove(MoveMessage moveMessage, MoveResponse response, boolean goToNextPlayer){
         // only don't go to next player when playing a SPLIT card, since you have to make processOnMove twice
         PawnId pawnId1 = moveMessage.getPawnId1();
+        Pawn pawn1 = getPawn(pawnId1);
         Card card = moveMessage.getCard();
         if(pawnId1 == null || card == null){
             response.setResult(INVALID_SELECTION);
@@ -441,7 +440,7 @@ public class GameState {
          // regular route
         if (next > 15 &&
                 !isPawnOnLastSection(playerId, playerIdOfTile) &&
-                !isPawnOnFinish(pawnId1, currentTileId) ) {
+                !isPawnOnFinish(pawn1) ) {
             Log.info("GameState: OnMove: normal route between 0,15 but could move to next section");
             // check
 
@@ -480,7 +479,7 @@ public class GameState {
         // normal route within section
         if(next > 0 &&
                 next <= 15 &&
-                !isPawnOnFinish(pawnId1, currentTileId)){
+                !isPawnOnFinish(pawn1)){
             Log.info("GameState: OnMove: normal route between 0,15");
             // check if you can kill an opponent
             TileId nextTileId = new TileId(playerIdOfTile, next);
@@ -570,7 +569,7 @@ public class GameState {
         }
 
         // pawn is already on finish
-        if (isPawnOnFinish(pawnId1, currentTileId)){
+        if (isPawnOnFinish(pawn1)){
             Log.info("GameState: OnMove: pawn is already on the finish");
             // moving is not possible when the pawn is directly between two other pawns
             if (isPawnTightlyClosedIn(pawnId1, currentTileId)){
@@ -765,17 +764,17 @@ public class GameState {
         Pawn pawn1 = getPawn(pawnId1);
         Pawn pawn2 = getPawn(pawnId2);
 
-        // pawns cannot move from EndTile or from NestTile
-        int tileNr1 = pawn1.getCurrentTileId().getTileNr();
-        int tileNr2 = pawn2.getCurrentTileId().getTileNr();
         String tilePlayerId2 = pawn2.getCurrentTileId().getPlayerId();
-        if(tileNr1 < 0 || tileNr2 < 0 || tileNr1 > 15 || tileNr2 > 15){
+        // pawns cannot move from Finish or from Nest
+        if(isPawnOnNest(pawn1) || isPawnOnNest(pawn2) ||
+            isPawnOnFinish(pawn1) || isPawnOnFinish(pawn2)){
             moveResponse.setResult(CANNOT_MAKE_MOVE);
             return;
         }
 
-        // player1 can move from starttile
-        // player2 cannot be taken from starttile
+        // player1 can move from start
+        // player2 cannot be taken from start
+        int tileNr2 = pawn2.getCurrentTileId().getTileNr();
         if(tilePlayerId2.equals(pawn2.getPlayerId()) && tileNr2 == 0){
             moveResponse.setResult(CANNOT_MAKE_MOVE);
             return;
@@ -837,6 +836,7 @@ public class GameState {
         }
 
         TileId currentTileId = getPawn(pawnId1).getCurrentTileId();
+
         TileId targetTileId = new TileId(playerId,0);
         response.setMoveType(ONBOARD);
 
