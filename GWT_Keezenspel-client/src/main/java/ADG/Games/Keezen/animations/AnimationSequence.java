@@ -21,16 +21,6 @@ public class AnimationSequence {
     }
 
     public static void movePawn(Pawn pawn, LinkedList<TileId> movePawn, boolean animateFirst) {
-        // move the pawn in the model
-        // todo: instead of doing this request the server for a current state of the pawns
-        ArrayList<Pawn> pawns = Board.getPawns();
-        for(Pawn pawnI : pawns){
-            if(pawn.equals(pawnI)){
-                pawnI.setCurrentTileId(movePawn.getLast());
-            }
-        }
-        Board.setPawns(pawns);
-
         // animate the movement of the pawn
         if(animateFirst){
             sequenceFirst.add(new AnimatePawnPoints(pawn, movePawn));
