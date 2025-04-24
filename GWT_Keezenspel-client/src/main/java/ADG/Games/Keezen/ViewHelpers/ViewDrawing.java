@@ -35,20 +35,14 @@ public class ViewDrawing {
         // Create new <div> Element
         DivElement pawnElement = Document.get().createDivElement();
         pawnElement.setClassName("pawnDiv");
-        pawnElement.getStyle().setWidth(40, Style.Unit.PX);
-        pawnElement.getStyle().setHeight(40, Style.Unit.PX);
         pawnElement.setId(pawn.getPawnId().toString());
-        pawnElement.getStyle().setPosition(Position.ABSOLUTE);
-        pawnElement.getStyle().setZIndex(10); // put it on top of any canvas elements
 
         // Create new <div> Element
         DivElement pawnImage = Document.get().createDivElement();
+        pawnImage.addClassName("pawnImage");
 
         // set image
         pawnImage.getStyle().setProperty("backgroundImage", "url(pawn"+pawn.getColorInt()+".png)");
-        pawnImage.getStyle().setProperty("backgroundSize", "contain");     // Scale image to fit div
-        pawnImage.getStyle().setProperty("backgroundRepeat", "no-repeat"); // Prevent tiling
-        pawnImage.getStyle().setProperty("backgroundPosition", "center");  // Center image
 
         // set overlay for when you want to select the pawn
         ImageElement overlayImage = Document.get().createImageElement();

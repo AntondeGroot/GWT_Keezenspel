@@ -1,6 +1,5 @@
 package ADG.Games.Keezen.board;
 
-import ADG.Games.Keezen.Cards.Card;
 import ADG.Games.Keezen.Cards.CardResponse;
 import ADG.Games.Keezen.Cards.CardsServiceAsync;
 import ADG.Games.Keezen.CardsDeck;
@@ -24,7 +23,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
 
 import static ADG.Games.Keezen.Move.MoveType.FORFEIT;
-import static ADG.Games.Keezen.Cards.CardValueCheck.isSeven;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.updatePlayerProfileUI;
 import static java.lang.String.valueOf;
 
@@ -40,6 +38,7 @@ public class GameBoardPresenter {
     private final PawnAndCardSelection pawnAndCardSelection;
     private final PlayerList playerList = new PlayerList();
     private final CardsDeck cardsDeck = new CardsDeck();
+    private final int BOARD_SIZE = 600; // todo: replace with CSS properties
 
     private MoveResponse storedMoveResponse = new MoveResponse();
 
@@ -144,7 +143,7 @@ public class GameBoardPresenter {
     private void initializeBoardState(GameStateResponse result) {
         Board board = new Board();
         Board.setPawns(result.getPawns());
-        board.createBoard(result.getPlayers(), view.getBoardSize());
+        board.createBoard(result.getPlayers(), BOARD_SIZE);
         view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
         view.createPawns(result.getPawns(), pawnAndCardSelection);
         view.animatePawns();
@@ -192,7 +191,7 @@ public class GameBoardPresenter {
                 boardModel = new Board();
                 GWT.log("gameStateService getPlayers board.create");
 
-                boardModel.createBoard(players, view.getBoardSize());
+                boardModel.createBoard(players, BOARD_SIZE);
             }
         });
     }
@@ -217,19 +216,6 @@ public class GameBoardPresenter {
                 }
             }
         });
-    }
-
-    private boolean showTextBoxes(Card card) {
-        if (card == null) {
-            return false;
-        }
-        if (!isSeven(card)) {
-            return false;
-        }
-        if (pawnAndCardSelection.getPawnId2() == null) {
-            return false;
-        }
-        return true;
     }
 
     public void draw(){
