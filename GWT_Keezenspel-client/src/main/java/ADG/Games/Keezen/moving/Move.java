@@ -23,7 +23,6 @@ public class Move {
                 StepsAnimation.resetStepsAnimation();
             }
             public void onSuccess(MoveResponse result) {
-                // todo: maybe place the following in the presenter
                 GWT.log("Test Move: "+result.toString());
                 List<TileId> tileIds = new ArrayList<>();
                 if(result.getMovePawn1() != null){

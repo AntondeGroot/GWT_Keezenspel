@@ -4,6 +4,8 @@ import static ADG.Games.Keezen.Move.MessageType.MAKE_MOVE;
 import static ADG.Games.Keezen.Move.MoveType.*;
 import static ADG.Games.Keezen.Cards.CardValueCheck.isJack;
 import static ADG.Games.Keezen.Cards.CardValueCheck.isSeven;
+import static ADG.Games.Keezen.logic.BoardLogic.isPawnOnNest;
+import static ADG.Games.Keezen.logic.BoardLogic.pawnIsOnNormalBoard;
 
 import ADG.Games.Keezen.Cards.Card;
 import ADG.Games.Keezen.Move.MessageType;
@@ -58,12 +60,12 @@ public class PawnAndCardSelection {
 
     private void validateAllPawnsAreOnBoard() {
         if(!pawn1.equals(resetPawn())){
-            if(!(pawn1.getCurrentTileId().getTileNr() >= 0 && pawn1.getCurrentTileId().getTileNr() < 16)){// reset when not on board
+            if(!pawnIsOnNormalBoard(pawn1)){
                 pawn1 = resetPawn();
             }
         }
         if(!pawn2.equals(resetPawn())){
-            if(!(pawn2.getCurrentTileId().getTileNr() >= 0 && pawn2.getCurrentTileId().getTileNr() < 16)){// todo: logic like this should be in some helper.util
+            if(!pawnIsOnNormalBoard(pawn2)){
                 pawn2 = resetPawn();
             }
         }
@@ -71,12 +73,12 @@ public class PawnAndCardSelection {
 
     private void validateAllPawnsAreOnBoardOrFinish() {
         if(!pawn1.equals(resetPawn())){
-            if(pawn1.getCurrentTileId().getTileNr() < 0){// reset when on nest
+            if(isPawnOnNest(pawn1)){
                 pawn1 = resetPawn();
             }
         }
         if(!pawn2.equals(resetPawn())){
-            if(pawn2.getCurrentTileId().getTileNr() < 0){// reset when on nest
+            if(isPawnOnNest(pawn2)){
                 pawn2 = resetPawn();
             }
         }
@@ -84,12 +86,12 @@ public class PawnAndCardSelection {
 
     private void validateAllPawnsAreOnNest() {
         if(!pawn1.equals(resetPawn())){
-            if(pawn1.getCurrentTileId().getTileNr() > 0){
+            if(!isPawnOnNest(pawn1)){
                 pawn1 = resetPawn();
             }
         }
         if(!pawn2.equals(resetPawn())){
-            if(pawn2.getCurrentTileId().getTileNr() > 0){
+            if(!isPawnOnNest(pawn2)){
                 pawn2 = resetPawn();
             }
         }
