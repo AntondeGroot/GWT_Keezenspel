@@ -9,31 +9,26 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class SpringAppTestHelper {
 
   private static ConfigurableApplicationContext context;
-  private static Class<?> currentAppClass = null;
 
   /***
    * start the springboot server for each test
    * this way you will have a clean slate for your tests
    */
   public static void startTestApp() {
-    if (context == null || !context.isRunning()) {
-      stopApp();
-      SpringApplication app = new SpringApplication(ApplicationAutomatedTest.class);
-      app.setAdditionalProfiles("mockedCardDeck");
-      app.setDefaultProperties(Map.of("server.port", "4200"));
-      context = app.run();
-      currentAppClass = ApplicationAutomatedTest.class;
-    }
+    start(false);
   }
 
   public static void startRealApp() {
+    start(true);
+  }
+
+  private static void start(Boolean cardDeckIsReal){
     if (context == null || !context.isRunning()) {
       stopApp();
       SpringApplication app = new SpringApplication(Application.class);
-      app.setAdditionalProfiles("realCardDeck");
+      app.setAdditionalProfiles(cardDeckIsReal ? "realCardDeck" : "mockedCardDeck");
       app.setDefaultProperties(Map.of("server.port", "4200"));
       context = app.run();
-      currentAppClass = Application.class;
     }
   }
 
@@ -41,7 +36,6 @@ public class SpringAppTestHelper {
     if (context != null && context.isRunning()) {
       context.close();
       context = null;
-      currentAppClass = null;
     }
   }
 }
