@@ -21,7 +21,7 @@ public class CardTest {
 
   @BeforeEach
   public void setUp() {
-//    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
+    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
     setPlayerIdPlaying(driver,"0");
