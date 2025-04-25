@@ -23,15 +23,16 @@ public class Application
         extends SpringBootServletInitializer {
 
   public static void main(String[] args) {
+    int NrPlayers = 3;
+
     SpringApplication.run(Application.class,
                           args);
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < NrPlayers; i++) {
       ImageProcessing.create(i);
     }
     String sessionId = GameRegistry.createNewGame("123");
     GameSession session = GameRegistry.getGame(sessionId);
     GameState gameState = session.getGameState();
-    int NrPlayers = 3;
     if(gameState.getPawns().isEmpty()){
       for (int i = 0; i < NrPlayers; i++) {
         Player player = new Player("player"+i,String.valueOf(i));

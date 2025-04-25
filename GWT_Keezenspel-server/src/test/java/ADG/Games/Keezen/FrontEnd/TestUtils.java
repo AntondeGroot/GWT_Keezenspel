@@ -1,5 +1,10 @@
 package ADG.Games.Keezen.FrontEnd;
 
+import static org.junit.Assert.assertTrue;
+
+import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.Player.PawnId;
+import ADG.Games.Keezen.Point;
 import java.time.Duration;
 import java.util.List;
 import org.openqa.selenium.By;
@@ -58,5 +63,32 @@ public class TestUtils {
   public static WebElement findCardByIndex(WebDriver driver, String className, int index){
     List<WebElement> cards = driver.findElements(By.className(className));
     return cards.get(index);
+  }
+
+  public static void clickCardByValue(WebDriver driver, int cardValue){
+    WebElement card = driver.findElement(By.id(new Card(0, cardValue).toString()));
+    card.click();
+  }
+
+  public static Point clickPawn(WebDriver driver, PawnId pawnId){
+    WebElement pawnElement = driver.findElement(By.id(pawnId.toString()));
+    pawnElement.click();
+    String x = pawnElement.getCssValue("left").replace("px", "");
+    String y = pawnElement.getCssValue("top").replace("px", "");
+    return new Point(Double.valueOf(x), Double.valueOf(y));
+  }
+
+  public static void makeMove(WebDriver driver){
+    WebElement sendButton = driver.findElement(By.className("sendButton"));
+    assertTrue("sendButton is not enabled: it was not the player's turn",sendButton.isEnabled());
+    sendButton.click();
+  }
+
+  public static void playerForfeits(WebDriver driver, String playerId){
+    setPlayerIdPlaying(driver,playerId);
+    WebElement forfeitButton = driver.findElement(By.className("forfeitButton"));
+    assertTrue("forfeitButton is not enabled: it was not the player's turn", forfeitButton.isEnabled());
+    forfeitButton.click();
+    forfeitButton.submit();
   }
 }
