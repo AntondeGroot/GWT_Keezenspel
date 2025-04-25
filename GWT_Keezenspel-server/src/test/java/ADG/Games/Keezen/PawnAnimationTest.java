@@ -21,17 +21,25 @@ public class PawnAnimationTest {
     MoveMessage moveMessage = new MoveMessage();
     MoveResponse moveResponse = new MoveResponse();
 
+    private GameSession engine;
+    private GameState gameState;
+    private CardsDeckInterface cardsDeck;
+
     @BeforeEach
     void setUp() {
-        createGame_With_NPlayers(8);
+        engine = new GameSession();
+        gameState = engine.getGameState();
+        cardsDeck = engine.getCardsDeck();
+
+        createGame_With_NPlayers(gameState , 8);
         moveMessage = new MoveMessage();
         moveResponse = new MoveResponse();
     }
 
     @AfterEach
     void tearDown() {
-        GameState.tearDown();
-        CardsDeck.reset();
+        gameState.tearDown();
+        cardsDeck.reset();
         moveMessage = null;
         moveResponse = null;
     }
@@ -39,12 +47,12 @@ public class PawnAnimationTest {
     @Test
     void pawnMovesAroundCorner7() {
         // GIVEN
-        Card card = givePlayerCard(0,4);
-        Pawn pawn1 = GameStateUtil.placePawnOnNest("0",new TileId("0",5));
+        Card card = givePlayerCard(cardsDeck , 0, 4);
+        Pawn pawn1 = GameStateUtil.placePawnOnNest(gameState , "0", new TileId("0",5));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
-        GameState.processOnMove(moveMessage, moveResponse);
+        gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovement = new LinkedList<>();
@@ -59,12 +67,12 @@ public class PawnAnimationTest {
     @Test
     void pawnMovesAroundCorner1() {
         // GIVEN
-        Card card = givePlayerCard(0,3);
-        Pawn pawn1 = placePawnOnNest("0",new TileId("0",0));
+        Card card = givePlayerCard(cardsDeck , 0, 3);
+        Pawn pawn1 = placePawnOnNest(gameState , "0", new TileId("0",0));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
-        GameState.processOnMove(moveMessage, moveResponse);
+        gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovement = new LinkedList<>();
@@ -79,12 +87,12 @@ public class PawnAnimationTest {
     @Test
     void pawnMovesAroundCorner13And0() {
         // GIVEN
-        Card card = givePlayerCard(2,8);
-        Pawn pawn1 = placePawnOnNest("2",new TileId("0",12));
+        Card card = givePlayerCard(cardsDeck , 2, 8);
+        Pawn pawn1 = placePawnOnNest(gameState , "2", new TileId("0",12));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
-        GameState.processOnMove(moveMessage, moveResponse);
+        gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovement = new LinkedList<>();
@@ -101,12 +109,12 @@ public class PawnAnimationTest {
     @Test
     void pawnMoveFrom9To12() {
         // GIVEN
-        Card card = givePlayerCard(0,3);
-        Pawn pawn1 = placePawnOnNest("0",new TileId("0",9));
+        Card card = givePlayerCard(cardsDeck , 0, 3);
+        Pawn pawn1 = placePawnOnNest(gameState , "0", new TileId("0",9));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
-        GameState.processOnMove(moveMessage, moveResponse);
+        gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovement = new LinkedList<>();
@@ -119,12 +127,12 @@ public class PawnAnimationTest {
     @Test
     void pawnMoveFrom11To1() {
         // GIVEN
-        Card card = givePlayerCard(2,6);
-        Pawn pawn1 = placePawnOnNest("2",new TileId("0",11));
+        Card card = givePlayerCard(cardsDeck , 2, 6);
+        Pawn pawn1 = placePawnOnNest(gameState , "2", new TileId("0",11));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
-        GameState.processOnMove(moveMessage, moveResponse);
+        gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovement = new LinkedList<>();
@@ -140,12 +148,12 @@ public class PawnAnimationTest {
     @Test
     void pawnMoveHitsAllCorners() {
         // GIVEN
-        Card card = givePlayerCard(2,19);
-        Pawn pawn1 = placePawnOnNest("2",new TileId("0",0));
+        Card card = givePlayerCard(cardsDeck , 2, 19);
+        Pawn pawn1 = placePawnOnNest(gameState , "2", new TileId("0",0));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
-        GameState.processOnMove(moveMessage, moveResponse);
+        gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovement = new LinkedList<>();
@@ -163,12 +171,12 @@ public class PawnAnimationTest {
     @Test
     void pawnMovesIntoFinishAndOvershoots() {
         // GIVEN
-        Card card = givePlayerCard(1,5);
-        Pawn pawn1 = placePawnOnNest("1",new TileId("0",15));
+        Card card = givePlayerCard(cardsDeck , 1, 5);
+        Pawn pawn1 = placePawnOnNest(gameState , "1", new TileId("0",15));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
-        GameState.processOnMove(moveMessage, moveResponse);
+        gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovement = new LinkedList<>();
@@ -182,12 +190,12 @@ public class PawnAnimationTest {
     @Test
     void pawnMovesBackwardsOverCorners15_13_7_1() {
         // GIVEN
-        Card card = givePlayerCard(1,-12);
-        Pawn pawn1 = placePawnOnNest("1",new TileId("1",16));
+        Card card = givePlayerCard(cardsDeck , 1, -12);
+        Pawn pawn1 = placePawnOnNest(gameState , "1", new TileId("1",16));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
-        GameState.processOnMove(moveMessage, moveResponse);
+        gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovement = new LinkedList<>();
@@ -204,12 +212,12 @@ public class PawnAnimationTest {
     @Test
     void pawnMovesBackwardsOverCorners13_7() {
         // GIVEN
-        Card card = givePlayerCard(0,-8);
-        Pawn pawn1 = placePawnOnNest("0",new TileId("0",14));
+        Card card = givePlayerCard(cardsDeck , 0, -8);
+        Pawn pawn1 = placePawnOnNest(gameState , "0", new TileId("0",14));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
-        GameState.processOnMove(moveMessage, moveResponse);
+        gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovement = new LinkedList<>();
@@ -225,12 +233,12 @@ public class PawnAnimationTest {
     @Test
     void pawnMovesBackwardsOverCorners7() {
         // GIVEN
-        Card card = givePlayerCard(0,-4);
-        Pawn pawn1 = placePawnOnNest("0",new TileId("0",8));
+        Card card = givePlayerCard(cardsDeck , 0, -4);
+        Pawn pawn1 = placePawnOnNest(gameState , "0", new TileId("0",8));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
-        GameState.processOnMove(moveMessage, moveResponse);
+        gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovement = new LinkedList<>();
@@ -244,17 +252,17 @@ public class PawnAnimationTest {
     @Test
     void pawnMovesForwards_13_7_1_ToNewSection() {
         // setup
-        GameState.tearDown();
-        createGame_With_NPlayers(3);
+        gameState.tearDown();
+        createGame_With_NPlayers(gameState , 3);
 
         // GIVEN
-        Card card = givePlayerCard(1,8);
-        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("2",12));
-        Pawn pawn2 = placePawnOnBoard(new PawnId("1",2) ,new TileId("0",0));
+        Card card = givePlayerCard(cardsDeck , 1, 8);
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("2",12));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new TileId("0",0));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
-        GameState.processOnMove(moveMessage, moveResponse);
+        gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovement = new LinkedList<>();
@@ -272,19 +280,19 @@ public class PawnAnimationTest {
     @Test
     void pawnSwitchesWithOpponent() {
         // setup
-        GameState.tearDown();
-        createGame_With_NPlayers(3);
+        gameState.tearDown();
+        createGame_With_NPlayers(gameState , 3);
 
         // GIVEN
-        Card card = givePlayerJack(0);
+        Card card = givePlayerJack(cardsDeck, 0);
         TileId tile1 = new TileId("2",12);
         TileId tile2 = new TileId("0",5);
-        Pawn pawn1 = placePawnOnBoard(new PawnId("0",1) , tile1);
-        Pawn pawn2 = placePawnOnBoard(new PawnId("1",2) , tile2);
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("0",1), tile1);
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), tile2);
 
         // WHEN
         createSwitchMessage(moveMessage, pawn1, pawn2, card);
-        GameState.processOnSwitch(moveMessage, moveResponse);
+        gameState.processOnSwitch(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovementPawn1 = new LinkedList<>();
@@ -313,17 +321,17 @@ public class PawnAnimationTest {
          */
 
         // setup
-        GameState.tearDown();
-        createGame_With_NPlayers(3);
+        gameState.tearDown();
+        createGame_With_NPlayers(gameState , 3);
 
         // GIVEN
-        Card card = givePlayerCard(1,8);
-        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",16));
-        Pawn pawn2 = placePawnOnBoard(new PawnId("1",2) ,new TileId("0",12));
+        Card card = givePlayerCard(cardsDeck , 1, 8);
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",16));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new TileId("0",12));
 
         // WHEN
         createMoveMessage(moveMessage, pawn2, card);
-        GameState.processOnMove(moveMessage, moveResponse);
+        gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovement = new LinkedList<>();
@@ -342,19 +350,19 @@ public class PawnAnimationTest {
     @Test
     void pawnMoves_PingPong_3StepsOnFinish_test() {
         // setup
-        GameState.tearDown();
-        createGame_With_NPlayers(3);
+        gameState.tearDown();
+        createGame_With_NPlayers(gameState , 3);
 
         // GIVEN
-        Card card = givePlayerCard(1,3);
-        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",17));
-        Pawn pawn2 = placePawnOnBoard(new PawnId("1",2) ,new TileId("1",19));
-        Pawn pawn3 = placePawnOnBoard(new PawnId("1",3) ,new TileId("1",16));
+        Card card = givePlayerCard(cardsDeck , 1, 3);
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",17));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new TileId("1",19));
+        Pawn pawn3 = placePawnOnBoard(gameState , new PawnId("1",3), new TileId("1",16));
 
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
-        GameState.processOnMove(moveMessage, moveResponse);
+        gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovement = new LinkedList<>();
@@ -371,19 +379,19 @@ public class PawnAnimationTest {
     @Test
     void pawnMoves_PingPong_9StepsOnFinish_test() {
         // setup
-        GameState.tearDown();
-        createGame_With_NPlayers(3);
+        gameState.tearDown();
+        createGame_With_NPlayers(gameState , 3);
 
         // GIVEN
-        Card card = givePlayerCard(1,9);
-        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",17));
-        Pawn pawn2 = placePawnOnBoard(new PawnId("1",2) ,new TileId("1",19));
-        Pawn pawn3 = placePawnOnBoard(new PawnId("1",3) ,new TileId("1",16));
+        Card card = givePlayerCard(cardsDeck , 1, 9);
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",17));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new TileId("1",19));
+        Pawn pawn3 = placePawnOnBoard(gameState , new PawnId("1",3), new TileId("1",16));
 
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
-        GameState.processOnMove(moveMessage, moveResponse);
+        gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
         LinkedList<TileId> expectedMovement = new LinkedList<>();
@@ -406,13 +414,13 @@ public class PawnAnimationTest {
     @Test
     void pawnMoves_PingPongMethod_9StepsOnFinish_test() {
         // setup
-        GameState.tearDown();
-        createGame_With_NPlayers(3);
+        gameState.tearDown();
+        createGame_With_NPlayers(gameState , 3);
 
         // GIVEN
-        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",17));
-        Pawn pawn2 = placePawnOnBoard(new PawnId("1",2) ,new TileId("1",19));
-        Pawn pawn3 = placePawnOnBoard(new PawnId("1",3) ,new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",17));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new TileId("1",19));
+        Pawn pawn3 = placePawnOnBoard(gameState , new PawnId("1",3), new TileId("1",16));
 
 
         // WHEN
@@ -428,7 +436,7 @@ public class PawnAnimationTest {
         expectedMovement.add(new TileId("1",17));
         expectedMovement.add(new TileId("1",18));
 
-        ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),9);
+        ArrayList<TileId> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),9);
         // THEN
         Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);
@@ -438,12 +446,12 @@ public class PawnAnimationTest {
     void pawnMoves_PingPongMethod_6StepsOnFinish_3places_test() {
         // setup
         int nrSteps = 6;
-        GameState.tearDown();
-        createGame_With_NPlayers(3);
+        gameState.tearDown();
+        createGame_With_NPlayers(gameState , 3);
 
         // GIVEN
-        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",17));
-        Pawn pawn2 = placePawnOnBoard(new PawnId("1",3) ,new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",17));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",3), new TileId("1",16));
 
 
         // WHEN
@@ -453,7 +461,7 @@ public class PawnAnimationTest {
         expectedMovement.add(new TileId("1",17));
         expectedMovement.add(new TileId("1",19));
 
-        ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
+        ArrayList<TileId> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
         // THEN
         Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);
@@ -463,12 +471,12 @@ public class PawnAnimationTest {
     void pawnMoves_PingPongMethod_5StepsOnFinish_3places_test() {
         // setup
         int nrSteps = 5;
-        GameState.tearDown();
-        createGame_With_NPlayers(3);
+        gameState.tearDown();
+        createGame_With_NPlayers(gameState , 3);
 
         // GIVEN
-        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",17));
-        Pawn pawn2 = placePawnOnBoard(new PawnId("1",3) ,new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",17));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",3), new TileId("1",16));
 
 
         // WHEN
@@ -478,7 +486,7 @@ public class PawnAnimationTest {
         expectedMovement.add(new TileId("1",17));
         expectedMovement.add(new TileId("1",18));
 
-        ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
+        ArrayList<TileId> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
         // THEN
         Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);
@@ -488,12 +496,12 @@ public class PawnAnimationTest {
     void pawnMoves_PingPongMethod_Negative4StepsOnFinish_3places_test() {
         // setup
         int nrSteps = -4;
-        GameState.tearDown();
-        createGame_With_NPlayers(3);
+        gameState.tearDown();
+        createGame_With_NPlayers(gameState , 3);
 
         // GIVEN
-        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",17));
-        Pawn pawn2 = placePawnOnBoard(new PawnId("1",3) ,new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",17));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",3), new TileId("1",16));
 
 
         // WHEN
@@ -502,7 +510,7 @@ public class PawnAnimationTest {
         expectedMovement.add(new TileId("1",19));
         expectedMovement.add(new TileId("1",17));
 
-        ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
+        ArrayList<TileId> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
         // THEN
         Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);
@@ -511,14 +519,14 @@ public class PawnAnimationTest {
     @Test
     void pawnMoves_PingPongMethod_Negative4StepsOnFinish_test() {
         // setup
-        GameState.tearDown();
-        createGame_With_NPlayers(3);
+        gameState.tearDown();
+        createGame_With_NPlayers(gameState , 3);
         int nrSteps = -4;
 
         // GIVEN
-        Pawn pawn1 = placePawnOnBoard(new PawnId("1",1) ,new TileId("1",17));
-        Pawn pawn2 = placePawnOnBoard(new PawnId("1",2) ,new TileId("1",19));
-        Pawn pawn3 = placePawnOnBoard(new PawnId("1",3) ,new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",17));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new TileId("1",19));
+        Pawn pawn3 = placePawnOnBoard(gameState , new PawnId("1",3), new TileId("1",16));
 
 
         // WHEN
@@ -529,7 +537,7 @@ public class PawnAnimationTest {
         expectedMovement.add(new TileId("1",18));
         expectedMovement.add(new TileId("1",17));
 
-        ArrayList<TileId> actualMovement = GameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
+        ArrayList<TileId> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
         // THEN
         Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);

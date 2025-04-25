@@ -5,6 +5,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("move")
 public interface MovingService extends RemoteService {
-    MoveResponse makeMove(MoveMessage name);
-    MoveResponse getMove();
+    MoveResponse makeMove(String sessionID, MoveMessage name);
+    MoveResponse getMove(String sessionID);
 }

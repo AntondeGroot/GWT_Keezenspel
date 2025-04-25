@@ -5,6 +5,8 @@ import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
 import ADG.Games.Keezen.ImageProcessing;
 import ADG.Games.Keezen.Player.Player;
+import java.io.File;
+import java.util.Objects;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -14,21 +16,18 @@ import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerF
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.util.Objects;
-
 @SpringBootApplication
 @ServletComponentScan
-public class Application
+public class ApplicationTest
         extends SpringBootServletInitializer {
 
   public static void main(String[] args) {
-    SpringApplication.run(Application.class,
+    SpringApplication.run(ApplicationTest.class,
                           args);
     for (int i = 0; i < 8; i++) {
       ImageProcessing.create(i);
     }
-    String sessionId = GameRegistry.createNewGame("123");
+    String sessionId = GameRegistry.createTestGame("123");
     GameSession session = GameRegistry.getGame(sessionId);
     GameState gameState = session.getGameState();
     int NrPlayers = 3;
@@ -50,7 +49,7 @@ public class Application
 
   @Override
   protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-    return builder.sources(Application.class);
+    return builder.sources(ApplicationTest.class);
   }
 
   @Component

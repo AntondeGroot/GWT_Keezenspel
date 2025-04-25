@@ -6,20 +6,27 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.*;
 
-public class CardsDeck implements IsSerializable {
-    private static int roundNr;
-    private static ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
-    private static final ArrayList<Card> playedCards = new ArrayList<>();
-    private static final HashMap<String, PlayerHand> playerHands = new HashMap<>();
-    private static ArrayList<String> activePlayers = new ArrayList<>();
+public class CardsDeck implements CardsDeckInterface, IsSerializable {
+    private int roundNr;
+    private ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
+    private final ArrayList<Card> playedCards = new ArrayList<>();
+    private final HashMap<String, PlayerHand> playerHands = new HashMap<>();
+    private ArrayList<String> activePlayers = new ArrayList<>();
+    private GameState gameState;
 
-    public static void addPlayers(ArrayList<Player> players) {
+    public CardsDeck() {}
+
+    public void setGameState(GameState gameState){
+        this.gameState = gameState;
+    }
+
+    public void addPlayers(ArrayList<Player> players) {
         for (Player p : players) {
             playerHands.put(p.getUUID(), new PlayerHand());
         }
     }
 
-    public static HashMap<String, Integer> getNrOfCardsForAllPlayers(){
+    public HashMap<String, Integer> getNrOfCardsForAllPlayers(){
         HashMap<String, Integer> nrOfCards = new HashMap<>();
         for(Map.Entry<String, PlayerHand> p : playerHands.entrySet()){
             nrOfCards.put(p.getKey(), p.getValue().getHand().size());
@@ -27,7 +34,7 @@ public class CardsDeck implements IsSerializable {
         return nrOfCards;
     }
 
-    public static ArrayList<Card> getCardsForPlayer(String playerUUID) {
+    public ArrayList<Card> getCardsForPlayer(String playerUUID) {
         if(playerHands.containsKey(playerUUID)){
             return playerHands.get(playerUUID).getHand();
         }else{
@@ -35,19 +42,19 @@ public class CardsDeck implements IsSerializable {
         }
     }
 
-    public static void forfeitCardsForPlayer(String playerId) {
+    public void forfeitCardsForPlayer(String playerId) {
         playedCards.addAll(playerHands.get(playerId).getHand());
         playerHands.get(playerId).dropCards();
 //        players.get(playerId).getHand().clear(); todo: method is different, does it work correctly?
     }
 
-    public static void shuffleIfFirstRound(){
+    public void shuffleIfFirstRound(){
         if(roundNr != 0){
             return;
         }
 
         ArrayList<Card> cards = new ArrayList<>();
-        activePlayers = GameState.getActivePlayers();
+        activePlayers = gameState.getActivePlayers();
         // create cards
         int uniqueCardNr = 0;
         for (int suit = 0; suit < activePlayers.size(); suit++) {
@@ -62,7 +69,7 @@ public class CardsDeck implements IsSerializable {
         cardsDeque = new ArrayDeque<>(cards);
     }
 
-    public static boolean playerPlaysCard(String playerId, Card card) {
+    public boolean playerPlaysCard(String playerId, Card card) {
         if(card != null) {
             playerHands.get(playerId).getHand().remove(card);
             playedCards.add(card);
@@ -73,18 +80,18 @@ public class CardsDeck implements IsSerializable {
         return false;
     }
 
-    public static void giveCardToPlayerForTesting(String playerId, Card card){
+    public void giveCardToPlayerForTesting(String playerId, Card card){
         // this way you can replace one card by another, play a card in a Test, and then know based on
         // the game whether the player should have 5 or 4 cards in their hand left.
         playerHands.get(playerId).getHand().removeFirst();
         setPlayerCard(playerId, card);
     }
 
-    public static void setPlayerCard(String playerId, Card card){
+    public void setPlayerCard(String playerId, Card card){
         playerHands.get(playerId).addCard(card);
     }
 
-    public static void dealCards(){
+    public void dealCards(){
         int nrCards;
         if(roundNr == 0){
             // new round so reset played cards stack
@@ -100,7 +107,7 @@ public class CardsDeck implements IsSerializable {
         }
 
         for (int j = 0; j < nrCards; j++) {
-            for(Player player: GameState.getPlayers()){
+            for(Player player: gameState.getPlayers()){
                 if(player.isActive()){
                     setPlayerCard(player.getUUID(), cardsDeque.pop());
                 }
@@ -110,22 +117,22 @@ public class CardsDeck implements IsSerializable {
         roundNr = (roundNr + 1) % 3;
     }
 
-    public static boolean playerHasCard(String playerId, Card card ){
+    public boolean playerHasCard(String playerId, Card card ){
         return playerHands.get(playerId).hasCard(card);
     }
 
-    public static boolean playerDoesNotHaveCard(String playerId, Card card ){
+    public boolean playerDoesNotHaveCard(String playerId, Card card ){
         return !playerHasCard(playerId, card);
     }
 
-    public static void reset(){
+    public void reset(){
         roundNr = 0;
         cardsDeque.clear();
         playerHands.clear();
         playedCards.clear();
     }
 
-    public static ArrayList<Card> getPlayedCards() {
+    public ArrayList<Card> getPlayedCards() {
         return playedCards;
     }
 }

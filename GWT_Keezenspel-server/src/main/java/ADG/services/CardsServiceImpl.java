@@ -1,8 +1,10 @@
 package ADG.services;
 
 import ADG.Games.Keezen.Cards.CardResponse;
-import ADG.Games.Keezen.CardsDeck;
 import ADG.Games.Keezen.Cards.CardsService;
+import ADG.Games.Keezen.CardsDeckInterface;
+import ADG.Games.Keezen.GameSession;
+import ADG.Games.Keezen.GameRegistry;
 import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import jakarta.servlet.annotation.WebServlet;
 
@@ -11,12 +13,15 @@ import jakarta.servlet.annotation.WebServlet;
 public class CardsServiceImpl extends RemoteServiceServlet implements CardsService {
 
     @Override
-    public CardResponse getCards(String playerUUID) throws IllegalArgumentException {
+    public CardResponse getCards(String sessionID, String playerUUID) throws IllegalArgumentException {
+        GameSession session = GameRegistry.getGame(sessionID);
+        CardsDeckInterface cardsDeck = session.getCardsDeck();
+
         CardResponse response = new CardResponse();
         response.setPlayerId(playerUUID);
-        response.setCards(CardsDeck.getCardsForPlayer(playerUUID));
-        response.setPlayedCards(CardsDeck.getPlayedCards());
-        response.setNrOfCardsPerPlayer(CardsDeck.getNrOfCardsForAllPlayers());
+        response.setCards(cardsDeck.getCardsForPlayer(playerUUID));
+        response.setPlayedCards(cardsDeck.getPlayedCards());
+        response.setNrOfCardsPerPlayer(cardsDeck.getNrOfCardsForAllPlayers());
         return response;
     }
 }

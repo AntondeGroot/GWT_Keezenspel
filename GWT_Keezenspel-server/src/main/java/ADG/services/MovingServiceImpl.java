@@ -23,7 +23,7 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
     Instant saveTime;
 
     @Override
-    public MoveResponse makeMove(MoveMessage message){
+    public MoveResponse makeMove(String sessionID, MoveMessage message){
         // Verify that the input is valid.
         // the movetype can be null when the player only selected a pawn
         // return an empty response, since nothing will be done and no error occured.
@@ -31,7 +31,9 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
             return new MoveResponse();
         }
 
-        if(!Objects.equals(message.getPlayerId(), GameState.getPlayerIdTurn())){
+        GameSession session = GameRegistry.getGame(sessionID);
+        GameState gameState = session.getGameState();
+        if(!Objects.equals(message.getPlayerId(), gameState.getPlayerIdTurn())){
             throw new IllegalArgumentException("It was not your turn to make a move");
         }
 
@@ -41,15 +43,15 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
 
         // change the gamestate
         switch (message.getMoveType()) {
-            case MOVE : GameState.processOnMove(message, response);
+            case MOVE : gameState.processOnMove(message, response);
                 break;
-            case ONBOARD : GameState.processOnBoard(message, response);
+            case ONBOARD : gameState.processOnBoard(message, response);
                 break;
-            case SWITCH: GameState.processOnSwitch(message,response);
+            case SWITCH: gameState.processOnSwitch(message,response);
                 break;
-            case FORFEIT: GameState.processOnForfeit(message);
+            case FORFEIT: gameState.processOnForfeit(message);
                 break;
-            case SPLIT: GameState.processOnSplit(message, response);
+            case SPLIT: gameState.processOnSplit(message, response);
                 break;
             default:
                 break;
@@ -68,11 +70,11 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
     }
 
     @Override
-    public MoveResponse getMove() {
+    public MoveResponse getMove(String sessionID) {
         // check if time in seconds has passed
         // don't show animation when too much time has passed, for example when refreshing browser
         Instant currentTime = Instant.now();
-        if(saveTime == null){
+        if(saveTime == null){// todo: make this sessionID dependent
             saveTime = currentTime;
         }
 
