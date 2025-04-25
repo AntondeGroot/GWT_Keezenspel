@@ -1,8 +1,8 @@
 package ADG.Games.Keezen.FrontEnd;
 
+import ADG.Games.Keezen.FrontEnd.Utils.SpringAppTestHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -19,6 +19,7 @@ class BoardTest {
   @BeforeEach
   public void setUp() {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
+    SpringAppTestHelper.startRealApp();
     driver = getDriver();
   }
 
@@ -28,6 +29,7 @@ class BoardTest {
     if(driver != null){
       driver.quit();
     }
+    SpringAppTestHelper.stopApp();
   }
 
   @Test

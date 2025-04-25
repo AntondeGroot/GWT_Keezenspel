@@ -7,6 +7,7 @@ import static ADG.Games.Keezen.FrontEnd.TestUtils.waitUntilDOMElementUpdates;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import ADG.Games.Keezen.FrontEnd.Utils.SpringAppTestHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ public class CardTest {
   @BeforeEach
   public void setUp() {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
+    SpringAppTestHelper.startRealApp();
     driver = getDriver();
     setPlayerIdPlaying(driver,"0");
   }
@@ -31,6 +33,7 @@ public class CardTest {
     if(driver != null){
       driver.quit();
     }
+    SpringAppTestHelper.stopApp();
   }
 
   @Test

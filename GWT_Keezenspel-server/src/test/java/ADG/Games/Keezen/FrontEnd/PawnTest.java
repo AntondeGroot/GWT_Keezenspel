@@ -4,9 +4,9 @@ import static ADG.Games.Keezen.FrontEnd.TestUtils.getDriver;
 import static ADG.Games.Keezen.FrontEnd.TestUtils.setPlayerIdPlaying;
 import static org.junit.Assert.assertEquals;
 
+import ADG.Games.Keezen.FrontEnd.Utils.SpringAppTestHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -21,6 +21,7 @@ public class PawnTest {
   public void setUp() {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
 
+    SpringAppTestHelper.startTestApp();
     driver = getDriver();
     setPlayerIdPlaying(driver,"0");
   }
@@ -31,6 +32,7 @@ public class PawnTest {
     if(driver != null){
       driver.quit();
     }
+    SpringAppTestHelper.stopApp();
   }
 
   @Test
