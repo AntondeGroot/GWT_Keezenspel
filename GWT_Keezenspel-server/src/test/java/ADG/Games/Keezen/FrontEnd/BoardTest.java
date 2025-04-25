@@ -18,7 +18,7 @@ class BoardTest {
 
   @BeforeEach
   public void setUp() {
-    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
+//    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
   }

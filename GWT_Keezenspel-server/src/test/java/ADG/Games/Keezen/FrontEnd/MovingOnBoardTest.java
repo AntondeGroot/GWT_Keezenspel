@@ -21,7 +21,7 @@ public class MovingOnBoardTest {
 
   @BeforeEach
   public void setUp() {
-    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
+//    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
 
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
