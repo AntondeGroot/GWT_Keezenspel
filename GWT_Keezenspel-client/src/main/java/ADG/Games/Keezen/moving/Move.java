@@ -6,6 +6,7 @@ import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Move.MovingService;
 import ADG.Games.Keezen.Move.MovingServiceAsync;
 import ADG.Games.Keezen.animations.StepsAnimation;
+import ADG.Games.Keezen.util.Cookie;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -18,7 +19,7 @@ public class Move {
     public static void testMove(MoveMessage moveMessage) {
         GWT.log(moveMessage.toString());
 
-        movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
+        movingService.makeMove(Cookie.getSessionID(), moveMessage, new AsyncCallback<MoveResponse>() {
             public void onFailure(Throwable caught) {
                 StepsAnimation.resetStepsAnimation();
             }
@@ -41,7 +42,7 @@ public class Move {
     public static void makeMove(MoveMessage moveMessage) {
         GWT.log("Sending MoveMessage" + moveMessage);
 
-        movingService.makeMove(moveMessage, new AsyncCallback<MoveResponse>() {
+        movingService.makeMove(Cookie.getSessionID(), moveMessage, new AsyncCallback<MoveResponse>() {
             public void onFailure(Throwable caught) {
                 StepsAnimation.resetStepsAnimation();
             }

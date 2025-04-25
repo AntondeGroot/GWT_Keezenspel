@@ -1,5 +1,6 @@
 package ADG.Games.Keezen.logic;
 
+import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
 import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.TileId;
@@ -18,14 +19,18 @@ import static org.junit.jupiter.api.Assertions.*;
  * course. Some of these tests may therefore be duplicates.
  */
 class MissingTilesTest {
+    private GameState gameState;
 
     @BeforeEach
     void setUp() {
-        GameState.stop();
-        GameState.addPlayer(new Player("player0","0"));
-        GameState.addPlayer(new Player("player1","1"));
-        GameState.addPlayer(new Player("player2","2"));
-        GameState.start();
+        GameSession engine = new GameSession();
+        gameState = engine.getGameState();
+
+        gameState.stop();
+        gameState.addPlayer(new Player("player0","0"));
+        gameState.addPlayer(new Player("player1","1"));
+        gameState.addPlayer(new Player("player2","2"));
+        gameState.start();
     }
 
     @AfterEach

@@ -6,8 +6,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
 
 public interface GameStateServiceAsync {
-    void getGameState(AsyncCallback<GameStateResponse> callback);
-    void getPlayers(AsyncCallback<ArrayList<Player>> callback);
-    void addPlayer(Player player, AsyncCallback<Player> callback);
-    void startGame(AsyncCallback<Void> callback) throws IllegalStateException;
+    void getGameState(String sessionID, AsyncCallback<GameStateResponse> callback);
+    void getPlayers(String sessionID, AsyncCallback<ArrayList<Player>> callback);
+    void addPlayer(String sessionID, Player player, AsyncCallback<Player> callback);
+    void startGame(String sessionID, AsyncCallback<Void> callback) throws IllegalStateException;
 }

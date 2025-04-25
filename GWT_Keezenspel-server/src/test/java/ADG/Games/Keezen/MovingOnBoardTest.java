@@ -20,17 +20,24 @@ class MovingOnBoardTest {
     MoveMessage moveMessage = new MoveMessage();
     MoveResponse moveResponse = new MoveResponse();
 
+    private GameState gameState;
+    private CardsDeckInterface cardsDeck;
+
     @BeforeEach
     void setUp() {
-        createGame_With_NPlayers(3);
+        GameSession engine = new GameSession();
+        gameState = engine.getGameState();
+        cardsDeck = engine.getCardsDeck();
+
+        createGame_With_NPlayers(gameState, 3);
         moveMessage = new MoveMessage();
         moveResponse = new MoveResponse();
     }
 
     @AfterEach
     void tearDown() {
-        GameState.tearDown();
-        CardsDeck.reset();
+        gameState.tearDown();
+        cardsDeck.reset();
         moveMessage = null;
         moveResponse = null;
     }
@@ -39,109 +46,109 @@ class MovingOnBoardTest {
     @Test
     void putPlayerOnBoard_WhenPossible() {
         // GIVEN
-        Card ace = givePlayerAce(0);
-        Pawn pawn1 = GameStateUtil.placePawnOnNest("0",new TileId("0",-2));
+        Card ace = givePlayerAce(cardsDeck, 0);
+        Pawn pawn1 = GameStateUtil.placePawnOnNest(gameState , "0", new TileId("0",-2));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
-        GameState.processOnBoard(moveMessage, moveResponse);
+        gameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN
         // response message is correct
         assertEquals(new TileId("0",0), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tileNr
         assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());                          // moves the correct pawn
         // GameState is correct
-        assertEquals(new TileId("0",0) ,GameState.getPawn(pawn1).getCurrentTileId());
+        assertEquals(new TileId("0",0) ,gameState.getPawn(pawn1).getCurrentTileId());
     }
 
     @Test
     void putPlayerOnBoard_ThenNextPlayerPlays() {
         // GIVEN
-        Card ace = givePlayerAce(0);
-        Pawn pawn1 = GameStateUtil.placePawnOnNest("0",new TileId("0",-2));
+        Card ace = givePlayerAce(cardsDeck, 0);
+        Pawn pawn1 = GameStateUtil.placePawnOnNest(gameState , "0", new TileId("0",-2));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
-        GameState.processOnBoard(moveMessage, moveResponse);
+        gameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN
-        assertEquals("1" ,GameState.getPlayerIdTurn());
+        assertEquals("1" ,gameState.getPlayerIdTurn());
     }
 
     @Test
     void putPlayerOnBoardAsLastCard_ThenNextPlayerPlays() {
         // GIVEN
-        GameState.setPlayerIdTurn("0");
+        gameState.setPlayerIdTurn("0");
         for (int i = 0; i < 4; i++) {
-            sendValidMoveMessage("0");
-            sendValidMoveMessage("1");
-            sendValidMoveMessage("2");
+            sendValidMoveMessage(gameState , cardsDeck , "0");
+            sendValidMoveMessage(gameState , cardsDeck , "1");
+            sendValidMoveMessage(gameState , cardsDeck , "2");
         }
 
-        Card ace = givePlayerAce(0);
-        Pawn pawn1 = GameStateUtil.placePawnOnNest("0",new TileId("0",-2));
+        Card ace = givePlayerAce(cardsDeck, 0);
+        Pawn pawn1 = GameStateUtil.placePawnOnNest(gameState , "0", new TileId("0",-2));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
-        GameState.processOnBoard(moveMessage, moveResponse);
+        gameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN
-        assertEquals("1" ,GameState.getPlayerIdTurn());
+        assertEquals("1" ,gameState.getPlayerIdTurn());
     }
 
     @Test
     void putPlayerNotOnBoard_WhenSamePlayerIsAlreadyThere() {
         // GIVEN
-        Card ace = givePlayerAce(0);
-        Pawn pawn1 = placePawnOnBoard(new PawnId("0",0), new TileId("0",-1));
-        Pawn pawn2 = placePawnOnBoard(new PawnId("0",1), new TileId("0",0));
+        Card ace = givePlayerAce(cardsDeck, 0);
+        Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("0",0), new TileId("0",-1));
+        Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("0",1), new TileId("0",0));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
-        GameState.processOnBoard(moveMessage, moveResponse);
+        gameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN response msg is correct
         assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
         assertNull(moveResponse.getMovePawn1());
         assertNull(moveResponse.getPawnId1());
         // THEN GameState is correct
-        assertEquals(new TileId("0",-1) , GameState.getPawn(pawn1).getCurrentTileId());
+        assertEquals(new TileId("0",-1) , gameState.getPawn(pawn1).getCurrentTileId());
     }
 
     @Test
     void putPlayerNotOnBoard_WhenNotOnNestTiles(){
         // GIVEN
-        Card ace = givePlayerAce(0);
-        Pawn pawn1 = placePawnOnNest("0",new TileId("0",3));
+        Card ace = givePlayerAce(cardsDeck, 0);
+        Pawn pawn1 = placePawnOnNest(gameState , "0", new TileId("0",3));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
-        GameState.processOnBoard(moveMessage, moveResponse);
+        gameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN response msg is correct
         assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
         assertNull(moveResponse.getPawnId1());
         assertNull(moveResponse.getMovePawn1());
         // THEN GameState is correct
-        assertEquals(3,GameState.getPawn(pawn1).getCurrentTileId().getTileNr());
+        assertEquals(3,gameState.getPawn(pawn1).getCurrentTileId().getTileNr());
     }
 
     @Test
     void putPlayerNotOnBoard_WhenOnFinishTiles(){
         // GIVEN
-        Card king = givePlayerKing(0);
-        Pawn pawn1 = placePawnOnNest("0",new TileId("0",17));
+        Card king = givePlayerKing(cardsDeck, 0);
+        Pawn pawn1 = placePawnOnNest(gameState , "0", new TileId("0",17));
 
         // WHEN
         createOnBoardMessage("0", pawn1, king);
-        GameState.processOnBoard(moveMessage, moveResponse);
+        gameState.processOnBoard(moveMessage, moveResponse);
 
         // THEN response msg is correct
         assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
         assertNull(moveResponse.getPawnId1());
         assertNull(moveResponse.getMovePawn1());
         // THEN GameState is correct
-        assertEquals(17,GameState.getPawn(pawn1).getCurrentTileId().getTileNr());
+        assertEquals(17,gameState.getPawn(pawn1).getCurrentTileId().getTileNr());
     }
 
     public void createOnBoardMessage(String playerId, Pawn pawn, Card card){

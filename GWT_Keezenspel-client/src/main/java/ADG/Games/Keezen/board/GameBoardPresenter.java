@@ -101,7 +101,7 @@ public class GameBoardPresenter {
     }
 
     private void pollServerForMove(){
-        movingService.getMove(new AsyncCallback<MoveResponse>() {
+        movingService.getMove(Cookie.getSessionID(), new AsyncCallback<MoveResponse>() {
             @Override public void onFailure(Throwable throwable) {}
 
             @Override
@@ -118,7 +118,7 @@ public class GameBoardPresenter {
     }
 
     private void pollServerForGameState() {
-        gameStateService.getGameState(new AsyncCallback<GameStateResponse>() {
+        gameStateService.getGameState(Cookie.getSessionID(), new AsyncCallback<GameStateResponse>() {
             public void onFailure(Throwable caught) {
                 StepsAnimation.resetStepsAnimation();
             }
@@ -153,7 +153,7 @@ public class GameBoardPresenter {
     private void updatePlayerList(GameStateResponse result) {
         playerList.setPlayers(result.getPlayers());
         if (!playerList.isIsUpToDate()) {
-            gameStateService.getPlayers(new AsyncCallback<ArrayList<Player>>() {
+            gameStateService.getPlayers(Cookie.getSessionID(), new AsyncCallback<ArrayList<Player>>() {
                 @Override
                 public void onFailure(Throwable throwable) {}
 
@@ -166,10 +166,14 @@ public class GameBoardPresenter {
     }
 
     private void initializeGame() {
-        gameStateService.startGame(new AsyncCallback<Void>() {
+        gameStateService.startGame(Cookie.getSessionID(), new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable throwable) {
                 GWT.log("Game is already running");
+                try{
+                    fetchAndInitializePlayers();
+                }catch (Exception ignored){
+                }
             }
 
             @Override
@@ -180,7 +184,7 @@ public class GameBoardPresenter {
     }
 
     private void fetchAndInitializePlayers(){
-        gameStateService.getPlayers(new AsyncCallback<ArrayList<Player>>() {
+        gameStateService.getPlayers(Cookie.getSessionID(), new AsyncCallback<ArrayList<Player>>() {
             @Override
             public void onFailure(Throwable throwable) {
             }
@@ -199,7 +203,7 @@ public class GameBoardPresenter {
 
     private void pollServerForCards() {
         pawnAndCardSelection.setPlayerId(Cookie.getPlayerId());
-        cardsService.getCards(Cookie.getPlayerId(), new AsyncCallback<CardResponse>() {
+        cardsService.getCards(Cookie.getSessionID(), Cookie.getPlayerId(), new AsyncCallback<CardResponse>() {
             public void onFailure(Throwable caught) {
                 StepsAnimation.resetStepsAnimation();
             }

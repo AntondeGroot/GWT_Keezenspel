@@ -11,30 +11,30 @@ import ADG.Log;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ADG.Games.Keezen.CardsDeck.playerDoesNotHaveCard;
 import static ADG.Games.Keezen.Move.MessageType.*;
 import static ADG.Games.Keezen.Move.MoveResult.*;
 import static ADG.Games.Keezen.Move.MoveType.*;
 import static ADG.Games.Keezen.Cards.CardValueCheck.*;
 import static ADG.Games.Keezen.logic.BoardLogic.isPawnOnFinish;
 import static ADG.Games.Keezen.logic.BoardLogic.isPawnOnNest;
-import static ADG.Games.Keezen.logic.StartTileLogic.canPassStartTile;
-import static ADG.Games.Keezen.logic.WinnerLogic.checkForWinners;
 
 public class GameState {
 
-    private static ArrayList<Pawn> pawns = new ArrayList<>();
-    private static String playerIdTurn;
-    private static String playerIdStartingRound;
-    private static final ArrayList<Player> players = new ArrayList<>();
-    private static final HashMap<String, Integer> playerColors = new HashMap<>(); // to map a player UUID to an int for player Colors
-    private static final ArrayList<String> activePlayers = new ArrayList<>();
-    private static final ArrayList<String> winners = new ArrayList<>();
-    private static final int MAX_PLAYERS = 8;
+    private ArrayList<Pawn> pawns = new ArrayList<>();
+    private String playerIdTurn;
+    private String playerIdStartingRound;
+    private final ArrayList<Player> players = new ArrayList<>();
+    private final HashMap<String, Integer> playerColors = new HashMap<>(); // to map a player UUID to an int for player Colors
+    private final ArrayList<String> activePlayers = new ArrayList<>();
+    private final ArrayList<String> winners = new ArrayList<>();
+    private final int MAX_PLAYERS = 8;
+    private final CardsDeckInterface cardsDeck;
 
-    public GameState() {}
+    public GameState(CardsDeckInterface cardsDeck) {
+        this.cardsDeck = cardsDeck;
+    }
 
-    public static void stop(){
+    public void stop(){
         pawns.clear();
         players.clear();
         playerColors.clear();
@@ -42,7 +42,7 @@ public class GameState {
         winners.clear();
     }
 
-    public static void start(){
+    public void start(){
         playerIdTurn = players.getFirst().getUUID();
         playerIdStartingRound = playerIdTurn;
         if (pawns.isEmpty()) {
@@ -60,35 +60,35 @@ public class GameState {
                 playerInt++;
             }
 
-            CardsDeck.addPlayers(players);
-            CardsDeck.shuffleIfFirstRound();
-            CardsDeck.dealCards();
+            cardsDeck.addPlayers(players);
+            cardsDeck.shuffleIfFirstRound();
+            cardsDeck.dealCards();
         }
     }
 
-    public static ArrayList<Player> getPlayers() {
+    public ArrayList<Player> getPlayers() {
         return players;
     }
 
-    public static void addPlayer(Player player) {
+    public void addPlayer(Player player) {
         if(!players.contains(player) && players.size() < MAX_PLAYERS){
             player.setIndex(players.size());
             players.add(player);
         }
     }
 
-    public static HashMap<String, Integer> getPlayerColors() {
+    public HashMap<String, Integer> getPlayerColors() {
         return playerColors;
     }
 
-    public static ArrayList<String> getActivePlayers() {
+    public ArrayList<String> getActivePlayers() {
         return players.stream()
                 .filter(Player::isActive)
                 .map(Player::getUUID)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public static void resetActivePlayers(){
+    public void resetActivePlayers(){
         activePlayers.clear();
         for(Player player : players){
             if(!player.hasFinished()){
@@ -98,7 +98,7 @@ public class GameState {
         }
     }
 
-    public static void forfeitPlayer(String playerId) {
+    public void forfeitPlayer(String playerId) {
         Optional<Player> matchingPlayer = players.stream()
                 .filter(player -> player.getUUID().equals(playerId))
                 .findFirst();
@@ -107,8 +107,8 @@ public class GameState {
 
         if(players.stream().noneMatch(Player::isActive)){
             resetActivePlayers();
-            CardsDeck.shuffleIfFirstRound();// error
-            CardsDeck.dealCards();
+            cardsDeck.shuffleIfFirstRound();// error
+            cardsDeck.dealCards();
             nextRoundPlayer();
         }else {
             activePlayers.remove(playerId);
@@ -116,13 +116,13 @@ public class GameState {
         }
     }
 
-    private static void removeWinnerFromActivePlayerList(){
+    private void removeWinnerFromActivePlayerList(){
         for (String winnerId: winners){
             activePlayers.remove(winnerId);
         }
     }
 
-    private static void nextRoundPlayer(){
+    private void nextRoundPlayer(){
         playerIdTurn = nextPlayerId(playerIdStartingRound);
         playerIdStartingRound = playerIdTurn;
         if(!activePlayers.isEmpty() && !activePlayers.contains(playerIdTurn)){
@@ -135,7 +135,7 @@ public class GameState {
         }
     }
 
-    private static void nextActivePlayer() {
+    private void nextActivePlayer() {
         playerIdTurn = nextPlayerId(playerIdTurn);
         if(!activePlayers.isEmpty() && !activePlayers.contains(playerIdTurn)){
             nextActivePlayer();
@@ -147,27 +147,27 @@ public class GameState {
         }
     }
 
-    public static String getPlayerIdTurn() {
+    public String getPlayerIdTurn() {
         return playerIdTurn;
     }
 
     /**
      * for testing purposes
-     * @param playerIdTurn
+     * @param playerId
      */
-    public static void setPlayerIdTurn(String playerIdTurn){
-        GameState.playerIdTurn = playerIdTurn;
+    public void setPlayerIdTurn(String playerId){
+        playerIdTurn = playerId;
     }
 
-    public static ArrayList<Pawn> getPawns() {
+    public ArrayList<Pawn> getPawns() {
         return pawns;
     }
 
-    private static boolean isPawnOnLastSection(String playerId, String sectionId){
+    private boolean isPawnOnLastSection(String playerId, String sectionId){
         return sectionId.equals(previousPlayerId(playerId));
     }
 
-    public static String previousPlayerId(String playerId){
+    public String previousPlayerId(String playerId){
         int playerInt = playerColors.get(playerId);
         int previousPlayerInt = (playerInt + players.size() - 1) % players.size();
         return playerColors.entrySet().stream()
@@ -175,7 +175,7 @@ public class GameState {
                 .map(HashMap.Entry::getKey).findFirst().orElse("0");
     }
 
-    private static boolean isPawnClosedInFromBehind(PawnId pawnId, TileId tileId){
+    private boolean isPawnClosedInFromBehind(PawnId pawnId, TileId tileId){
         int tileNr = tileId.getTileNr();
         while (tileNr > 15){
             if(!canMoveToTile(pawnId, new TileId(pawnId.getPlayerId(), tileNr-1))){
@@ -186,11 +186,11 @@ public class GameState {
         return false;
     }
 
-    public static int getNrPlayers() {
+    public int getNrPlayers() {
         return players.size();
     }
 
-    private static boolean isPawnLooselyClosedIn(PawnId pawnId, TileId tileId){
+    private boolean isPawnLooselyClosedIn(PawnId pawnId, TileId tileId){
         int tileNr = tileId.getTileNr();
         String playerId = pawnId.getPlayerId();
 
@@ -207,7 +207,7 @@ public class GameState {
         return false;
     }
 
-    private static boolean isPawnTightlyClosedIn(PawnId pawnId, TileId tileId){
+    private boolean isPawnTightlyClosedIn(PawnId pawnId, TileId tileId){
 
         if(tileId.getTileNr() == 19
                 && !canMoveToTile(pawnId,new TileId(pawnId.getPlayerId(), 18))){
@@ -237,7 +237,7 @@ public class GameState {
      * @Return False if it ends on blockaded starting tile
      *
      */
-    private static boolean canMoveToTile(PawnId selectedPawnId, TileId nextTileId){
+    private boolean canMoveToTile(PawnId selectedPawnId, TileId nextTileId){
         if(nextTileId.getTileNr() > 19){
             return false;
         }
@@ -258,7 +258,7 @@ public class GameState {
         return true;
     }
 
-    private static boolean cannotMoveToTileBecauseSamePlayer(PawnId selectedPawnId, TileId nextTileId){
+    private boolean cannotMoveToTileBecauseSamePlayer(PawnId selectedPawnId, TileId nextTileId){
         Pawn pawn = getPawn(nextTileId);
         if(pawn != null) {
             if (Objects.equals(pawn.getPlayerId(), selectedPawnId.getPlayerId()) && !pawn.getPawnId().equals(selectedPawnId)) {
@@ -268,7 +268,7 @@ public class GameState {
         return false;
     }
 
-    public static TileId getPawnTileId(PawnId pawnId){
+    public TileId getPawnTileId(PawnId pawnId){
         for(Pawn pawn : pawns){
             if(pawn.getPawnId().equals(pawnId)){
                 return pawn.getCurrentTileId();
@@ -277,7 +277,7 @@ public class GameState {
         return null;
     }
 
-    public static void processOnSplit(MoveMessage moveMessage, MoveResponse response){
+    public void processOnSplit(MoveMessage moveMessage, MoveResponse response){
         PawnId pawnId1 = moveMessage.getPawnId1();
         PawnId pawnId2 = moveMessage.getPawnId2();
         Card card = moveMessage.getCard();
@@ -333,7 +333,7 @@ public class GameState {
         // 4. move Pawn1 back to its original place
         // 5. then if the movetype is MAKE_MOVE then do it for real.
         // make sure to use new Pawn(), otherwise it will refer to the same memory and the backup would be updated!
-        Pawn backupPawn1 = new Pawn(pawnId1, GameState.getPawn(moveMessagePawn1.getPawnId1()).getCurrentTileId());
+        Pawn backupPawn1 = new Pawn(pawnId1, getPawn(moveMessagePawn1.getPawnId1()).getCurrentTileId());
 
         processOnMove(moveMessagePawn1, moveResponsePawn1);
         if(moveResponsePawn1.getResult().equals(CANNOT_MAKE_MOVE)){
@@ -342,12 +342,12 @@ public class GameState {
         }
 
         // temporarily move Pawn1
-        GameState.movePawn(new Pawn(pawnId1, moveResponsePawn1.getMovePawn1().getLast()));
+        movePawn(new Pawn(pawnId1, moveResponsePawn1.getMovePawn1().getLast()));
 
         // check Pawn2, this time it will take in account the new position of Pawn1
         processOnMove(moveMessagePawn2, moveResponsePawn2);
         //restore and move Pawn1 back to where it originally was
-        GameState.movePawn(new Pawn(pawnId1, backupPawn1.getCurrentTileId()));
+        movePawn(new Pawn(pawnId1, backupPawn1.getCurrentTileId()));
         if(moveResponsePawn2.getResult().equals(CANNOT_MAKE_MOVE)){
             response.setResult(CANNOT_MAKE_MOVE);
             return;
@@ -360,7 +360,7 @@ public class GameState {
             }
             // DO IT AGAIN NOW FOR REAL
             moveMessagePawn1.setMessageType(MAKE_MOVE);
-            CardsDeck.setPlayerCard(playerId, card); // duplicate the 7 card so that the player can play both pawns with 1 card
+            cardsDeck.setPlayerCard(playerId, card); // duplicate the 7 card so that the player can play both pawns with 1 card
             moveMessagePawn2.setMessageType(MAKE_MOVE);
             processOnMove(moveMessagePawn1, moveResponsePawn1, false);
             processOnMove(moveMessagePawn2, moveResponsePawn2, true);
@@ -385,11 +385,11 @@ public class GameState {
     }
 
 
-    public static void processOnMove(MoveMessage moveMessage, MoveResponse response){
+    public void processOnMove(MoveMessage moveMessage, MoveResponse response){
         processOnMove(moveMessage, response, true);
     }
 
-    public static void processOnMove(MoveMessage moveMessage, MoveResponse response, boolean goToNextPlayer){
+    public void processOnMove(MoveMessage moveMessage, MoveResponse response, boolean goToNextPlayer){
         // only don't go to next player when playing a SPLIT card, since you have to make processOnMove twice
         PawnId pawnId1 = moveMessage.getPawnId1();
         Pawn pawn1 = getPawn(pawnId1);
@@ -417,7 +417,7 @@ public class GameState {
         }
 
         // Player must have the card he wants to play
-        if(playerDoesNotHaveCard(playerId, card)) {
+        if(!cardsDeck.playerHasCard(playerId, card)) {
             response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
             return;
         }
@@ -639,7 +639,7 @@ public class GameState {
         }
     }
 
-    private static void clearResponse(MoveResponse response) {
+    private void clearResponse(MoveResponse response) {
         response.setPawnId1(null);
         response.setPawnId2(null);
         response.setMoveType(null);
@@ -647,7 +647,7 @@ public class GameState {
         response.setMovePawn2(null);
     }
 
-    public static int checkHighestTileNrYouCanMoveTo(PawnId pawnId, TileId tileId, int nrSteps) {
+    public int checkHighestTileNrYouCanMoveTo(PawnId pawnId, TileId tileId, int nrSteps) {
         int direction = 1;
         int tileNrToCheck = tileId.getTileNr();
 
@@ -666,7 +666,7 @@ public class GameState {
         return tileNrToCheck;
     }
 
-    public static ArrayList<TileId> pingpongMove(PawnId pawnId, TileId tileId , int nrSteps){
+    public ArrayList<TileId> pingpongMove(PawnId pawnId, TileId tileId , int nrSteps){
         // it is already guaranteed that a pawn is loosely closed in on the finish tiles
         ArrayList<TileId> moves = new ArrayList<>();
         int direction = 1;
@@ -697,7 +697,7 @@ public class GameState {
         return moves;
     }
 
-    public static TileId moveAndCheckEveryTile(PawnId pawnId, TileId tileId, int nrSteps){
+    public TileId moveAndCheckEveryTile(PawnId pawnId, TileId tileId, int nrSteps){
         int direction = 1;
         int tileNrToCheck = tileId.getTileNr();
 
@@ -724,12 +724,12 @@ public class GameState {
 
     }
 
-    public static void processOnForfeit(MoveMessage message){
-        CardsDeck.forfeitCardsForPlayer(message.getPlayerId());
-        GameState.forfeitPlayer(message.getPlayerId());
+    public void processOnForfeit(MoveMessage message){
+        cardsDeck.forfeitCardsForPlayer(message.getPlayerId());
+        forfeitPlayer(message.getPlayerId());
     }
 
-    public static void processOnSwitch(MoveMessage moveMessage, MoveResponse moveResponse){
+    public void processOnSwitch(MoveMessage moveMessage, MoveResponse moveResponse){
 
         PawnId pawnId1 = moveMessage.getPawnId1();
         PawnId pawnId2 = moveMessage.getPawnId2();
@@ -756,7 +756,7 @@ public class GameState {
             moveResponse.setResult(CANNOT_MAKE_MOVE);
             return;
         }
-        if(playerDoesNotHaveCard(playerId, card)) {
+        if(!cardsDeck.playerHasCard(playerId, card)) {
             moveResponse.setResult(PLAYER_DOES_NOT_HAVE_CARD);
             return;
         }
@@ -803,7 +803,7 @@ public class GameState {
         if(moveMessage.getMessageType() == MAKE_MOVE){
             movePawn(new Pawn(pawnId1,tileId2));
             movePawn(new Pawn(pawnId2,tileId1));
-            Boolean playerHasNoCardsLeft = CardsDeck.playerPlaysCard(playerId, card);
+            Boolean playerHasNoCardsLeft = cardsDeck.playerPlaysCard(playerId, card);
             if(playerHasNoCardsLeft){
                 forfeitPlayer(playerId);
             }else{
@@ -812,7 +812,7 @@ public class GameState {
         }
     }
 
-    public static void processOnBoard(MoveMessage moveMessage, MoveResponse response) {
+    public void processOnBoard(MoveMessage moveMessage, MoveResponse response) {
         PawnId pawnId1 = moveMessage.getPawnId1();
         Card card = moveMessage.getCard();
         String playerId = moveMessage.getPlayerId();
@@ -824,7 +824,7 @@ public class GameState {
         }
 
         // player should have the card he's playing
-        if(playerDoesNotHaveCard(playerId, card)) {
+        if(!cardsDeck.playerHasCard(playerId, card)) {
             response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
             return;
         }
@@ -861,11 +861,11 @@ public class GameState {
         processMove(pawnId1, targetTileId, moveMessage, response);
     }
 
-    public static void processMove(PawnId pawnId, TileId targetTileId, MoveMessage moveMessage, MoveResponse response){
+    public void processMove(PawnId pawnId, TileId targetTileId, MoveMessage moveMessage, MoveResponse response){
         processMove(pawnId, targetTileId, moveMessage, response, true);
     }
 
-    public static void processMove(PawnId pawnId, TileId targetTileId, MoveMessage moveMessage, MoveResponse response, boolean goToNextPlayer){
+    public void processMove(PawnId pawnId, TileId targetTileId, MoveMessage moveMessage, MoveResponse response, boolean goToNextPlayer){
         String playerId = moveMessage.getPlayerId();
         Card card = moveMessage.getCard();
 
@@ -874,7 +874,7 @@ public class GameState {
             response.setResult(CANNOT_MAKE_MOVE);
             return;
         }
-        if(playerDoesNotHaveCard(playerId, card)){
+        if(!cardsDeck.playerHasCard(playerId, card)){
             clearResponse(response);
             response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
             return;
@@ -900,7 +900,7 @@ public class GameState {
         response.setPawnId1(pawnId);
         if(moveMessage.getMessageType() == MAKE_MOVE){
             movePawn(new Pawn(pawnId,targetTileId));
-            Boolean playerHasNoCardsLeft = CardsDeck.playerPlaysCard(playerId, card);
+            Boolean playerHasNoCardsLeft = cardsDeck.playerPlaysCard(playerId, card);
             if(goToNextPlayer){// this is only false when you SPLIT a move, the second time calling it will make you go to the next player
                 if(playerHasNoCardsLeft){
                     forfeitPlayer(playerId);
@@ -917,7 +917,7 @@ public class GameState {
         Log.info("GameState: pawn moves to "+targetTileId +", with response "+response);
     }
 
-    public static void movePawn(Pawn selectedPawn){
+    public void movePawn(Pawn selectedPawn){
         // set a pawn's location without triggering any validation
         // public for testing purposes
         for (Pawn pawn : pawns) {
@@ -928,7 +928,7 @@ public class GameState {
         }
     }
 
-    public static void tearDown(){
+    public void tearDown(){
         pawns = new ArrayList<>();
         playerIdTurn = "0";
         players.clear();
@@ -937,7 +937,7 @@ public class GameState {
         playerIdStartingRound = "0";
     }
 
-    public static Pawn getPawn(Pawn selectedPawn){
+    public Pawn getPawn(Pawn selectedPawn){
         for (Pawn pawn : pawns) {
             if (pawn.equals(selectedPawn)){
                 return pawn;
@@ -945,7 +945,7 @@ public class GameState {
         }
         return null;
     }
-    public static Pawn getPawn(PawnId selectedPawnId){
+    public Pawn getPawn(PawnId selectedPawnId){
         for (Pawn pawn : pawns) {
             if (pawn.getPawnId().equals(selectedPawnId)){
                 return pawn;
@@ -953,7 +953,7 @@ public class GameState {
         }
         return null;
     }
-    public static Pawn getPawn(TileId selectedTileId){
+    public Pawn getPawn(TileId selectedTileId){
         for (Pawn pawn : pawns) {
             if (pawn.getCurrentTileId().equals(selectedTileId)){
                 return pawn;
@@ -962,7 +962,7 @@ public class GameState {
         return null;
     }
 
-    public static boolean tileIsABlockade(TileId selectedStartTile){
+    public boolean tileIsABlockade(TileId selectedStartTile){
         Pawn pawnOnStart = getPawn(selectedStartTile);
         if(pawnOnStart == null){
             return false;
@@ -973,19 +973,56 @@ public class GameState {
         return false;
     }
 
-    public static String nextPlayerId(String playerId){
+    public String nextPlayerId(String playerId){
         int playerInt = playerColors.get(playerId);
         return nextPlayerId(playerInt);
     }
 
-    private static String nextPlayerId(int playerInt){
+    private String nextPlayerId(int playerInt){
         int nextPlayerInt = (playerInt + 1) % players.size();
         return playerColors.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(nextPlayerInt))
                 .map(HashMap.Entry::getKey).findFirst().orElse("0");
     }
 
-    public static ArrayList<String> getWinners() {
+    public ArrayList<String> getWinners() {
         return winners;
+    }
+
+    public boolean canPassStartTile(PawnId selectedPawnId, TileId tileId){
+        Pawn pawnOnTile = getPawn(tileId);
+
+        if(pawnOnTile == null){
+            return true;
+        }
+
+        if(selectedPawnId.equals(pawnOnTile.getPawnId())){
+            return true;
+        }
+
+        if(Objects.equals(pawnOnTile.getPlayerId(), tileId.getPlayerId())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public void checkForWinners(ArrayList<String> winners){
+        ArrayList<Pawn> pawns = getPawns();
+        ArrayList<Player> players = getPlayers();
+
+        for(Player player : players){
+            int nrPawnsFinished = 0;
+            String playerId = player.getUUID();
+            for (Pawn pawn: pawns){
+                if(playerId.equals(pawn.getPlayerId()) && isPawnOnFinish(pawn)){
+                    nrPawnsFinished++;
+                }
+            }
+            if(nrPawnsFinished == 4 && !winners.contains(playerId)){
+                player.setPlace(winners.size()+1);
+                winners.add(playerId);
+            }
+        }
     }
 }
