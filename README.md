@@ -12,6 +12,8 @@ This project is used to learn
 - HTML and CSS
 - Unit testing
 - Selenium automated browser testing
+
 The SpringBootApplication server is automatically restarted before each Selenium test.
+
 - Mockito
 - Continuous Integration
