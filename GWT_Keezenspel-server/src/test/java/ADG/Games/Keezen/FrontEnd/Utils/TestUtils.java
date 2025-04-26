@@ -20,10 +20,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 /***
  *  WARNING
- *  changes to this file may severely impact performance for the Selenium tests
- *  test before committing any changes.
+ *  Changes to this file may severely impact performance for the Selenium tests.
+ *  Test before committing any changes.
  */
-
 public class TestUtils {
 
   public static WebDriver getDriver() {
@@ -35,16 +34,16 @@ public class TestUtils {
 
     // this line is here to fix a CI error
     options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.nanoTime());
-
     WebDriver driver = new ChromeDriver(options);
     driver.get("http://localhost:4200/");
     driver.manage().addCookie(new Cookie("sessionid", "123"));
     driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+    driver.navigate().refresh();
     return driver;
   }
 
   public static void waitUntilCardsAreLoaded(WebDriver driver) {
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
     try {
       wait.until(driver1 -> {
@@ -105,7 +104,7 @@ public class TestUtils {
     return new Point(Double.valueOf(x), Double.valueOf(y));
   }
 
-  public static void makeMove(WebDriver driver) {
+  public static void clickMakeMoveButton(WebDriver driver) {
     WebElement sendButton = driver.findElement(By.className("sendButton"));
     assertTrue("⚠️ sendButton is not enabled: it was not the player's turn",
         sendButton.isEnabled());
@@ -131,6 +130,22 @@ public class TestUtils {
     } catch (WebDriverException timeoutException) {
       System.out.println("⚠️ Timeout waiting for game elements — continuing without failure.");
       // Optionally: set a flag or take fallback action
+    }
+  }
+
+  /**
+   * <p>This method has to be called using TestUtils.wait()
+   * DO NOT USE only the method call wait()</p>
+   *
+   * <p>TestUtils.wait() will execute it in the thread the test is running in
+   * wait() creates a separate thread and will then not actually wait</p>
+   * @param millis
+   */
+  public static void wait(int millis){
+    try {
+      Thread.sleep(millis);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
   }
 }

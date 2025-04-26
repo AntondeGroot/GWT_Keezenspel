@@ -1,6 +1,9 @@
 package ADG.Games.Keezen.FrontEnd;
 
+import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickCardByValue;
 import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickForfeitButton;
+import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickMakeMoveButton;
+import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickPawn;
 import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.setPlayerIdPlaying;
 import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.waitUntilCardsAreLoaded;
@@ -9,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import ADG.Games.Keezen.FrontEnd.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.FrontEnd.Utils.SpringAppTestHelper;
 import ADG.Games.Keezen.FrontEnd.Utils.TestUtils;
+import ADG.Games.Keezen.Player.PawnId;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
@@ -20,14 +24,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 @ExtendWith(ScreenshotOnFailure.class)
-public class PlayerStatus {
+public class PlayerStatusMockTest {
   static WebDriver driver;
-
 
   @BeforeEach
   public void setUp() {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
-    SpringAppTestHelper.startRealApp();
+    SpringAppTestHelper.startTestApp();
     driver = getDriver();
     setPlayerIdPlaying(driver,"0");
   }
@@ -55,13 +58,8 @@ public class PlayerStatus {
 
   @Test
   public void player0IsPlayingWhenStartingGame(){
-    // The following seems redundant but for some reason it helps the test
-    waitUntilCardsAreLoaded(driver);
-    driver.navigate().refresh();
-    TestUtils.wait(200);
-
     WebElement player0 = driver.findElement(By.id("player0"));
-    assertEquals("playerPlaying", player0.getAttribute("class"));
+    assertEquals("playerPlaying playerActive", player0.getAttribute("class"));
   }
 
   @Test
@@ -73,8 +71,27 @@ public class PlayerStatus {
     clickForfeitButton(driver);
     TestUtils.wait(200);
 
-    // THEN;
-    WebElement player1 = driver.findElement(By.id("player0"));
-    assertEquals("playerNotPlaying playerInactive", player1.getAttribute("class"));
+    // THEN
+    setPlayerIdPlaying(driver,"1");
+    waitUntilCardsAreLoaded(driver);
+    WebElement player0 = driver.findElement(By.id("player0"));
+    assertEquals("playerNotPlaying playerInactive", player0.getAttribute("class"));
+  }
+  @Test
+  public void player0IsStilActiveAfterPlayingCard() throws InterruptedException {
+    // GIVEN
+    waitUntilCardsAreLoaded(driver);
+
+    // WHEN
+    clickPawn(driver, new PawnId("0",0));
+    TestUtils.wait(200);
+    clickCardByValue(driver, 1);
+    TestUtils.wait(200);
+    clickMakeMoveButton(driver);
+    TestUtils.wait(200);
+
+    // THEN
+    WebElement player0 = driver.findElement(By.id("player0"));
+    assertEquals("playerNotPlaying playerActive", player0.getAttribute("class"));
   }
 }

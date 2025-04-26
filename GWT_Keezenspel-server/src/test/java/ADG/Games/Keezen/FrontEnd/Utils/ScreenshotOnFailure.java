@@ -44,7 +44,7 @@ public class ScreenshotOnFailure implements TestWatcher {
       String timeForFilename = LocalTime.now().format(DateTimeFormatter.ofPattern("HH_mm_ss"));
 
       File source = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-      File destination = new File("screenshots/" + testName +"_"+timeForFilename+ ".png");
+      File destination = new File("screenshots/" + timeForFilename + "_" + testName + ".png");
       //Now you can do whatever you need to do with it, for example copy somewhere
       FileUtils.copyFile(source, destination);
       System.out.println("Screenshot saved: " + destination.getAbsolutePath());

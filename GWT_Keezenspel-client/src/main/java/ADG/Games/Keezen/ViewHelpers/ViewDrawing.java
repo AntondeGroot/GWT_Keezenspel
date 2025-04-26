@@ -264,12 +264,11 @@ public class ViewDrawing {
             playerLabel.setClassName(player.isActive() ? "activePlayerName" : "inactivePlayerName");
             playerLabel.addClassName("playerName");
 
+
             // set border for Horizontal Panel
-            Document.get()
-                .getElementById(player.getName())
-                .setClassName(
-                    player.isPlaying() ?
-                        "playerPlaying" : "playerNotPlaying");
+            Element hp = Document.get().getElementById(player.getName());
+            hp.setClassName(player.isPlaying() ? "playerPlaying" : "playerNotPlaying");
+            hp.addClassName(player.isActive() ?  "playerActive"  : "playerInactive");
         }
     }
 }
