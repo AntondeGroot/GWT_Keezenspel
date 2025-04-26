@@ -3,7 +3,7 @@ package ADG.Games.Keezen.FrontEnd;
 import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickForfeitButton;
 import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.setPlayerIdPlaying;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.waitUntilPageIsLoaded;
+import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.waitUntilCardsAreLoaded;
 import static org.junit.Assert.assertEquals;
 
 import ADG.Games.Keezen.FrontEnd.Utils.ScreenshotOnFailure;
@@ -60,12 +60,16 @@ public class PlayerStatus {
 
   @Test
   public void player1IsPlayingWhenPlayer0Forfeits() throws InterruptedException {
-    waitUntilPageIsLoaded(driver);
+    // GIVEN
+    waitUntilCardsAreLoaded(driver);
+
+    // WHEN
     clickForfeitButton(driver);
 
-    driver.navigate().refresh();
+    // THEN
+    setPlayerIdPlaying(driver,"1");
+    waitUntilCardsAreLoaded(driver);
     WebElement player1 = driver.findElement(By.id("player0"));
-
     assertEquals("playerNotPlaying", player1.getAttribute("class"));
   }
 }

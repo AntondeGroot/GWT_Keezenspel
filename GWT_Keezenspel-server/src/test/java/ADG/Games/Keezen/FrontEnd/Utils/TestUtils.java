@@ -43,7 +43,7 @@ public class TestUtils {
     return driver;
   }
 
-  public static void waitUntilPageIsLoaded(WebDriver driver) {
+  public static void waitUntilCardsAreLoaded(WebDriver driver) {
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
     try {
