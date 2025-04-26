@@ -14,6 +14,10 @@ public class CardsServiceImpl extends RemoteServiceServlet implements CardsServi
 
     @Override
     public CardResponse getCards(String sessionID, String playerUUID) throws IllegalArgumentException {
+        if (sessionID == null || playerUUID == null) {
+            return new CardResponse();
+        }
+
         GameSession session = GameRegistry.getGame(sessionID);
         CardsDeckInterface cardsDeck = session.getCardsDeck();
 
