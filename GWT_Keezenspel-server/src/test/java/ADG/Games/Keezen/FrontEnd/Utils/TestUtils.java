@@ -34,7 +34,6 @@ public class TestUtils {
 
     // this line is here to fix a CI error
     options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.nanoTime());
-
     WebDriver driver = new ChromeDriver(options);
     driver.get("http://localhost:4200/");
     driver.manage().addCookie(new Cookie("sessionid", "123"));
@@ -43,7 +42,7 @@ public class TestUtils {
   }
 
   public static void waitUntilCardsAreLoaded(WebDriver driver) {
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
     try {
       wait.until(driver1 -> {
