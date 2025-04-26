@@ -38,6 +38,7 @@ public class TestUtils {
     driver.get("http://localhost:4200/");
     driver.manage().addCookie(new Cookie("sessionid", "123"));
     driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+    driver.navigate().refresh();
     return driver;
   }
 

@@ -55,7 +55,10 @@ public class PlayerStatus {
 
   @Test
   public void player0IsPlayingWhenStartingGame(){
+    // The following seems redundant but for some reason it helps the test
     waitUntilCardsAreLoaded(driver);
+    driver.navigate().refresh();
+    TestUtils.wait(200);
 
     WebElement player0 = driver.findElement(By.id("player0"));
     assertEquals("playerPlaying", player0.getAttribute("class"));

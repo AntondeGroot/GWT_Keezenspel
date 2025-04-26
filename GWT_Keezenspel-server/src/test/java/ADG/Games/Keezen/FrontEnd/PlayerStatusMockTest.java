@@ -59,7 +59,7 @@ public class PlayerStatusMockTest {
   @Test
   public void player0IsPlayingWhenStartingGame(){
     WebElement player0 = driver.findElement(By.id("player0"));
-    assertEquals("playerPlaying", player0.getAttribute("class"));
+    assertEquals("playerPlaying playerActive", player0.getAttribute("class"));
   }
 
   @Test
@@ -69,21 +69,24 @@ public class PlayerStatusMockTest {
 
     // WHEN
     clickForfeitButton(driver);
+    TestUtils.wait(200);
 
     // THEN
     setPlayerIdPlaying(driver,"1");
     waitUntilCardsAreLoaded(driver);
     WebElement player0 = driver.findElement(By.id("player0"));
-    assertEquals("playerNotPlaying", player0.getAttribute("class"));
+    assertEquals("playerNotPlaying playerInactive", player0.getAttribute("class"));
   }
   @Test
-  public void player0IsPlayingWhenPlayer0PlaysCard() throws InterruptedException {
+  public void player0IsStilActiveAfterPlayingCard() throws InterruptedException {
     // GIVEN
     waitUntilCardsAreLoaded(driver);
 
     // WHEN
-    clickCardByValue(driver, 1);
     clickPawn(driver, new PawnId("0",0));
+    TestUtils.wait(200);
+    clickCardByValue(driver, 1);
+    TestUtils.wait(200);
     clickMakeMoveButton(driver);
     TestUtils.wait(200);
 
