@@ -1,21 +1,26 @@
 package ADG.Games.Keezen.FrontEnd;
 
-import static ADG.Games.Keezen.FrontEnd.TestUtils.getDriver;
-import static ADG.Games.Keezen.FrontEnd.TestUtils.setPlayerIdPlaying;
+import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.getDriver;
+import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.setPlayerIdPlaying;
 import static org.junit.Assert.assertEquals;
 
+import ADG.Games.Keezen.FrontEnd.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.FrontEnd.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.Player.PawnId;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.By.ById;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+@ExtendWith(ScreenshotOnFailure.class)
 public class PawnTest {
-  WebDriver driver;
+  static WebDriver driver;
 
   @BeforeEach
   public void setUp() {
@@ -28,8 +33,21 @@ public class PawnTest {
 
   @AfterEach
   public void tearDown() {
+    SpringAppTestHelper.stopApp();
+  }
+
+  /***
+   * in order to use ScreenshotOnFailure, the webdriver should not be quit in the
+   * @AfterEach tearDown(), because then the driver would no longer be accessible
+   * to take a screenshot with.
+   *
+   * The driver.quit() should then be put in the @AfterAll which comes after the TestWatcher
+   * is done. This however is a static method, requiring the webdriver to be static as well.
+   */
+  @AfterAll
+  public static void tearDownAll() {
     // needed for skipping the selenium tests in CI
-    if(driver != null){
+    if (driver != null) {
       driver.quit();
     }
     SpringAppTestHelper.stopApp();
@@ -38,31 +56,34 @@ public class PawnTest {
   @Test
   public void clickOnOwnPawn_Selected() throws InterruptedException {
     // GIVEN
-    WebElement pawn1 = driver.findElement(new ById("PawnId{0,1}"));
+    PawnId pawnId = new PawnId("0",0);
+    WebElement pawn1 = driver.findElement(By.id(pawnId.toString()));
 
     // WHEN
     pawn1.click();
 
     // THEN
-    WebElement pawn1Outline = driver.findElement(By.className("PawnId{0,1}Overlay"));
+    WebElement pawn1Outline = driver.findElement(By.className(pawnId+"Overlay"));
     assertEquals("visible", pawn1Outline.getCssValue("visibility"));
   }
 
   @Test
   public void clickOnOwnPawn_clickSecondPawn_FirstPawnDeselected(){
     // GIVEN
-    WebElement pawn1 = driver.findElement(new ById("PawnId{0,1}"));
+    PawnId pawnId1 = new PawnId("0",1);
+    PawnId pawnId2 = new PawnId("0",2);
+    WebElement pawn1 = driver.findElement(new ById(pawnId1.toString()));
     pawn1.click();
 
     // WHEN
-    WebElement pawn2 = driver.findElement(new ById("PawnId{0,2}"));
+    WebElement pawn2 = driver.findElement(new ById(pawnId2.toString()));
     pawn2.click();
 
     // THEN
-    WebElement pawn1Outline = driver.findElement(By.className("PawnId{0,1}Overlay"));
+    WebElement pawn1Outline = driver.findElement(By.className(pawnId1+"Overlay"));
     assertEquals("hidden", pawn1Outline.getCssValue("visibility"));
 
-    WebElement pawn2Outline = driver.findElement(By.className("PawnId{0,2}Overlay"));
+    WebElement pawn2Outline = driver.findElement(By.className(pawnId2+"Overlay"));
     assertEquals("visible", pawn2Outline.getCssValue("visibility"));
   }
 

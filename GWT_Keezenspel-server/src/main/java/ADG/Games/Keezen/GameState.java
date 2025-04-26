@@ -30,6 +30,15 @@ public class GameState {
     private final int MAX_PLAYERS = 8;
     private final CardsDeckInterface cardsDeck;
 
+    public void reset(){
+        winners.clear();
+        for(Pawn p : pawns){
+            p.setCurrentTileId(p.getNestTileId());
+        }
+        resetActivePlayers();
+        cardsDeck.reset();
+    }
+
     public GameState(CardsDeckInterface cardsDeck) {
         this.cardsDeck = cardsDeck;
     }

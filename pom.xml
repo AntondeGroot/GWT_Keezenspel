@@ -104,6 +104,19 @@
           </executions>
         </plugin>
         <plugin>
+          <groupId>net.ltgt.gwt.maven</groupId>
+          <artifactId>gwt-maven-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>compile-gwt-before-tests</id>
+              <phase>prepare-package</phase> <!-- or pre-integration-test -->
+              <goals>
+                <goal>compile</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
           <version>${spring-boot.version}</version>

@@ -24,4 +24,8 @@ public class GameSession {
   public GameState getGameState() { return gameState; }
   public CardsDeckInterface getCardsDeck() { return cardsDeck; }
   public String getSessionId() { return sessionId; }
+
+  public void reset(){
+    this.gameState.reset();
+  }
 }
