@@ -34,7 +34,7 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
         GameSession session = GameRegistry.getGame(sessionID);
         GameState gameState = session.getGameState();
         if(!Objects.equals(message.getPlayerId(), gameState.getPlayerIdTurn())){
-            throw new IllegalArgumentException("It was not your turn to make a move");
+            return new MoveResponse();
         }
 
         MoveResponse response = new MoveResponse();

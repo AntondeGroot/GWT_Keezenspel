@@ -73,9 +73,8 @@ public class Card implements IsSerializable {
             default: cardDescription = String.valueOf(cardValue);
         }
 
-        return "Card{" +
-                "suit=" + suit +
-                ", card=" + cardDescription +
-                '}';
+        return "Card_" +
+                "suit_" + suit +
+                "card_" + cardDescription;
     }
 }
