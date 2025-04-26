@@ -268,7 +268,7 @@ public class ViewDrawing {
             // set border for Horizontal Panel
             Element hp = Document.get().getElementById(player.getName());
             hp.setClassName(player.isPlaying() ? "playerPlaying" : "playerNotPlaying");
-            hp.addClassName(player.isActive() ?  "playerActive"  : "playerInActive");
+            hp.addClassName(player.isActive() ?  "playerActive"  : "playerInactive");
         }
     }
 }
