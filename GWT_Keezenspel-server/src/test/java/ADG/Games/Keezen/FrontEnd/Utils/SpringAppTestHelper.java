@@ -14,6 +14,7 @@ public class SpringAppTestHelper {
   private static ConfigurableApplicationContext context;
 
   private static Boolean isReal;
+
   /***
    * start the springboot server for each test
    * this way you will have a clean slate for your tests
@@ -26,19 +27,10 @@ public class SpringAppTestHelper {
     start(true);
   }
 
-  private static void start(Boolean cardDeckIsReal){
+  private static void start(Boolean cardDeckIsReal) {
+    resetGameState();
 
-    HttpClient client = HttpClient.newHttpClient();
-    HttpRequest request = HttpRequest.newBuilder()
-        .uri(URI.create("http://localhost:4200/test/reset"))
-        .POST(HttpRequest.BodyPublishers.noBody())
-        .build();
-    try {
-      client.send(request, HttpResponse.BodyHandlers.ofString());
-    } catch (Exception ignored) {
-    }
-
-    if (context == null || cardDeckIsReal != isReal ) {
+    if (context == null || cardDeckIsReal != isReal) {
       stopApp();
       SpringApplication app = new SpringApplication(Application.class);
       app.setAdditionalProfiles(cardDeckIsReal ? "realCardDeck" : "mockedCardDeck");
@@ -52,6 +44,18 @@ public class SpringAppTestHelper {
     if (context != null && context.isRunning()) {
       context.close();
       context = null;
+    }
+  }
+
+  public static void resetGameState() {
+    HttpClient client = HttpClient.newHttpClient();
+    HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create("http://localhost:4200/test/reset"))
+        .POST(HttpRequest.BodyPublishers.noBody())
+        .build();
+    try {
+      client.send(request, HttpResponse.BodyHandlers.ofString());
+    } catch (Exception ignored) {
     }
   }
 }
