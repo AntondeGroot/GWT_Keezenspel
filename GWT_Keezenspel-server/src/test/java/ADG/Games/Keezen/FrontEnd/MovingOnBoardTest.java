@@ -1,9 +1,9 @@
 package ADG.Games.Keezen.FrontEnd;
 
 import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickCardByValue;
+import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickMakeMoveButton;
 import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickPawn;
 import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.getDriver;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.makeMove;
 import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.setPlayerIdPlaying;
 import static org.junit.Assert.assertNotEquals;
 
@@ -61,7 +61,7 @@ public class MovingOnBoardTest {
 
     // WHEN
     clickCardByValue(driver, 1);
-    makeMove(driver);
+    clickMakeMoveButton(driver);
 
     // THEN
     Point end = clickPawn(driver, new PawnId("0",0));
@@ -75,7 +75,7 @@ public class MovingOnBoardTest {
 
     // WHEN
     clickCardByValue(driver, 13);
-    makeMove(driver);
+    clickMakeMoveButton(driver);
 
     // THEN
     Point end = clickPawn(driver, new PawnId("0",0));
