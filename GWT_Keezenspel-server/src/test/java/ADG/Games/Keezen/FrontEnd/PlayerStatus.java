@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 
 import ADG.Games.Keezen.FrontEnd.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.FrontEnd.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.FrontEnd.Utils.TestUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
@@ -54,6 +55,8 @@ public class PlayerStatus {
 
   @Test
   public void player0IsPlayingWhenStartingGame(){
+    waitUntilCardsAreLoaded(driver);
+
     WebElement player0 = driver.findElement(By.id("player0"));
     assertEquals("playerPlaying", player0.getAttribute("class"));
   }
@@ -65,11 +68,10 @@ public class PlayerStatus {
 
     // WHEN
     clickForfeitButton(driver);
+    TestUtils.wait(200);
 
-    // THEN
-    setPlayerIdPlaying(driver,"1");
-    waitUntilCardsAreLoaded(driver);
+    // THEN;
     WebElement player1 = driver.findElement(By.id("player0"));
-    assertEquals("playerNotPlaying", player1.getAttribute("class"));
+    assertEquals("playerNotPlaying playerInactive", player1.getAttribute("class"));
   }
 }
