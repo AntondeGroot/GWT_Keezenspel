@@ -14,6 +14,7 @@ This project is used to learn
 - Selenium automated browser testing
 
 The SpringBootApplication server is automatically restarted before each Selenium test.
+
 When a test fails a screenshot is taken.
 
 - Mockito
