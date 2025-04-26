@@ -1,7 +1,7 @@
 # GWT_Keezenspel
 
 
-To start the application:
+## To start the application:
 1) in the server folder run the Application file, this is a springboot application.
 2) in a prompt run the code: ```mvn gwt:codeserver -pl *-client -am``` to start the Code Server
 3) go to : http://localhost:4200/
