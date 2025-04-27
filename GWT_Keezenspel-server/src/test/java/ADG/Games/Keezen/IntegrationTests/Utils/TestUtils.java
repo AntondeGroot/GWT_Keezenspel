@@ -1,4 +1,4 @@
-package ADG.Games.Keezen.FrontEnd.Utils;
+package ADG.Games.Keezen.IntegrationTests.Utils;
 
 import static org.junit.Assert.assertTrue;
 
@@ -92,8 +92,8 @@ public class TestUtils {
   }
 
   public static void clickCardByValue(WebDriver driver, int cardValue) {
-    WebElement card = driver.findElement(By.id(new Card(0, cardValue).toString()));
-    card.click();
+      WebElement card = driver.findElement(By.id(new Card(0, cardValue).toString()));
+      card.click();
   }
 
   public static Point clickPawn(WebDriver driver, PawnId pawnId) {

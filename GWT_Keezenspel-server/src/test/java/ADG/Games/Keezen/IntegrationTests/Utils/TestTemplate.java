@@ -1,9 +1,7 @@
-package ADG.Games.Keezen.FrontEnd;
+package ADG.Games.Keezen.IntegrationTests.Utils;
 
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.getDriver;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 
-import ADG.Games.Keezen.FrontEnd.Utils.ScreenshotOnFailure;
-import ADG.Games.Keezen.FrontEnd.Utils.SpringAppTestHelper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 
 @ExtendWith(ScreenshotOnFailure.class)
-public class PlayerLabelTest {
+public class TestTemplate {
 
   static WebDriver driver;
 
