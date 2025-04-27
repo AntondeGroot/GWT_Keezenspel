@@ -19,6 +19,9 @@ public class CardsServiceImpl extends RemoteServiceServlet implements CardsServi
         }
 
         GameSession session = GameRegistry.getGame(sessionID);
+        if (session == null) {
+            return new CardResponse();
+        }
         CardsDeckInterface cardsDeck = session.getCardsDeck();
 
         CardResponse response = new CardResponse();

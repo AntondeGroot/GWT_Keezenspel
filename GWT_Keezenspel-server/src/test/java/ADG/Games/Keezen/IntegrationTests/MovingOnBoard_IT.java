@@ -1,7 +1,7 @@
 package ADG.Games.Keezen.IntegrationTests;
 
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickCardByValue;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickMakeMoveButton;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPlayCardButton;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPawn;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
@@ -61,7 +61,7 @@ public class MovingOnBoard_IT {
 
     // WHEN
     clickCardByValue(driver, 1);
-    clickMakeMoveButton(driver);
+    clickPlayCardButton(driver);
 
     // THEN
     Point end = clickPawn(driver, new PawnId("0",0));
@@ -75,7 +75,7 @@ public class MovingOnBoard_IT {
 
     // WHEN
     clickCardByValue(driver, 13);
-    clickMakeMoveButton(driver);
+    clickPlayCardButton(driver);
 
     // THEN
     Point end = clickPawn(driver, new PawnId("0",0));

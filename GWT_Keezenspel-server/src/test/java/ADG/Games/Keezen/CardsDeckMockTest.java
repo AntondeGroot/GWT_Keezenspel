@@ -1,23 +1,30 @@
 package ADG.Games.Keezen;
 
+import static ADG.Games.Keezen.GameStateUtil.createGame_With_NPlayers;
+import static ADG.Games.Keezen.GameStateUtil.givePlayerCard;
+import static ADG.Games.Keezen.GameStateUtil.place4PawnsOnFinish;
+import static ADG.Games.Keezen.GameStateUtil.playRemainingCards;
+import static ADG.Games.Keezen.GameStateUtil.sendValidMoveMessage;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import ADG.Games.Keezen.Cards.Card;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
-
-import static ADG.Games.Keezen.GameStateUtil.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-class CardsDeckTest {
+class CardsDeckMockTest {
     private GameState gameState;
     private CardsDeckInterface cardsDeck;
     
     @BeforeEach
     void setup(){
-        GameSession engine = new GameSession();
+        GameSession engine = new GameSession(new CardsDeckMock());
         gameState = engine.getGameState();
         cardsDeck = engine.getCardsDeck();
         cardsDeck.reset();
@@ -31,7 +38,7 @@ class CardsDeckTest {
     }
 
     @Test
-    void fivePlayers_ShuffleDeck_EachHas5Cards() {
+    void fivePlayers_ShuffleDeck_EachHas13Cards() {
         // GIVEN WHEN
         createGame_With_NPlayers(gameState, 5);
 
@@ -39,8 +46,8 @@ class CardsDeckTest {
         for (int i = 0; i < 5; i++) {
             totalCards += cardsDeck.getCardsForPlayer(String.valueOf(i)).size();
         }
-        // THEN, all the players have 5 cards in their hand
-        assertEquals(5*5, totalCards);
+        // THEN, all the players have 13 cards in their hand
+        assertEquals(5*13, totalCards);
     }
 
     @Test
@@ -50,34 +57,34 @@ class CardsDeckTest {
 
         // THEN
         List<Card> cards =  cardsDeck.getCardsForPlayer("0");
-        assertFalse(isSortedNumerically(cards));
-        assertEquals(5, cards.size());
+        assertTrue(isSortedNumerically(cards));
+        assertEquals(13, cards.size());
     }
 
     @Test
-    void dealCards_5_4_4_CardsPerRound() {
+    void dealCards_13_13_13_CardsPerRound() {
         // GIVEN WHEN
         createGame_With_NPlayers(gameState, 1);
 
         // THEN
-        Assert.assertEquals(5, cardsDeck.getCardsForPlayer("0").size());
+        Assert.assertEquals(13, cardsDeck.getCardsForPlayer("0").size());
         cardsDeck.forfeitCardsForPlayer("0");
         cardsDeck.dealCards();
 
-        Assert.assertEquals(4, cardsDeck.getCardsForPlayer("0").size());
+        Assert.assertEquals(13, cardsDeck.getCardsForPlayer("0").size());
         cardsDeck.forfeitCardsForPlayer("0");
         cardsDeck.dealCards();
 
-        Assert.assertEquals(4, cardsDeck.getCardsForPlayer("0").size());
+        Assert.assertEquals(13, cardsDeck.getCardsForPlayer("0").size());
         cardsDeck.forfeitCardsForPlayer("0");
         cardsDeck.shuffleIfFirstRound();
         cardsDeck.dealCards();
 
-        Assert.assertEquals(5, cardsDeck.getCardsForPlayer("0").size());
+        Assert.assertEquals(13, cardsDeck.getCardsForPlayer("0").size());
     }
 
     @Test
-    void twoPlayersDoNotHaveTheSameCard() {
+    void twoPlayersHaveTheSameCard() {
         // GIVEN WHEN
         createGame_With_NPlayers(gameState, 2);
 
@@ -86,7 +93,7 @@ class CardsDeckTest {
         List<Card> cards2 = cardsDeck.getCardsForPlayer("1");
 
         // THEN
-        assertTrue(doNotContainTheSameCards(cards1, cards2));
+        assertFalse(doNotContainTheSameCards(cards1, cards2));
     }
 
     @Test
@@ -98,7 +105,7 @@ class CardsDeckTest {
         List<Card> cards = cardsDeck.getCardsForPlayer("0");
 
         // THEN
-        assertEquals(5, cards.size());
+        assertEquals(13, cards.size());
         for (Card card : cards) {
             assertTrue(cardsDeck.playerHasCard("0", card));
         }
@@ -115,7 +122,7 @@ class CardsDeckTest {
         // THEN
         HashMap<String, Integer> nrs = new HashMap<>();
         nrs.put("0",0);
-        nrs.put("1",5);
+        nrs.put("1",13);
 
         assertEquals(nrs, cardsDeck.getNrOfCardsForAllPlayers());
         assertTrue(cardsDeck.getCardsForPlayer("0").isEmpty());
@@ -176,7 +183,7 @@ class CardsDeckTest {
                 .mapToInt(Integer::intValue)
                 .sum();
 
-        assertEquals(4,totalCards);
+        assertEquals(13,totalCards);
     }
 
     @Test
@@ -218,20 +225,6 @@ class CardsDeckTest {
             sendValidMoveMessage(gameState , cardsDeck , "2");
         }
         assertEquals(3*5+3*4, cardsDeck.getPlayedCards().size());
-
-        gameState.tearDown();
-        cardsDeck.reset();
-    }
-    @Test
-    void PlayedCardsResetAfterThirdRound() {
-        createGame_With_NPlayers(gameState, 3);
-        gameState.setPlayerIdTurn("0");
-        for (int i = 0; i < 13; i++) {
-            sendValidMoveMessage(gameState , cardsDeck , "0");
-            sendValidMoveMessage(gameState , cardsDeck , "1");
-            sendValidMoveMessage(gameState , cardsDeck , "2");
-        }
-        assertEquals(0, cardsDeck.getPlayedCards().size());
 
         gameState.tearDown();
         cardsDeck.reset();

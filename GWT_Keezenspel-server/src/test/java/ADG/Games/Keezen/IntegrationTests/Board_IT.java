@@ -25,6 +25,7 @@ class Board_IT {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
+    setPlayerIdPlaying(driver,"0");
   }
 
   @AfterEach
