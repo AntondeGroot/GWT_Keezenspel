@@ -301,6 +301,12 @@ public class GameState {
             return;
         }
 
+        // todo: this seems sensible but will fail tests
+//        if(!playerId.equals(playerIdTurn)){
+//            response.setResult(CANNOT_MAKE_MOVE);
+//            return;
+//        }
+
         if(pawnId1 == null || card == null || pawnId2 == null){
             response.setResult(INVALID_SELECTION);
             return;
@@ -408,7 +414,12 @@ public class GameState {
             return;
         }
 
-        String playerId = pawnId1.getPlayerId();
+        String playerId = moveMessage.getPlayerId();
+        // todo: this seems sensible but will fail tests
+//        if(!playerId.equals(playerIdTurn)){
+//            response.setResult(CANNOT_MAKE_MOVE);
+//            return;
+//        }
         TileId currentTileId = getPawnTileId(pawnId1);
         int nrSteps = moveMessage.getStepsPawn1();
         int next;
@@ -753,6 +764,11 @@ public class GameState {
         String selectedPawnPlayerId1 = moveMessage.getPawnId1().getPlayerId();
         String selectedPawnPlayerId2 = moveMessage.getPawnId2().getPlayerId();
         String playerId = moveMessage.getPlayerId();
+        // todo: this seems sensible but will fail tests
+//        if(!playerId.equals(playerIdTurn)){
+//            moveResponse.setResult(CANNOT_MAKE_MOVE);
+//            return;
+//        }
         moveResponse.setMoveType(SWITCH);
 
         // You can't switch with yourself

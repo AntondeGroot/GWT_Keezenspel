@@ -63,6 +63,7 @@ public class TestUtils {
   public static void setPlayerIdPlaying(WebDriver driver, String playerId) {
     Cookie playerCookie = new Cookie("playerid", playerId);
     driver.manage().addCookie(playerCookie);
+    wait(400);
   }
 
   /***
@@ -94,21 +95,28 @@ public class TestUtils {
   public static void clickCardByValue(WebDriver driver, int cardValue) {
       WebElement card = driver.findElement(By.id(new Card(0, cardValue).toString()));
       card.click();
+
+      wait(200);
   }
 
   public static Point clickPawn(WebDriver driver, PawnId pawnId) {
     WebElement pawnElement = driver.findElement(By.id(pawnId.toString()));
     pawnElement.click();
+
+    wait(200);
+
     String x = pawnElement.getCssValue("left").replace("px", "");
     String y = pawnElement.getCssValue("top").replace("px", "");
     return new Point(Double.valueOf(x), Double.valueOf(y));
   }
 
-  public static void clickMakeMoveButton(WebDriver driver) {
+  public static void clickPlayCardButton(WebDriver driver) {
     WebElement sendButton = driver.findElement(By.className("sendButton"));
     assertTrue("⚠️ sendButton is not enabled: it was not the player's turn",
         sendButton.isEnabled());
     sendButton.click();
+
+    wait(400);
   }
 
   public static void clickForfeitButton(WebDriver driver) {
@@ -117,6 +125,8 @@ public class TestUtils {
         forfeitButton.isEnabled());
     assertTrue("forfeitButton is not visible: ", forfeitButton.isDisplayed());
     forfeitButton.click();
+
+    wait(200);
 
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
     try {

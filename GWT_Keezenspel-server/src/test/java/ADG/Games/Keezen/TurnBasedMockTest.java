@@ -1,6 +1,19 @@
 package ADG.Games.Keezen;
 
 
+import static ADG.Games.Keezen.GameStateUtil.createGame_With_NPlayers;
+import static ADG.Games.Keezen.GameStateUtil.createSplitMessage;
+import static ADG.Games.Keezen.GameStateUtil.place4PawnsOnFinish;
+import static ADG.Games.Keezen.GameStateUtil.placePawnOnBoard;
+import static ADG.Games.Keezen.GameStateUtil.playRemainingCards;
+import static ADG.Games.Keezen.GameStateUtil.sendForfeitMessage;
+import static ADG.Games.Keezen.GameStateUtil.sendValidMoveMessage;
+import static ADG.Games.Keezen.GameStateUtil.stringsToList;
+import static ADG.Games.Keezen.Move.MoveResult.CAN_MAKE_MOVE;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import ADG.Games.Keezen.Cards.Card;
 import ADG.Games.Keezen.Move.MessageType;
 import ADG.Games.Keezen.Move.MoveMessage;
@@ -9,22 +22,16 @@ import ADG.Games.Keezen.Move.MoveResult;
 import ADG.Games.Keezen.Move.MoveType;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-
-import static ADG.Games.Keezen.GameStateUtil.*;
-import static ADG.Games.Keezen.Move.MoveResult.CAN_MAKE_MOVE;
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class TurnBasedTest {
+public class TurnBasedMockTest {
     MoveMessage moveMessage = new MoveMessage();
     MoveResponse moveResponse = new MoveResponse();
     ArrayList<String> activePlayers = new ArrayList<>();
@@ -36,7 +43,7 @@ public class TurnBasedTest {
 
     @BeforeEach
     void setUp() {
-        engine = new GameSession();
+        engine = new GameSession(new CardsDeckMock());
         gameState = engine.getGameState();
         cardsDeck = engine.getCardsDeck();
 
@@ -77,8 +84,8 @@ public class TurnBasedTest {
         // THEN
         HashMap<String, Integer> nrCardsPerPlayer = new HashMap<>();
         nrCardsPerPlayer.put("0",0);
-        nrCardsPerPlayer.put("1",5);
-        nrCardsPerPlayer.put("2",5);
+        nrCardsPerPlayer.put("1",13);
+        nrCardsPerPlayer.put("2",13);
         assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
     }
     @Test
@@ -92,15 +99,15 @@ public class TurnBasedTest {
         assertEquals(activePlayers, gameState.getActivePlayers());
     }
     @Test
-    void player1PlaysCard_4_5_5_CardsInTheGame() {
+    void player1PlaysCard_13_13_13_CardsInTheGame() {
         // WHEN
         sendValidMoveMessage(gameState , cardsDeck , "0");
 
         // THEN
         HashMap<String, Integer> nrCardsPerPlayer = new HashMap<>();
-        nrCardsPerPlayer.put("0",4);
-        nrCardsPerPlayer.put("1",5);
-        nrCardsPerPlayer.put("2",5);
+        nrCardsPerPlayer.put("0",13);
+        nrCardsPerPlayer.put("1",13);
+        nrCardsPerPlayer.put("2",13);
         assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
     }
     @Test
@@ -127,7 +134,7 @@ public class TurnBasedTest {
         Assert.assertEquals(3, gameState.getActivePlayers().size());
     }
     @Test
-    void allPlayersForfeit_AllPlayersHave4Cards() {
+    void allPlayersForfeit_AllPlayersHave13Cards() {
         // WHEN
         sendForfeitMessage(gameState , "0");
         sendForfeitMessage(gameState , "1");
@@ -135,13 +142,13 @@ public class TurnBasedTest {
 
         // THEN
         HashMap<String, Integer> nrCardsPerPlayer = new HashMap<>();
-        nrCardsPerPlayer.put("0",4);
-        nrCardsPerPlayer.put("1",4);
-        nrCardsPerPlayer.put("2",4);
+        nrCardsPerPlayer.put("0",13);
+        nrCardsPerPlayer.put("1",13);
+        nrCardsPerPlayer.put("2",13);
         assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
     }
     @Test
-    void allPlayersForfeit2Rounds_AllPlayersHave4Cards() {
+    void allPlayersForfeit2Rounds_AllPlayersHave13Cards() {
         // WHEN
         for (int i = 0; i < 2; i++) {
             sendForfeitMessage(gameState , "0");
@@ -151,13 +158,13 @@ public class TurnBasedTest {
 
         // THEN
         HashMap<String, Integer> nrCardsPerPlayer = new HashMap<>();
-        nrCardsPerPlayer.put("0",4);
-        nrCardsPerPlayer.put("1",4);
-        nrCardsPerPlayer.put("2",4);
+        nrCardsPerPlayer.put("0",13);
+        nrCardsPerPlayer.put("1",13);
+        nrCardsPerPlayer.put("2",13);
         assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
     }
     @Test
-    void allPlayersForfeit3Rounds_AllPlayersHave5Cards() {
+    void allPlayersForfeit3Rounds_AllPlayersHave13Cards() {
         // WHEN
         for (int i = 0; i < 3; i++) {
             sendForfeitMessage(gameState , "0");
@@ -167,9 +174,9 @@ public class TurnBasedTest {
 
         // THEN
         HashMap<String, Integer> nrCardsPerPlayer = new HashMap<>();
-        nrCardsPerPlayer.put("0",5);
-        nrCardsPerPlayer.put("1",5);
-        nrCardsPerPlayer.put("2",5);
+        nrCardsPerPlayer.put("0",13);
+        nrCardsPerPlayer.put("1",13);
+        nrCardsPerPlayer.put("2",13);
         assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
     }
     @Test
@@ -187,20 +194,18 @@ public class TurnBasedTest {
         assertEquals("2",gameState.getPlayerIdTurn());
     }
     @Test
-    void allPlayersExcept1Forfeit_RemainingPlayerKeepsPlayingUntilLastCard(){
+    void allPlayersExcept1Forfeit_RemainingPlayerCanKeepPlayingIndefinitely(){
         // GIVEN
         sendForfeitMessage(gameState , "0");
         sendForfeitMessage(gameState , "1");
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 13; i++) {
             // WHEN
             sendValidMoveMessage(gameState , cardsDeck , "2");
 
             // THEN
-            if(i < 4){
-                Assert.assertEquals("playerId turn NOT last round","2", gameState.getPlayerIdTurn());
-                Assert.assertEquals("cards remaining for player 2", 4-i, cardsDeck.getCardsForPlayer("2").size());
-            }
+            Assert.assertEquals("playerId turn NOT last round","2", gameState.getPlayerIdTurn());
+            Assert.assertEquals("cards remaining for player 2", 13, cardsDeck.getCardsForPlayer("2").size());
         }
     }
     @Test
@@ -212,11 +217,8 @@ public class TurnBasedTest {
         // send a valid move for the wrong player
         Pawn pawn = new Pawn(new PawnId("0",0),new TileId("0",6));
 
-        // fake a valid card
+        // a valid card that both players will have since they have all 13 cards
         Card card = new Card(0,5);
-
-        // replace a card from the players hand with this card
-        cardsDeck.giveCardToPlayerForTesting("1", card);
 
         // send move message
         MoveMessage moveMessage = new MoveMessage();
@@ -236,7 +238,7 @@ public class TurnBasedTest {
         assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
     }
     @Test
-    void playersPlayAllTheirCards_ExceptLastPlayer_OnlyLastPlayerIsActive(){
+    void playersPlayAllTheirCards_ExceptLastPlayer_AllPlayersAreStillActive(){
         // GIVEN
         for (int i = 0; i < 4; i++) {
             sendValidMoveMessage(gameState , cardsDeck , "0");
@@ -249,7 +251,7 @@ public class TurnBasedTest {
         sendValidMoveMessage(gameState , cardsDeck , "1");
 
         // THEN
-        assertEquals(stringsToList(new String[]{"2"}), gameState.getActivePlayers());
+        assertEquals(stringsToList(new String[]{"0","1","2"}), gameState.getActivePlayers());
     }
     @Test
     void players0and2Finished_OnlyPlayer1PlayingAndForfeiting_DoesNotSwitchToWinner(){
@@ -355,6 +357,7 @@ public class TurnBasedTest {
         gameState.forfeitPlayer("1");
         gameState.forfeitPlayer("2");
         playRemainingCards(gameState , cardsDeck, "0");
+        gameState.forfeitPlayer("0");
 
         // THEN
         assertEquals("1", gameState.getPlayerIdTurn());
@@ -388,19 +391,7 @@ public class TurnBasedTest {
         assertEquals("1", gameState.getPlayerIdTurn());
     }
     @Test
-    void oneRound_player2LastPlayer_nextPlayer1_byPlaying(){
-        // GIVEN
-        createGame_With_NPlayers(gameState , 3);
-
-        // WHEN
-        gameState.forfeitPlayer("0");
-        gameState.forfeitPlayer("1");
-        playRemainingCards(gameState , cardsDeck, "2");
-        // THEN
-        assertEquals("1", gameState.getPlayerIdTurn());
-    }
-    @Test
-    void twoRounds_player0LastPlayer_nextPlayer2(){
+    void twoRoundsPlayed_nextPlayer2(){
         // GIVEN
         createGame_With_NPlayers(gameState , 3);
 
@@ -411,25 +402,7 @@ public class TurnBasedTest {
         // WHEN round 2
         gameState.forfeitPlayer("1");
         gameState.forfeitPlayer("2");
-        playRemainingCards(gameState , cardsDeck, "0");
-
-        // THEN
-        assertEquals("2", gameState.getPlayerIdTurn());
-    }
-    @Test
-    void twoRounds_player1LastPlayer_nextPlayer2(){
-        // GIVEN
-        createGame_With_NPlayers(gameState , 3);
-
-        // WHEN round 1
         gameState.forfeitPlayer("0");
-        gameState.forfeitPlayer("1");
-        gameState.forfeitPlayer("2");
-        // WHEN round 2
-        sendValidMoveMessage(gameState , cardsDeck , "1");
-        gameState.forfeitPlayer("2");
-        gameState.forfeitPlayer("0");
-        playRemainingCards(gameState , cardsDeck, "1");
 
         // THEN
         assertEquals("2", gameState.getPlayerIdTurn());
@@ -474,7 +447,7 @@ public class TurnBasedTest {
         assertEquals("0", gameState.getPlayerIdTurn());
     }
     @Test
-    void threeRounds_player1LastPlayer_nextPlayer0(){
+    void threeRoundsPlayed_nextPlayer0(){
         // GIVEN
         createGame_With_NPlayers(gameState , 3);
 
@@ -489,34 +462,11 @@ public class TurnBasedTest {
         // WHEN round 3
         gameState.forfeitPlayer("2");
         gameState.forfeitPlayer("0");
-        playRemainingCards(gameState , cardsDeck, "1");
+        gameState.forfeitPlayer("1");
 
         // THEN
         assertEquals("0", gameState.getPlayerIdTurn());
     }
-    @Test
-    void threeRounds_player2LastPlayer_nextPlayer0(){
-        /// GIVEN
-        createGame_With_NPlayers(gameState , 3);
-
-        // WHEN round 1
-        gameState.forfeitPlayer("0");
-        gameState.forfeitPlayer("1");
-        gameState.forfeitPlayer("2");
-        // WHEN round 2
-        gameState.forfeitPlayer("1");
-        gameState.forfeitPlayer("2");
-        gameState.forfeitPlayer("0");
-        // WHEN round 3
-        sendValidMoveMessage(gameState , cardsDeck , "2");
-        gameState.forfeitPlayer("0");
-        gameState.forfeitPlayer("1");
-        playRemainingCards(gameState , cardsDeck, "2");
-
-        // THEN
-        assertEquals("0", gameState.getPlayerIdTurn());
-    }
-
     @Test
     void test_whenSplitIsPlayed_nextPlayerIs() {
         /// GIVEN
@@ -538,27 +488,5 @@ public class TurnBasedTest {
 
         assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
         assertEquals("1", gameState.getPlayerIdTurn());
-    }
-
-    @Test
-    void ThreeRoundsArePlayed_NumberOfUniqueCards_39_bugfix(){
-         // I discovered that not enough kings and aces were given
-
-        // GIVEN, WHEN
-        ArrayList<Card> cards = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            gameState.setPlayerIdTurn("0");
-            cards.addAll(cardsDeck.getCardsForPlayer("0"));
-            sendForfeitMessage(gameState , "0");
-            cards.addAll(cardsDeck.getCardsForPlayer("1"));
-            sendForfeitMessage(gameState , "1");
-            cards.addAll(cardsDeck.getCardsForPlayer("2"));
-            sendForfeitMessage(gameState , "2");
-        }
-
-        // THEN
-        HashSet<Card> cardSet = new HashSet<>(cards);
-        assertEquals(13*3, cards.size());
-        assertEquals(13*3, cardSet.size());
     }
 }

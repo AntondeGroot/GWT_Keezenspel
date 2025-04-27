@@ -2,7 +2,7 @@ package ADG.Games.Keezen.IntegrationTests;
 
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickCardByValue;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickForfeitButton;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickMakeMoveButton;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPlayCardButton;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPawn;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
@@ -33,6 +33,7 @@ public class PlayerStatusMock_IT {
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
     setPlayerIdPlaying(driver,"0");
+    waitUntilCardsAreLoaded(driver);
   }
 
   @AfterEach
@@ -63,9 +64,8 @@ public class PlayerStatusMock_IT {
   }
 
   @Test
-  public void player1IsPlayingWhenPlayer0Forfeits() throws InterruptedException {
-    // GIVEN
-    waitUntilCardsAreLoaded(driver);
+  public void player0IsInactiveAfterForfeit() throws InterruptedException {
+    // GIVEN game started
 
     // WHEN
     clickForfeitButton(driver);
@@ -78,16 +78,45 @@ public class PlayerStatusMock_IT {
     assertEquals("playerNotPlaying playerInactive", player0.getAttribute("class"));
   }
   @Test
-  public void player0IsStilActiveAfterPlayingCard() throws InterruptedException {
-    // GIVEN
+  public void player1IsPlayingWhenPlayer0Forfeits() throws InterruptedException {
+    // GIVEN game started
+
+    // WHEN
+    clickForfeitButton(driver);
+    TestUtils.wait(200);
+
+    // THEN
+    setPlayerIdPlaying(driver,"1");
     waitUntilCardsAreLoaded(driver);
+    WebElement player1 = driver.findElement(By.id("player1"));
+    assertEquals("playerPlaying playerActive", player1.getAttribute("class"));
+  }
+  @Test
+  public void player2IsPlayingWhen0And1Forfeit() throws InterruptedException {
+    // GIVEN game started
+
+    // WHEN
+    // player 0 forfeits
+    clickForfeitButton(driver);
+
+    // player 1 forfeits
+    setPlayerIdPlaying(driver,"1");
+    clickForfeitButton(driver);
+
+    // THEN
+    WebElement player = driver.findElement(By.id("player2"));
+    assertEquals("playerPlaying playerActive", player.getAttribute("class"));
+  }
+  @Test
+  public void player0IsStilActiveAfterPlayingCard() throws InterruptedException {
+    // GIVEN game started
 
     // WHEN
     clickPawn(driver, new PawnId("0",0));
     TestUtils.wait(200);
     clickCardByValue(driver, 1);
     TestUtils.wait(200);
-    clickMakeMoveButton(driver);
+    clickPlayCardButton(driver);
     TestUtils.wait(5000);
 
     // THEN

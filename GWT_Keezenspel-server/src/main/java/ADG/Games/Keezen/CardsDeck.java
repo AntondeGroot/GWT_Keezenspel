@@ -70,6 +70,7 @@ public class CardsDeck implements CardsDeckInterface, IsSerializable {
     }
 
     public boolean playerPlaysCard(String playerId, Card card) {
+        // todo: this is both playerPlaysCard and playerHasCardsLeft, also change the mocked cardsdeck
         if(card != null) {
             playerHands.get(playerId).getHand().remove(card);
             playedCards.add(card);
@@ -101,9 +102,9 @@ public class CardsDeck implements CardsDeckInterface, IsSerializable {
             nrCards = 4;
         }
 
-        //todo: is this reset necessary?
-        for(String playerId: playerHands.keySet() ){
-            playerHands.get(playerId).dropCards();
+        // todo: is this reset necessary?
+        for(PlayerHand hand : playerHands.values()) {
+            hand.dropCards();
         }
 
         for (int j = 0; j < nrCards; j++) {
