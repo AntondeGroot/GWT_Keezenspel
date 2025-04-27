@@ -1,4 +1,4 @@
-package ADG.Games.Keezen.FrontEnd.Utils;
+package ADG.Games.Keezen.IntegrationTests.Utils;
 
 import java.io.File;
 import java.time.LocalTime;

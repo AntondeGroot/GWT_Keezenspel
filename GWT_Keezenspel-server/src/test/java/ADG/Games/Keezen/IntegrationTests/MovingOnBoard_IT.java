@@ -1,14 +1,14 @@
-package ADG.Games.Keezen.FrontEnd;
+package ADG.Games.Keezen.IntegrationTests;
 
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickCardByValue;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickMakeMoveButton;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickPawn;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.getDriver;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.setPlayerIdPlaying;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickCardByValue;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickMakeMoveButton;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPawn;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
 import static org.junit.Assert.assertNotEquals;
 
-import ADG.Games.Keezen.FrontEnd.Utils.ScreenshotOnFailure;
-import ADG.Games.Keezen.FrontEnd.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
+import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Point;
 import org.junit.jupiter.api.AfterAll;
@@ -20,7 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 
 @ExtendWith(ScreenshotOnFailure.class)
-public class MovingOnBoardTest {
+public class MovingOnBoard_IT {
   static WebDriver driver;
 
   @BeforeEach

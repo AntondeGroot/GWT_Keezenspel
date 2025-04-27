@@ -1,14 +1,14 @@
-package ADG.Games.Keezen.FrontEnd;
+package ADG.Games.Keezen.IntegrationTests;
 
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.findCardByIndex;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.getDriver;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.setPlayerIdPlaying;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.waitUntilDOMElementUpdates;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.findCardByIndex;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilDOMElementUpdates;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-import ADG.Games.Keezen.FrontEnd.Utils.ScreenshotOnFailure;
-import ADG.Games.Keezen.FrontEnd.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
+import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
@@ -20,7 +20,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 @ExtendWith(ScreenshotOnFailure.class)
-public class CardTest {
+public class Card_IT {
   static WebDriver driver;
 
   @BeforeEach

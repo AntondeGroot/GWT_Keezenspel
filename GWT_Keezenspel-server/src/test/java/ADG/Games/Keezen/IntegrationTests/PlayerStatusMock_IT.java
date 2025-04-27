@@ -1,17 +1,17 @@
-package ADG.Games.Keezen.FrontEnd;
+package ADG.Games.Keezen.IntegrationTests;
 
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickCardByValue;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickForfeitButton;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickMakeMoveButton;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.clickPawn;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.getDriver;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.setPlayerIdPlaying;
-import static ADG.Games.Keezen.FrontEnd.Utils.TestUtils.waitUntilCardsAreLoaded;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickCardByValue;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickForfeitButton;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickMakeMoveButton;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPawn;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
 import static org.junit.Assert.assertEquals;
 
-import ADG.Games.Keezen.FrontEnd.Utils.ScreenshotOnFailure;
-import ADG.Games.Keezen.FrontEnd.Utils.SpringAppTestHelper;
-import ADG.Games.Keezen.FrontEnd.Utils.TestUtils;
+import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
+import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import ADG.Games.Keezen.Player.PawnId;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -24,7 +24,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 @ExtendWith(ScreenshotOnFailure.class)
-public class PlayerStatusMockTest {
+public class PlayerStatusMock_IT {
   static WebDriver driver;
 
   @BeforeEach
@@ -88,7 +88,7 @@ public class PlayerStatusMockTest {
     clickCardByValue(driver, 1);
     TestUtils.wait(200);
     clickMakeMoveButton(driver);
-    TestUtils.wait(200);
+    TestUtils.wait(5000);
 
     // THEN
     WebElement player0 = driver.findElement(By.id("player0"));

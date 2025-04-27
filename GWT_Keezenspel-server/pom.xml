@@ -115,6 +115,19 @@
           <target>21</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>net.ltgt.gwt.maven</groupId>
+        <artifactId>gwt-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile-gwt-before-tests</id>
+            <phase>pre-integration-test</phase> <!--prepare-package or pre-integration-test -->
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 

@@ -36,11 +36,11 @@ public class CardsDeckMock implements CardsDeckInterface, IsSerializable {
     }
 
     public ArrayList<Card> getCardsForPlayer(String playerUUID) {
-        if(playerHands.containsKey(playerUUID)){
-            return playerHands.get(playerUUID).getHand();
-        }else{
-            return new ArrayList<>();
+        ArrayList<Card> cards = new ArrayList<>();
+        for (int cardValue = 1; cardValue < 14; cardValue++) {
+            cards.add(new Card(0, cardValue, 1));
         }
+        return cards;
     }
 
     public void forfeitCardsForPlayer(String playerId) {
