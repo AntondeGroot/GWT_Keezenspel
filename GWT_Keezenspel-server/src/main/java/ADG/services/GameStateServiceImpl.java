@@ -22,6 +22,9 @@ public class GameStateServiceImpl extends RemoteServiceServlet implements GameSt
         }
         GameStateResponse response = new GameStateResponse();
         GameSession session = GameRegistry.getGame(sessionID);
+        if (session == null) {
+            return new GameStateResponse();
+        }
         GameState gameState = session.getGameState();
 
         response.setPlayerColors(gameState.getPlayerColors());

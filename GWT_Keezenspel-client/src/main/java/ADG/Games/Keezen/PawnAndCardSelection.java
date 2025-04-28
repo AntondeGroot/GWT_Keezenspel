@@ -200,6 +200,8 @@ public class PawnAndCardSelection {
         if(moveType == FORFEIT){
             pawn1 = resetPawn();
             pawn2 = resetPawn();
+            nrStepsPawn1 = 0;
+            nrStepsPawn2 = 0;
             card = null;
         }
     }
@@ -345,6 +347,7 @@ public class PawnAndCardSelection {
     public MoveMessage createMoveMessage() {
         MoveMessage moveMessage = createMessage();
         moveMessage.setMessageType(MAKE_MOVE);
+        moveType = null;
         return moveMessage;
     }
 

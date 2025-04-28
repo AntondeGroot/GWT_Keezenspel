@@ -1,6 +1,7 @@
 package ADG.Games.Keezen.IntegrationTests.Utils;
 
 import static org.junit.Assert.assertTrue;
+import static org.openqa.selenium.support.ui.ExpectedConditions.stalenessOf;
 
 import ADG.Games.Keezen.Cards.Card;
 import ADG.Games.Keezen.Player.PawnId;
@@ -10,6 +11,7 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -93,17 +95,38 @@ public class TestUtils {
   }
 
   public static void clickCardByValue(WebDriver driver, int cardValue) {
-      WebElement card = driver.findElement(By.id(new Card(0, cardValue).toString()));
-      card.click();
+    WebElement container = driver.findElement(By.className("cardsContainer")); // FIRST
+    WebElement card = driver.findElement(By.id(new Card(0, cardValue).toString())); // THEN
+    card.click();
 
-      wait(200);
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+    try{
+      wait.until(stalenessOf(container));
+      wait.until(d -> d.findElement(By.className("cardsContainer")));
+    } catch (TimeoutException e) {
+     System.out.println("⚠️ Warning: cardsContainer did not become stale after clicking card: " + cardValue);
+    }
+
+    wait(100);
   }
 
   public static Point clickPawn(WebDriver driver, PawnId pawnId) {
+    WebElement pawnOverlay = driver.findElement(By.className(pawnId+"Overlay"));
     WebElement pawnElement = driver.findElement(By.id(pawnId.toString()));
     pawnElement.click();
 
-    wait(200);
+    // wait until visibility changes
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
+    wait.until(driverTemp -> {
+      try {
+        WebElement updatedElement = driverTemp.findElement(By.className(pawnId+"Overlay"));
+        updatedElement.getAttribute("visibility"); // force touching the new element
+        return true;
+      } catch (StaleElementReferenceException e) {
+        return false;
+      }
+    });
+
 
     String x = pawnElement.getCssValue("left").replace("px", "");
     String y = pawnElement.getCssValue("top").replace("px", "");
@@ -115,6 +138,8 @@ public class TestUtils {
     assertTrue("⚠️ sendButton is not enabled: it was not the player's turn",
         sendButton.isEnabled());
     sendButton.click();
+
+    driver.navigate().refresh(); // this is necessary
 
     wait(400);
   }
