@@ -9,6 +9,7 @@ import ADG.Games.Keezen.moving.Move;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
@@ -147,6 +148,7 @@ public class ViewDrawing {
     }
 
     public static Grid createPlayerGrid(ArrayList<Player> players){
+        GWT.log("creates player grid");
         // todo: maybe check player whether they belong in column 1 or 2, so don't expand both when a winner has been declared
         List<Integer> column1 = Arrays.asList(0, 1, 2, 3);
         List<Integer> column2 = Arrays.asList(4, 5, 6, 7);
@@ -166,6 +168,7 @@ public class ViewDrawing {
 
             ImageElement img = Document.get().createImageElement();
             img.setSrc("/profilepics.png");
+
             HorizontalPanel hp = new HorizontalPanel();
             hp.getElement().setId(player.getName());
             Label playerNameLabel = new Label(player.getName());
@@ -207,34 +210,12 @@ public class ViewDrawing {
             // winners can be in either column 1 or 2: only add a medal to the winner,
             // but add an empty canvas to the other players in that column so that they are aligned
             // todo: medals are now not implemented
-            if(!winners.isEmpty()){
-                Canvas canvasMedal = Canvas.createIfSupported();
-                canvasMedal.setWidth(imagePixelSize + "px");
-                canvasMedal.setHeight(imagePixelSize + "px");
-                canvasMedal.setCoordinateSpaceWidth(imagePixelSize);
-                canvasMedal.setCoordinateSpaceHeight(imagePixelSize);
+            Canvas canvasMedal = Canvas.createIfSupported();
+            canvasMedal.getElement().setId(player.getName()+"Medal");
+            canvasMedal.setWidth("0px");
+            canvasMedal.setHeight("0px");
 
-                ImageElement imgMedals = Document.get().createImageElement();
-                imgMedals.setSrc("/medals.png");
-
-                // image has 220px empty space on top and bottom
-                // and is 2500px wide and 1668px high
-                double sw1 = 2500/3.0;
-                double sh1 = 1668-440;
-                double sx1 = sw1*(player.getPlace()-1);
-                double sy1 = 220;
-                // destination
-                double dy1 = 0;
-                double dx1 = 0;
-                double dh1 = imagePixelSize+5;
-                double dw1 = dh1/sh1*sw1;
-
-                Context2d ctxMedals = canvasMedal.getContext2d();
-                if(winners.contains(player)){
-                    ctxMedals.drawImage(imgMedals, sx1,sy1,sw1,sh1,dx1,dy1,dw1,dh1);
-                }
-                hp.add(canvasMedal.asWidget());
-            }
+            hp.add(canvasMedal.asWidget());
             hp.add(canvas.asWidget());
             hp.add(playerNameLabel);
             int row = playerId % 4;
@@ -269,6 +250,43 @@ public class ViewDrawing {
             Element hp = Document.get().getElementById(player.getName());
             hp.setClassName(player.isPlaying() ? "playerPlaying" : "playerNotPlaying");
             hp.addClassName(player.isActive() ?  "playerActive"  : "playerInactive");
+        }
+
+        drawMedals(players);
+    }
+
+    private static void drawMedals(ArrayList<Player> players){
+        for (Player player : players) {
+            if(player.getPlace() > -1) {
+                // get element
+                CanvasElement canvasMedal = (CanvasElement) Document.get().getElementById(player.getName() + "Medal");
+                canvasMedal.setClassName("Medal"+player.getPlace());
+
+                // fill element
+                int imagePixelSize = 50;
+                canvasMedal.setWidth(imagePixelSize); // drawing resolution
+                canvasMedal.setHeight(imagePixelSize);
+                canvasMedal.getStyle().setWidth(imagePixelSize, Style.Unit.PX); // visual size
+                canvasMedal.getStyle().setHeight(imagePixelSize, Style.Unit.PX); // visual size
+
+                ImageElement imgMedals = Document.get().createImageElement();
+                imgMedals.setSrc("/medals.png");
+
+                // image has 220px empty space on top and bottom
+                // and is 2500px wide and 1668px high
+                double sw1 = 2500 / 3.0;
+                double sh1 = 1668 - 440;
+                double sx1 = sw1 * (player.getPlace() - 1);
+                double sy1 = 220;
+                // destination
+                double dy1 = 0;
+                double dx1 = 0;
+                double dh1 = imagePixelSize + 5;
+                double dw1 = dh1 / sh1 * sw1;
+
+                Context2d ctxMedals = canvasMedal.getContext2d();
+                ctxMedals.drawImage(imgMedals, sx1, sy1, sw1, sh1, dx1, dy1, dw1, dh1);
+            }
         }
     }
 }
