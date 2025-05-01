@@ -80,6 +80,19 @@ public class Pawn implements IsSerializable {
         return Objects.equals(pawnId, pawn.pawnId);
     }
 
+    /***
+     * Normal pawn comparison only compares if they have the sameId
+     * This also compares current position which is needed to update the PawnAndCardSelection
+     * Otherwise it will think a pawn on the board is still in the nest
+     * @param other
+     * @return
+     */
+    public boolean equalsByIdAndPosition(Pawn other) {
+        return other != null &&
+            Objects.equals(this.pawnId, other.pawnId) &&
+            Objects.equals(this.currentTileId, other.currentTileId);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hashCode(pawnId);

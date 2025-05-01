@@ -55,23 +55,23 @@ public class PlayerStatusReal_IT {
 
   @Test
   public void player0IsPlayingWhenStartingGame(){
-    // The following seems redundant but for some reason it helps the test
+    // GIVEN a started game
     waitUntilCardsAreLoaded(driver);
-    driver.navigate().refresh();
-    TestUtils.wait(200);
 
+    // WHEN you look at player 0
     WebElement player0 = driver.findElement(By.id("player0"));
-    assertEquals("playerPlaying", player0.getAttribute("class"));
+
+    // THEN it is player 0's turn
+    assertEquals("playerPlaying playerActive", player0.getAttribute("class"));
   }
 
   @Test
   public void player1IsPlayingWhenPlayer0Forfeits() throws InterruptedException {
-    // GIVEN
+    // GIVEN a started game
     waitUntilCardsAreLoaded(driver);
 
     // WHEN
     clickForfeitButton(driver);
-    TestUtils.wait(200);
 
     // THEN;
     WebElement player1 = driver.findElement(By.id("player0"));

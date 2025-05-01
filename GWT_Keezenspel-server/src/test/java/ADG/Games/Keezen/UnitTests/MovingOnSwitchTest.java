@@ -1,17 +1,21 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.UnitTests;
 
 import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.CardsDeckInterface;
+import ADG.Games.Keezen.GameSession;
+import ADG.Games.Keezen.GameState;
 import ADG.Games.Keezen.Move.MessageType;
 import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Move.MoveResult;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
+import ADG.Games.Keezen.TileId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static ADG.Games.Keezen.GameStateUtil.*;
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
 import static ADG.Games.Keezen.Move.MessageType.MAKE_MOVE;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;

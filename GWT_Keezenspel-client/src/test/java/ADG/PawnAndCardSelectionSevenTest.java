@@ -41,7 +41,7 @@ public class PawnAndCardSelectionSevenTest {
     }
 
     @Test
-    public void test_SetSeven_SelectPawn1_SelectPawn2_MoveTypeSplit(){
+    public void withSeven_Select2Pawns_MoveTypeSplit(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(sevenCard);
@@ -56,7 +56,7 @@ public class PawnAndCardSelectionSevenTest {
 
     // TEST nest
     @Test
-    public void test_SetSeven_PawnOnNest_NotPossible(){
+    public void withSeven_PawnOnNest_NotPossible(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(sevenCard);
@@ -69,7 +69,7 @@ public class PawnAndCardSelectionSevenTest {
     }
     // test board
     @Test
-    public void test_SetSeven_SelectPawn_MoveTypeMove(){
+    public void withSeven_SelectPawn_MoveTypeMove(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(sevenCard);
@@ -82,7 +82,7 @@ public class PawnAndCardSelectionSevenTest {
     }
     // test finish
     @Test
-    public void test_SetSeven_PawnOnFinish_MoveOnMove(){
+    public void withSeven_PawnOnFinish_MoveTypeMove(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(sevenCard);
@@ -97,7 +97,7 @@ public class PawnAndCardSelectionSevenTest {
 
     // test board and finish
     @Test
-    public void test_SetSeven_PawnOnBoard_PawnOnFinish_Possible(){
+    public void withSeven_PawnOnBoardAndFinish_Possible(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(sevenCard);
@@ -114,7 +114,7 @@ public class PawnAndCardSelectionSevenTest {
     }
     // test board and board
     @Test
-    public void test_SetSeven_SelectPawn1_SelectPawn2_Pawn2IsSelected(){
+    public void withSeven_SelectTwoOwnPawnsOnBoard(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(sevenCard);
@@ -129,7 +129,7 @@ public class PawnAndCardSelectionSevenTest {
     }
     // test board and board2
     @Test
-    public void test_SetSeven_SelectOwnPawn_SelectOtherPawn_MoveTypeMove(){
+    public void withSeven_CanOnlySelectOwnPawn(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(sevenCard);
@@ -144,7 +144,7 @@ public class PawnAndCardSelectionSevenTest {
     }
 
     @Test
-    public void test_SetSeven_SelectPawn1And2_SetOtherCard_DeselectPawn2(){
+    public void withSeven_SelectTwoPawns_SetOtherCard_DeselectPawn2(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(sevenCard);
@@ -159,7 +159,7 @@ public class PawnAndCardSelectionSevenTest {
     }
 
     @Test
-    public void testSetSeven_SelectPawn_CannotSelectPawnOnNest(){
+    public void withSeven_CannotSelectSecondPawnOnNest(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(sevenCard);
@@ -174,7 +174,7 @@ public class PawnAndCardSelectionSevenTest {
     }
 
     @Test
-    public void testSetSeven_SelectPawn_DeselectSecondPawn_MoveOnMove(){
+    public void withSeven_SelectPawn_DeselectSecondPawn_MoveTypeMove(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(sevenCard);
@@ -196,7 +196,7 @@ public class PawnAndCardSelectionSevenTest {
 
     // test nr steps is correct
     @Test
-    public void test_SetSeven_Select1Pawn_nrStepsIs7(){
+    public void withSeven_SelectPawn_nrStepsIs7(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(sevenCard);
@@ -209,7 +209,7 @@ public class PawnAndCardSelectionSevenTest {
     }
 
     @Test
-    public void test_SetSeven_Select2Pawns_DeselectPawn1_Pawn2IsNowPawn1(){
+    public void withSeven_Select2Pawns_DeselectPawn1_Pawn2IsNowPawn1(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(sevenCard);
@@ -226,8 +226,9 @@ public class PawnAndCardSelectionSevenTest {
     }
 
     @Test
-    public void test_setSeven_Select2Pawns_SetJack_DeselectsPawn2_bugfix(){
+    public void withSeven_Select2Pawns_SetJack_DeselectsPawn2_bugfix(){
         // this bug occurred because both Seven and Jack allow two pawns to be selected
+        // and you can't switch two of your own pawns with a Jack
 
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");

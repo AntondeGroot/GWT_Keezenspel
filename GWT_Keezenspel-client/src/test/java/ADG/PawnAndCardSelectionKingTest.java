@@ -38,7 +38,7 @@ public class PawnAndCardSelectionKingTest {
 
     // TEST: NEST
     @Test
-    public void test_SetKing_SelectPawnOffBoard_MoveOnBoard(){
+    public void withKing_SelectPawnOffBoard_MoveTypeOBoard(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(kingCard);
@@ -52,7 +52,7 @@ public class PawnAndCardSelectionKingTest {
 
     // TEST: NEST
     @Test
-    public void test_SelectPawnOffBoard_SetKing_MoveOnBoard(){
+    public void selectPawnOffBoard_SetKing_MoveTypeOnBoard(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnNest);
@@ -65,7 +65,7 @@ public class PawnAndCardSelectionKingTest {
     }
 
     @Test
-    public void test_SetKing_SelectOtherPawnOnNest_NotPossible(){
+    public void withKing_SelectOtherPawnOnNest_NotPossible(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(kingCard);
@@ -79,7 +79,7 @@ public class PawnAndCardSelectionKingTest {
     }
 
     @Test
-    public void test_SetKing_SelectOtherPawnOnFinish_NotPossible(){
+    public void withKing_SelectOtherPawnOnFinish_NotPossible(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(kingCard);
@@ -92,7 +92,11 @@ public class PawnAndCardSelectionKingTest {
         assertNull(pawnAndCardSelection.getPawnId2());
     }
     @Test
-    public void test_SelectOwnPawnOnFinish_SetKing_NotPossible(){
+    public void selectOwnPawnOnFinish_SetKing_Possible(){
+        /***
+         * The test move will show if you can make the move
+         * We do not want to client to deselect the pawn based on a wrongly selected card
+         */
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnFinish);
@@ -101,11 +105,11 @@ public class PawnAndCardSelectionKingTest {
         pawnAndCardSelection.setCard(kingCard);
 
         // THEN
-        assertNull(pawnAndCardSelection.getPawnId1());// todo: or should the card be empty?
+        assertEquals(ownPawnOnFinish.getPawnId(), pawnAndCardSelection.getPawnId1());
     }
 
     @Test
-    public void test_SetCardThenKing_ResetsStepsPawn1(){
+    public void withNormalCard_ThenKing_ResetsStepsPawn1(){
         // GIVEN
         pawnAndCardSelection.setCard(new Card(0,5));
 

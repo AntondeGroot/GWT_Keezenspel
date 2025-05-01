@@ -1,12 +1,15 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.UnitTests;
 
+import ADG.Games.Keezen.CardsDeckInterface;
+import ADG.Games.Keezen.GameSession;
+import ADG.Games.Keezen.GameState;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static ADG.Games.Keezen.GameStateUtil.*;
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class WinnerLogicTest {

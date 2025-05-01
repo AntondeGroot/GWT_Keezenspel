@@ -251,8 +251,8 @@ public class GameState {
             return false;
         }
         Pawn pawn = getPawn(nextTileId);
-        Log.info("found pawn on start tile: "+pawn);
         if(pawn != null) {
+            Log.info("found pawn on start tile: "+pawn);
             if(pawn.getPawnId().equals(selectedPawnId)){
                 return true;
             }
@@ -309,6 +309,12 @@ public class GameState {
 
         if(pawnId1 == null || card == null || pawnId2 == null){
             response.setResult(INVALID_SELECTION);
+
+            StringBuilder errorMsg = new StringBuilder("Invalid selection: ");
+            if (pawnId1 == null) errorMsg.append("pawnId1 is null. ");
+            if (pawnId2 == null) errorMsg.append("pawnId2 is null. ");
+            if (card == null)    errorMsg.append("card is null. ");
+            response.setErrorMessage(errorMsg.toString().trim());
             return;
         }
 
@@ -317,6 +323,8 @@ public class GameState {
             return;
         }
 
+        // This should not actually be possible due to validation on client side
+        // However, still double check it.
         if((nrStepsPawn1 + nrStepsPawn2 != 7) &&  moveType==MOVE){
             response.setResult(INVALID_SELECTION);
             return;
@@ -411,6 +419,11 @@ public class GameState {
         Card card = moveMessage.getCard();
         if(pawnId1 == null || card == null){
             response.setResult(INVALID_SELECTION);
+
+            StringBuilder errorMsg = new StringBuilder("Invalid selection: ");
+            if (pawnId1 == null) errorMsg.append("pawnId1 is null. ");
+            if (card == null)    errorMsg.append("card is null. ");
+            response.setErrorMessage(errorMsg.toString().trim());
             return;
         }
 
@@ -758,6 +771,12 @@ public class GameState {
         // invalid selection
         if(pawnId1 == null || card == null || pawnId2 == null){
             moveResponse.setResult(INVALID_SELECTION);
+
+            StringBuilder errorMsg = new StringBuilder("Invalid selection: ");
+            if (pawnId1 == null) errorMsg.append("pawnId1 is null. ");
+            if (card == null)    errorMsg.append("card is null. ");
+            if (pawnId2 == null) errorMsg.append("pawnId2 is null. ");
+            moveResponse.setErrorMessage(errorMsg.toString().trim());
             return;
         }
 
@@ -845,6 +864,11 @@ public class GameState {
         // invalid selection
         if(pawnId1 == null || card == null){
             response.setResult(INVALID_SELECTION);
+
+            StringBuilder errorMsg = new StringBuilder("Invalid selection: ");
+            if (pawnId1 == null) errorMsg.append("pawnId1 is null. ");
+            if (card == null)    errorMsg.append("card is null. ");
+            response.setErrorMessage(errorMsg.toString().trim());
             return;
         }
 
@@ -857,6 +881,7 @@ public class GameState {
         // cannot go onboard without an Ace or King
         if(!(isAce(card) || isKing(card))){
             response.setResult(CANNOT_MAKE_MOVE);
+            response.setErrorMessage("You can't move on board without an Ace or King");
             return;
         }
 
@@ -868,12 +893,14 @@ public class GameState {
         // when occupied by own pawn
         if(!canMoveToTile(pawnId1, targetTileId)){
             response.setResult(CANNOT_MAKE_MOVE);
+            response.setErrorMessage("You can't end up on your own pawn");
             return;
         }
 
         // when pawn not in the nest
         if(currentTileId.getTileNr() >= 0 ){
             response.setResult(CANNOT_MAKE_MOVE);
+            response.setErrorMessage("You can't move from nest to board when you are already on board");
             return;
         }
 

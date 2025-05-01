@@ -6,15 +6,20 @@ import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Point;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Style;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 public class PawnAnimation {
-  boolean isFirstSequence = true;
-  double totalDelay;
+  private boolean isFirstSequence = true;
+  private double totalDelay;
+  private Map<String, DivElement> pawnElements;
+
+  public PawnAnimation(Map<String, DivElement> pawnElements) {
+    this.pawnElements = pawnElements;
+  }
 
   public void animateSequence(List<AnimatePawnPoints> sequence) {
     // * get the list of all pawns that should be animated first
@@ -35,7 +40,7 @@ public class PawnAnimation {
 
       double pixelsPerMs = calculateSpeed(distance);
 
-      DivElement pawnElement = (DivElement) Document.get().getElementById(pawn.getPawnId().toString());
+      DivElement pawnElement = pawnElements.get(pawn.getPawnId().toString());
 
       animateStep(pawnElement, points.get(0), points, pixelsPerMs);
 
@@ -81,15 +86,4 @@ public class PawnAnimation {
       }
     }.schedule(duration);
   }
-
-  /***
-   * remove "transition" and "animation-delay" from showing after it was finished
-   */
-  public native void clearPawnDivStyles() /*-{
-    var elements = $doc.getElementsByClassName('pawnDiv');
-    for (var i = 0; i < elements.length; i++) {
-      elements[i].style.transition = '';
-      elements[i].style.animationDelay = '';
-    }
-  }-*/;
 }

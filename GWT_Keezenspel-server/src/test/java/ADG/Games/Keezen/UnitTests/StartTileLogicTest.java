@@ -1,13 +1,17 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.UnitTests;
 
+import ADG.Games.Keezen.CardsDeckInterface;
+import ADG.Games.Keezen.GameSession;
+import ADG.Games.Keezen.GameState;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
+import ADG.Games.Keezen.TileId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static ADG.Games.Keezen.GameStateUtil.*;
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StartTileLogicTest {

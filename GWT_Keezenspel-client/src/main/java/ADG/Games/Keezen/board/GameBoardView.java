@@ -75,6 +75,8 @@ public class GameBoardView extends Composite {
         super.onLoad();
     }
 
+    private final Map<String, DivElement> pawnElements = new HashMap<>();
+
     public GameBoardView() {
         initWidget(uiBinder.createAndBindUi(this));
         document = Document.get();
@@ -125,10 +127,9 @@ public class GameBoardView extends Composite {
     public void animatePawns(){
         //pawns.sort(new PawnComparator()); // todo: will pawns be drawn incorrectly when on finish tile?
         GWT.log("view.animatepawns");
-        PawnAnimation animation = new PawnAnimation();
+        PawnAnimation animation = new PawnAnimation(pawnElements);
         animation.animateSequence(AnimationSequence.getFirst());
         animation.animateSequence(AnimationSequence.getLast());
-        animation.clearPawnDivStyles();
         AnimationSequence.reset();
     }
 
@@ -158,7 +159,12 @@ public class GameBoardView extends Composite {
         Point point = new Point(0,0);
 
         for (Pawn pawn : pawns) {
-           DivElement pawnElement = createPawn(pawn, pawnAndCardSelection);
+            DivElement pawnElement = pawnElements.get(pawn.getPawnId().toString());
+            if(pawnElement == null){
+                pawnElement = createPawn(pawn, pawnAndCardSelection);
+                pawnElements.put(pawn.getPawnId().toString(), pawnElement);
+                pawnBoard.getElement().appendChild(pawnElement);
+            }
 
             for (TileMapping mapping : Board.getTiles()) {
                 if(mapping.getTileId().equals(pawn.getCurrentTileId())){
@@ -167,8 +173,6 @@ public class GameBoardView extends Composite {
             }
             pawnElement.getStyle().setLeft(point.getX() - desiredWidth/2, Style.Unit.PX);
             pawnElement.getStyle().setTop(point.getY() - desiredHeight/2 - 15, Style.Unit.PX);
-
-            pawnBoard.getElement().appendChild(pawnElement);
         }
     }
 
@@ -223,6 +227,7 @@ public class GameBoardView extends Composite {
         Card selectedCard = pawnAndCardSelection.getCard();
         // create divs
         cardsContainer.getElement().removeAllChildren();
+        GWT.log("cards have now become stale");
 
         GWT.log("cards = "+cards);
         for (Card card : cards) {
@@ -256,9 +261,8 @@ public class GameBoardView extends Composite {
                 public void onBrowserEvent(Event event) {
                     if (DOM.eventGetType(event) == Event.ONCLICK) {
                         pawnAndCardSelection.setCard(card);
-                        if(pawnAndCardSelection.getPawn1() != null && pawnAndCardSelection.getCard() != null){
-                            Move.testMove(pawnAndCardSelection.createTestMoveMessage());//todo: improve elegance
-                        }
+                        GWT.log("pawnAndCardSelection = "+pawnAndCardSelection);
+                        Move.testMove(pawnAndCardSelection.createTestMoveMessage());//todo: improve elegance
 
                         drawPlayerCardsInHand(cards, pawnAndCardSelection, spriteImage);
                     }

@@ -13,13 +13,16 @@ import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveType;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Style.Visibility;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class PawnAndCardSelection {
     private String playerId;
-    private Pawn pawn1 = resetPawn();
-    private Pawn pawn2 = resetPawn();
+    private Pawn pawn1 = null;
+    private Pawn pawn2 = null;
     private Card card;
     private boolean drawCards = true;
     private MoveType moveType;
@@ -32,7 +35,27 @@ public class PawnAndCardSelection {
     }
 
     public void setPlayerId(String id) {
+        // For testing purposes if you change a player ID then deselect everything
+        // This makes it easier to say "player 2 picks card 2" instead of assuming PLayer 2 continues
+        // playing with a card that Player 1 had selected.
+        if(!Objects.equals(playerId,id)){
+            reset();
+        }
         playerId = id;
+    }
+
+    public void updatePawns(ArrayList<Pawn> pawns){
+        for (Pawn pawn : pawns) {
+            // compares pawnId's then updates current position
+            if(Objects.equals(pawn, pawn1)){
+                pawn1 = pawn;
+                GWT.log("PawnAndCardSelection.updatePawns(): " + pawn1);
+            }
+            if(Objects.equals(pawn, pawn2)){
+                pawn2 = pawn;
+                GWT.log("PawnAndCardSelection.updatePawns(): " + pawn1);
+            }
+        }
     }
 
     public String getPlayerId(){
@@ -40,6 +63,7 @@ public class PawnAndCardSelection {
     }
 
     public void addPawn(Pawn pawn) {
+        GWT.log("test playerId = "+playerId);
         validateSelectionBasedOnPlayerID(pawn); // not accounting for if they are on nest/board/finish
         validateSelectionBasedOnLocation();     // validate if they are on nest/board/finish
         validateMoveType();
@@ -59,56 +83,58 @@ public class PawnAndCardSelection {
     }
 
     private void validateAllPawnsAreOnBoard() {
-        if(!pawn1.equals(resetPawn())){
+        if(pawn1 != null){
             if(!pawnIsOnNormalBoard(pawn1)){
-                pawn1 = resetPawn();
+                pawn1 = null;
             }
         }
-        if(!pawn2.equals(resetPawn())){
+        if(pawn2 != null){
             if(!pawnIsOnNormalBoard(pawn2)){
-                pawn2 = resetPawn();
+                pawn2 = null;
             }
         }
     }
 
     private void validateAllPawnsAreOnBoardOrFinish() {
-        if(!pawn1.equals(resetPawn())){
+        if(pawn1 != null){
+            // this does not work if the pawn is not updated, should be server side only
             if(isPawnOnNest(pawn1)){
-                pawn1 = resetPawn();
+                GWT.log("pawn is still on nest");
+                pawn1 = null;
             }
         }
-        if(!pawn2.equals(resetPawn())){
+        if(pawn2 != null){
             if(isPawnOnNest(pawn2)){
-                pawn2 = resetPawn();
+                pawn2 = null;
             }
         }
     }
 
     private void validateAllPawnsAreOnNest() {
-        if(!pawn1.equals(resetPawn())){
+        if(pawn1 != null){
             if(!isPawnOnNest(pawn1)){
-                pawn1 = resetPawn();
+                pawn1 = null;
             }
         }
-        if(!pawn2.equals(resetPawn())){
+        if(pawn2 != null){
             if(!isPawnOnNest(pawn2)){
-                pawn2 = resetPawn();
+                pawn2 = null;
             }
         }
     }
 
     private boolean aPawnWasNotDeselected(Pawn pawn) {
-        if (pawn1.equals(pawn)) {
+        if (Objects.equals(pawn1, pawn)) {
             // this moves pawn 2 to pawn1 and resets pawn2
             // if pawn 2 was already reset, this changes nothing but clears pawn1
             pawn1 = pawn2;
-            pawn2 = resetPawn();
+            pawn2 = null;
             return false;
         }
 
         // deselect pawn2
-        if (pawn2.equals(pawn)) {
-            pawn2 = resetPawn();
+        if (Objects.equals(pawn2, pawn)) {
+            pawn2 = null;
             return false;
         }
 
@@ -122,7 +148,7 @@ public class PawnAndCardSelection {
             }
 
             // select pawn
-            if (pawn1.equals(resetPawn())) {
+            if (pawn1 == null) {
                 pawn1 = pawn;
             }else{
                 pawn2 = pawn;
@@ -170,7 +196,11 @@ public class PawnAndCardSelection {
 
         // deselect when clicked twice
         if(card != null && card.equals(p_card)){
+            System.out.println("PawnAndCardSelection the card was deselected, reset everything");
             card = null;
+            nrStepsPawn1 = 0;
+            nrStepsPawn2 = 0;
+            moveType = null;
             return;
         }
 
@@ -185,7 +215,7 @@ public class PawnAndCardSelection {
     }
 
     public PawnId getPawnId1(){
-        if(pawn1.equals(resetPawn())){
+        if(pawn1 == null){
             return null;
         }
         return pawn1.getPawnId();
@@ -198,8 +228,8 @@ public class PawnAndCardSelection {
     public void setMoveType(MoveType moveType) {
         this.moveType = moveType;
         if(moveType == FORFEIT){
-            pawn1 = resetPawn();
-            pawn2 = resetPawn();
+            pawn1 = null;
+            pawn2 = null;
             nrStepsPawn1 = 0;
             nrStepsPawn2 = 0;
             card = null;
@@ -207,7 +237,7 @@ public class PawnAndCardSelection {
     }
 
     public PawnId getPawnId2(){
-        if(pawn2.equals(resetPawn())){
+        if(pawn2 == null){
             return null;
         }
         return pawn2.getPawnId();
@@ -229,14 +259,10 @@ public class PawnAndCardSelection {
         return drawCards;
     }
 
-    private Pawn resetPawn(){
-        return new Pawn(new PawnId("-1",-1),new TileId("-1",90));//todo: improve reset
-    }
-
     public void reset(){
         // do not reset playerId
-        pawn1 = resetPawn();
-        pawn2 = resetPawn();
+        pawn1 = null;
+        pawn2 = null;
         card = null;
         drawCards = true;
         moveType = null;
@@ -262,11 +288,17 @@ public class PawnAndCardSelection {
 
         // selection of card deselects second pawn when card is not 7 or jack
         if(!isJack(card) && !isSeven(card)){
-            pawn2 = resetPawn();
+            pawn2 = null;
         }
     }
 
     private void handleAce() {
+        if(pawn1 == null){
+            nrStepsPawn1 = 1;
+            setMoveType(MOVE);
+            return;
+        }
+
         if (pawn1.getCurrentTileId().getTileNr() < 0) {
             nrStepsPawn1 = 0;
             setMoveType(ONBOARD);
@@ -277,7 +309,7 @@ public class PawnAndCardSelection {
     }
 
     private void handleSeven() {
-        if (!pawn1.equals(resetPawn()) && !pawn2.equals(resetPawn())) {
+        if (pawn1 != null && pawn2 != null) {
             setMoveType(SPLIT);
             // show boxes used to split a 7 over two pawns
             setSplitBoxesVisibility(Visibility.VISIBLE);
@@ -368,6 +400,7 @@ public class PawnAndCardSelection {
 
     private void setSplitBoxesVisibility(Visibility visibility){
         if (!uiEnabled) return;
+
         try {
             Document.get().getElementById("pawnIntegerBoxes").getStyle().setVisibility(visibility);
         } catch (Exception ignored) {}
