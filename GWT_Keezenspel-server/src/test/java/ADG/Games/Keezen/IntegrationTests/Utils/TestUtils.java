@@ -1,6 +1,9 @@
 package ADG.Games.Keezen.IntegrationTests.Utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.openqa.selenium.support.ui.ExpectedConditions.stalenessOf;
 
 import ADG.Games.Keezen.Cards.Card;
@@ -8,6 +11,7 @@ import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Point;
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -40,12 +44,11 @@ public class TestUtils {
     driver.get("http://localhost:4200/");
     driver.manage().addCookie(new Cookie("sessionid", "123"));
     driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
-    driver.navigate().refresh();
     return driver;
   }
 
   public static void waitUntilCardsAreLoaded(WebDriver driver) {
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
     try {
       wait.until(driver1 -> {
@@ -65,7 +68,7 @@ public class TestUtils {
   public static void setPlayerIdPlaying(WebDriver driver, String playerId) {
     Cookie playerCookie = new Cookie("playerid", playerId);
     driver.manage().addCookie(playerCookie);
-    wait(400);
+    wait(1000);
   }
 
   /***
@@ -110,6 +113,13 @@ public class TestUtils {
     wait(100);
   }
 
+  public static Point getPawnLocation(WebDriver driver, PawnId pawnId) {
+      WebElement pawnElement = driver.findElement(By.id(pawnId.toString()));
+      String x = pawnElement.getCssValue("left").replace("px", "");
+      String y = pawnElement.getCssValue("top").replace("px", "");
+      return new Point(Double.parseDouble(x), Double.parseDouble(y));
+    }
+
   public static Point clickPawn(WebDriver driver, PawnId pawnId) {
     WebElement pawnOverlay = driver.findElement(By.className(pawnId+"Overlay"));
     WebElement pawnElement = driver.findElement(By.id(pawnId.toString()));
@@ -127,10 +137,15 @@ public class TestUtils {
       }
     });
 
-
     String x = pawnElement.getCssValue("left").replace("px", "");
     String y = pawnElement.getCssValue("top").replace("px", "");
     return new Point(Double.valueOf(x), Double.valueOf(y));
+  }
+
+  public static boolean pawnIsSelected(WebDriver driver, PawnId pawnId){
+    WebElement updatedElement = driver.findElement(By.className(pawnId.toString()+"Overlay"));
+    String output = updatedElement.getAttribute("visibility");
+    return Objects.equals(output,"visible");
   }
 
   public static void clickPlayCardButton(WebDriver driver) {
@@ -139,9 +154,35 @@ public class TestUtils {
         sendButton.isEnabled());
     sendButton.click();
 
-    driver.navigate().refresh(); // this is necessary
-
     wait(400);
+  }
+
+  public static void waitUntilPawnStopsMoving(WebDriver driver, PawnId pawnId) {
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    WebElement pawn = driver.findElement(By.id(pawnId.toString()));
+
+    wait.until(driver1 -> {
+      org.openqa.selenium.Point oldPosition = pawn.getLocation();
+      try {
+        Thread.sleep(100); // Wait a bit to allow animation to progress
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+
+      org.openqa.selenium.Point newPosition = pawn.getLocation();
+
+      // Check if position has stabilized
+      if (oldPosition.equals(newPosition)) {
+        return true;
+      } else {
+        return null; // keep waiting
+      }
+    });
+  }
+
+  public static void playerForfeits(WebDriver driver, String playerId) {
+    setPlayerIdPlaying(driver,playerId);
+    clickForfeitButton(driver);
   }
 
   public static void clickForfeitButton(WebDriver driver) {
@@ -153,7 +194,7 @@ public class TestUtils {
 
     wait(200);
 
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
     try {
       wait.until(driver1 -> {
         try {
@@ -182,5 +223,10 @@ public class TestUtils {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
+  }
+
+  public static void assertPointsNotEqual(String msg, Point p1, Point p2){
+    assertNotEquals(msg, p1.getX(), p2.getX(),2);
+    assertNotEquals(msg, p1.getY(), p2.getY(),2);
   }
 }

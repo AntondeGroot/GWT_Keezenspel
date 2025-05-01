@@ -5,9 +5,11 @@ import ADG.Games.Keezen.Cards.Card;
 import ADG.Games.Keezen.Move.MoveType;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static ADG.CardEnum.JACK;
 import static ADG.Games.Keezen.Move.MoveType.FORFEIT;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,15 +21,12 @@ public class PawnAndCardSelectionJackTest {
     private Pawn otherPawnOnBoard;
     private Pawn otherPawnOnNest;
     private Pawn otherPawnOnFinish;
-    private Card jackCard;
+    private Card jackCard = JACK.get();
     private Card nonJackCard;
     private PawnAndCardSelection pawnAndCardSelection;
 
     @BeforeEach
     void setup(){
-        pawnAndCardSelection = new PawnAndCardSelection();
-        pawnAndCardSelection.disableUIForTests();
-
         // pawns player playing
         ownPawnOnBoard = new Pawn(new PawnId("1", 1), new TileId("1", 0));
         ownPawnOnNest = new Pawn(new PawnId("1", 2), new TileId("1", -1));
@@ -37,13 +36,15 @@ public class PawnAndCardSelectionJackTest {
         otherPawnOnNest = new Pawn(new PawnId("2", 2), new TileId("2", -1));
         otherPawnOnFinish = new Pawn(new PawnId("2", 3), new TileId("2", 16));
 
-        jackCard = new Card(0,11);
         nonJackCard = new Card(0,5);
+        pawnAndCardSelection = new PawnAndCardSelection();
+        pawnAndCardSelection.disableUIForTests();
+
     }
 
     // TEST: OWN PAWN ON NEST
     @Test
-    public void test_SetJack_SelectNestPawn_NotPossible(){
+    public void withJack_SelectNestPawn_NotPossible(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(jackCard);
@@ -68,7 +69,7 @@ public class PawnAndCardSelectionJackTest {
     }
     // other player on nest
     @Test
-    public void test_SetJack_SelectPawnOnBoard_SelectPawnOnNest_NotPossible(){
+    public void withJack_SelectPawnOnBoard_AndOnNest_NotPossible(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(jackCard);
@@ -97,7 +98,7 @@ public class PawnAndCardSelectionJackTest {
 
     // TEST: OWN PAWN ON BOARD
     @Test
-    public void test_SetJack_SelectPawnOnBoard_MoveOnSwitch(){
+    public void withJack_SelectPawnOnBoard_MoveTypeIsSwitch(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(jackCard);
@@ -109,7 +110,7 @@ public class PawnAndCardSelectionJackTest {
         assertEquals(MoveType.SWITCH, pawnAndCardSelection.getMoveType());
     }
     @Test
-    public void test_SelectPawnOnBoard_SetJack_MoveOnSwitch(){
+    public void selectPawnOnBoard_SetJack_MoveTypeIsSwitch(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnBoard);
@@ -122,7 +123,7 @@ public class PawnAndCardSelectionJackTest {
     }
     // TEST: FINISH
     @Test
-    public void test_SetJack_SelectPawnOnFinish_NotPossible(){
+    public void withJack_SelectPawnOnFinish_NotPossible(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(jackCard);
@@ -147,7 +148,7 @@ public class PawnAndCardSelectionJackTest {
     }
     // TEST: FORFEIT
     @Test
-    public void test_SelectJack_ThenForfeit(){
+    public void withJack_Forfeit_ResetsCardAndPawn(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnBoard);
@@ -163,7 +164,7 @@ public class PawnAndCardSelectionJackTest {
     }
     // TEST: DESELECT BY SELECTING TWICE
     @Test
-    public void test_SelectPawnTwice_Deselects(){
+    public void selectPawnTwice_Deselects(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnBoard);
@@ -177,7 +178,7 @@ public class PawnAndCardSelectionJackTest {
     }
 
     @Test
-    void test_SetJack_clickOnOtherPawn_Possible(){
+    void withJack_ClickOnlyOnOpponent_Possible(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
 
@@ -190,7 +191,7 @@ public class PawnAndCardSelectionJackTest {
         assertEquals(otherPawnOnBoard.getPawnId(), pawnAndCardSelection.getPawnId2());
     }
     @Test
-    void test_SetNonJack_clickOnOtherPawn_NotPossible(){
+    void withoutJack_clickOnOtherPawn_NotPossible(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
 
@@ -203,7 +204,7 @@ public class PawnAndCardSelectionJackTest {
         assertNull(pawnAndCardSelection.getPawnId2());
     }
     @Test
-    void test_selectTwoPawnsWithJack_OtherCardSelected_OnlyOwnPawnIsSelected(){
+    void selectTwoPawnsWithJack_SetNormalCard_OnlyOwnPawnIsSelected(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
 
@@ -222,7 +223,7 @@ public class PawnAndCardSelectionJackTest {
         assertNull(pawnAndCardSelection.getPawnId2());
     }
     @Test
-    public void test_SetJack_AddOtherPawn_AddOtherPawn_Deselects() {
+    public void withJack_AddOtherPawnTwice_Deselects() {
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnBoard);
@@ -242,7 +243,7 @@ public class PawnAndCardSelectionJackTest {
     }
 
     @Test
-    public void test_SetNonJack_DeselectsOtherPawn() {
+    public void withoutJack_DeselectsOtherPawn() {
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnBoard);
@@ -256,7 +257,7 @@ public class PawnAndCardSelectionJackTest {
         assertNull(pawnAndCardSelection.getPawnId2());
     }
     @Test
-    public void test_SetJack_SelectOtherPawnOnNest_NotPossible(){
+    public void withJack_SelectOtherPawnOnNest_NotPossible(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(jackCard);
@@ -268,7 +269,7 @@ public class PawnAndCardSelectionJackTest {
         assertNull(pawnAndCardSelection.getPawnId2());
     }
     @Test
-    public void test_SetJack_SelectOtherPawnOnFinish_NotPossible(){
+    public void withJack_SelectOtherPawnOnFinish_NotPossible(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(jackCard);
@@ -280,7 +281,7 @@ public class PawnAndCardSelectionJackTest {
         assertNull(pawnAndCardSelection.getPawnId2());
     }
     @Test
-    public void test_SetCardThenJack_ResetsStepsPawn1(){
+    public void withoutJack_ThenJack_ResetsStepsPawn1(){
         // GIVEN
         pawnAndCardSelection.setCard(new Card(0,5));
 

@@ -1,11 +1,20 @@
 package ADG.Games.Keezen.IntegrationTests;
 
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickCardByValue;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickForfeitButton;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPawn;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPlayCardButton;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.pawnIsSelected;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import ADG.Games.Keezen.Player.PawnId;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -98,5 +107,49 @@ public class Pawn_IT {
     // THEN
     WebElement pawnOtherPlayerOutline = driver.findElement(By.className("PawnId{1,1}Overlay"));
     assertEquals("hidden", pawnOtherPlayerOutline.getCssValue("visibility"));
+  }
+
+  @Test
+  public void playerCanMoveOnBoardAndPlayWithoutHavingToRefreshPage(){
+    PawnId pawnId = new PawnId("2",0);
+
+    // GIVEN player 0 forfeits
+    waitUntilCardsAreLoaded(driver);
+    clickForfeitButton(driver);
+
+    // GIVEN player 1 forfeits
+    setPlayerIdPlaying(driver,"1");
+    clickForfeitButton(driver);
+
+    // GIVEN player 2 moves on board
+    setPlayerIdPlaying(driver, "2");
+    clickPawn(driver, pawnId);
+    clickCardByValue(driver,1);
+    clickPlayCardButton(driver);
+    TestUtils.wait(2000);
+    fail("finish this test");
+    assertTrue(pawnIsSelected(driver, pawnId));
+
+
+//
+//    clickPawn(driver, new PawnId("2", 0));
+//
+//    clickCardByValue(driver,10);
+//    clickPlayCardButton(driver);
+//    TestUtils.wait(4000);
+//
+//    driver.navigate().refresh();
+//
+//    Point p2 = clickPawn(driver, new PawnId("2", 0));
+//    WebElement updatedElement = driver.findElement(By.className(new PawnId("2",0).toString()+"Overlay"));
+//    String value = updatedElement.getAttribute("visibility");
+//    assertNotNull(updatedElement);
+//
+//    driver.navigate().refresh();
+//
+//    p2 = clickPawn(driver, new PawnId("2", 0));
+//    updatedElement = driver.findElement(By.className(new PawnId("2",0).toString()+"Overlay"));
+//    assertTrue(updatedElement.getAttribute("visibility").equals("visible"));
+
   }
 }

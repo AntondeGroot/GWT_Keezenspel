@@ -6,6 +6,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -83,12 +84,40 @@ public class GameStateResponse implements IsSerializable {
             return false;
         }
         GameStateResponse that = (GameStateResponse) o;
-        return nrPlayers == that.nrPlayers && Objects.equals(pawns, that.pawns) && Objects.equals(players, that.players) && Objects.equals(playerColors, that.playerColors) && Objects.equals(playerIdTurn, that.playerIdTurn) && Objects.equals(activePlayers, that.activePlayers) && Objects.equals(winners, that.winners);
+        return nrPlayers == that.nrPlayers &&
+            pawnsEqualByIdAndPosition(pawns, that.pawns) &&
+            Objects.equals(players, that.players) &&
+            Objects.equals(playerColors, that.playerColors) &&
+            Objects.equals(playerIdTurn, that.playerIdTurn) &&
+            Objects.equals(activePlayers, that.activePlayers) &&
+            Objects.equals(winners, that.winners);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(pawns, players, playerColors, playerIdTurn, nrPlayers, activePlayers, winners);
+    }
+
+    /***
+     * Normal pawn comparison only compares if they have the sameId
+     * This also compares current position which is needed to update the PawnAndCardSelection
+     * Otherwise it will think a pawn on the board is still in the nest
+     * @param list1
+     * @param list2
+     * @return
+     */
+    private static boolean pawnsEqualByIdAndPosition(List<Pawn> list1, List<Pawn> list2) {
+        if (list1 == null || list2 == null) return false;
+        if (list1.size() != list2.size()) return false;
+
+        for (int i = 0; i < list1.size(); i++) {
+            Pawn p1 = list1.get(i);
+            Pawn p2 = list2.get(i);
+            if (!p1.equalsByIdAndPosition(p2)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

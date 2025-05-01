@@ -1,15 +1,19 @@
-package ADG.Games.Keezen;
+package ADG.Games.Keezen.UnitTests;
 
-import static ADG.Games.Keezen.GameStateUtil.createGame_With_NPlayers;
-import static ADG.Games.Keezen.GameStateUtil.givePlayerCard;
-import static ADG.Games.Keezen.GameStateUtil.place4PawnsOnFinish;
-import static ADG.Games.Keezen.GameStateUtil.playRemainingCards;
-import static ADG.Games.Keezen.GameStateUtil.sendValidMoveMessage;
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.createGame_With_NPlayers;
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.givePlayerCard;
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.place4PawnsOnFinish;
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.playRemainingCards;
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.sendValidMoveMessage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.CardsDeckInterface;
+import ADG.Games.Keezen.CardsDeckMock;
+import ADG.Games.Keezen.GameSession;
+import ADG.Games.Keezen.GameState;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

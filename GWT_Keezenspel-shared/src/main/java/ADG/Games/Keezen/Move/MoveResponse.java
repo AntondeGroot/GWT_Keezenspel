@@ -22,6 +22,15 @@ public class MoveResponse implements IsSerializable {
     private MoveType moveType;
     private MessageType messageType;
     private MoveResult result;
+    private String errorMessage;
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
 
     public MoveResponse() {}
 
@@ -122,19 +131,26 @@ public class MoveResponse implements IsSerializable {
 
     @Override
     public String toString() {
-        return "MoveResponse{\n" +
-                "    result = " + result +",\n\n"+
-                "    pawnId 1 = " + pawnId1 +",\n"+
-                "    pawnId 2 = " + pawnId2 +",\n"+
-                "    pawnId Killed 1 = " + pawnIdKilled1 +",\n"+
-                "    pawnId Killed 2 = " + pawnIdKilled2 +",\n"+
-                "    movePawn 1 = " + movePawn1 +",\n"+
-                "    movePawn 2 = " + movePawn2 +",\n"+
-                "    moveKilledPawn 1 = " + moveKilledPawn1 +",\n"+
-                "    moveKilledPawn 2 = " + moveKilledPawn2 +",\n"+
-                "    moveType = " + moveType +",\n"+
-                "    messageType = " + messageType +",\n"+
-                '}';
+        /***
+         * only display the non-null fields
+         */
+        StringBuilder sb = new StringBuilder("MoveResponse{\n");
+
+        if (result != null) sb.append("    result = ").append(result).append(",\n");
+        if (pawnId1 != null) sb.append("    pawnId 1 = ").append(pawnId1).append(",\n");
+        if (pawnId2 != null) sb.append("    pawnId 2 = ").append(pawnId2).append(",\n");
+        if (pawnIdKilled1 != null) sb.append("    pawnId Killed 1 = ").append(pawnIdKilled1).append(",\n");
+        if (pawnIdKilled2 != null) sb.append("    pawnId Killed 2 = ").append(pawnIdKilled2).append(",\n");
+        if (movePawn1 != null) sb.append("    movePawn 1 = ").append(movePawn1).append(",\n");
+        if (movePawn2 != null) sb.append("    movePawn 2 = ").append(movePawn2).append(",\n");
+        if (moveKilledPawn1 != null) sb.append("    moveKilledPawn 1 = ").append(moveKilledPawn1).append(",\n");
+        if (moveKilledPawn2 != null) sb.append("    moveKilledPawn 2 = ").append(moveKilledPawn2).append(",\n");
+        if (moveType != null) sb.append("    moveType = ").append(moveType).append(",\n");
+        if (messageType != null) sb.append("    messageType = ").append(messageType).append(",\n");
+        if (errorMessage != null) sb.append("    errorMessage = ").append(errorMessage).append(",\n");
+
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override

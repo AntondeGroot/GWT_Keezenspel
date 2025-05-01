@@ -8,7 +8,9 @@ import ADG.Games.Keezen.Player.PawnId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static ADG.CardEnum.ACE;
 import static ADG.Games.Keezen.Move.MoveType.FORFEIT;
+import static ADG.Games.Keezen.Move.MoveType.MOVE;
 import static ADG.Games.Keezen.Move.MoveType.ONBOARD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -17,7 +19,6 @@ public class PawnAndCardSelectionAceTest {
     private Pawn ownPawnOnBoard;
     private Pawn ownPawnOnNest;
     private Pawn ownPawnOnFinish;
-    private Card aceCard;
     private PawnAndCardSelection pawnAndCardSelection;
 
     @BeforeEach
@@ -29,15 +30,14 @@ public class PawnAndCardSelectionAceTest {
         ownPawnOnNest = new Pawn(new PawnId("1", 2), new TileId("1", -1));
         ownPawnOnFinish = new Pawn(new PawnId("1", 3), new TileId("1", 16));
 
-        aceCard = new Card(0,1);
     }
 
     // TEST: NEST
     @Test
-    public void test_SetAce_SelectPawnOffBoard_MoveOnBoard(){
+    public void setAce_SelectPawnOffBoard_MoveOnBoard(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
-        pawnAndCardSelection.setCard(aceCard);
+        pawnAndCardSelection.setCard(ACE.get());
 
         // WHEN
         pawnAndCardSelection.addPawn(ownPawnOnNest);
@@ -46,74 +46,74 @@ public class PawnAndCardSelectionAceTest {
         assertEquals(MoveType.ONBOARD, pawnAndCardSelection.getMoveType());
     }
     @Test
-    public void test_SelectPawnOffBoard_SetAce_MoveOnBoard(){
+    public void selectPawnOffBoard_SetAce_MoveOnBoard(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnNest);
 
         // WHEN
-        pawnAndCardSelection.setCard(aceCard);
+        pawnAndCardSelection.setCard(ACE.get());
 
         // THEN
         assertEquals(MoveType.ONBOARD, pawnAndCardSelection.getMoveType());
     }
     // TEST: ON BOARD
     @Test
-    public void test_SetAce_SelectPawnOnBoard_MoveOnMove(){
+    public void setAce_SelectPawnOnBoard_MoveTypeMove(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
-        pawnAndCardSelection.setCard(aceCard);
+        pawnAndCardSelection.setCard(ACE.get());
 
         // WHEN
         pawnAndCardSelection.addPawn(ownPawnOnBoard);
 
         // THEN
-        assertEquals(MoveType.MOVE, pawnAndCardSelection.getMoveType());
+        assertEquals(MOVE, pawnAndCardSelection.getMoveType());
     }
     @Test
-    public void test_SelectPawnOnBoard_SelectAce_MoveOnMove(){
+    public void selectPawnOnBoard_SelectAce_MoveTypeMove(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnBoard);
 
         // WHEN
-        pawnAndCardSelection.setCard(aceCard);
+        pawnAndCardSelection.setCard(ACE.get());
 
         // THEN
-        assertEquals(MoveType.MOVE, pawnAndCardSelection.getMoveType());
+        assertEquals(MOVE, pawnAndCardSelection.getMoveType());
     }
     // TEST: FINISH
     @Test
-    public void test_SetAce_SelectPawnOnFinish_MoveOnMove(){
+    public void setAce_SelectPawnOnFinish_MoveTypeMove(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
-        pawnAndCardSelection.setCard(aceCard);
+        pawnAndCardSelection.setCard(ACE.get());
 
         // WHEN
         pawnAndCardSelection.addPawn(ownPawnOnFinish);
 
         // THEN
-        assertEquals(MoveType.MOVE, pawnAndCardSelection.getMoveType());
+        assertEquals(MOVE, pawnAndCardSelection.getMoveType());
     }
     @Test
-    public void test_SelectPawnOnFinish_SelectAce_MoveOnMove(){
+    public void selectPawnOnFinish_SelectAce_MoveTypeMove(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnFinish);
 
         // WHEN
-        pawnAndCardSelection.setCard(aceCard);
+        pawnAndCardSelection.setCard(ACE.get());
 
         // THEN
-        assertEquals(MoveType.MOVE, pawnAndCardSelection.getMoveType());
+        assertEquals(MOVE, pawnAndCardSelection.getMoveType());
     }
     // TEST: FORFEIT
     @Test
-    public void test_SelectAce_ThenForfeit(){
+    public void selectAce_ThenForfeit_Resets(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnBoard);
-        pawnAndCardSelection.setCard(aceCard);
+        pawnAndCardSelection.setCard(ACE.get());
 
         // WHEN
         pawnAndCardSelection.setMoveType(FORFEIT);
@@ -125,11 +125,11 @@ public class PawnAndCardSelectionAceTest {
     }
     // TEST: DESELECT BY SELECTING TWICE
     @Test
-    public void test_SelectPawnTwice_Deselects(){
+    public void selectPawnTwice_Deselects(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnBoard);
-        pawnAndCardSelection.setCard(aceCard);
+        pawnAndCardSelection.setCard(ACE.get());
 
         // WHEN
         pawnAndCardSelection.addPawn(ownPawnOnBoard);
@@ -138,21 +138,33 @@ public class PawnAndCardSelectionAceTest {
         assertNull(pawnAndCardSelection.getPawnId1());
     }
     @Test
-    public void test_SetCardThenKing_ResetsStepsPawn1(){
+    public void ONBOARD_SetAce_NonAce_ThenAce_MOVEStillONBOARD(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
-        pawnAndCardSelection.setCard(aceCard);
+        pawnAndCardSelection.setCard(ACE.get());
         pawnAndCardSelection.addPawn(ownPawnOnNest);
         pawnAndCardSelection.setCard(new Card(0,5));
         // giving a non ace card deselects the pawn, but when you select an Ace and the pawn
         // you should no longer see nrStepsPawn1 as 5.
 
         // WHEN
-        pawnAndCardSelection.setCard(aceCard);
-        pawnAndCardSelection.addPawn(ownPawnOnNest);
+        pawnAndCardSelection.setCard(ACE.get());
 
         // THEN
         assertEquals(ONBOARD, pawnAndCardSelection.getMoveType());
         assertEquals(0, pawnAndCardSelection.getNrStepsPawn1());
+    }
+    @Test
+    public void pawnOnBoard_SelectAce_Move(){
+        // GIVEN
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.addPawn(ownPawnOnBoard);
+        pawnAndCardSelection.setCard(new Card(0,5));
+        pawnAndCardSelection.setCard(ACE.get());
+
+
+        // THEN
+        assertEquals(MOVE, pawnAndCardSelection.getMoveType());
+        assertEquals(1, pawnAndCardSelection.getNrStepsPawn1());
     }
 }

@@ -5,18 +5,22 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickForfeitButt
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPlayCardButton;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPawn;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilPawnStopsMoving;
 import static org.junit.Assert.assertEquals;
 
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import ADG.Games.Keezen.Player.PawnId;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -51,23 +55,24 @@ public class Winner_IT {
   }
 
   @Test
-  public void letPlayer2Win_HeGetsFirstPrize(){
+  @Timeout(20) // otherwise it would take 1.5 minute to obviously fail
+  public void letPlayer2WinsAndGetsFirstPrize() throws InterruptedException {
     // GIVEN player 0 forfeits
     waitUntilCardsAreLoaded(driver);
-    clickForfeitButton(driver);
+    playerForfeits(driver, "0");
 
     // GIVEN player 1 forfeits
-    setPlayerIdPlaying(driver,"1");
-    clickForfeitButton(driver);
+    playerForfeits(driver, "1");
 
     // WHEN player 2 plays all cards until he wins
     // This is possible with the mocked CardsDeck as they never run out of cards to play
     setPlayerIdPlaying(driver,"2");
     for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
+      clickPawn(driver, new PawnId("2",pawnNr));
       for (int step : winningMoves[pawnNr]) {
-        clickPawn(driver, new PawnId("2",pawnNr));
         clickCardByValue(driver,step);
         clickPlayCardButton(driver);
+        waitUntilPawnStopsMoving(driver, new PawnId("2", pawnNr));
       }
     }
 

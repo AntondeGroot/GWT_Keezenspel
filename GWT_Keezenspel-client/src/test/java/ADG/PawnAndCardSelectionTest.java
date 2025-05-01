@@ -117,7 +117,7 @@ class PawnAndCardSelectionTest {
     }
 
     @Test
-    public void testSetJack_SelectPawn1And2_CannotSelectPawnOffBoard(){
+    public void withJack_CannotSelectOtherPawnOnNest(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(jackCard);
@@ -132,7 +132,7 @@ class PawnAndCardSelectionTest {
     }
 
     @Test
-    public void testSetJack_SelectPawn1And2_CannotSelectPawnOnFinish(){
+    public void withJack_CannotSelectOtherPawnOnFinish(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(jackCard);
