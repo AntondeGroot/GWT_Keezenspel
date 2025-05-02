@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -98,19 +99,39 @@ public class TestUtils {
   }
 
   public static void clickCardByValue(WebDriver driver, int cardValue) {
-    WebElement container = driver.findElement(By.className("cardsContainer")); // FIRST
-    WebElement card = driver.findElement(By.id(new Card(0, cardValue).toString())); // THEN
-    card.click();
+    WebElement card = driver.findElement(By.id(new Card(0, cardValue).toString()));
+    String initialBorder = card.getCssValue("border-color");
 
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
-    try{
-      wait.until(stalenessOf(container));
-      wait.until(d -> d.findElement(By.className("cardsContainer")));
-    } catch (TimeoutException e) {
-     System.out.println("⚠️ Warning: cardsContainer did not become stale after clicking card: " + cardValue);
+    System.out.println("border: " + initialBorder);
+    if(initialBorder.equals("rgb(0, 0, 0)")) {
+      card.click();
+      waitUntilCardChangesBorder(driver, cardValue);
+    }else{
+      // in a mocked cardsdeck you can keep on playing the exact same card. This does not change
+      // movetype for an ace. Realistically you would chose another Ace card if you had two, this
+      // would trigger the reevaluation of the movetype
+      card.click();
+      waitUntilCardChangesBorder(driver, cardValue);
+      // after clicking the card it will become stale
+      card = driver.findElement(By.id(new Card(0, cardValue).toString()));
+      card.click();
+      waitUntilCardChangesBorder(driver, cardValue);
     }
+  }
 
-    wait(100);
+  private static void waitUntilCardChangesBorder(WebDriver driver, int cardValue){
+    WebElement card = driver.findElement(By.id(new Card(0, cardValue).toString()));
+    String initialBorder = card.getCssValue("border-color");
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+    try {
+      wait.until(d -> {
+        WebElement updatedCard = d.findElement(By.id(new Card(0, cardValue).toString()));
+        String currentBorder = updatedCard.getCssValue("border-color");
+        return !currentBorder.equals(initialBorder);
+      });
+    } catch (TimeoutException e) {
+      System.out.println("⚠️ Warning: card " + cardValue + " border-color did not change after clicking.");
+    }
   }
 
   public static Point getPawnLocation(WebDriver driver, PawnId pawnId) {
@@ -120,31 +141,56 @@ public class TestUtils {
       return new Point(Double.parseDouble(x), Double.parseDouble(y));
     }
 
-  public static Point clickPawn(WebDriver driver, PawnId pawnId) {
-    WebElement pawnOverlay = driver.findElement(By.className(pawnId+"Overlay"));
-    WebElement pawnElement = driver.findElement(By.id(pawnId.toString()));
-    pawnElement.click();
+    public static void scrollUp(WebDriver driver) {
+    // useful when you select a Jack
+      JavascriptExecutor js = (JavascriptExecutor) driver;
+      js.executeScript("window.scrollTo(0, 0);"); // Scroll to top
+      TestUtils.wait(200);
+    }
 
-    // wait until visibility changes
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
-    wait.until(driverTemp -> {
-      try {
-        WebElement updatedElement = driverTemp.findElement(By.className(pawnId+"Overlay"));
-        updatedElement.getAttribute("visibility"); // force touching the new element
-        return true;
-      } catch (StaleElementReferenceException e) {
-        return false;
-      }
-    });
+  public static Point clickPawn(WebDriver driver, PawnId pawnId) {
+    WebElement pawnOverlay = driver.findElement(By.className(pawnId + "Overlay"));
+    WebElement pawnElement = driver.findElement(By.id(pawnId.toString()));
+
+    // Check if the overlay is not visible
+    if(!pawnIsSelected(driver, pawnId)){
+      pawnElement.click();
+      waitUntilPawnChangesColor(driver, pawnId);
+    }else{
+      pawnElement.click();
+      waitUntilPawnChangesColor(driver, pawnId);
+
+      pawnElement = driver.findElement(By.id(pawnId.toString()));
+      pawnElement.click();
+      waitUntilPawnChangesColor(driver, pawnId);
+    }
 
     String x = pawnElement.getCssValue("left").replace("px", "");
     String y = pawnElement.getCssValue("top").replace("px", "");
-    return new Point(Double.valueOf(x), Double.valueOf(y));
+    return new Point(Double.parseDouble(x), Double.parseDouble(y));
+  }
+
+  private static void waitUntilPawnChangesColor(WebDriver driver, PawnId pawnId) {
+    // Wait until the overlay becomes visible
+    try {
+      WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
+      wait.until(driverTemp -> {
+        try {
+          WebElement updatedElement = driverTemp.findElement(By.className(pawnId + "Overlay"));
+          String updatedVisibility = updatedElement.getCssValue("visibility");
+          return "visible".equals(updatedVisibility);
+        } catch (StaleElementReferenceException e) {
+          // Keep waiting if the element went stale
+          return false;
+        }
+      });
+    }catch(TimeoutException ignored){}
   }
 
   public static boolean pawnIsSelected(WebDriver driver, PawnId pawnId){
     WebElement updatedElement = driver.findElement(By.className(pawnId.toString()+"Overlay"));
-    String output = updatedElement.getAttribute("visibility");
+    String output = updatedElement.getCssValue("visibility");
+    System.out.println("pawnIsSelected: " + output+" for element "+updatedElement);
     return Objects.equals(output,"visible");
   }
 
@@ -228,5 +274,9 @@ public class TestUtils {
   public static void assertPointsNotEqual(String msg, Point p1, Point p2){
     assertNotEquals(msg, p1.getX(), p2.getX(),2);
     assertNotEquals(msg, p1.getY(), p2.getY(),2);
+  }
+  public static void assertPointsEqual(String msg, Point p1, Point p2){
+    assertEquals(msg, p1.getX(), p2.getX(),2);
+    assertEquals(msg, p1.getY(), p2.getY(),2);
   }
 }

@@ -69,10 +69,10 @@ public class PawnAnimation {
     GWT.log("duration = "+duration);
 
     // Apply CSS transition
-    pawn.getStyle().setProperty("transition","all " + duration + "ms linear");// setTransition("all " + duration + "ms linear");
-    if(!isFirstSequence){
-      pawn.getStyle().setProperty("animationDelay", totalDelay+"ms");
-    }
+        pawn.getStyle().setProperty("transition","all " + duration + "ms linear");// setTransition("all " + duration + "ms linear");
+        if(!isFirstSequence){
+          pawn.getStyle().setProperty("animationDelay", totalDelay+"ms");
+        }
     pawn.getOffsetWidth(); // force reflow
 
     pawn.getStyle().setLeft(next.getX()-20, Style.Unit.PX);

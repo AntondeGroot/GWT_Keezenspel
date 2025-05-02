@@ -1,5 +1,8 @@
 package ADG.Games.Keezen.IntegrationTests;
 
+import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerPlaysCard;
+import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerSwitchesPawns;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.assertPointsEqual;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.assertPointsNotEqual;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickCardByValue;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPlayCardButton;
@@ -8,8 +11,6 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getPawnLocation;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilPawnStopsMoving;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 
@@ -94,27 +96,27 @@ public class MovingOnBoard_IT {
    * A pawn on a nest tile cannot move
    */
   @Test
-  public void pawnAfterMovingOnboardCanImmediatelyMove(){
+  @Timeout(25)
+  public void pawnAfterMovingOnboardCanImmediatelyMoveWithAce(){
+    /***
+     *
+     */
+
     // GIVEN
     playerForfeits(driver, "0");
     playerForfeits(driver, "1");
 
     // WHEN
-    setPlayerIdPlaying(driver,"2");
-    clickPawn(driver, pawnId20);
-    clickCardByValue(driver, 1);
-    clickPlayCardButton(driver);
-    Point startTile = getPawnLocation(driver, pawnId20);
+    Point nest = getPawnLocation(driver, pawnId20);
+    playerPlaysCard(driver,"2", pawnId20, 13); // onboard with king
+    Point start = getPawnLocation(driver, pawnId20);
 
-    // WHEN
-    clickCardByValue(driver, 5);
-    clickPlayCardButton(driver);
+    playerPlaysCard(driver,"2", pawnId20,1); // move with Ace
+    Point end = getPawnLocation(driver, pawnId20);
 
     // THEN
-    waitUntilPawnStopsMoving(driver, pawnId20);
-    Point endLocation = getPawnLocation(driver, pawnId20);
-
-    assertPointsNotEqual("The pawn did not move", startTile, endLocation);
+    assertPointsNotEqual("The pawn did not move from nest", nest, start);
+    assertPointsNotEqual("The pawn did not move on the board", start, end);
   }
 
   /***
@@ -127,23 +129,13 @@ public class MovingOnBoard_IT {
     playerForfeits(driver, "0");
 
     // WHEN BOTH PLAYERS GET ON BOARD
-    setPlayerIdPlaying(driver,"1");
-    clickPawn(driver, pawnId10);
-    clickCardByValue(driver, 1);
-    clickPlayCardButton(driver);
-    waitUntilPawnStopsMoving(driver, pawnId10);
+    playerPlaysCard(driver,"1", pawnId10, 1);
 
-    setPlayerIdPlaying(driver,"2");
-    clickPawn(driver, pawnId20);
-    clickCardByValue(driver, 1);
-    clickPlayCardButton(driver);
-    waitUntilPawnStopsMoving(driver, pawnId20);
+    playerPlaysCard(driver,"2", pawnId20, 1);
 
-    setPlayerIdPlaying(driver,"1");
-    Point p1 = clickPawn(driver, pawnId10);
-    clickCardByValue(driver, 5);
-    clickPlayCardButton(driver);
-    waitUntilPawnStopsMoving(driver, pawnId10);
+    // THEN one pawn moves from starttile so that it can be switched
+    Point p1 = getPawnLocation(driver, pawnId10);
+    playerPlaysCard(driver,"1", pawnId10, 5);
     Point p2 = getPawnLocation(driver, pawnId10);
 
     assertPointsNotEqual("The pawn 10 did not move after coming on board", p1, p2);
@@ -152,17 +144,11 @@ public class MovingOnBoard_IT {
     Point positionPawn20 = getPawnLocation(driver, pawnId20);
 
     // WHEN PLAYER 2 SWITCHES WITH PLAYER 1
-    setPlayerIdPlaying(driver,"2");
-    clickCardByValue(driver, 11);
-    clickPawn(driver, pawnId20);
-    clickPawn(driver, pawnId10);
-    clickPlayCardButton(driver);
-
-    waitUntilPawnStopsMoving(driver, pawnId20);
+    playerSwitchesPawns(driver, "2", pawnId20, pawnId10);
 
     // THEN THE PAWNS SWITCHED PLACE
-    assertEquals(positionPawn10, getPawnLocation(driver, pawnId20));
-    assertEquals(positionPawn20, getPawnLocation(driver, pawnId10));
+    assertPointsEqual("Pawn 2 did not move to pawn 1", positionPawn10, getPawnLocation(driver, pawnId20));
+    assertPointsEqual("Pawn 1 did not move to pawn 2", positionPawn20, getPawnLocation(driver, pawnId10));
   }
 
   /***

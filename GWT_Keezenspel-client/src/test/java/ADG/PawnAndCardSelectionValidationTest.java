@@ -10,6 +10,8 @@ import ADG.Games.Keezen.PawnAndCardSelection;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.TileId;
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -97,5 +99,21 @@ public class PawnAndCardSelectionValidationTest {
 
     // THEN
     assertNull(pawnAndCardSelection.getMoveType());
+  }
+
+  @Test
+  public void updatePawnWithNewCurrentPosition(){
+    // GIVEN
+    Pawn pawnOld = new Pawn(new PawnId("2",0),new TileId("2",-1));
+    Pawn pawnNew = new Pawn(new PawnId("2",0),new TileId("2",5));
+
+    pawnAndCardSelection.setPlayerId("2");
+    pawnAndCardSelection.addPawn(pawnOld);
+
+    // WHEN
+    pawnAndCardSelection.updatePawns(new ArrayList<Pawn>(Arrays.asList(pawnNew)));
+
+    // THEN
+    assertEquals(5, pawnAndCardSelection.getPawn1().getCurrentTileId().getTileNr());
   }
 }

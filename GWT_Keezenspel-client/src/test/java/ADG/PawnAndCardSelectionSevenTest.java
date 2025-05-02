@@ -56,7 +56,12 @@ public class PawnAndCardSelectionSevenTest {
 
     // TEST nest
     @Test
-    public void withSeven_PawnOnNest_NotPossible(){
+    public void withSeven_PawnOnNest_PossibleToSelect(){
+        /***
+         * it is possible to select an invalid choice of your own pawn
+         * you just can't move them
+         */
+
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(sevenCard);
@@ -65,7 +70,8 @@ public class PawnAndCardSelectionSevenTest {
         pawnAndCardSelection.addPawn(ownPawnOnNest);
 
         // THEN
-        assertNull(pawnAndCardSelection.getPawnId1());
+        assertEquals(ownPawnOnNest, pawnAndCardSelection.getPawn1());
+        assertEquals(sevenCard, pawnAndCardSelection.getCard());
     }
     // test board
     @Test
@@ -159,7 +165,12 @@ public class PawnAndCardSelectionSevenTest {
     }
 
     @Test
-    public void withSeven_CannotSelectSecondPawnOnNest(){
+    public void withSeven_CanSelectSecondPawnOnNest(){
+        /***
+         * it is possible to select an invalid choice of your own pawn
+         * you just can't move them
+         */
+
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(sevenCard);
@@ -169,8 +180,9 @@ public class PawnAndCardSelectionSevenTest {
         pawnAndCardSelection.addPawn(ownPawnOnNest);
 
         // THEN
-        assertNull(pawnAndCardSelection.getPawnId2());
-        assertEquals(MoveType.MOVE, pawnAndCardSelection.getMoveType());
+        assertEquals(ownPawnOnNest, pawnAndCardSelection.getPawn2());
+        assertEquals(sevenCard, pawnAndCardSelection.getCard());
+        assertEquals(MoveType.SPLIT, pawnAndCardSelection.getMoveType());
     }
 
     @Test

@@ -1,14 +1,14 @@
 package ADG.Games.Keezen.IntegrationTests;
 
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickCardByValue;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPawn;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPlayCardButton;
+import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerPlaysCard;
+import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerSwitchesPawns;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.assertPointsEqual;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.assertPointsNotEqual;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getPawnLocation;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilPawnStopsMoving;
-import static org.junit.Assert.assertEquals;
 
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
@@ -52,36 +52,26 @@ public class Jack_IT {
 
     playerForfeits(driver, "0");
 
-    setPlayerIdPlaying(driver, "1");
-    clickPawn(driver, pawnId10);
-    clickCardByValue(driver, 1);
-    clickPlayCardButton(driver);
-    TestUtils.wait(400);
+    // get on board
+    playerPlaysCard(driver, "1", pawnId10,1);
+    playerPlaysCard(driver, "2", pawnId20,1);
 
-    setPlayerIdPlaying(driver, "2");
-    clickPawn(driver, pawnId20);
-    clickCardByValue(driver, 1);
-    clickPlayCardButton(driver);
-    waitUntilPawnStopsMoving(driver, pawnId20);
-
-    setPlayerIdPlaying(driver, "1");
-    clickPawn(driver, pawnId10);
-    clickCardByValue(driver, 2);
-    clickPlayCardButton(driver);
+    // move on board
+    Point start = getPawnLocation(driver, pawnId10);
+    playerPlaysCard(driver, "1", pawnId10,2);
+    Point end = getPawnLocation(driver, pawnId10);
+    assertPointsNotEqual("The pawn of player 1 did not move with 2 steps after coming on board", start, end);
 
     // now player 2 can switch using a Jack
-    setPlayerIdPlaying(driver, "2");
-    Point positionPlayer2 = clickPawn(driver, pawnId20); // this deselects player 1
-    clickCardByValue(driver, 11); // this should enable selecting player 1's pawn
-    Point positionPlayer1 = clickPawn(driver, pawnId10);
-    clickPlayCardButton(driver);
+    Point positionPlayer1 = getPawnLocation(driver, pawnId10);
+    Point positionPlayer2 = getPawnLocation(driver, pawnId20);
+    playerSwitchesPawns(driver, "2", pawnId20, pawnId10);
 
-    waitUntilPawnStopsMoving(driver, pawnId10);
     // THEN
     TestUtils.wait(400);
 
     System.out.println("original position player 1 :"+positionPlayer2+" original position player 2 :"+positionPlayer1);
-    assertEquals("Expected player 2 to be: ", positionPlayer1, clickPawn(driver, pawnId20));
-    assertEquals("Expected player 1 to be:", positionPlayer2, clickPawn(driver, pawnId10));
+    assertPointsEqual("Expected player 2 to be at position 1", positionPlayer1, getPawnLocation(driver, pawnId20));
+    assertPointsEqual("Expected player 1 to be at point 2", positionPlayer2, getPawnLocation(driver, pawnId10));
   }
 }

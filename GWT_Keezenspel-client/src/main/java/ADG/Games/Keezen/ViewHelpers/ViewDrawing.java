@@ -78,8 +78,10 @@ public class ViewDrawing {
       @Override
       public void onBrowserEvent(Event event) {
         if (DOM.eventGetType(event) == Event.ONCLICK) {
-          // select the pawn when you click on the div
-          pawnAndCardSelection.addPawn(pawn);
+          // select the pawnId when you click on the div
+          // we do not want to add the pawn itself as it will contain an outdated currentposition
+          // let pawnandcardselection keep track of where pawns are based on polling the server.
+          pawnAndCardSelection.addPawnId(pawn.getPawnId());
           GWT.log("Pawn and card selection is: " + pawnAndCardSelection);
 
           // each time you click on a pawn, you need to check all other pawns
