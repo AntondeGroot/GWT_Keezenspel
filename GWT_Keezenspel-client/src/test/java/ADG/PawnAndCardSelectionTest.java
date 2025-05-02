@@ -7,6 +7,7 @@ import ADG.Games.Keezen.Player.PawnId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static ADG.CardEnum.ACE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PawnAndCardSelectionTest {
@@ -114,6 +115,14 @@ class PawnAndCardSelectionTest {
         assertNull(pawnAndCardSelection.getPawnId2());
         assertNull(pawnAndCardSelection.getCard());
         assertTrue(pawnAndCardSelection.getDrawCards());
+
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.addPawn(ownPawnOnBoard);
+        pawnAndCardSelection.setCard(ACE.get());
+        pawnAndCardSelection.reset();
+
+        assertEquals(0, pawnAndCardSelection.getNrStepsPawn1());
+        assertEquals(0, pawnAndCardSelection.getNrStepsPawn2());
     }
 
     @Test

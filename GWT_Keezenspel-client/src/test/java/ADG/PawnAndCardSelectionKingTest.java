@@ -106,6 +106,7 @@ public class PawnAndCardSelectionKingTest {
 
         // THEN
         assertEquals(ownPawnOnFinish.getPawnId(), pawnAndCardSelection.getPawnId1());
+        assertEquals(kingCard, pawnAndCardSelection.getCard());
     }
 
     @Test

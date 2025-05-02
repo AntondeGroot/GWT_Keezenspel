@@ -1,9 +1,6 @@
 package ADG.Games.Keezen.IntegrationTests;
 
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickCardByValue;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickForfeitButton;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPlayCardButton;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPawn;
+import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerPlaysCard;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
@@ -20,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -55,7 +51,6 @@ public class Winner_IT {
   }
 
   @Test
-  @Timeout(20) // otherwise it would take 1.5 minute to obviously fail
   public void letPlayer2WinsAndGetsFirstPrize() throws InterruptedException {
     // GIVEN player 0 forfeits
     waitUntilCardsAreLoaded(driver);
@@ -68,16 +63,10 @@ public class Winner_IT {
     // This is possible with the mocked CardsDeck as they never run out of cards to play
     setPlayerIdPlaying(driver,"2");
     for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
-      clickPawn(driver, new PawnId("2",pawnNr));
       for (int step : winningMoves[pawnNr]) {
-        clickCardByValue(driver,step);
-        clickPlayCardButton(driver);
-        waitUntilPawnStopsMoving(driver, new PawnId("2", pawnNr));
+        playerPlaysCard(driver, "2", new PawnId("2", pawnNr), step);
       }
     }
-
-    // Because the player does not actually play cards he has to forfeit at the end of his turn.
-    clickForfeitButton(driver);
 
     // THEN player 2 got the first prize medal
     List<WebElement> medalForPlayer2 =  driver.findElements(By.id("player2Medal"));

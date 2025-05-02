@@ -1,16 +1,16 @@
 package ADG.Games.Keezen.IntegrationTests;
 
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickCardByValue;
+import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerPlaysCard;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickForfeitButton;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPlayCardButton;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPawn;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
 import static org.junit.Assert.assertEquals;
 
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.IntegrationTests.Utils.Steps;
 import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import ADG.Games.Keezen.Player.PawnId;
 import org.junit.jupiter.api.AfterAll;
@@ -68,8 +68,7 @@ public class PlayerStatusMock_IT {
     // GIVEN game started
 
     // WHEN
-    clickForfeitButton(driver);
-    TestUtils.wait(200);
+    Steps.playerForfeits(driver,"0");
 
     // THEN
     setPlayerIdPlaying(driver,"1");
@@ -96,12 +95,8 @@ public class PlayerStatusMock_IT {
     // GIVEN game started
 
     // WHEN
-    // player 0 forfeits
-    clickForfeitButton(driver);
-
-    // player 1 forfeits
-    setPlayerIdPlaying(driver,"1");
-    clickForfeitButton(driver);
+    playerForfeits(driver,"0");
+    playerForfeits(driver,"1");
 
     // THEN
     WebElement player = driver.findElement(By.id("player2"));
@@ -112,12 +107,9 @@ public class PlayerStatusMock_IT {
     // GIVEN game started
 
     // WHEN
-    clickPawn(driver, new PawnId("0",0));
-    TestUtils.wait(200);
-    clickCardByValue(driver, 1);
-    TestUtils.wait(200);
-    clickPlayCardButton(driver);
-    TestUtils.wait(5000);
+    PawnId pawnId00 = new PawnId("0",0);
+    playerPlaysCard(driver, "0", pawnId00, 1);
+    TestUtils.wait(400);
 
     // THEN
     WebElement player0 = driver.findElement(By.id("player0"));

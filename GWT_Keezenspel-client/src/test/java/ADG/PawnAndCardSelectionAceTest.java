@@ -16,20 +16,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class PawnAndCardSelectionAceTest {
-    private Pawn ownPawnOnBoard;
-    private Pawn ownPawnOnNest;
-    private Pawn ownPawnOnFinish;
+    private final Pawn ownPawnOnBoard = new Pawn(new PawnId("1", 1), new TileId("1", 0));
+    private final Pawn ownPawnOnNest = new Pawn(new PawnId("1", 2), new TileId("1", -1));
+    private final Pawn ownPawnOnFinish = new Pawn(new PawnId("1", 3), new TileId("1", 16));
     private PawnAndCardSelection pawnAndCardSelection;
 
     @BeforeEach
     void setup(){
         pawnAndCardSelection = new PawnAndCardSelection();
         pawnAndCardSelection.disableUIForTests();
-
-        ownPawnOnBoard = new Pawn(new PawnId("1", 1), new TileId("1", 0));
-        ownPawnOnNest = new Pawn(new PawnId("1", 2), new TileId("1", -1));
-        ownPawnOnFinish = new Pawn(new PawnId("1", 3), new TileId("1", 16));
-
     }
 
     // TEST: NEST
@@ -156,6 +151,19 @@ public class PawnAndCardSelectionAceTest {
     }
     @Test
     public void pawnOnBoard_SelectAce_Move(){
+        // GIVEN
+        pawnAndCardSelection.setPlayerId("1");
+        pawnAndCardSelection.addPawn(ownPawnOnBoard);
+        pawnAndCardSelection.setCard(new Card(0,5));
+        pawnAndCardSelection.setCard(ACE.get());
+
+
+        // THEN
+        assertEquals(MOVE, pawnAndCardSelection.getMoveType());
+        assertEquals(1, pawnAndCardSelection.getNrStepsPawn1());
+    }
+    @Test
+    public void pawnOnBoard_SelectAce_Mov(){
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnBoard);

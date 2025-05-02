@@ -44,7 +44,12 @@ public class PawnAndCardSelectionJackTest {
 
     // TEST: OWN PAWN ON NEST
     @Test
-    public void withJack_SelectNestPawn_NotPossible(){
+    public void withJack_SelectNestPawn_PossibleToSelect(){
+        /***
+         * it is possible to select an invalid choice of your own pawn
+         * you just can't move them
+         */
+
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(jackCard);
@@ -53,10 +58,16 @@ public class PawnAndCardSelectionJackTest {
         pawnAndCardSelection.addPawn(ownPawnOnNest);
 
         // THEN
-        assertNull(pawnAndCardSelection.getPawnId1());
+        assertEquals(ownPawnOnNest, pawnAndCardSelection.getPawn1());
+        assertEquals(jackCard, pawnAndCardSelection.getCard());
     }
     @Test
-    public void test_SelectNestPawn_SetJack_NotPossible(){
+    public void test_SelectNestPawn_SetJack_PossibleToSelect(){
+        /***
+         * it is possible to select an invalid choice of your own pawn
+         * you just can't move them
+         */
+
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnNest);
@@ -65,7 +76,8 @@ public class PawnAndCardSelectionJackTest {
         pawnAndCardSelection.setCard(jackCard);
 
         // THEN
-        assertNull(pawnAndCardSelection.getPawnId1());
+        assertEquals(ownPawnOnNest, pawnAndCardSelection.getPawn1());
+        assertEquals(jackCard, pawnAndCardSelection.getCard());
     }
     // other player on nest
     @Test
@@ -123,7 +135,12 @@ public class PawnAndCardSelectionJackTest {
     }
     // TEST: FINISH
     @Test
-    public void withJack_SelectPawnOnFinish_NotPossible(){
+    public void withJack_SelectPawnOnFinish_PossibleToSelect(){
+        /***
+         * it is possible to select an invalid choice of your own pawn
+         * you just can't move them
+         */
+
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.setCard(jackCard);
@@ -132,10 +149,16 @@ public class PawnAndCardSelectionJackTest {
         pawnAndCardSelection.addPawn(ownPawnOnFinish);
 
         // THEN
-        assertNull(pawnAndCardSelection.getPawnId1());
+        assertEquals(ownPawnOnFinish, pawnAndCardSelection.getPawn1());
+        assertEquals(jackCard, pawnAndCardSelection.getCard());
     }
     @Test
-    public void test_SelectPawnOnFinish_SelectJack_NotPossible(){
+    public void test_SelectPawnOnFinish_SelectJack_PossibleToSelect(){
+        /***
+         * it is possible to select an invalid choice of your own pawn
+         * you just can't move them
+         */
+
         // GIVEN
         pawnAndCardSelection.setPlayerId("1");
         pawnAndCardSelection.addPawn(ownPawnOnFinish);
@@ -144,7 +167,8 @@ public class PawnAndCardSelectionJackTest {
         pawnAndCardSelection.setCard(jackCard);
 
         // THEN
-        assertNull(pawnAndCardSelection.getPawnId1());
+        assertEquals(ownPawnOnFinish, pawnAndCardSelection.getPawn1());
+        assertEquals(jackCard, pawnAndCardSelection.getCard());
     }
     // TEST: FORFEIT
     @Test

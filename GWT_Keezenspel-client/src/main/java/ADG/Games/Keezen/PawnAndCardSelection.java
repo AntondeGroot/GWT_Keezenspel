@@ -29,6 +29,7 @@ public class PawnAndCardSelection {
     private int nrStepsPawn1 = 0;
     private int nrStepsPawn2 = 0;
     private boolean uiEnabled = true;
+    private ArrayList<Pawn> pawns = new ArrayList<>();
 
     public void disableUIForTests() {
         this.uiEnabled = false;
@@ -45,6 +46,12 @@ public class PawnAndCardSelection {
     }
 
     public void updatePawns(ArrayList<Pawn> pawns){
+        this.pawns = pawns;
+        checkIfSelectedPawnsAreUpToDate();
+    }
+
+    public void checkIfSelectedPawnsAreUpToDate(){
+        GWT.log("updatePawns trying to update");
         for (Pawn pawn : pawns) {
             // compares pawnId's then updates current position
             if(Objects.equals(pawn, pawn1)){
@@ -62,9 +69,42 @@ public class PawnAndCardSelection {
         return playerId;
     }
 
+    private Pawn getPawn(PawnId pawnId){
+        for (Pawn pawn : pawns) {
+            if(pawn.getPawnId().equals(pawnId)){
+                return pawn;
+            }
+        }
+        return null;
+    }
+
+    /***
+     * For selecting a pawn based on its pawnId in onClick eventHandlers
+     * Otherwise you will add pawns with outdated current positions
+     * Let PawnAndCardSelection decide based on server calls where the pawns are and then decide
+     * what message to send.
+     * @param pawnId
+     */
+    // for real life
+    public void addPawnId(PawnId pawnId) {
+        Pawn pawn = getPawn(pawnId);
+        GWT.log("test playerId = "+playerId);
+        GWT.log("trying to add pawn = "+pawn);
+        validateHowManyPawnsCanBeSelected(pawn); // not accounting for if they are on nest/board/finish
+        validateSelectionBasedOnLocation();     // validate if they are on nest/board/finish
+        validateMoveType();
+    }
+
+    /***
+     * For testing purposes only, use addPawnId instead, otherwise you risk keeping track of outdated
+     * current positions. In real life let server polls update PawnAncCardSelection to know what the pawns
+     * locations are
+     * @param pawn
+     */
     public void addPawn(Pawn pawn) {
         GWT.log("test playerId = "+playerId);
-        validateSelectionBasedOnPlayerID(pawn); // not accounting for if they are on nest/board/finish
+        GWT.log("trying to add pawn = "+pawn);
+        validateHowManyPawnsCanBeSelected(pawn); // not accounting for if they are on nest/board/finish
         validateSelectionBasedOnLocation();     // validate if they are on nest/board/finish
         validateMoveType();
     }
@@ -76,50 +116,34 @@ public class PawnAndCardSelection {
 
         switch (card.getCardValue()) {
             case 1: break;//always valid: nest/board/finish
-            case 11: validateAllPawnsAreOnBoard(); break;
-            case 13: validateAllPawnsAreOnNest(); break;
+            case 11: secondPawnIsOnNormalBoardWhenYouPlayJack(); break;
+            case 13: firstPawnIsOnNestWhenYouPlayKing(); break;
             default: validateAllPawnsAreOnBoardOrFinish(); break;
         }
     }
 
-    private void validateAllPawnsAreOnBoard() {
-        if(pawn1 != null){
-            if(!pawnIsOnNormalBoard(pawn1)){
-                pawn1 = null;
-            }
-        }
+    private void secondPawnIsOnNormalBoardWhenYouPlayJack() {
+        // you cannot switch,
         if(pawn2 != null){
             if(!pawnIsOnNormalBoard(pawn2)){
                 pawn2 = null;
+                System.out.println("Pawn 2 is not on normal board, you cannot switch with it, pawn is deselected.");
             }
         }
     }
 
     private void validateAllPawnsAreOnBoardOrFinish() {
-        if(pawn1 != null){
-            // this does not work if the pawn is not updated, should be server side only
-            if(isPawnOnNest(pawn1)){
-                GWT.log("pawn is still on nest");
-                pawn1 = null;
-            }
-        }
-        if(pawn2 != null){
-            if(isPawnOnNest(pawn2)){
-                pawn2 = null;
-            }
-        }
+// this is only for validating your own pawns, we do not care about this
     }
 
-    private void validateAllPawnsAreOnNest() {
-        if(pawn1 != null){
-            if(!isPawnOnNest(pawn1)){
-                pawn1 = null;
-            }
-        }
-        if(pawn2 != null){
-            if(!isPawnOnNest(pawn2)){
-                pawn2 = null;
-            }
+    private void firstPawnIsOnNestWhenYouPlayKing() {
+//        if(pawn1 != null){
+//            if(!isPawnOnNest(pawn1)){
+//                pawn1 = null;
+//            }
+//        }
+        if(pawn2 != null) {
+            pawn2 = null;
         }
     }
 
@@ -178,7 +202,7 @@ public class PawnAndCardSelection {
        }
     }
 
-    private void validateSelectionBasedOnPlayerID(Pawn pawn) {
+    private void validateHowManyPawnsCanBeSelected(Pawn pawn) {
         if(card == null){
             handlePlayerCanSelect1Pawn(pawn);
             return;
@@ -205,9 +229,9 @@ public class PawnAndCardSelection {
         }
 
         card = p_card;
-        validateMoveType();
-        validateSelectionBasedOnPlayerID(pawn2);
+        validateHowManyPawnsCanBeSelected(pawn2);
         validateSelectionBasedOnLocation();
+        validateMoveType();
     }
 
     public Pawn getPawn1() {
@@ -377,6 +401,10 @@ public class PawnAndCardSelection {
     }
 
     public MoveMessage createMoveMessage() {
+        if(pawn1 != null){
+            GWT.log("PawnAncCardSelection creates move message and thinks pawn is on location "+pawn1.getCurrentTileId());
+        }
+
         MoveMessage moveMessage = createMessage();
         moveMessage.setMessageType(MAKE_MOVE);
         moveType = null;
