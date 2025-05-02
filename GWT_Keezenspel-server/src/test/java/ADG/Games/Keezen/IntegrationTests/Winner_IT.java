@@ -1,18 +1,14 @@
 package ADG.Games.Keezen.IntegrationTests;
 
-import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerPlaysCard;
+import static ADG.Games.Keezen.IntegrationTests.Utils.Player.assertPlayerHasMedal;
+import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.whenPlayerWins;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilPawnStopsMoving;
-import static org.junit.Assert.assertEquals;
 
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
-import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
-import ADG.Games.Keezen.Player.PawnId;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
@@ -26,13 +22,6 @@ import org.openqa.selenium.WebElement;
 public class Winner_IT {
 
   static WebDriver driver;
-
-  private final int[][] winningMoves = {
-      {1, 4, 7},    // Pawn 0
-      {1, 4, 6},    // Pawn 1
-      {1, 4, 5},    // Pawn 2
-      {1, 4, 3, 1}  // Pawn 3
-  };
 
   @BeforeEach
   public void setUp() {
@@ -60,17 +49,35 @@ public class Winner_IT {
     playerForfeits(driver, "1");
 
     // WHEN player 2 plays all cards until he wins
-    // This is possible with the mocked CardsDeck as they never run out of cards to play
-    setPlayerIdPlaying(driver,"2");
-    for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
-      for (int step : winningMoves[pawnNr]) {
-        playerPlaysCard(driver, "2", new PawnId("2", pawnNr), step);
-      }
-    }
+    whenPlayerWins(driver, "2");
 
     // THEN player 2 got the first prize medal
-    List<WebElement> medalForPlayer2 =  driver.findElements(By.id("player2Medal"));
-    assertEquals(1, medalForPlayer2.size());
-    assertEquals("Medal1", medalForPlayer2.get(0).getAttribute("class")); // player has the first prize
+    assertPlayerHasMedal(driver, "2", 1);
+  }
+
+  @Test
+  public void letPlayer2Win_ThenPlayer0_ThenPlayer1() throws InterruptedException {
+    // GIVEN player 0 forfeits
+    waitUntilCardsAreLoaded(driver);
+    playerForfeits(driver, "0");
+
+    // GIVEN player 1 forfeits
+    playerForfeits(driver, "1");
+
+    // WHEN player 2 plays all cards until he wins
+    whenPlayerWins(driver, "2");
+    playerForfeits(driver, "2");
+
+    // When
+    playerForfeits(driver, "1");
+
+    // WHEN player 0 plays until he wins
+    whenPlayerWins(driver, "0");
+    playerForfeits(driver, "0");
+
+    assertPlayerHasMedal(driver, "0", 2);
+
+    whenPlayerWins(driver, "1");
+    assertPlayerHasMedal(driver, "1", 3);
   }
 }

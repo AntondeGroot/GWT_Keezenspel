@@ -43,4 +43,22 @@ public class Steps {
     clickPlayCardButton(driver);
     waitUntilPawnStopsMoving(driver, ownPawnId);
   }
+
+  public static void whenPlayerWins(WebDriver driver, String playerId) {
+    // WHEN player plays all cards until he wins
+    // This is possible with the mocked CardsDeck as they never run out of cards to play
+    int[][] winningMoves = {
+        {1, 4, 7},    // Pawn 0
+        {1, 4, 6},    // Pawn 1
+        {1, 4, 5},    // Pawn 2
+        {1, 4, 3, 1}  // Pawn 3
+    };
+
+    setPlayerIdPlaying(driver,playerId);
+    for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
+      for (int step : winningMoves[pawnNr]) {
+        playerPlaysCard(driver, playerId, new PawnId(playerId, pawnNr), step);
+      }
+    }
+  }
 }
