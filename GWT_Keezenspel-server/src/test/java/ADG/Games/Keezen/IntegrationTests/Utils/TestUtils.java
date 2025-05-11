@@ -9,6 +9,7 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.stalenessOf;
 import ADG.Games.Keezen.Cards.Card;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Point;
+import ADG.Log;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
@@ -49,7 +50,7 @@ public class TestUtils {
   }
 
   public static void waitUntilCardsAreLoaded(WebDriver driver) {
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
 
     try {
       wait.until(driver1 -> {
@@ -61,7 +62,7 @@ public class TestUtils {
         }
       });
     } catch (WebDriverException timeoutException) {
-      System.out.println("⚠️ Timeout waiting for game elements — continuing without failure.");
+      Log.info("⚠️ Timeout waiting for game elements — continuing without failure.");
       // Optionally: set a flag or take fallback action
     }
   }
@@ -69,7 +70,7 @@ public class TestUtils {
   public static void setPlayerIdPlaying(WebDriver driver, String playerId) {
     Cookie playerCookie = new Cookie("playerid", playerId);
     driver.manage().addCookie(playerCookie);
-    wait(1000);
+    wait(200);
   }
 
   /***
@@ -102,35 +103,17 @@ public class TestUtils {
     WebElement card = driver.findElement(By.id(new Card(0, cardValue).toString()));
     String initialBorder = card.getCssValue("border-color");
 
-    System.out.println("border: " + initialBorder);
+    Log.info("border: " + initialBorder);
     if(initialBorder.equals("rgb(0, 0, 0)")) {
       card.click();
-      waitUntilCardChangesBorder(driver, cardValue);
     }else{
       // in a mocked cardsdeck you can keep on playing the exact same card. This does not change
       // movetype for an ace. Realistically you would chose another Ace card if you had two, this
       // would trigger the reevaluation of the movetype
       card.click();
-      waitUntilCardChangesBorder(driver, cardValue);
       // after clicking the card it will become stale
       card = driver.findElement(By.id(new Card(0, cardValue).toString()));
       card.click();
-      waitUntilCardChangesBorder(driver, cardValue);
-    }
-  }
-
-  private static void waitUntilCardChangesBorder(WebDriver driver, int cardValue){
-    WebElement card = driver.findElement(By.id(new Card(0, cardValue).toString()));
-    String initialBorder = card.getCssValue("border-color");
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
-    try {
-      wait.until(d -> {
-        WebElement updatedCard = d.findElement(By.id(new Card(0, cardValue).toString()));
-        String currentBorder = updatedCard.getCssValue("border-color");
-        return !currentBorder.equals(initialBorder);
-      });
-    } catch (TimeoutException e) {
-      System.out.println("⚠️ Warning: card " + cardValue + " border-color did not change after clicking.");
     }
   }
 
@@ -155,14 +138,11 @@ public class TestUtils {
     // Check if the overlay is not visible
     if(!pawnIsSelected(driver, pawnId)){
       pawnElement.click();
-      waitUntilPawnChangesColor(driver, pawnId);
     }else{
       pawnElement.click();
-      waitUntilPawnChangesColor(driver, pawnId);
 
       pawnElement = driver.findElement(By.id(pawnId.toString()));
       pawnElement.click();
-      waitUntilPawnChangesColor(driver, pawnId);
     }
 
     String x = pawnElement.getCssValue("left").replace("px", "");
@@ -170,27 +150,10 @@ public class TestUtils {
     return new Point(Double.parseDouble(x), Double.parseDouble(y));
   }
 
-  private static void waitUntilPawnChangesColor(WebDriver driver, PawnId pawnId) {
-    // Wait until the overlay becomes visible
-    try {
-      WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
-      wait.until(driverTemp -> {
-        try {
-          WebElement updatedElement = driverTemp.findElement(By.className(pawnId + "Overlay"));
-          String updatedVisibility = updatedElement.getCssValue("visibility");
-          return "visible".equals(updatedVisibility);
-        } catch (StaleElementReferenceException e) {
-          // Keep waiting if the element went stale
-          return false;
-        }
-      });
-    }catch(TimeoutException ignored){}
-  }
-
   public static boolean pawnIsSelected(WebDriver driver, PawnId pawnId){
     WebElement updatedElement = driver.findElement(By.className(pawnId.toString()+"Overlay"));
     String output = updatedElement.getCssValue("visibility");
-    System.out.println("pawnIsSelected: " + output+" for element "+updatedElement);
+    Log.info("pawnIsSelected: " + output+" for element "+updatedElement);
     return Objects.equals(output,"visible");
   }
 
@@ -199,12 +162,10 @@ public class TestUtils {
     assertTrue("⚠️ sendButton is not enabled: it was not the player's turn",
         sendButton.isEnabled());
     sendButton.click();
-
-    wait(400);
   }
 
   public static void waitUntilPawnStopsMoving(WebDriver driver, PawnId pawnId) {
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
     WebElement pawn = driver.findElement(By.id(pawnId.toString()));
 
     wait.until(driver1 -> {

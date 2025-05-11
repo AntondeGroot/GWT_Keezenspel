@@ -29,6 +29,7 @@ public class GameState {
     private final ArrayList<String> winners = new ArrayList<>();
     private final int MAX_PLAYERS = 8;
     private final CardsDeckInterface cardsDeck;
+    private int animationSpeed;
 
     public void reset(){
         winners.clear();
@@ -1076,5 +1077,13 @@ public class GameState {
                 winners.add(playerId);
             }
         }
+    }
+
+    public void setAnimationSpeed(int speed){
+        animationSpeed = speed;
+    }
+
+    public int getAnimationSpeed(){
+        return animationSpeed;
     }
 }

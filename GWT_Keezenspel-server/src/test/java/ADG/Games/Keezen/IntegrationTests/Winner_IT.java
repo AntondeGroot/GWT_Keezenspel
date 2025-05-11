@@ -9,14 +9,13 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAr
 
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 @ExtendWith(ScreenshotOnFailure.class)
 public class Winner_IT {
@@ -78,6 +77,7 @@ public class Winner_IT {
     assertPlayerHasMedal(driver, "0", 2);
 
     whenPlayerWins(driver, "1");
+    TestUtils.wait(500);
     assertPlayerHasMedal(driver, "1", 3);
   }
 }
