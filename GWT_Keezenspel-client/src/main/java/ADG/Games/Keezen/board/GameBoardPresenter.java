@@ -126,6 +126,7 @@ public class GameBoardPresenter {
             public void onSuccess(GameStateResponse result) {
                 if (!Board.isInitialized()) {
                     initializeBoardState(result);
+                    AnimationSpeed.setSpeed(result.getAnimationSpeed());
                 }
 
                 if (!gameStateResponseUpdate.equals(result)) {

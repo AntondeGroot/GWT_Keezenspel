@@ -26,7 +26,9 @@ public class GameRegistry {
   }
 
   public static String createTestGame(String sessionID) {
-    games.put(sessionID, new GameSession(new CardsDeckMock()));
+    int animationSpeed = 100;
+    GameSession session = new GameSession(new CardsDeckMock(), animationSpeed);
+    games.put(sessionID, session);
     return sessionID;
   }
 
