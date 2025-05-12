@@ -18,6 +18,7 @@ public class GameStateResponse implements IsSerializable {
     private int nrPlayers;
     private ArrayList<String> activePlayers;
     private ArrayList<String> winners;
+    private int animationSpeed;
 
     public GameStateResponse() {
     }
@@ -134,5 +135,13 @@ public class GameStateResponse implements IsSerializable {
                 "    activePlayers = " + activePlayers +",\n"+
                 "    winners=" + winners +",\n"+
                 '}';
+    }
+
+    public int getAnimationSpeed() {
+        return animationSpeed;
+    }
+
+    public void setAnimationSpeed(int animationSpeed) {
+        this.animationSpeed = animationSpeed;
     }
 }

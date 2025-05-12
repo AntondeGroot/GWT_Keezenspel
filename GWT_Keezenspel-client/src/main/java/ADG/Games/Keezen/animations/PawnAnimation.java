@@ -54,6 +54,8 @@ public class PawnAnimation {
     double pixelsPerMs = 0.1;
     if(distance > 200){ pixelsPerMs = 0.12;};
     if(distance > 400){ pixelsPerMs = 0.16;};
+    pixelsPerMs = pixelsPerMs * AnimationSpeed.getSpeed();
+
     return pixelsPerMs;
   }
 
