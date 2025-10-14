@@ -10,6 +10,7 @@
 ## This project is used to learn 
 - Google Webtoolkit, which is used to convert Java code to JavaScript. Which at my current job is used for creating webpages.
 - HTML, CSS and JavaScript
+- OpenAPI
 - Unit testing
 - Selenium automated browser testing
 
