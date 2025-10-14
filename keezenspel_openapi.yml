@@ -48,7 +48,7 @@ paths:
           content:
             application/json:
               schema:
-                roomId:
+                sessionId:
                   type: string
         409:
           description: Game already exists with that name
