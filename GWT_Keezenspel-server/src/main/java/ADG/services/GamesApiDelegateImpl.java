@@ -36,7 +36,9 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
       return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
-    GameRegistry.createNewGame(sessionID, roomName);
+    Integer maxPlayers = newGameRequest.getMaxPlayers();
+    GameRegistry.createNewGame(sessionID, roomName, maxPlayers);
+
     GameCreatedResponse response = new GameCreatedResponse(sessionID);
     return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
