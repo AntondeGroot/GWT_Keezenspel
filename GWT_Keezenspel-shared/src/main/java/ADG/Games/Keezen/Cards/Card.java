@@ -45,6 +45,10 @@ public class Card implements IsSerializable {
         return cardValue;
     }
 
+    public int getUniqueCardNumber(){
+        return uniqueCardNumber;
+    }
+
     public void setCardValue(int cardValue) {
         this.cardValue = cardValue;
     }
