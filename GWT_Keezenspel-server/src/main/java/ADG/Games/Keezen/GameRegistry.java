@@ -1,5 +1,8 @@
 package ADG.Games.Keezen;
 
+import com.adg.openapi.model.GameInfo;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,6 +28,16 @@ public class GameRegistry {
     return sessionID;
   }
 
+  /***
+   * For testing purposes
+   * @param sessionID
+   * @return
+   */
+  public static String createNewGame(String sessionID, String roomName) {
+    games.put(sessionID, new GameSession(roomName));
+    return sessionID;
+  }
+
   public static String createTestGame(String sessionID) {
     int animationSpeed = 100;
     GameSession session = new GameSession(new CardsDeckMock(), animationSpeed);
@@ -39,6 +52,19 @@ public class GameRegistry {
       return null;
     }
     return session;
+  }
+
+  public static List<GameInfo> getAllGames(){
+    ArrayList<GameInfo> gameInfos = new ArrayList<>();
+    for(GameSession session : games.values()){
+      GameInfo gameInfo = new GameInfo();
+      gameInfo.setId(session.getSessionId());
+      gameInfo.setMaxNrPlayers(999);
+      gameInfo.setRoomName(session.getRoomName());
+
+      gameInfos.add(gameInfo);
+    }
+    return gameInfos;
   }
 
   //

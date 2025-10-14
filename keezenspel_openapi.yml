@@ -140,6 +140,8 @@ components:
       properties:
         id:
           type: string
+        roomName:
+          type: string
         players:
           type: array
           items:
