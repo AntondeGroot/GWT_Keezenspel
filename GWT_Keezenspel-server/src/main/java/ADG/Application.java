@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.Objects;
 
-@SpringBootApplication
 @ServletComponentScan
+@SpringBootApplication(scanBasePackages = {"ADG", "com.adg.openapi.api"})// this is necessary to use generated REST classes
 public class Application
         extends SpringBootServletInitializer {
 
