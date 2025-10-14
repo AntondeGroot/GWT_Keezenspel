@@ -1,0 +1,214 @@
+openapi: 3.1.0
+info:
+  title: Keezen Game API
+  version: 1.0.0
+  description: |
+    OpenApi definition for the Keezen board game.
+    This API manages players, games, moves, and cards.
+
+servers:
+  - url: http://localhost:4200
+    description: Local development server
+
+paths:
+  /test:
+    get:
+      summary: Simple test for openAPI
+      responses:
+        200:
+          description: get a number
+          content:
+            application/json:
+              schema:
+                type: integer
+                example: 7
+
+  /games:
+    get:
+      summary: List all active games
+      responses:
+        '200':
+          description: A list of games
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Game'
+    post:
+      summary: Create a new game
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewGameRequest'
+      responses:
+        201:
+          description: Game created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        409:
+          description: Game already exists
+
+  /cards/{gameId}/{playerId}:
+    get:
+      summary: Get cards for a specific player
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of cards for the player
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /gamestates/{gameId}:
+    get:
+      summary: Get gamestate of a specific game
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Gamestate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameState'
+        404:
+          description: Game not found
+
+  /games/{gameId}:
+    get:
+      summary: Get details of a specific game
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Game details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        404:
+          description: Game not found
+
+components:
+  schemas:
+    Game:
+      type: object
+      properties:
+        id:
+          type: string
+        players:
+          type: array
+          items:
+            $ref: '#/components/schemas/Player'
+        maxNrPlayers:
+          type: integer
+        status:
+          type: string
+          enum:
+            - waiting
+            - inProgress
+
+    Pawn:
+      type: object
+      properties:
+        playerId:
+          type: string
+        pawnId:
+          type: string
+        positionId:
+          type: object
+          playerId:
+            type: string
+          tileNr:
+            type: integer
+
+    Player:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        profilePic:
+          type: string
+
+    GameState:
+      type: object
+      properties:
+        currentPlayerId:
+          type: string
+        pawns:
+          type: array
+          items:
+            type: object
+            properties:
+              schema:
+                $ref: '#/components/schemas/Pawn'
+        players:
+          type: array
+          items:
+            properties:
+              schema:
+                $ref: '#/components/schemas/Player'
+        winners:
+          type: array
+          items:
+            properties:
+              schema:
+                $ref: '#/components/schemas/Player'
+        board:
+          type: array
+          items:
+            type: string
+
+    NewGameRequest:
+      type: object
+      properties:
+        playerId:
+          type: string
+
+    MoveRequest:
+      type: object
+      properties:
+        playerId:
+          type: string
+        card:
+          type: string
+        pawnId1:
+          type: string
+        pawnId2:
+          type: string
+        moveType:
+          type: string
+          enum:
+            - switch
+            - onBoard
+            - move
+            - forfeit
+
