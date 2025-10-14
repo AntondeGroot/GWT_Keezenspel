@@ -33,8 +33,8 @@ public class GameRegistry {
    * @param sessionID
    * @return
    */
-  public static String createNewGame(String sessionID, String roomName) {
-    games.put(sessionID, new GameSession(roomName));
+  public static String createNewGame(String sessionID, String roomName, Integer maxPlayers) {
+    games.put(sessionID, new GameSession(sessionID, roomName, maxPlayers));
     return sessionID;
   }
 
@@ -59,7 +59,7 @@ public class GameRegistry {
     for(GameSession session : games.values()){
       GameInfo gameInfo = new GameInfo();
       gameInfo.setId(session.getSessionId());
-      gameInfo.setMaxNrPlayers(999);
+      gameInfo.setMaxNrPlayers(session.getMaxPlayers());
       gameInfo.setRoomName(session.getRoomName());
 
       gameInfos.add(gameInfo);
