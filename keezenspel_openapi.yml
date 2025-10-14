@@ -22,7 +22,6 @@ paths:
               schema:
                 type: integer
                 example: 7
-
   /games:
     get:
       summary: List all active games
@@ -34,7 +33,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Game'
+                  $ref: '#/components/schemas/GameInfo'
     post:
       summary: Create a new game
       requestBody:
@@ -49,9 +48,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Game'
+                roomId:
+                  type: string
         409:
-          description: Game already exists
+          description: Game already exists with that name
 
   /cards/{gameId}/{playerId}:
     get:
@@ -75,7 +75,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: string
+                  $ref: '#/components/schemas/Card'
 
   /gamestates/{gameId}:
     get:
@@ -111,13 +111,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Game'
+                $ref: '#/components/schemas/GameInfo'
         404:
           description: Game not found
+#  /games/{gameId}/players:
+#    post:
+#      parameters:
+#        - name: gameId
+#          in: path
+#          required: true
+#          schema:
+#            type: string
+#      summary: Add a player to a game
+#      requestBody:
+#        required: true
+#        content:
+#          application/json:
+#            schema:
+#              $ref: '#/components/schemas/Player'
+
+
+
 
 components:
   schemas:
-    Game:
+    GameInfo:
       type: object
       properties:
         id:
@@ -190,6 +208,12 @@ components:
     NewGameRequest:
       type: object
       properties:
+        roomName:
+          type: string
+          min: 3
+          max: 50
+        maxPlayers:
+          type: integer
         playerId:
           type: string
 
@@ -211,4 +235,39 @@ components:
             - onBoard
             - move
             - forfeit
+    Card:
+      properties:
+        suit:
+          description: |
+            there is 1 suite per player
+            with a maximum of 4 suites (0,1,2,3)
+          type: integer
+          min: 0
+          max: 3
+        value:
+          description: the face value of the card 1 = ace, ... , 12 = king
+          type: integer
+        uuid:
+          description: |
+            a unique tracking number to distinguish between two identical cards (Ace♠︎),
+            this happens when you have more than 4 players.
+          type: integer
 
+    CardResponse:
+      type: object
+      properties:
+        cards:
+          type: array
+          items:
+            type: object
+            properties:
+              schema:
+                $ref: '#/components/schemas/Card'
+        playedCards:
+          type: array
+          items:
+            type: string
+        nrOfCardsPerPlayer:
+          type: array
+          items:
+            type: integer
