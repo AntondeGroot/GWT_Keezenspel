@@ -173,6 +173,11 @@ paths:
 
 components:
   schemas:
+    MessageType:
+      enum:
+        - CHECK_MOVE
+        - MAKE_MOVE
+
     GameInfo:
       type: object
       properties:
