@@ -4,6 +4,7 @@ import ADG.Games.Keezen.GameRegistry;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
 import ADG.dto.GameCreatedResponse;
+import com.adg.openapi.api.GamesApi;
 import com.adg.openapi.api.GamesApiDelegate;
 import com.adg.openapi.model.GameInfo;
 import com.adg.openapi.model.NewGameRequest;
@@ -36,7 +37,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    //todo: generate sessionId based on roomname
+    //todo: generate sessionId based on roomName
     String sessionID = roomName;
 
     if(GameRegistry.getGame(sessionID) != null){
@@ -102,5 +103,23 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
     }
     gameState.start();
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  /**
+   * DELETE /games/{sessionId}/ : Stop a specific game
+   *
+   * @param sessionId  (required)
+   * @return Game was stopped (status code 204)
+   *         or Game could not be found in order to stop it (status code 404)
+   * @see GamesApi#gamesSessionIdDelete
+   */
+  @Override
+  public ResponseEntity<Void> gamesSessionIdDelete(String sessionId) {
+    if(!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)){
+      return ResponseEntity.status(404).build();
+    }
+    gameSession.getGameState().stop();
+    GameRegistry.removeGame(sessionId);
+    return ResponseEntity.status(204).build();
   }
 }
