@@ -53,6 +53,44 @@ paths:
         409:
           description: Game already exists with that name
 
+  /games/{sessionId}/players:
+    get:
+      summary: Get all players in a game
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: An array of all players in the session
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Player'
+    post:
+      summary: Add a player to a game
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Player'
+      responses:
+        201:
+          description: "Player was added successfully"
+        400:
+          description: "Player could not be added"
+
+
   /cards/{gameId}/{playerId}:
     get:
       summary: Get cards for a specific player
@@ -170,6 +208,8 @@ components:
 
     Player:
       type: object
+      required:
+        - id
       properties:
         id:
           type: string
@@ -177,6 +217,15 @@ components:
           type: string
         profilePic:
           type: string
+        color:
+          type: string
+        isActive:
+          type: boolean
+        isPlaying:
+          type: boolean
+        place:
+          description: standard value -1, if they won they are either 1st 2nd 3rd
+          type: integer
 
     GameState:
       type: object
