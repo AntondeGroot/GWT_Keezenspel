@@ -11,17 +11,6 @@ servers:
     description: Local development server
 
 paths:
-  /test:
-    get:
-      summary: Simple test for openAPI
-      responses:
-        200:
-          description: get a number
-          content:
-            application/json:
-              schema:
-                type: integer
-                example: 7
   /games:
     get:
       summary: List all active games
@@ -69,7 +58,19 @@ paths:
           description: Game could not be found
         409:
           description: Game was already started
-
+    delete:
+      summary: Stop a specific game
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Game was stopped
+        404:
+          description: Game could not be found in order to stop it
   /games/{sessionId}/players:
     get:
       summary: Get all players in a game

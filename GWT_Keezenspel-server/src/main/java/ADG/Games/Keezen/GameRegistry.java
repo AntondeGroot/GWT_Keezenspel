@@ -67,11 +67,9 @@ public class GameRegistry {
     return gameInfos;
   }
 
-  //
-  //  // Optional: Remove a game (cleanup)
-  //  public static void removeGame(String sessionID) {
-  //    games.remove(sessionID);
-  //  }
+  public static void removeGame(String sessionID) {
+    games.remove(sessionID);
+  }
   //
   //  // Optional: List all session IDs (useful for admin/debugging)
   //  public static Map<String, GameSession> getAllGames() {
