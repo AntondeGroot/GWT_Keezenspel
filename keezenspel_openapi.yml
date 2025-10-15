@@ -53,6 +53,23 @@ paths:
         409:
           description: Game already exists with that name
 
+  /games/{sessionId}/:
+    post:
+      summary: Start a specific game
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Game was started
+        404:
+          description: Game could not be found
+        409:
+          description: Game was already started
+
   /games/{sessionId}/players:
     get:
       summary: Get all players in a game

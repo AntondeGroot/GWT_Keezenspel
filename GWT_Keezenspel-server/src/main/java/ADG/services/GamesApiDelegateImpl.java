@@ -2,16 +2,20 @@ package ADG.services;
 
 import ADG.Games.Keezen.GameRegistry;
 import ADG.Games.Keezen.GameSession;
+import ADG.Games.Keezen.GameState;
 import ADG.dto.GameCreatedResponse;
 import com.adg.openapi.api.GamesApiDelegate;
 import com.adg.openapi.model.GameInfo;
 import com.adg.openapi.model.NewGameRequest;
 import com.adg.openapi.model.Player;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
 public class GamesApiDelegateImpl implements GamesApiDelegate {
@@ -82,5 +86,21 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
     gameSession.getGameState().addPlayer(p);
 
     return new ResponseEntity<>(HttpStatus.CREATED);
+  }
+
+  @Override
+  public ResponseEntity<Void> gamesSessionIdPost(
+      @Parameter(name = "sessionId", description = "", required = true, in = ParameterIn.PATH) @PathVariable("sessionId") String sessionId
+  ) {
+    if(!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)){
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND) ;
+    }
+
+    GameState gameState = gameSession.getGameState();
+    if(gameState.hasStarted()){
+      return new ResponseEntity<>(HttpStatus.CONFLICT) ;
+    }
+    gameState.start();
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 }

@@ -30,6 +30,11 @@ public class GameState {
     private final int MAX_PLAYERS = 8;
     private final CardsDeckInterface cardsDeck;
     private int animationSpeed;
+    private Boolean hasStarted = false;
+
+    public Boolean hasStarted() {
+        return hasStarted;
+    }
 
     public void reset(){
         winners.clear();
@@ -45,6 +50,8 @@ public class GameState {
     }
 
     public void stop(){
+        hasStarted = false;
+
         pawns.clear();
         players.clear();
         playerColors.clear();
@@ -53,6 +60,8 @@ public class GameState {
     }
 
     public void start(){
+        hasStarted = true;
+
         playerIdTurn = players.getFirst().getUUID();
         playerIdStartingRound = playerIdTurn;
         if (pawns.isEmpty()) {
