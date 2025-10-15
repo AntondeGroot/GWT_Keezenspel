@@ -25,6 +25,16 @@ public class ImageProcessing {
 
             // Read the image file
             File inputFile = new File(resourceUrl.toURI());
+            // Prepare the output file path
+            String outputImagePath = inputFile.getParent() + File.separator + "pawn"+colorId+".png";
+            File outputFile = new File(outputImagePath);
+
+            if (outputFile.exists()) {
+              Log.info("Skipping image creation: " + outputFile.getName() + " already exists.");
+              return;
+            }
+
+            // Read the base image
             BufferedImage image = ImageIO.read(inputFile);
             if (image == null) {
                 System.err.println("Failed to load image from " + resourcePath);
@@ -53,10 +63,6 @@ public class ImageProcessing {
                     }
                 }
             }
-
-            // Prepare the output file path
-            String outputImagePath = inputFile.getParent() + File.separator + "pawn"+colorId+".png";
-            File outputFile = new File(outputImagePath);
 
             // Save the modified image
             ImageIO.write(processedImage, "png", outputFile);
