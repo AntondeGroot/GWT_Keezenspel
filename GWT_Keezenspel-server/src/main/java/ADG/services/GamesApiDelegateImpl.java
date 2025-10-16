@@ -4,33 +4,26 @@ import ADG.Games.Keezen.GameRegistry;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
 import ADG.dto.GameCreatedResponse;
-import com.adg.openapi.api.GamesApi;
 import com.adg.openapi.api.GamesApiDelegate;
 import com.adg.openapi.model.GameInfo;
 import com.adg.openapi.model.NewGameRequest;
 import com.adg.openapi.model.Player;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
 public class GamesApiDelegateImpl implements GamesApiDelegate {
 
   @Override
-  public ResponseEntity<List<GameInfo>> gamesGet() {
-    List<GameInfo> gameInfos = GameRegistry.getAllGames();
-
-    return new ResponseEntity<>(gameInfos, HttpStatus.OK);
-
+  public ResponseEntity<List<GameInfo>> getAllGames() {
+    return new ResponseEntity<>(GameRegistry.getAllGames(), HttpStatus.OK);
   }
 
   @Override
-  public ResponseEntity<Object> gamesPost(NewGameRequest newGameRequest) {
+  public ResponseEntity<Object> createNewGame(NewGameRequest newGameRequest) {
     String roomName = newGameRequest.getRoomName();
 
     if(roomName == null || roomName.isEmpty()){
@@ -52,7 +45,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
   }
 
   @Override
-  public ResponseEntity<List<Player>> gamesSessionIdPlayersGet(String sessionId) {
+  public ResponseEntity<List<Player>> getAllPlayersInGame(String sessionId) {
 
     if(!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)){
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -75,7 +68,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
   }
 
   @Override
-  public ResponseEntity<Void> gamesSessionIdPlayersPost(String sessionId,
+  public ResponseEntity<Void> addPlayerToGame(String sessionId,
       Player player) {
 
     if(!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)){
@@ -90,9 +83,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
   }
 
   @Override
-  public ResponseEntity<Void> gamesSessionIdPost(
-      @Parameter(name = "sessionId", description = "", required = true, in = ParameterIn.PATH) @PathVariable("sessionId") String sessionId
-  ) {
+  public ResponseEntity<Void> startGame(String sessionId) {
     if(!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)){
       return new ResponseEntity<>(HttpStatus.NOT_FOUND) ;
     }
@@ -101,20 +92,13 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
     if(gameState.hasStarted()){
       return new ResponseEntity<>(HttpStatus.CONFLICT) ;
     }
+
     gameState.start();
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  /**
-   * DELETE /games/{sessionId}/ : Stop a specific game
-   *
-   * @param sessionId  (required)
-   * @return Game was stopped (status code 204)
-   *         or Game could not be found in order to stop it (status code 404)
-   * @see GamesApi#gamesSessionIdDelete
-   */
   @Override
-  public ResponseEntity<Void> gamesSessionIdDelete(String sessionId) {
+  public ResponseEntity<Void> stopGame(String sessionId) {
     if(!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)){
       return ResponseEntity.status(404).build();
     }

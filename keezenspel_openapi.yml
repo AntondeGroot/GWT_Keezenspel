@@ -14,6 +14,8 @@ paths:
   /games:
     get:
       summary: List all active games
+      description: Get stats like number of players, max nr players, is the game playing.
+      operationId: getAllGames
       responses:
         '200':
           description: A list of games
@@ -25,6 +27,7 @@ paths:
                   $ref: '#/components/schemas/GameInfo'
     post:
       summary: Create a new game
+      operationId: createNewGame
       requestBody:
         required: true
         content:
@@ -45,12 +48,9 @@ paths:
   /games/{sessionId}/:
     post:
       summary: Start a specific game
+      operationId: startGame
       parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/sessionId'
       responses:
         200:
           description: Game was started
@@ -60,12 +60,9 @@ paths:
           description: Game was already started
     delete:
       summary: Stop a specific game
+      operationId: stopGame
       parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/sessionId'
       responses:
         204:
           description: Game was stopped
@@ -74,12 +71,9 @@ paths:
   /games/{sessionId}/players:
     get:
       summary: Get all players in a game
+      operationId: getAllPlayersInGame
       parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/sessionId'
       responses:
         200:
           description: An array of all players in the session
@@ -91,12 +85,9 @@ paths:
                   $ref: '#/components/schemas/Player'
     post:
       summary: Add a player to a game
+      operationId: addPlayerToGame
       parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/sessionId'
       requestBody:
         content:
           application/json:
@@ -109,20 +100,13 @@ paths:
           description: "Player could not be added"
 
 
-  /cards/{gameId}/{playerId}:
+  /cards/{sessionId}/{playerId}:
     get:
       summary: Get cards for a specific player
+      operationId: getPlayerCards
       parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: playerId
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/sessionId'
+        - $ref: '#/components/parameters/playerId'
       responses:
         200:
           description: List of cards for the player
@@ -133,15 +117,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/Card'
 
-  /gamestates/{gameId}:
+  /gamestates/{sessionId}:
     get:
       summary: Get gamestate of a specific game
+      operationId: getGameStateForGame
       parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/sessionId'
       responses:
         200:
           description: Gamestate
@@ -152,15 +133,11 @@ paths:
         404:
           description: Game not found
 
-  /games/{gameId}:
+  /games/{sessionId}:
     get:
       summary: Get details of a specific game
       parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/sessionId'
       responses:
         200:
           description: Game details
@@ -172,6 +149,19 @@ paths:
           description: Game not found
 
 components:
+  parameters:
+    sessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema:
+        type: string
+    playerId:
+      name: playerId
+      in: path
+      required: true
+      schema:
+        type: string
   schemas:
     MessageType:
       enum:
@@ -196,6 +186,13 @@ components:
           enum:
             - waiting
             - inProgress
+    PawnId:
+      type: object
+      properties:
+        playerId:
+          type: string
+        pawnNr:
+          type: integer
 
     Pawn:
       type: object
@@ -240,22 +237,15 @@ components:
         pawns:
           type: array
           items:
-            type: object
-            properties:
-              schema:
-                $ref: '#/components/schemas/Pawn'
+            $ref: '#/components/schemas/Pawn'
         players:
           type: array
           items:
-            properties:
-              schema:
-                $ref: '#/components/schemas/Player'
+            $ref: '#/components/schemas/Player'
         winners:
           type: array
           items:
-            properties:
-              schema:
-                $ref: '#/components/schemas/Player'
+            $ref: '#/components/schemas/Player'
         board:
           type: array
           items:
@@ -279,7 +269,7 @@ components:
         playerId:
           type: string
         card:
-          type: string
+          $ref: '#/components/schemas/Card'
         pawnId1:
           type: string
         pawnId2:
@@ -291,6 +281,7 @@ components:
             - onBoard
             - move
             - forfeit
+
     Card:
       properties:
         suit:
@@ -315,10 +306,7 @@ components:
         cards:
           type: array
           items:
-            type: object
-            properties:
-              schema:
-                $ref: '#/components/schemas/Card'
+            $ref: '#/components/schemas/Card'
         playedCards:
           type: array
           items:
