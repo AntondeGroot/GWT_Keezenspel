@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class CardsApiDelegateImpl implements CardsApiDelegate {
 
   @Override
-  public ResponseEntity<List<Card>> cardsGameIdPlayerIdGet(String gameId, String playerId) {
+  public ResponseEntity<List<Card>> getPlayerCards(String gameId, String playerId) {
     // Input validation
     if (gameId == null || playerId == null) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(List.of());
