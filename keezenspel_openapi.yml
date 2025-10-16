@@ -98,7 +98,24 @@ paths:
           description: "Player was added successfully"
         400:
           description: "Player could not be added"
-
+  /moves/{sessionId}/{playerId}:
+    post:
+      summary: make a move for a player
+      operationId: makeMove
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+        - $ref: '#/components/parameters/playerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoveRequest'
+      responses:
+        200:
+          description: Move is allowed
+        400:
+          description: Move is not allowed
 
   /cards/{sessionId}/{playerId}:
     get:
@@ -163,11 +180,16 @@ components:
       schema:
         type: string
   schemas:
-    MessageType:
+    RequestType:
       enum:
         - CHECK_MOVE
         - MAKE_MOVE
-
+    MoveType:
+      enum:
+        - switch
+        - onBoard
+        - move
+        - split
     GameInfo:
       type: object
       properties:
@@ -271,17 +293,17 @@ components:
         card:
           $ref: '#/components/schemas/Card'
         pawnId1:
-          type: string
+          $ref: '#/components/schemas/PawnId'
         pawnId2:
-          type: string
+          $ref: '#/components/schemas/PawnId'
+        requestType:
+          $ref: '#/components/schemas/RequestType'
         moveType:
-          type: string
-          enum:
-            - switch
-            - onBoard
-            - move
-            - forfeit
-
+          $ref: '#/components/schemas/MoveType'
+        stepsPawn1:
+          type: integer
+        stepsPawn2:
+          type: integer
     Card:
       properties:
         suit:
