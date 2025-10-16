@@ -3,6 +3,9 @@ package ADG.services;
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameRegistry;
 import ADG.Games.Keezen.GameSession;
+import ADG.Games.Keezen.GameState;
+import ADG.Games.Keezen.Move.MoveMessage;
+import ADG.Games.Keezen.Move.MoveType;
 import com.adg.openapi.api.CardsApiDelegate;
 import com.adg.openapi.model.Card;
 import org.springframework.http.HttpStatus;
@@ -49,5 +52,28 @@ public class CardsApiDelegateImpl implements CardsApiDelegate {
         .collect(Collectors.toList());
 
     return ResponseEntity.ok(responseCards);
+  }
+
+  @Override
+  public ResponseEntity<Void> playerForfeits(String sessionId,
+      String playerId) {
+
+    GameSession session = GameRegistry.getGame(sessionId);
+    if (session == null) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    }
+
+    GameState gameState = session.getGameState();
+
+    if(gameState.hasStarted() && gameState.getPlayerIdTurn().equals(playerId)) {
+
+      // todo improve when switching to openapi
+      MoveMessage moveMessage = new MoveMessage();
+      moveMessage.setPlayerId(playerId);
+      moveMessage.setMoveType(MoveType.FORFEIT);
+      gameState.processOnForfeit(moveMessage);
+      return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
   }
 }

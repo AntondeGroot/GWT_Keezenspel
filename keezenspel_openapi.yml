@@ -133,7 +133,17 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Card'
-
+    delete:
+      summary: Player forfeits cards
+      operationId: playerForfeits
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+        - $ref: '#/components/parameters/playerId'
+      responses:
+        200:
+          description: player forfeited successfully
+        400:
+          description: player could not forfeit
   /gamestates/{sessionId}:
     get:
       summary: Get gamestate of a specific game
