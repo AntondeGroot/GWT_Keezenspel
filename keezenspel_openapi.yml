@@ -248,10 +248,8 @@ components:
           type: string
         roomName:
           type: string
-        players:
-          type: array
-          items:
-            $ref: '#/components/schemas/Player'
+        nrPlayers:
+          type: integer
         maxNrPlayers:
           type: integer
         status:

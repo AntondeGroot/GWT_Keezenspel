@@ -61,7 +61,7 @@ public class GameRegistry {
       gameInfo.setId(session.getSessionId());
       gameInfo.setMaxNrPlayers(session.getMaxPlayers());
       gameInfo.setRoomName(session.getRoomName());
-
+      gameInfo.setNrPlayers(session.getGameState().getPlayers().size());
       gameInfos.add(gameInfo);
     }
     return gameInfos;
