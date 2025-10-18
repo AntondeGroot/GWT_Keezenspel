@@ -16,6 +16,8 @@ paths:
       summary: List all active games
       description: Get stats like number of players, max nr players, is the game playing.
       operationId: getAllGames
+      tags:
+        - games
       responses:
         '200':
           description: A list of games
@@ -28,6 +30,8 @@ paths:
     post:
       summary: Create a new game
       operationId: createNewGame
+      tags:
+        - games
       requestBody:
         required: true
         content:
@@ -49,6 +53,8 @@ paths:
     post:
       summary: Start a specific game
       operationId: startGame
+      tags:
+        - games
       parameters:
         - $ref: '#/components/parameters/sessionId'
       responses:
@@ -61,6 +67,8 @@ paths:
     delete:
       summary: Stop a specific game
       operationId: stopGame
+      tags:
+        - games
       parameters:
         - $ref: '#/components/parameters/sessionId'
       responses:
@@ -72,6 +80,8 @@ paths:
     get:
       summary: Get all players in a game
       operationId: getAllPlayersInGame
+      tags:
+        - players
       parameters:
         - $ref: '#/components/parameters/sessionId'
       responses:
@@ -86,6 +96,8 @@ paths:
     post:
       summary: Add a player to a game
       operationId: addPlayerToGame
+      tags:
+        - players
       parameters:
         - $ref: '#/components/parameters/sessionId'
       requestBody:
@@ -102,6 +114,8 @@ paths:
     post:
       summary: make a move for a player
       operationId: makeMove
+      tags:
+        - moves
       parameters:
         - $ref: '#/components/parameters/sessionId'
         - $ref: '#/components/parameters/playerId'
@@ -123,6 +137,8 @@ paths:
       description: >
         - Number of cards already played (for displaying the played cards stack)
         - Number of cards each player has left
+      tags:
+        - cards
       parameters:
         - $ref: '#/components/parameters/sessionId'
       responses:
@@ -142,6 +158,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/sessionId'
         - $ref: '#/components/parameters/playerId'
+      tags:
+        - cards
       responses:
         200:
           description: List of cards for the player
@@ -158,6 +176,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/sessionId'
         - $ref: '#/components/parameters/playerId'
+      tags:
+        - moves
       responses:
         200:
           description: player forfeited successfully
@@ -167,6 +187,8 @@ paths:
     get:
       summary: Get gamestate of a specific game
       operationId: getGameStateForGame
+      tags:
+        - gamestates
       parameters:
         - $ref: '#/components/parameters/sessionId'
       responses:

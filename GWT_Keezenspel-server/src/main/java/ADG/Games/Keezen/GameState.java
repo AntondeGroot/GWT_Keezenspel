@@ -100,6 +100,9 @@ public class GameState {
               // otherwise it is already set by a test
               player.setId("player"+players.size());
             }
+            player.setIsActive(true);
+            player.setPlace(-1);
+            player.isPlaying(false);
             players.add(player);
         }
     }
