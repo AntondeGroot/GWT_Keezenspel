@@ -116,6 +116,24 @@ paths:
           description: Move is allowed
         400:
           description: Move is not allowed
+  /cards/{sessionId}:
+    get:
+      summary: Get all card info that is publicly available
+      operationId: getPubliclyAvailableCardInformation
+      description: >
+        - Number of cards already played (for displaying the played cards stack)
+        - Number of cards each player has left
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+      responses:
+        200:
+          description: get all cards info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponse'
+        404:
+          description: not found
 
   /cards/{sessionId}/{playerId}:
     get:
@@ -133,6 +151,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Card'
+
     delete:
       summary: Player forfeits cards
       operationId: playerForfeits
@@ -335,15 +354,11 @@ components:
     CardResponse:
       type: object
       properties:
-        cards:
-          type: array
-          items:
-            $ref: '#/components/schemas/Card'
         playedCards:
           type: array
           items:
             type: string
         nrOfCardsPerPlayer:
-          type: array
-          items:
+          type: object
+          additionalProperties: #for a flexible key value mapping
             type: integer

@@ -27,6 +27,16 @@ public class GameSession {
     this.maxPlayers = 3;
   }
 
+  public GameSession(String sessionId) {
+    // for testing purposes
+    this.sessionId = sessionId;
+    this.cardsDeck = new CardsDeck();
+    this.gameState = new GameState(cardsDeck);
+    this.cardsDeck.setGameState(this.gameState);
+    this.roomName = "";
+    this.maxPlayers = 3;
+  }
+
   public GameSession(CardsDeckInterface cardsDeck){
     this.sessionId = UUID.randomUUID().toString();
     this.cardsDeck = cardsDeck;

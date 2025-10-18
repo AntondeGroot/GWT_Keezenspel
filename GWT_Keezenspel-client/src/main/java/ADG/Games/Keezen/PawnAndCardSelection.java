@@ -2,17 +2,16 @@ package ADG.Games.Keezen;
 
 import static ADG.Games.Keezen.Move.MessageType.MAKE_MOVE;
 import static ADG.Games.Keezen.Move.MoveType.*;
-import static ADG.Games.Keezen.Cards.CardValueCheck.isJack;
-import static ADG.Games.Keezen.Cards.CardValueCheck.isSeven;
-import static ADG.Games.Keezen.logic.BoardLogic.isPawnOnNest;
 import static ADG.Games.Keezen.logic.BoardLogic.pawnIsOnNormalBoard;
+import static ADG.Games.Keezen.util.CardDTOValueCheck.isJack;
+import static ADG.Games.Keezen.util.CardDTOValueCheck.isSeven;
 
-import ADG.Games.Keezen.Cards.Card;
 import ADG.Games.Keezen.Move.MessageType;
 import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveType;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
+import ADG.Games.Keezen.dto.CardDTO;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Style.Visibility;
@@ -23,7 +22,7 @@ public class PawnAndCardSelection {
     private String playerId;
     private Pawn pawn1 = null;
     private Pawn pawn2 = null;
-    private Card card;
+    private CardDTO card;
     private boolean drawCards = true;
     private MoveType moveType;
     private int nrStepsPawn1 = 0;
@@ -114,7 +113,7 @@ public class PawnAndCardSelection {
             return;
         }
 
-        switch (card.getCardValue()) {
+        switch (card.getValue()) {
             case 1: break;//always valid: nest/board/finish
             case 11: secondPawnIsOnNormalBoardWhenYouPlayJack(); break;
             case 13: firstPawnIsOnNestWhenYouPlayKing(); break;
@@ -208,14 +207,14 @@ public class PawnAndCardSelection {
             return;
         }
 
-        switch (card.getCardValue()) {
+        switch (card.getValue()) {
             case 7: handlePlayerCanSelect2Pawns(pawn); break;
             case 11: handlePlayerCanSelectTheirOwnAndOpponentsPawn(pawn); break;
             default: handlePlayerCanSelect1Pawn(pawn); break;
         }
     }
 
-    public void setCard(Card p_card) {
+    public void setCard(CardDTO p_card) {
         drawCards = true;
 
         // deselect when clicked twice
@@ -271,7 +270,7 @@ public class PawnAndCardSelection {
         return pawn2;
     }
 
-    public Card getCard() {
+    public CardDTO getCard() {
         return card;
     }
 
@@ -302,7 +301,7 @@ public class PawnAndCardSelection {
 
         // hide boxes used to split a 7 over two pawns
         setSplitBoxesVisibility(Visibility.HIDDEN);
-        switch (card.getCardValue()) {
+        switch (card.getValue()) {
             case 1: handleAce(); break;
             case 7: handleSeven(); break;
             case 11: handleJack(); break;
@@ -358,7 +357,7 @@ public class PawnAndCardSelection {
 
     private void handleDefaultCard() {
         setMoveType(MOVE);
-        nrStepsPawn1 = card.getCardValue();
+        nrStepsPawn1 = card.getValue();
         if (nrStepsPawn1 == 4) {
             nrStepsPawn1 = -4;
         }
@@ -413,15 +412,15 @@ public class PawnAndCardSelection {
 
     private MoveMessage createMessage() {
         MoveMessage moveMessage = new MoveMessage();
-        moveMessage.setPlayerId(playerId);
-        moveMessage.setPawnId1(getPawnId1());
-        moveMessage.setPawnId2(getPawnId2());
-        moveMessage.setCard(card);
-        moveMessage.setMoveType(moveType);
-        moveMessage.setStepsPawn1(nrStepsPawn1);
-        if(moveType == SPLIT){ // comparing Enums with == is null safe
-            moveMessage.setStepsPawn2(nrStepsPawn2);
-        }
+//        moveMessage.setPlayerId(playerId);
+//        moveMessage.setPawnId1(getPawnId1());
+//        moveMessage.setPawnId2(getPawnId2());
+//        moveMessage.setCard(card);
+//        moveMessage.setMoveType(moveType);
+//        moveMessage.setStepsPawn1(nrStepsPawn1);
+//        if(moveType == SPLIT){ // comparing Enums with == is null safe
+//            moveMessage.setStepsPawn2(nrStepsPawn2);
+//        }
 
         return moveMessage;
     }

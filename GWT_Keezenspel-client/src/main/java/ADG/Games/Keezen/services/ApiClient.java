@@ -1,0 +1,125 @@
+package ADG.Games.Keezen.services;
+
+import ADG.Games.Keezen.Cards.CardResponse;
+import ADG.Games.Keezen.dto.CardResponseDTO;
+import com.google.gwt.http.client.*;
+import com.google.gwt.json.client.*;
+import com.google.gwt.user.client.Window;
+
+public class ApiClient {
+
+  private static final String BASE_URL = "http://localhost:4200";
+
+  // === GAMES ===
+  public void getAllGames(ApiCallback<JSONArray> callback) {
+    get("/games", response -> JSONParser.parseStrict(response).isArray(), callback);
+  }
+
+  public void createNewGame(JSONObject newGameRequest, ApiCallback<JSONObject> callback) {
+    post("/games", newGameRequest, response -> JSONParser.parseStrict(response).isObject(), callback);
+  }
+
+  public void getGame(String sessionId, ApiCallback<JSONObject> callback) {
+    get("/games/" + sessionId, response -> JSONParser.parseStrict(response).isObject(), callback);
+  }
+
+  public void startGame(String sessionId, ApiCallback<Void> callback) {
+    post("/games/" + sessionId + "/", null, r -> null, callback);
+  }
+
+  public void stopGame(String sessionId, ApiCallback<Void> callback) {
+    delete("/games/" + sessionId + "/", r -> null, callback);
+  }
+
+  // === PLAYERS ===
+  public void getAllPlayersInGame(String sessionId, ApiCallback<JSONArray> callback) {
+    get("/games/" + sessionId + "/players", response -> JSONParser.parseStrict(response).isArray(), callback);
+  }
+
+  public void addPlayerToGame(String sessionId, JSONObject playerJson, ApiCallback<Void> callback) {
+    post("/games/" + sessionId + "/players", playerJson, r -> null, callback);
+  }
+
+  // === MOVES ===
+  public void makeMove(String sessionId, String playerId, JSONObject moveJson, ApiCallback<Void> callback) {
+    post("/moves/" + sessionId + "/" + playerId, moveJson, r -> null, callback);
+  }
+
+  // === CARDS ===
+  public void getPlayerCards(String sessionId, String playerId, ApiCallback<CardResponseDTO> callback) {
+    get("/cards/" + sessionId + "/" + playerId, CardResponseDTO::fromJson, callback);
+  }
+
+  public void playerForfeits(String sessionId, String playerId, ApiCallback<Void> callback) {
+    delete("/cards/" + sessionId + "/" + playerId, r -> null, callback);
+  }
+
+  // === GAMESTATE ===
+  public void getGameState(String sessionId, ApiCallback<JSONObject> callback) {
+    get("/gamestates/" + sessionId, response -> JSONParser.parseStrict(response).isObject(), callback);
+  }
+
+  // === GENERIC HTTP HELPERS ===
+  private <T> void get(String path, JsonParser<T> parser, ApiCallback<T> callback) {
+    sendRequest(RequestBuilder.GET, path, null, parser, callback);
+  }
+
+  private <T> void post(String path, JSONObject payload, JsonParser<T> parser, ApiCallback<T> callback) {
+    sendRequest(RequestBuilder.POST, path, payload, parser, callback);
+  }
+
+  private <T> void delete(String path, JsonParser<T> parser, ApiCallback<T> callback) {
+    sendRequest(RequestBuilder.DELETE, path, null, parser, callback);
+  }
+
+  private <T> void sendRequest(RequestBuilder.Method method, String path, JSONObject data,
+      JsonParser<T> parser, ApiCallback<T> callback) {
+
+    String url = BASE_URL + path;
+    RequestBuilder builder = new RequestBuilder(method, URL.encode(url));
+    builder.setHeader("Accept", "application/json");
+    if (data != null) {
+      builder.setHeader("Content-Type", "application/json");
+    }
+
+    try {
+      builder.sendRequest(data == null ? null : data.toString(), new RequestCallback() {
+        @Override
+        public void onResponseReceived(Request req, Response res) {
+          if (res.getStatusCode() >= 200 && res.getStatusCode() < 300) {
+            try {
+              T parsed = parser.parse(res.getText());
+              callback.onSuccess(parsed);
+            } catch (Exception e) {
+              callback.onFailure(e);
+            }
+          } else {
+            callback.onFailure(new Exception("HTTP " + res.getStatusCode() + ": " + res.getStatusText()));
+          }
+        }
+
+        @Override
+        public void onError(Request req, Throwable ex) {
+          callback.onFailure(ex);
+        }
+      });
+    } catch (RequestException e) {
+      callback.onFailure(e);
+    }
+  }
+
+  // === Functional interfaces ===
+  @FunctionalInterface
+  public interface JsonParser<T> {
+    T parse(String json);
+  }
+
+  public interface ApiCallback<T> {
+    void onSuccess(T result);
+
+    default void onFailure(Throwable caught) {
+      Window.alert("API error: " + caught.getMessage());
+    }
+  }
+}
+

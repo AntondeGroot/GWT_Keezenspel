@@ -1,7 +1,7 @@
 package ADG.Games.Keezen;
 
-import ADG.Games.Keezen.Cards.Card;
-import ADG.Games.Keezen.Player.Player;
+import com.adg.openapi.model.Card;
+import com.adg.openapi.model.Player;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.*;
@@ -22,11 +22,11 @@ public class CardsDeck implements CardsDeckInterface, IsSerializable {
 
     public void addPlayers(ArrayList<Player> players) {
         for (Player p : players) {
-            playerHands.put(p.getUUID(), new PlayerHand());
+            playerHands.put(p.getId(), new PlayerHand());
         }
     }
 
-    public HashMap<String, Integer> getNrOfCardsForAllPlayers(){
+    public HashMap<String, Integer> getNrOfCardsPerPlayer(){
         HashMap<String, Integer> nrOfCards = new HashMap<>();
         for(Map.Entry<String, PlayerHand> p : playerHands.entrySet()){
             nrOfCards.put(p.getKey(), p.getValue().getHand().size());
@@ -59,8 +59,11 @@ public class CardsDeck implements CardsDeckInterface, IsSerializable {
         int uniqueCardNr = 0;
         for (int suit = 0; suit < activePlayers.size(); suit++) {
             for (int cardValue = 1; cardValue < 14; cardValue++) {
-                cards.add(new Card(suit % 4, cardValue, uniqueCardNr));
-                uniqueCardNr++;
+                cards.add(
+                    new Card()
+                        .suit(suit%4)
+                        .value(cardValue)
+                        .uuid(uniqueCardNr++));
             }
         }
 
@@ -109,8 +112,8 @@ public class CardsDeck implements CardsDeckInterface, IsSerializable {
 
         for (int j = 0; j < nrCards; j++) {
             for(Player player: gameState.getPlayers()){
-                if(player.isActive()){
-                    setPlayerCard(player.getUUID(), cardsDeque.pop());
+                if(player.getIsActive()){
+                    setPlayerCard(player.getId(), cardsDeque.pop());
                 }
             }
         }

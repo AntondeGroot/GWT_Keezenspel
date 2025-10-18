@@ -16,29 +16,29 @@ public class TestGameInitializer_MockedCards {
 
   @PostConstruct
   public void setupTestGame() {
-    int nrPlayers = 3;
-
-    for (int i = 0; i < nrPlayers; i++) {
-      ImageProcessing.create(i);
-    }
-
-    String sessionId = GameRegistry.createTestGame("123");
-    GameSession session = GameRegistry.getGame(sessionId);
-    GameState gameState = session.getGameState();
-
-
-    if (gameState.getPawns().isEmpty()) {
-      for (int i = 0; i < nrPlayers; i++) {
-        Player player = new Player("player" + i, String.valueOf(i));
-        if (i == 0) {
-          player.setIsPlaying(true);
-        }
-        gameState.addPlayer(player);
-      }
-    }
-
-    if (gameState.getPawns().isEmpty()) {
-      gameState.start();
-    }
+//    int nrPlayers = 3;
+//
+//    for (int i = 0; i < nrPlayers; i++) {
+//      ImageProcessing.create(i);
+//    }
+//
+//    String sessionId = GameRegistry.createTestGame("123");
+//    GameSession session = GameRegistry.getGame(sessionId);
+//    GameState gameState = session.getGameState();
+//
+//
+//    if (gameState.getPawns().isEmpty()) {
+//      for (int i = 0; i < nrPlayers; i++) {
+//        Player player = new Player("player" + i, String.valueOf(i));
+//        if (i == 0) {
+//          player.setIsPlaying(true);
+//        }
+//        gameState.addPlayer(player);
+//      }
+//    }
+//
+//    if (gameState.getPawns().isEmpty()) {
+//      gameState.start();
+//    }
   }
 }

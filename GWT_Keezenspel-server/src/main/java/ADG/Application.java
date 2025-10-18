@@ -1,6 +1,10 @@
 package ADG;
 
+import ADG.Games.Keezen.GameRegistry;
+import ADG.Games.Keezen.GameSession;
+import ADG.Games.Keezen.GameState;
 import ADG.Games.Keezen.ImageProcessing;
+import com.adg.openapi.model.Player;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -26,6 +30,27 @@ public class Application
     // Create 8 pawns when missing
     for (int i = 0; i < 8; i++) {
       ImageProcessing.create(i);
+    }
+
+    String sessionId = GameRegistry.createNewGame("123");
+    GameSession session = GameRegistry.getGame(sessionId);
+    GameState gameState = session.getGameState();
+    if(gameState.getPawns().isEmpty()){
+      for (int i = 0; i < NrPlayers; i++) {
+        Player player = new Player().id("player"+i).name("player "+i);
+        if(i==0){
+          player.setIsPlaying(true);
+        }
+        System.out.println("application player:");
+        System.out.println(player);
+        gameState.addPlayer(player);
+      }
+    }
+    System.out.println(gameState.getPlayers().size());
+    //todo: remove testdata
+    //todo: replace with isRunning method
+    if(gameState.getPawns().isEmpty()){
+      gameState.start();
     }
   }
 

@@ -51,20 +51,9 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    //todo: rework this to the new openapi.model.player
-    ArrayList<ADG.Games.Keezen.Player.Player> players = gameSession.getGameState().getPlayers();
-    ArrayList<Player> playersResponse = new ArrayList<>();
-    for (ADG.Games.Keezen.Player.Player player : players) {
-      playersResponse.add(
-          new Player()
-              .id(player.getUUID())
-              .name(player.getName())
-              .place(player.getPlace())
-              .isPlaying(player.isPlaying())
-              .isActive(player.isActive()));
-    }
+    ArrayList<Player> players = gameSession.getGameState().getPlayers();
 
-    return new ResponseEntity<>(playersResponse,HttpStatus.OK);
+    return new ResponseEntity<>(players,HttpStatus.OK);
   }
 
   @Override
@@ -75,10 +64,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    //todo replace with openapi player-model
-    ADG.Games.Keezen.Player.Player p = new  ADG.Games.Keezen.Player.Player(player.getName(), player.getId());
-    gameSession.getGameState().addPlayer(p);
-
+    gameSession.getGameState().addPlayer(player);
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 

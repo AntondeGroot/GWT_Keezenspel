@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ADG.Games.Keezen.Cards.Card;
+import com.adg.openapi.model.Card;
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.CardsDeckMock;
 import ADG.Games.Keezen.GameSession;
@@ -128,14 +128,14 @@ class CardsDeckMockTest {
         nrs.put("0",0);
         nrs.put("1",13);
 
-        assertEquals(nrs, cardsDeck.getNrOfCardsForAllPlayers());
+        assertEquals(nrs, cardsDeck.getNrOfCardsPerPlayer());
         assertTrue(cardsDeck.getCardsForPlayer("0").isEmpty());
     }
 
     public static boolean isSortedNumerically(List<Card> cards) {
         for (int i = 0; i < cards.size() - 1; i++) {
-            int currentValue = cards.get(i).getCardValue();
-            int nextValue = cards.get(i + 1).getCardValue();
+            int currentValue = cards.get(i).getValue();
+            int nextValue = cards.get(i + 1).getValue();
             if (currentValue > nextValue) {
                 return false;
             }
@@ -181,7 +181,7 @@ class CardsDeckMockTest {
         cardsDeck.dealCards();
 
         // THEN
-        int totalCards = cardsDeck.getNrOfCardsForAllPlayers()
+        int totalCards = cardsDeck.getNrOfCardsPerPlayer()
                 .values()
                 .stream()
                 .mapToInt(Integer::intValue)

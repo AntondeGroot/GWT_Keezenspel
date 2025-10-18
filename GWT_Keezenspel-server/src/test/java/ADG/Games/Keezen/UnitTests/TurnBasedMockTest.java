@@ -14,7 +14,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import ADG.Games.Keezen.Cards.Card;
+import com.adg.openapi.model.Card;
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.CardsDeckMock;
 import ADG.Games.Keezen.GameSession;
@@ -90,7 +90,7 @@ public class TurnBasedMockTest {
         nrCardsPerPlayer.put("0",0);
         nrCardsPerPlayer.put("1",13);
         nrCardsPerPlayer.put("2",13);
-        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
+        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsPerPlayer());
     }
     @Test
     void player1Forfeits_Player2IsNowPlaying() {
@@ -112,7 +112,7 @@ public class TurnBasedMockTest {
         nrCardsPerPlayer.put("0",13);
         nrCardsPerPlayer.put("1",13);
         nrCardsPerPlayer.put("2",13);
-        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
+        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsPerPlayer());
     }
     @Test
     void player1Forfeits_Player1GetsSkippedInNextTurn() {
@@ -149,7 +149,7 @@ public class TurnBasedMockTest {
         nrCardsPerPlayer.put("0",13);
         nrCardsPerPlayer.put("1",13);
         nrCardsPerPlayer.put("2",13);
-        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
+        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsPerPlayer());
     }
     @Test
     void allPlayersForfeit2Rounds_AllPlayersHave13Cards() {
@@ -165,7 +165,7 @@ public class TurnBasedMockTest {
         nrCardsPerPlayer.put("0",13);
         nrCardsPerPlayer.put("1",13);
         nrCardsPerPlayer.put("2",13);
-        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
+        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsPerPlayer());
     }
     @Test
     void allPlayersForfeit3Rounds_AllPlayersHave13Cards() {
@@ -181,7 +181,7 @@ public class TurnBasedMockTest {
         nrCardsPerPlayer.put("0",13);
         nrCardsPerPlayer.put("1",13);
         nrCardsPerPlayer.put("2",13);
-        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
+        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsPerPlayer());
     }
     @Test
     void player2Forfeits_WhenPlayer1HasPlayed_Player3WillPlayNext(){
@@ -229,7 +229,7 @@ public class TurnBasedMockTest {
         moveMessage.setPlayerId("1");
         moveMessage.setPawnId1(pawn.getPawnId());
         moveMessage.setMoveType(MoveType.MOVE);
-        moveMessage.setStepsPawn1(card.getCardValue());
+        moveMessage.setStepsPawn1(card.getValue());
         moveMessage.setCard(card);
         moveMessage.setMessageType(MessageType.MAKE_MOVE);
 

@@ -1,11 +1,9 @@
 package ADG.Games.Keezen;
 
-import ADG.Games.Keezen.Cards.Card;
-import ADG.Games.Keezen.Player.Player;
+import com.adg.openapi.model.Card;
+import com.adg.openapi.model.Player;
 import com.google.gwt.user.client.rpc.IsSerializable;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,11 +23,11 @@ public class CardsDeckMock implements CardsDeckInterface, IsSerializable {
 
     public void addPlayers(ArrayList<Player> players) {
         for (Player p : players) {
-            playerHands.put(p.getUUID(), new PlayerHand());
+            playerHands.put(p.getId(), new PlayerHand());
         }
     }
 
-    public HashMap<String, Integer> getNrOfCardsForAllPlayers(){
+    public HashMap<String, Integer> getNrOfCardsPerPlayer(){
         HashMap<String, Integer> nrOfCards = new HashMap<>();
         for(Map.Entry<String, PlayerHand> p : playerHands.entrySet()){
             nrOfCards.put(p.getKey(), p.getValue().getHand().size());
@@ -84,9 +82,9 @@ public class CardsDeckMock implements CardsDeckInterface, IsSerializable {
         }
 
         for(Player player: gameState.getPlayers()){
-            if(player.isActive()){
+            if(player.getIsActive()){
                 for(Card card: allCardsFromAceToKing){
-                    setPlayerCard(player.getUUID(), card);
+                    setPlayerCard(player.getId(), card);
                 }
             }
         }
@@ -111,7 +109,11 @@ public class CardsDeckMock implements CardsDeckInterface, IsSerializable {
     private ArrayList<Card> all13Cards(){
         ArrayList<Card> all13Cards = new ArrayList<>();
         for (int cardValue = 1; cardValue <= 13; cardValue++) {
-            all13Cards.add(new Card(0, cardValue));
+            all13Cards.add(
+                new Card()
+                    .suit(0)
+                    .value(cardValue)
+            );
         }
         return all13Cards;
     }

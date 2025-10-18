@@ -1,6 +1,6 @@
 package ADG.Games.Keezen.UnitTests;
 
-import ADG.Games.Keezen.Cards.Card;
+import com.adg.openapi.model.Card;
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
@@ -120,14 +120,14 @@ class CardsDeckTest {
         nrs.put("0",0);
         nrs.put("1",5);
 
-        assertEquals(nrs, cardsDeck.getNrOfCardsForAllPlayers());
+        assertEquals(nrs, cardsDeck.getNrOfCardsPerPlayer());
         assertTrue(cardsDeck.getCardsForPlayer("0").isEmpty());
     }
 
     public static boolean isSortedNumerically(List<Card> cards) {
         for (int i = 0; i < cards.size() - 1; i++) {
-            int currentValue = cards.get(i).getCardValue();
-            int nextValue = cards.get(i + 1).getCardValue();
+            int currentValue = cards.get(i).getValue();
+            int nextValue = cards.get(i + 1).getValue();
             if (currentValue > nextValue) {
                 return false;
             }
@@ -173,7 +173,7 @@ class CardsDeckTest {
         cardsDeck.dealCards();
 
         // THEN
-        int totalCards = cardsDeck.getNrOfCardsForAllPlayers()
+        int totalCards = cardsDeck.getNrOfCardsPerPlayer()
                 .values()
                 .stream()
                 .mapToInt(Integer::intValue)
