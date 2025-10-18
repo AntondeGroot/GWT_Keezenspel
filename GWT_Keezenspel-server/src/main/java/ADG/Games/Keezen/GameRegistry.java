@@ -24,7 +24,7 @@ public class GameRegistry {
    * @return
    */
   public static String createNewGame(String sessionID) {
-    games.put(sessionID, new GameSession());
+    games.put(sessionID, new GameSession(sessionID));
     return sessionID;
   }
 

@@ -1,6 +1,6 @@
 package ADG.Games.Keezen.UnitTests;
 
-import ADG.Games.Keezen.Cards.Card;
+import com.adg.openapi.model.Card;
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
@@ -168,7 +168,7 @@ class MovingAndKillTest {
         Pawn otherPawn1 = placePawnOnBoard(gameState, new PawnId("1", 1), new TileId("0",3));
 
         // WHEN no decision was made how to split the 7 among the two pawns
-        createSplitMessage(moveMessage, pawn1, 3, pawn2,4, new Card(0,7));
+        createSplitMessage(moveMessage, pawn1, 3, pawn2,4, new Card().suit(0).value(7));
         gameState.processOnSplit(moveMessage, moveResponse);
 
         // THEN
@@ -185,7 +185,7 @@ class MovingAndKillTest {
         Pawn otherPawn1 = placePawnOnBoard(gameState, new PawnId("1", 1), new TileId("0",8));
 
         // WHEN no decision was made how to split the 7 among the two pawns
-        createSplitMessage(moveMessage, pawn1, 5, pawn2,2, new Card(0,7));
+        createSplitMessage(moveMessage, pawn1, 5, pawn2,2, new Card().suit(0).value(7));
         gameState.processOnSplit(moveMessage, moveResponse);
 
         // THEN

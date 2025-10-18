@@ -1,7 +1,7 @@
 package ADG.Games.Keezen;
 
-import ADG.Games.Keezen.Cards.Card;
-import ADG.Games.Keezen.Player.Player;
+import com.adg.openapi.model.Player;
+import com.adg.openapi.model.Card;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,7 +9,7 @@ public interface CardsDeckInterface {
 
   void addPlayers(ArrayList<Player> players);
 
-  HashMap<String, Integer> getNrOfCardsForAllPlayers();
+  HashMap<String, Integer> getNrOfCardsPerPlayer();
 
   ArrayList<Card> getCardsForPlayer(String playerUUID);
 

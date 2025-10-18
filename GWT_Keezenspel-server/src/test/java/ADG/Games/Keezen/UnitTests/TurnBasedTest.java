@@ -1,7 +1,7 @@
 package ADG.Games.Keezen.UnitTests;
 
 
-import ADG.Games.Keezen.Cards.Card;
+import com.adg.openapi.model.Card;
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
@@ -83,7 +83,7 @@ public class TurnBasedTest {
         nrCardsPerPlayer.put("0",0);
         nrCardsPerPlayer.put("1",5);
         nrCardsPerPlayer.put("2",5);
-        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
+        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsPerPlayer());
     }
     @Test
     void player1Forfeits_Player2IsNowPlaying() {
@@ -105,7 +105,7 @@ public class TurnBasedTest {
         nrCardsPerPlayer.put("0",4);
         nrCardsPerPlayer.put("1",5);
         nrCardsPerPlayer.put("2",5);
-        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
+        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsPerPlayer());
     }
     @Test
     void player1Forfeits_Player1GetsSkippedInNextTurn() {
@@ -142,7 +142,7 @@ public class TurnBasedTest {
         nrCardsPerPlayer.put("0",4);
         nrCardsPerPlayer.put("1",4);
         nrCardsPerPlayer.put("2",4);
-        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
+        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsPerPlayer());
     }
     @Test
     void allPlayersForfeit2Rounds_AllPlayersHave4Cards() {
@@ -158,7 +158,7 @@ public class TurnBasedTest {
         nrCardsPerPlayer.put("0",4);
         nrCardsPerPlayer.put("1",4);
         nrCardsPerPlayer.put("2",4);
-        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
+        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsPerPlayer());
     }
     @Test
     void allPlayersForfeit3Rounds_AllPlayersHave5Cards() {
@@ -174,7 +174,7 @@ public class TurnBasedTest {
         nrCardsPerPlayer.put("0",5);
         nrCardsPerPlayer.put("1",5);
         nrCardsPerPlayer.put("2",5);
-        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsForAllPlayers());
+        assertEquals(nrCardsPerPlayer, cardsDeck.getNrOfCardsPerPlayer());
     }
     @Test
     void player2Forfeits_WhenPlayer1HasPlayed_Player3WillPlayNext(){
@@ -217,7 +217,7 @@ public class TurnBasedTest {
         Pawn pawn = new Pawn(new PawnId("0",0),new TileId("0",6));
 
         // fake a valid card
-        Card card = new Card(0,5);
+        Card card = new Card().suit(0).value(5);
 
         // replace a card from the players hand with this card
         cardsDeck.giveCardToPlayerForTesting("1", card);
@@ -227,7 +227,7 @@ public class TurnBasedTest {
         moveMessage.setPlayerId("1");
         moveMessage.setPawnId1(pawn.getPawnId());
         moveMessage.setMoveType(MoveType.MOVE);
-        moveMessage.setStepsPawn1(card.getCardValue());
+        moveMessage.setStepsPawn1(card.getValue());
         moveMessage.setCard(card);
         moveMessage.setMessageType(MessageType.MAKE_MOVE);
 
@@ -531,7 +531,7 @@ public class TurnBasedTest {
         placePawnOnBoard(gameState, pawn1);
         placePawnOnBoard(gameState, pawn2);
         // fake a valid card
-        Card card = new Card(0,7);
+        Card card = new Card().suit(0).value(7);
         // replace a card from the players hand with this card
         cardsDeck.giveCardToPlayerForTesting("0", card);
 

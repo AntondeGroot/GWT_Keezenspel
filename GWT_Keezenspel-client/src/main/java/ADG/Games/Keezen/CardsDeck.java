@@ -1,44 +1,55 @@
 package ADG.Games.Keezen;
 
-import ADG.Games.Keezen.Cards.Card;
-import ADG.Games.Keezen.Cards.CardResponse;
+import ADG.Games.Keezen.dto.CardDTO;
+import ADG.Games.Keezen.dto.CardResponseDTO;
+import ADG.Games.Keezen.util.JsInteropUtil;
+import com.google.gwt.core.client.JsArray;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class CardsDeck {
 
-    private List<Card> cards = new ArrayList<>();
-    private ArrayList<Card> playedCards = new ArrayList<>();
-    private HashMap<String, Integer> nrCardsPerPlayer = new HashMap<>();
+  private List<CardDTO> cards = new ArrayList<>();
+  private List<CardDTO> playedCards = new ArrayList<>();
+  private HashMap<String, Integer> nrCardsPerPlayer = new HashMap<>();
 
-    public HashMap<String, Integer> getNrCardsPerPlayer() {
-        return nrCardsPerPlayer;
-    }
+  public HashMap<String, Integer> getNrCardsPerPlayer() {
+    return nrCardsPerPlayer;
+  }
 
-    public void setNrCardsPerPlayer(HashMap<String, Integer> nrCardsPerPlayer) {
-        this.nrCardsPerPlayer = nrCardsPerPlayer;
-    }
+  public void setNrCardsPerPlayer(HashMap<String, Integer> nrCardsPerPlayer) {
+    this.nrCardsPerPlayer = nrCardsPerPlayer;
+  }
 
-    public void setCards(List<Card> cards){
-        this.cards = cards;
-    }
+  public List<CardDTO> getCards() {
+    return cards;
+  }
 
-    public List<Card> getCards(){
-        return cards;
-    }
+  public List<CardDTO> getPlayedCards() {
+    return playedCards;
+  }
 
-    public void setPlayedCards(ArrayList<Card> playedCards){
-        this.playedCards = playedCards;
+  public void setCardsFromJsArray(JsArray<CardDTO> jsCards) {
+    List<CardDTO> cardList = new ArrayList<>();
+    for (int i = 0; i < jsCards.length(); i++) {
+      cardList.add(jsCards.get(i));
     }
+    this.cards = cardList;
+  }
 
-    public ArrayList<Card> getPlayedCards(){
-        return playedCards;
+  public void setPlayedCardsFromJsArray(JsArray<CardDTO> jsPlayedCards) {
+    List<CardDTO> playedList = new ArrayList<>();
+    for (int i = 0; i < jsPlayedCards.length(); i++) {
+      playedList.add(jsPlayedCards.get(i));
     }
+    this.playedCards = playedList;
+  }
 
-    public void processCardResponse(CardResponse cardResponse){
-        setCards(cardResponse.getCards());
-        setNrCardsPerPlayer(cardResponse.getNrOfCardsPerPlayer());
-        setPlayedCards(cardResponse.getPlayedCards());
-    }
+  public void processCardResponse(CardResponseDTO cardResponse) {
+    setCardsFromJsArray(cardResponse.getCards());
+    setPlayedCardsFromJsArray(cardResponse.getPlayedCards());
+    setNrCardsPerPlayer(JsInteropUtil.toHashMap(cardResponse.getNrOfCardsPerPlayer()));
+  }
 }

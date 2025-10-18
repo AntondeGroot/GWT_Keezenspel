@@ -1,6 +1,6 @@
 package ADG.Games.Keezen.UnitTests;
 
-import ADG.Games.Keezen.Cards.Card;
+import com.adg.openapi.model.Card;
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MovingWithCard7Test {
     private MoveMessage moveMessage = new MoveMessage();
     private MoveResponse moveResponse = new MoveResponse();
-    private final Card sevenCard = new Card(0, 7);
+    private final Card sevenCard = new Card().suit(0).value(7);
 
     private GameSession engine;
     private GameState gameState;

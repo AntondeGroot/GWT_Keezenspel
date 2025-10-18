@@ -12,12 +12,18 @@ import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Move.MovingServiceAsync;
 import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.animations.*;
+import ADG.Games.Keezen.dto.CardDTO;
+import ADG.Games.Keezen.dto.CardResponseDTO;
 import ADG.Games.Keezen.moving.Move;
+import ADG.Games.Keezen.services.ApiClient;
+import ADG.Games.Keezen.services.ApiClient.ApiCallback;
 import ADG.Games.Keezen.services.PollingService;
 import ADG.Games.Keezen.util.Cookie;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import java.util.ArrayList;
@@ -28,6 +34,7 @@ import static java.lang.String.valueOf;
 
 public class GameBoardPresenter {
     private CardResponse storedCardResponse;
+  private boolean requestInProgress = false;
     private Board boardModel;
     private final GameBoardView view;
     private final GameStateServiceAsync gameStateService;
@@ -38,6 +45,7 @@ public class GameBoardPresenter {
     private final PawnAndCardSelection pawnAndCardSelection;
     private final PlayerList playerList = new PlayerList();
     private final CardsDeck cardsDeck = new CardsDeck();
+    private final ApiClient apiClient = new ApiClient();
     private final int BOARD_SIZE = 600; // todo: replace with CSS properties
 
     private MoveResponse storedMoveResponse = new MoveResponse();
@@ -204,25 +212,60 @@ public class GameBoardPresenter {
     }
 
     private void pollServerForCards() {
+
+      if (requestInProgress) {
+        GWT.log("Skipped poll — still waiting for previous response.");
+        return;
+      }
+      requestInProgress = true;
         pawnAndCardSelection.setPlayerId(Cookie.getPlayerId());
-        cardsService.getCards(Cookie.getSessionID(), Cookie.getPlayerId(), new AsyncCallback<CardResponse>() {
-            public void onFailure(Throwable caught) {
-                StepsAnimation.resetStepsAnimation();
-            }
+        apiClient.getPlayerCards(Cookie.getSessionID(), Cookie.getPlayerId(), new ApiClient.ApiCallback<CardResponseDTO>() {
+        @Override
+        public void onSuccess(CardResponseDTO result) {
+          GWT.log("Received "  + " cards from api:");
 
-            public void onSuccess(CardResponse result) {
-
-                if (!storedCardResponse.equals(result)) {
-                    GWT.log(result.toString());
-                    storedCardResponse = result;
-                    cardsDeck.processCardResponse(result);
-                    view.drawCards(
-                            cardsDeck,
-                            pawnAndCardSelection);
-                    playerList.refresh();
-                }
+          JsArray<CardDTO> played = result.getPlayedCards();
+          if (played != null) {
+            for (int i = 0; i < played.length(); i++) {
+              CardDTO card = played.get(i);
+              GWT.log("Played card: suit=" + card.getSuit() +
+                  ", value=" + card.getValue() +
+                  ", uuid=" + card.getUuid());
             }
-        });
+          } else {
+            GWT.log("No played cards in response.");
+          }
+          GWT.log("end");
+          cardsDeck.processCardResponse(result);
+          view.drawCards(cardsDeck, pawnAndCardSelection);
+          playerList.refresh();
+          requestInProgress = false;
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          StepsAnimation.resetStepsAnimation();
+          requestInProgress = false;
+        }
+      });
+//        cardsService.getCards(Cookie.getSessionID(), Cookie.getPlayerId(), new AsyncCallback<CardResponse>() {
+//            public void onFailure(Throwable caught) {
+//                StepsAnimation.resetStepsAnimation();
+//            }
+//
+//            public void onSuccess(CardResponse result) {
+//
+//                if (!storedCardResponse.equals(result)) {
+//                    GWT.log(result.toString());
+//                    storedCardResponse = result;
+//                    cardsDeck.processCardResponse(result);
+//                    view.drawCards(
+//                            cardsDeck,
+//                            pawnAndCardSelection);
+//                    playerList.refresh();
+//                }
+//            }
+//        });
     }
 
     public void draw(){

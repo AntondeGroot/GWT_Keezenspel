@@ -27,46 +27,47 @@ public class MovingServiceImpl extends RemoteServiceServlet implements MovingSer
         // Verify that the input is valid.
         // the movetype can be null when the player only selected a pawn
         // return an empty response, since nothing will be done and no error occured.
-        if (message.getMoveType() == null) {
-            return new MoveResponse();
-        }
-
-        GameSession session = GameRegistry.getGame(sessionID);
-        GameState gameState = session.getGameState();
-        if(!Objects.equals(message.getPlayerId(), gameState.getPlayerIdTurn())){
-            return new MoveResponse();
-        }
-
-        MoveResponse response = new MoveResponse();
-        response.setPawnId1(message.getPawnId1());
-        response.setPawnId2(message.getPawnId2());
-
-        // change the gamestate
-        switch (message.getMoveType()) {
-            case MOVE : gameState.processOnMove(message, response);
-                break;
-            case ONBOARD : gameState.processOnBoard(message, response);
-                break;
-            case SWITCH: gameState.processOnSwitch(message,response);
-                break;
-            case FORFEIT: gameState.processOnForfeit(message);
-                break;
-            case SPLIT: gameState.processOnSplit(message, response);
-                break;
-            default:
-                break;
-        }
-
-        if(Objects.equals(response.getResult(), CAN_MAKE_MOVE)
-            && Objects.equals(response.getMessageType(), MAKE_MOVE)){
-            saveTime = Instant.now();
-            moves.add(response);
-            if(moves.size() > 1){
-                moves.removeFirst();
-            }
-        }
-
-        return response;
+//        if (message.getMoveType() == null) {
+//            return new MoveResponse();
+//        }
+//
+//        GameSession session = GameRegistry.getGame(sessionID);
+//        GameState gameState = session.getGameState();
+//        if(!Objects.equals(message.getPlayerId(), gameState.getPlayerIdTurn())){
+//            return new MoveResponse();
+//        }
+//
+//        MoveResponse response = new MoveResponse();
+//        response.setPawnId1(message.getPawnId1());
+//        response.setPawnId2(message.getPawnId2());
+//
+//        // change the gamestate
+//        switch (message.getMoveType()) {
+//            case MOVE : gameState.processOnMove(message, response);
+//                break;
+//            case ONBOARD : gameState.processOnBoard(message, response);
+//                break;
+//            case SWITCH: gameState.processOnSwitch(message,response);
+//                break;
+//            case FORFEIT: gameState.processOnForfeit(message);
+//                break;
+//            case SPLIT: gameState.processOnSplit(message, response);
+//                break;
+//            default:
+//                break;
+//        }
+//
+//        if(Objects.equals(response.getResult(), CAN_MAKE_MOVE)
+//            && Objects.equals(response.getMessageType(), MAKE_MOVE)){
+//            saveTime = Instant.now();
+//            moves.add(response);
+//            if(moves.size() > 1){
+//                moves.removeFirst();
+//            }
+//        }
+//
+//        return response;
+        return new MoveResponse();
     }
 
     @Override

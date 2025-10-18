@@ -1,6 +1,5 @@
 package ADG.Games.Keezen.board;
 
-import ADG.Games.Keezen.Cards.Card;
 import ADG.Games.Keezen.CardsDeck;
 import ADG.Games.Keezen.PawnAndCardSelection;
 import ADG.Games.Keezen.Player.Pawn;
@@ -10,6 +9,7 @@ import ADG.Games.Keezen.Point;
 import ADG.Games.Keezen.TileMapping;
 import ADG.Games.Keezen.animations.AnimationSequence;
 import ADG.Games.Keezen.animations.PawnAnimation;
+import ADG.Games.Keezen.dto.CardDTO;
 import ADG.Games.Keezen.moving.Move;
 import ADG.Games.Keezen.util.Cookie;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -223,14 +223,14 @@ public class GameBoardView extends Composite {
         }
     }
 
-    private void drawPlayerCardsInHand(List<Card> cards, PawnAndCardSelection pawnAndCardSelection, Image spriteImage){
-        Card selectedCard = pawnAndCardSelection.getCard();
+    private void drawPlayerCardsInHand(List<CardDTO> cards, PawnAndCardSelection pawnAndCardSelection, Image spriteImage){
+        CardDTO selectedCard = pawnAndCardSelection.getCard();
         // create divs
         cardsContainer.getElement().removeAllChildren();
         GWT.log("cards have now become stale");
 
         GWT.log("cards = "+cards);
-        for (Card card : cards) {
+        for (CardDTO card : cards) {
             // Define sprite dimensions
             double spriteWidth = 1920 / 13.0; // One card's width in sprite
             double spriteHeight = 1150 / 5.0; // One card's height in sprite
@@ -239,7 +239,7 @@ public class GameBoardView extends Composite {
             double destHeight = factor * spriteHeight; // Maintain aspect ratio
 
             // Calculate correct sprite offset (WITHOUT scaling)
-            double sourceX = spriteWidth * (card.getCardValue()-1);
+            double sourceX = spriteWidth * (card.getValue()-1);
             double sourceY = spriteHeight * card.getSuit();
 
             // Create the card element
@@ -291,13 +291,13 @@ public class GameBoardView extends Composite {
     }
 
     public void drawCards(CardsDeck cardsDeck, PawnAndCardSelection pawnAndCardSelection){
-        List<Card> cards = cardsDeck.getCards();
+        List<CardDTO> cards = cardsDeck.getCards();
         HashMap<String, Integer> nrCardsPerPlayerUUID = cardsDeck.getNrCardsPerPlayer();
-        ArrayList<Card> playedCards = cardsDeck.getPlayedCards();
+        ArrayList<CardDTO> playedCards = (ArrayList<CardDTO>) cardsDeck.getPlayedCards();
 
         // Create an image to represent the card deck
         Image img = new Image("/card-deck.png");
-
+        GWT.log("drawcards method");
         // Add a LoadHandler to ensure the image is fully loaded before drawing
         img.addLoadHandler(new LoadHandler() {
             @Override
@@ -318,7 +318,7 @@ public class GameBoardView extends Composite {
         RootPanel.get().add(img);
     }
 
-    private void drawPlayedCards(ArrayList<Card> playedCards, Image spriteImage) {
+    private void drawPlayedCards(ArrayList<CardDTO> playedCards, Image spriteImage) {
         // Loop through the cards to draw them
         // the cards are drawn rotating with an angle of 45 degrees
         // meaning that after 8 cards you will draw a card over a previous drawn card
@@ -334,13 +334,13 @@ public class GameBoardView extends Composite {
             angleDegrees = angleDegrees + 45;
 
             if(i >= startDrawingFromCardIndex) {
-                Card card = playedCards.get(i);
+                CardDTO card = playedCards.get(i);
                 double angleRadians = Math.toRadians(angleDegrees);
 
                 // Define the source rectangle (from the sprite sheet)
                 double spriteWidth = 1920 / 13.0;
                 double spriteHeight = 1150 / 5.0;
-                double sourceX = spriteWidth * (card.getCardValue() - 1);
+                double sourceX = spriteWidth * (card.getValue() - 1);
                 double sourceY = spriteHeight * card.getSuit();
 
                 // Define the destination rectangle (on the canvas)
