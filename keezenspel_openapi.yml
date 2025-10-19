@@ -29,6 +29,11 @@ paths:
                   $ref: '#/components/schemas/GameInfo'
     post:
       summary: Create a new game
+      description: |
+        To start playing:
+        1. Create a game
+        2. Add players
+        3. Start the game
       operationId: createNewGame
       tags:
         - games
@@ -51,7 +56,7 @@ paths:
 
   /games/{sessionId}/:
     post:
-      summary: Start a specific game
+      summary: Start a game
       operationId: startGame
       tags:
         - games
@@ -65,7 +70,7 @@ paths:
         409:
           description: Game was already started
     delete:
-      summary: Stop a specific game
+      summary: Stop a game
       operationId: stopGame
       tags:
         - games
@@ -110,6 +115,14 @@ paths:
           description: "Player was added successfully"
         400:
           description: "Player could not be added"
+#  /moves/{sessionId}:
+#    get:
+#      summary: get the latest moves you have to animate
+#      description: returns empty array if too much time has passed
+#      tags:
+#        - moves
+#      parameters:
+#        - $ref: '#/components/parameters/sessionId'
   /moves/{sessionId}/{playerId}:
     post:
       summary: make a move for a player
@@ -128,6 +141,35 @@ paths:
       responses:
         200:
           description: Move is allowed
+          content:
+            appplication/json:
+              schema:
+                $ref: '#/components/schemas/MoveResponse'
+        400:
+          description: Move is not allowed
+
+  /moves/{sessionId}/{playerId}/test:
+    post:
+      summary: check if a move for a player is possible
+      operationId: checkMove
+      tags:
+        - moves
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+        - $ref: '#/components/parameters/playerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoveRequest'
+      responses:
+        200:
+          description: Move is allowed
+          content:
+            appplication/json:
+              schema:
+                $ref: '#/components/schemas/TestMoveResponse'
         400:
           description: Move is not allowed
   /cards/{sessionId}:
@@ -357,6 +399,8 @@ components:
           max: 50
         maxPlayers:
           type: integer
+          min: 2
+          max: 8
         playerId:
           type: string
 
@@ -364,19 +408,16 @@ components:
       type: object
       required:
         - playerId
-        - requestType
         - moveType
       properties:
         playerId:
           type: string
         card:
           $ref: '#/components/schemas/Card'
-        pawnId1:
-          $ref: '#/components/schemas/PositionKey'
-        pawnId2:
-          $ref: '#/components/schemas/PositionKey'
-        requestType:
-          $ref: '#/components/schemas/RequestType'
+        pawn1:
+          $ref: '#/components/schemas/Pawn'
+        pawn2:
+          $ref: '#/components/schemas/Pawn'
         moveType:
           $ref: '#/components/schemas/MoveType'
         stepsPawn1:
@@ -404,6 +445,51 @@ components:
             a unique tracking number to distinguish between two identical cards (Ace♠︎),
             this happens when you have more than 4 players.
           type: integer
+    MoveResult:
+      enum:
+        - CAN_MAKE_MOVE
+        - CANNOT_MAKE_MOVE
+        - PLAYER_DOES_NOT_HAVE_CARD
+        - INVALID_SELECTION
+    MoveSet:
+      type: array
+      items:
+        $ref: '#/components/schemas/PositionKey'
+    TestMoveResponse:
+      type: object
+      description:
+        only returns PositionKeys you need to highlight for possible moves
+      properties:
+        tiles:
+          $ref: '#/components/schemas/MoveSet'
+    MoveResponse:
+      type: object
+      description:
+        when you use 7 you could kill 2 opponents at the same time
+      properties:
+        # pawns
+        pawn1:
+          $ref: '#/components/schemas/Pawn'
+        pawn2:
+          $ref: '#/components/schemas/Pawn'
+        pawnKilledByPawn1:
+          $ref: '#/components/schemas/Pawn'
+        pawnKilledByPawn2:
+          $ref: '#/components/schemas/Pawn'
+        # move sets
+        movePawn1:
+          $ref: '#/components/schemas/MoveSet'
+        movePawn2:
+          $ref: '#/components/schemas/MoveSet'
+        movePawnKilledByPawn1:
+          $ref: '#/components/schemas/MoveSet'
+        movePawnKilledByPawn2:
+          $ref: '#/components/schemas/MoveSet'
+        # move type
+        moveType:
+          $ref: '#/components/schemas/MoveType'
+        result:
+          $ref: '#/components/schemas/MoveResult'
 
     CardResponse:
       type: object
