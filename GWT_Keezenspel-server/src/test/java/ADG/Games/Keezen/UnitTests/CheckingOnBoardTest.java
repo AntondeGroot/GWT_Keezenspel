@@ -7,9 +7,9 @@ import ADG.Games.Keezen.GameState;
 import ADG.Games.Keezen.Move.MessageType;
 import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveResponse;
-import ADG.Games.Keezen.Player.Pawn;
-import ADG.Games.Keezen.Player.PawnId;
-import ADG.Games.Keezen.TileId;
+import com.adg.openapi.model.Pawn;
+import com.adg.openapi.model.PawnId;
+import com.adg.openapi.model.PositionKey;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,7 @@ public class CheckingOnBoardTest {
         // GIVEN
         Card card = givePlayerAce(cardsDeck, 0);
         int nrCards = cardsDeck.getCardsForPlayer("0").size();
-        Pawn pawn1 = new Pawn(new PawnId("0",1), new TileId("0", -1));
+        Pawn pawn1 = new Pawn(new PawnId("0",1), new PositionKey("0", -1));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
@@ -64,7 +64,7 @@ public class CheckingOnBoardTest {
     void checkOnBoard_WrongCard_DoesNotShow() {
         // GIVEN
         Card card = givePlayerCard(cardsDeck, 0, 3);
-        Pawn pawn1 = new Pawn(new PawnId("0",1), new TileId("0", -1));
+        Pawn pawn1 = new Pawn(new PawnId("0",1), new PositionKey("0", -1));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);

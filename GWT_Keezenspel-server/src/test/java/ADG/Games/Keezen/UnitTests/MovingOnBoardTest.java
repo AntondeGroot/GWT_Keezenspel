@@ -9,9 +9,9 @@ import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Move.MoveResult;
 import ADG.Games.Keezen.Move.MoveType;
-import ADG.Games.Keezen.Player.Pawn;
-import ADG.Games.Keezen.Player.PawnId;
-import ADG.Games.Keezen.TileId;
+import com.adg.openapi.model.Pawn;
+import com.adg.openapi.model.PawnId;
+import com.adg.openapi.model.PositionKey;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +51,7 @@ class MovingOnBoardTest {
     void putPlayerOnBoard_WhenPossible() {
         // GIVEN
         Card ace = givePlayerAce(cardsDeck, 0);
-        Pawn pawn1 = GameStateUtil.placePawnOnNest(gameState , "0", new TileId("0",-2));
+        Pawn pawn1 = GameStateUtil.placePawnOnNest(gameState , "0", new PositionKey("0",-2));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
@@ -59,17 +59,17 @@ class MovingOnBoardTest {
 
         // THEN
         // response message is correct
-        assertEquals(new TileId("0",0), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tileNr
+        assertEquals(new PositionKey("0",0), moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tileNr
         assertEquals(pawn1.getPawnId(), moveResponse.getPawnId1());                          // moves the correct pawn
         // GameState is correct
-        assertEquals(new TileId("0",0) ,gameState.getPawn(pawn1).getCurrentTileId());
+        assertEquals(new PositionKey("0",0) ,gameState.getPawn(pawn1).getCurrentTileId());
     }
 
     @Test
     void putPlayerOnBoard_ThenNextPlayerPlays() {
         // GIVEN
         Card ace = givePlayerAce(cardsDeck, 0);
-        Pawn pawn1 = GameStateUtil.placePawnOnNest(gameState , "0", new TileId("0",-2));
+        Pawn pawn1 = GameStateUtil.placePawnOnNest(gameState , "0", new PositionKey("0",-2));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
@@ -90,7 +90,7 @@ class MovingOnBoardTest {
         }
 
         Card ace = givePlayerAce(cardsDeck, 0);
-        Pawn pawn1 = GameStateUtil.placePawnOnNest(gameState , "0", new TileId("0",-2));
+        Pawn pawn1 = GameStateUtil.placePawnOnNest(gameState , "0", new PositionKey("0",-2));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
@@ -104,8 +104,8 @@ class MovingOnBoardTest {
     void putPlayerNotOnBoard_WhenSamePlayerIsAlreadyThere() {
         // GIVEN
         Card ace = givePlayerAce(cardsDeck, 0);
-        Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("0",0), new TileId("0",-1));
-        Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("0",1), new TileId("0",0));
+        Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("0",0), new PositionKey("0",-1));
+        Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("0",1), new PositionKey("0",0));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
@@ -116,14 +116,14 @@ class MovingOnBoardTest {
         assertNull(moveResponse.getMovePawn1());
         assertNull(moveResponse.getPawnId1());
         // THEN GameState is correct
-        assertEquals(new TileId("0",-1) , gameState.getPawn(pawn1).getCurrentTileId());
+        assertEquals(new PositionKey("0",-1) , gameState.getPawn(pawn1).getCurrentTileId());
     }
 
     @Test
     void putPlayerNotOnBoard_WhenNotOnNestTiles(){
         // GIVEN
         Card ace = givePlayerAce(cardsDeck, 0);
-        Pawn pawn1 = placePawnOnNest(gameState , "0", new TileId("0",3));
+        Pawn pawn1 = placePawnOnNest(gameState , "0", new PositionKey("0",3));
 
         // WHEN
         createOnBoardMessage("0", pawn1, ace);
@@ -141,7 +141,7 @@ class MovingOnBoardTest {
     void putPlayerNotOnBoard_WhenOnFinishTiles(){
         // GIVEN
         Card king = givePlayerKing(cardsDeck, 0);
-        Pawn pawn1 = placePawnOnNest(gameState , "0", new TileId("0",17));
+        Pawn pawn1 = placePawnOnNest(gameState , "0", new PositionKey("0",17));
 
         // WHEN
         createOnBoardMessage("0", pawn1, king);

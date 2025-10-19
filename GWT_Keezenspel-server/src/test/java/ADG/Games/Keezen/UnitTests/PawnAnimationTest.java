@@ -6,10 +6,10 @@ import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
 import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveResponse;
-import ADG.Games.Keezen.Player.Pawn;
-import ADG.Games.Keezen.Player.PawnId;
-import ADG.Games.Keezen.TileId;
 import ADG.Log;
+import com.adg.openapi.model.PositionKey;
+import com.adg.openapi.model.Pawn;
+import com.adg.openapi.model.PawnId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,17 +52,17 @@ public class PawnAnimationTest {
     void pawnMovesAroundCorner7() {
         // GIVEN
         Card card = givePlayerCard(cardsDeck , 0, 4);
-        Pawn pawn1 = GameStateUtil.placePawnOnNest(gameState , "0", new TileId("0",5));
+        Pawn pawn1 = GameStateUtil.placePawnOnNest(gameState , "0", new PositionKey("0",5));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
         gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("0",5));
-        expectedMovement.add(new TileId("0",7));
-        expectedMovement.add(new TileId("0",9));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("0",5));
+        expectedMovement.add(new PositionKey("0",7));
+        expectedMovement.add(new PositionKey("0",9));
 
         // response message is correct
         assertEquals(expectedMovement, moveResponse.getMovePawn1());
@@ -72,17 +72,17 @@ public class PawnAnimationTest {
     void pawnMovesAroundCorner1() {
         // GIVEN
         Card card = givePlayerCard(cardsDeck , 0, 3);
-        Pawn pawn1 = placePawnOnNest(gameState , "0", new TileId("0",0));
+        Pawn pawn1 = placePawnOnNest(gameState , "0", new PositionKey("0",0));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
         gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("0",0));
-        expectedMovement.add(new TileId("0",1));
-        expectedMovement.add(new TileId("0",3));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("0",0));
+        expectedMovement.add(new PositionKey("0",1));
+        expectedMovement.add(new PositionKey("0",3));
 
         // response message is correct
         assertEquals(expectedMovement, moveResponse.getMovePawn1());
@@ -92,19 +92,19 @@ public class PawnAnimationTest {
     void pawnMovesAroundCorner13And0() {
         // GIVEN
         Card card = givePlayerCard(cardsDeck , 2, 8);
-        Pawn pawn1 = placePawnOnNest(gameState , "2", new TileId("0",12));
+        Pawn pawn1 = placePawnOnNest(gameState , "2", new PositionKey("0",12));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
         gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("0",12));
-        expectedMovement.add(new TileId("0",13));
-        expectedMovement.add(new TileId("0",15));
-        expectedMovement.add(new TileId("1",1));
-        expectedMovement.add(new TileId("1",4));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("0",12));
+        expectedMovement.add(new PositionKey("0",13));
+        expectedMovement.add(new PositionKey("0",15));
+        expectedMovement.add(new PositionKey("1",1));
+        expectedMovement.add(new PositionKey("1",4));
 
         // response message is correct
         assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
@@ -114,16 +114,16 @@ public class PawnAnimationTest {
     void pawnMoveFrom9To12() {
         // GIVEN
         Card card = givePlayerCard(cardsDeck , 0, 3);
-        Pawn pawn1 = placePawnOnNest(gameState , "0", new TileId("0",9));
+        Pawn pawn1 = placePawnOnNest(gameState , "0", new PositionKey("0",9));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
         gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("0",9));
-        expectedMovement.add(new TileId("0",12));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("0",9));
+        expectedMovement.add(new PositionKey("0",12));
 
         // response message is correct
         assertEquals(expectedMovement, moveResponse.getMovePawn1());
@@ -132,18 +132,18 @@ public class PawnAnimationTest {
     void pawnMoveFrom11To1() {
         // GIVEN
         Card card = givePlayerCard(cardsDeck , 2, 6);
-        Pawn pawn1 = placePawnOnNest(gameState , "2", new TileId("0",11));
+        Pawn pawn1 = placePawnOnNest(gameState , "2", new PositionKey("0",11));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
         gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("0",11));
-        expectedMovement.add(new TileId("0",13));
-        expectedMovement.add(new TileId("0",15));
-        expectedMovement.add(new TileId("1",1));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("0",11));
+        expectedMovement.add(new PositionKey("0",13));
+        expectedMovement.add(new PositionKey("0",15));
+        expectedMovement.add(new PositionKey("1",1));
 
 
         // response message is correct
@@ -153,21 +153,21 @@ public class PawnAnimationTest {
     void pawnMoveHitsAllCorners() {
         // GIVEN
         Card card = givePlayerCard(cardsDeck , 2, 19);
-        Pawn pawn1 = placePawnOnNest(gameState , "2", new TileId("0",0));
+        Pawn pawn1 = placePawnOnNest(gameState , "2", new PositionKey("0",0));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
         gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("0",0));
-        expectedMovement.add(new TileId("0",1));
-        expectedMovement.add(new TileId("0",7));
-        expectedMovement.add(new TileId("0",13));
-        expectedMovement.add(new TileId("0",15));
-        expectedMovement.add(new TileId("1",1));
-        expectedMovement.add(new TileId("1",3));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("0",0));
+        expectedMovement.add(new PositionKey("0",1));
+        expectedMovement.add(new PositionKey("0",7));
+        expectedMovement.add(new PositionKey("0",13));
+        expectedMovement.add(new PositionKey("0",15));
+        expectedMovement.add(new PositionKey("1",1));
+        expectedMovement.add(new PositionKey("1",3));
 
         // response message is correct
         assertEquals(expectedMovement, moveResponse.getMovePawn1());
@@ -176,17 +176,17 @@ public class PawnAnimationTest {
     void pawnMovesIntoFinishAndOvershoots() {
         // GIVEN
         Card card = givePlayerCard(cardsDeck , 1, 5);
-        Pawn pawn1 = placePawnOnNest(gameState , "1", new TileId("0",15));
+        Pawn pawn1 = placePawnOnNest(gameState , "1", new PositionKey("0",15));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
         gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("0",15));
-        expectedMovement.add(new TileId("1",19));
-        expectedMovement.add(new TileId("1",18));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("0",15));
+        expectedMovement.add(new PositionKey("1",19));
+        expectedMovement.add(new PositionKey("1",18));
 
         // response message is correct
         assertEquals(expectedMovement, moveResponse.getMovePawn1());
@@ -195,19 +195,19 @@ public class PawnAnimationTest {
     void pawnMovesBackwardsOverCorners15_13_7_1() {
         // GIVEN
         Card card = givePlayerCard(cardsDeck , 1, -12);
-        Pawn pawn1 = placePawnOnNest(gameState , "1", new TileId("1",16));
+        Pawn pawn1 = placePawnOnNest(gameState , "1", new PositionKey("1",16));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
         gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("1",16));
-        expectedMovement.add(new TileId("0",15));
-        expectedMovement.add(new TileId("0",13));
-        expectedMovement.add(new TileId("0",7));
-        expectedMovement.add(new TileId("0",4));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("1",16));
+        expectedMovement.add(new PositionKey("0",15));
+        expectedMovement.add(new PositionKey("0",13));
+        expectedMovement.add(new PositionKey("0",7));
+        expectedMovement.add(new PositionKey("0",4));
 
         // response message is correct
         assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
@@ -217,18 +217,18 @@ public class PawnAnimationTest {
     void pawnMovesBackwardsOverCorners13_7() {
         // GIVEN
         Card card = givePlayerCard(cardsDeck , 0, -8);
-        Pawn pawn1 = placePawnOnNest(gameState , "0", new TileId("0",14));
+        Pawn pawn1 = placePawnOnNest(gameState , "0", new PositionKey("0",14));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
         gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("0",14));
-        expectedMovement.add(new TileId("0",13));
-        expectedMovement.add(new TileId("0",7));
-        expectedMovement.add(new TileId("0",6));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("0",14));
+        expectedMovement.add(new PositionKey("0",13));
+        expectedMovement.add(new PositionKey("0",7));
+        expectedMovement.add(new PositionKey("0",6));
 
 
         // response message is correct
@@ -238,17 +238,17 @@ public class PawnAnimationTest {
     void pawnMovesBackwardsOverCorners7() {
         // GIVEN
         Card card = givePlayerCard(cardsDeck , 0, -4);
-        Pawn pawn1 = placePawnOnNest(gameState , "0", new TileId("0",8));
+        Pawn pawn1 = placePawnOnNest(gameState , "0", new PositionKey("0",8));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
         gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("0",8));
-        expectedMovement.add(new TileId("0",7));
-        expectedMovement.add(new TileId("0",4));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("0",8));
+        expectedMovement.add(new PositionKey("0",7));
+        expectedMovement.add(new PositionKey("0",4));
 
         // response message is correct
         assertEquals(expectedMovement, moveResponse.getMovePawn1());
@@ -261,20 +261,20 @@ public class PawnAnimationTest {
 
         // GIVEN
         Card card = givePlayerCard(cardsDeck , 1, 8);
-        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("2",12));
-        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new TileId("0",0));
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new PositionKey("2",12));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new PositionKey("0",0));
 
         // WHEN
         createMoveMessage(moveMessage, pawn1, card);
         gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("2",12));
-        expectedMovement.add(new TileId("2",13));
-        expectedMovement.add(new TileId("2",15));
-        expectedMovement.add(new TileId("0",1));
-        expectedMovement.add(new TileId("0",4));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("2",12));
+        expectedMovement.add(new PositionKey("2",13));
+        expectedMovement.add(new PositionKey("2",15));
+        expectedMovement.add(new PositionKey("0",1));
+        expectedMovement.add(new PositionKey("0",4));
 
         // response message is correct
         assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
@@ -289,8 +289,8 @@ public class PawnAnimationTest {
 
         // GIVEN
         Card card = givePlayerJack(cardsDeck, 0);
-        TileId tile1 = new TileId("2",12);
-        TileId tile2 = new TileId("0",5);
+        PositionKey tile1 = new PositionKey("2",12);
+        PositionKey tile2 = new PositionKey("0",5);
         Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("0",1), tile1);
         Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), tile2);
 
@@ -299,11 +299,11 @@ public class PawnAnimationTest {
         gameState.processOnSwitch(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovementPawn1 = new LinkedList<>();
+        LinkedList<PositionKey> expectedMovementPawn1 = new LinkedList<>();
         expectedMovementPawn1.add(tile1);
         expectedMovementPawn1.add(tile2);
 
-        LinkedList<TileId> expectedMovementPawn2 = new LinkedList<>();
+        LinkedList<PositionKey> expectedMovementPawn2 = new LinkedList<>();
         expectedMovementPawn2.add(tile2);
         expectedMovementPawn2.add(tile1);
 
@@ -330,20 +330,20 @@ public class PawnAnimationTest {
 
         // GIVEN
         Card card = givePlayerCard(cardsDeck , 1, 8);
-        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",16));
-        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new TileId("0",12));
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new PositionKey("1",16));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new PositionKey("0",12));
 
         // WHEN
         createMoveMessage(moveMessage, pawn2, card);
         gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("0",12));
-        expectedMovement.add(new TileId("0",13));
-        expectedMovement.add(new TileId("0",15));
-        expectedMovement.add(new TileId("0",13));
-        expectedMovement.add(new TileId("0",10));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("0",12));
+        expectedMovement.add(new PositionKey("0",13));
+        expectedMovement.add(new PositionKey("0",15));
+        expectedMovement.add(new PositionKey("0",13));
+        expectedMovement.add(new PositionKey("0",10));
 
         // response message is correct
         assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
@@ -359,9 +359,9 @@ public class PawnAnimationTest {
 
         // GIVEN
         Card card = givePlayerCard(cardsDeck , 1, 3);
-        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",17));
-        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new TileId("1",19));
-        Pawn pawn3 = placePawnOnBoard(gameState , new PawnId("1",3), new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new PositionKey("1",17));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new PositionKey("1",19));
+        Pawn pawn3 = placePawnOnBoard(gameState , new PawnId("1",3), new PositionKey("1",16));
 
 
         // WHEN
@@ -369,11 +369,11 @@ public class PawnAnimationTest {
         gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
 
         // response message is correct
         assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
@@ -388,9 +388,9 @@ public class PawnAnimationTest {
 
         // GIVEN
         Card card = givePlayerCard(cardsDeck , 1, 9);
-        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",17));
-        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new TileId("1",19));
-        Pawn pawn3 = placePawnOnBoard(gameState , new PawnId("1",3), new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new PositionKey("1",17));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new PositionKey("1",19));
+        Pawn pawn3 = placePawnOnBoard(gameState , new PawnId("1",3), new PositionKey("1",16));
 
 
         // WHEN
@@ -398,17 +398,17 @@ public class PawnAnimationTest {
         gameState.processOnMove(moveMessage, moveResponse);
 
         // THEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
 
         // response message is correct
         assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
@@ -422,25 +422,25 @@ public class PawnAnimationTest {
         createGame_With_NPlayers(gameState , 3);
 
         // GIVEN
-        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",17));
-        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new TileId("1",19));
-        Pawn pawn3 = placePawnOnBoard(gameState , new PawnId("1",3), new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new PositionKey("1",17));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new PositionKey("1",19));
+        Pawn pawn3 = placePawnOnBoard(gameState , new PawnId("1",3), new PositionKey("1",16));
 
 
         // WHEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
 
-        ArrayList<TileId> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),9);
+        ArrayList<PositionKey> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),9);
         // THEN
         Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);
@@ -454,18 +454,18 @@ public class PawnAnimationTest {
         createGame_With_NPlayers(gameState , 3);
 
         // GIVEN
-        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",17));
-        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",3), new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new PositionKey("1",17));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",3), new PositionKey("1",16));
 
 
         // WHEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",19));
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",19));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",19));
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",19));
 
-        ArrayList<TileId> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
+        ArrayList<PositionKey> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
         // THEN
         Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);
@@ -479,18 +479,18 @@ public class PawnAnimationTest {
         createGame_With_NPlayers(gameState , 3);
 
         // GIVEN
-        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",17));
-        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",3), new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new PositionKey("1",17));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",3), new PositionKey("1",16));
 
 
         // WHEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",19));
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",19));
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
 
-        ArrayList<TileId> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
+        ArrayList<PositionKey> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
         // THEN
         Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);
@@ -504,17 +504,17 @@ public class PawnAnimationTest {
         createGame_With_NPlayers(gameState , 3);
 
         // GIVEN
-        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",17));
-        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",3), new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new PositionKey("1",17));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",3), new PositionKey("1",16));
 
 
         // WHEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",19));
-        expectedMovement.add(new TileId("1",17));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",19));
+        expectedMovement.add(new PositionKey("1",17));
 
-        ArrayList<TileId> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
+        ArrayList<PositionKey> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
         // THEN
         Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);
@@ -528,20 +528,20 @@ public class PawnAnimationTest {
         int nrSteps = -4;
 
         // GIVEN
-        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new TileId("1",17));
-        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new TileId("1",19));
-        Pawn pawn3 = placePawnOnBoard(gameState , new PawnId("1",3), new TileId("1",16));
+        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId("1",1), new PositionKey("1",17));
+        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId("1",2), new PositionKey("1",19));
+        Pawn pawn3 = placePawnOnBoard(gameState , new PawnId("1",3), new PositionKey("1",16));
 
 
         // WHEN
-        LinkedList<TileId> expectedMovement = new LinkedList<>();
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
-        expectedMovement.add(new TileId("1",17));
-        expectedMovement.add(new TileId("1",18));
-        expectedMovement.add(new TileId("1",17));
+        LinkedList<PositionKey> expectedMovement = new LinkedList<>();
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
+        expectedMovement.add(new PositionKey("1",17));
+        expectedMovement.add(new PositionKey("1",18));
+        expectedMovement.add(new PositionKey("1",17));
 
-        ArrayList<TileId> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
+        ArrayList<PositionKey> actualMovement = gameState.pingpongMove(pawn1.getPawnId(), pawn1.getCurrentTileId(),nrSteps);
         // THEN
         Log.info(actualMovement.toString());
         assertEquals(expectedMovement, actualMovement);

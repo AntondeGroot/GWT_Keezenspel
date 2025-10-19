@@ -459,7 +459,7 @@ public class GameState {
 //        int next;
 //        String playerIdOfTile = currentTileId.getPlayerId();
 //        Log.info("moveMessage = "+moveMessage);
-//        LinkedList<TileId> moves = new LinkedList<>();
+//        LinkedList<PositionKey> moves = new LinkedList<>();
 //        response.setMoveType(MOVE);
 //        Log.info("GameState: OnMove: received msg: " + moveMessage);
 //        TileId startTileId;
@@ -632,7 +632,7 @@ public class GameState {
 //            }
 //            // moving between pawns on the finish tile
 //            if(isPawnLooselyClosedIn(pawnId1, currentTileId)){
-//                ArrayList<TileId> pingpongmoves = pingpongMove(pawnId1, currentTileId, nrSteps);
+//                ArrayList<PositionKey> pingpongmoves = pingpongMove(pawnId1, currentTileId, nrSteps);
 //                moves.clear();
 //                moves.addAll(pingpongmoves);// todo is this necessary?
 //                response.setMovePawn1(moves);
@@ -720,9 +720,9 @@ public class GameState {
         return tileNrToCheck;
     }
 
-    public ArrayList<TileId> pingpongMove(PawnId pawnId, TileId tileId , int nrSteps){
+    public ArrayList<PositionKey> pingpongMove(PawnId pawnId, PositionKey tileId , int nrSteps){
         // it is already guaranteed that a pawn is loosely closed in on the finish tiles
-        ArrayList<TileId> moves = new ArrayList<>();
+        ArrayList<PositionKey> moves = new ArrayList<>();
         int direction = 1;
         int tileNrToCheck = tileId.getTileNr();
         moves.add(tileId);
@@ -734,12 +734,12 @@ public class GameState {
         for (int i = 0; i < nrSteps; i++) {
             tileNrToCheck = tileNrToCheck + direction;
             if(!canMoveToTile(pawnId, new PositionKey(pawnId.getPlayerId(), tileNrToCheck))) {
-                moves.add(new TileId(pawnId.getPlayerId(), tileNrToCheck-direction));
+                moves.add(new PositionKey(pawnId.getPlayerId(), tileNrToCheck-direction));
                 direction = - direction;
                 tileNrToCheck = tileNrToCheck + 2*direction;
             }
         }
-        moves.add(new TileId(pawnId.getPlayerId(), tileNrToCheck));
+        moves.add(new PositionKey(pawnId.getPlayerId(), tileNrToCheck));
 
         // an extra check to see if the first two moves are identical. this can happen when you do -4 steps and are
         // closed in from behind or try to move forward but are blocked that way.
@@ -751,7 +751,7 @@ public class GameState {
         return moves;
     }
 
-    public TileId moveAndCheckEveryTile(PawnId pawnId, TileId tileId, int nrSteps){
+    public PositionKey moveAndCheckEveryTile(PawnId pawnId, TileId tileId, int nrSteps){
         int direction = 1;
         int tileNrToCheck = tileId.getTileNr();
 
@@ -771,10 +771,10 @@ public class GameState {
         }
 
         if(tileNrToCheck <= 15){// when back on the last section, change the playerId of the section
-            return new TileId(previousPlayerId(pawnId.getPlayerId()), tileNrToCheck);
+            return new PositionKey(previousPlayerId(pawnId.getPlayerId()), tileNrToCheck);
         }
 
-        return new TileId(pawnId.getPlayerId(), tileNrToCheck);
+        return new PositionKey(pawnId.getPlayerId(), tileNrToCheck);
 
     }
 
@@ -846,8 +846,8 @@ public class GameState {
 //            return;
 //        }
 //
-//        LinkedList<TileId> move1 = new LinkedList<>();
-//        LinkedList<TileId> move2 = new LinkedList<>();
+//        LinkedList<PositionKey> move1 = new LinkedList<>();
+//        LinkedList<PositionKey> move2 = new LinkedList<>();
 //
 //        move1.add(pawn1.getCurrentTileId());
 //        move1.add(pawn2.getCurrentTileId());
@@ -862,8 +862,8 @@ public class GameState {
 //        moveResponse.setResult(CAN_MAKE_MOVE);
 //        moveResponse.setMessageType(moveMessage.getMessageType());
 //
-//        TileId tileId1 = new TileId(pawn1.getCurrentTileId());
-//        TileId tileId2 = new TileId(pawn2.getCurrentTileId());
+//        TileId tileId1 = new PositionKey(pawn1.getCurrentTileId());
+//        TileId tileId2 = new PositionKey(pawn2.getCurrentTileId());
 //        // switch in gamestate
 //        // only use the card when not testing
 //        if(moveMessage.getMessageType() == MAKE_MOVE){
@@ -909,7 +909,7 @@ public class GameState {
 //
 //        TileId currentTileId = getPawn(pawnId1).getCurrentTileId();
 //
-//        TileId targetTileId = new TileId(playerId,0);
+//        TileId targetTileId = new PositionKey(playerId,0);
 //        response.setMoveType(ONBOARD);
 //
 //        // when occupied by own pawn
@@ -926,7 +926,7 @@ public class GameState {
 //            return;
 //        }
 //
-//        LinkedList<TileId> move = new LinkedList<>();
+//        LinkedList<PositionKey> move = new LinkedList<>();
 //        move.add(currentTileId);
 //        move.add(targetTileId);
 //
@@ -960,7 +960,7 @@ public class GameState {
 //            if(!Objects.equals(pawn.getPlayerId(), pawnId.getPlayerId())){
 //                response.setPawnId1(pawnId);
 //                response.setPawnId2(null);
-//                LinkedList<TileId> move2 = new LinkedList<>();
+//                LinkedList<PositionKey> move2 = new LinkedList<>();
 //                move2.add(targetTileId);
 //                move2.add(pawn.getNestTileId());
 //                response.setPawnIdKilled1(pawn.getPawnId());

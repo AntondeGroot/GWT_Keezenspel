@@ -2,8 +2,8 @@ package ADG.Games.Keezen.UnitTests;
 
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
-import ADG.Games.Keezen.Player.Pawn;
-import ADG.Games.Keezen.Player.Player;
+import com.adg.openapi.model.Pawn;
+import com.adg.openapi.model.Player;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ public class GameStateTest {
 
     @BeforeEach
     void setUp() {
-        GameSession engine = new GameSession();
+        GameSession engine = new GameSession("GameStateTest");
         gameState = engine.getGameState();
 
         gameState.stop();

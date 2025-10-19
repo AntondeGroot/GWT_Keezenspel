@@ -9,6 +9,7 @@ import ADG.Games.Keezen.Move.MoveType;
 import ADG.Games.Keezen.TileId;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PawnId;
+import com.adg.openapi.model.Player;
 import com.adg.openapi.model.PositionKey;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,10 +29,11 @@ public class GameStateUtil {
         return pawn1;
     }
 
-    public static Pawn placePawnOnBoard(GameState gameState, PawnId pawnId, PositionKey currentTileId){
+    public static Pawn placePawnOnBoard(GameState gameState, PawnId pawnId, PositionKey currentTile){
         // for creating multiple pawns for the same player
-        Pawn pawn1 = new Pawn(pawnId, new TileId(pawnId.getPlayerId(), -pawnId.getPawnNr()-1));
-        pawn1.setCurrentTileId(currentTileId);
+        String playerId = pawnId.getPlayerId();
+        PositionKey nestTile = new PositionKey(playerId, -pawnId.getPawnNr()-1);
+        Pawn pawn1 = new Pawn(playerId, pawnId, currentTile, nestTile);
         gameState.movePawn(pawn1);
         return pawn1;
     }
@@ -155,10 +157,10 @@ public class GameStateUtil {
     }
 
     public static void place4PawnsOnFinish(GameState gameState, String playerId){
-        placePawnOnBoard(gameState, new PawnId(playerId,0), new TileId(playerId,16));
-        placePawnOnBoard(gameState, new PawnId(playerId,1), new TileId(playerId,17));
-        placePawnOnBoard(gameState, new PawnId(playerId,2), new TileId(playerId,18));
-        placePawnOnBoard(gameState, new PawnId(playerId,3), new TileId(playerId,19));
+        placePawnOnBoard(gameState, new PawnId(playerId,0), new PositionKey(playerId,16));
+        placePawnOnBoard(gameState, new PawnId(playerId,1), new PositionKey(playerId,17));
+        placePawnOnBoard(gameState, new PawnId(playerId,2), new PositionKey(playerId,18));
+        placePawnOnBoard(gameState, new PawnId(playerId,3), new PositionKey(playerId,19));
     }
 
     public static void createGame_With_NPlayers(GameState gameState, int nrPlayers){
