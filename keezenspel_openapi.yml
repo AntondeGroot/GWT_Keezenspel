@@ -262,8 +262,7 @@ components:
           enum:
             - waiting
             - inProgress
-
-    PositionKey:
+    PawnId:
       type: object
       required:
         - playerId
@@ -272,6 +271,17 @@ components:
         playerId:
           type: string
         pawnNr:
+          type: integer
+
+    PositionKey:
+      type: object
+      required:
+        - playerId
+        - tileNr
+      properties:
+        playerId:
+          type: string
+        tileNr:
           type: integer
 
     Pawn:
@@ -285,7 +295,7 @@ components:
         playerId:
           type: string
         pawnId:
-          $ref: '#/components/schemas/PositionKey'
+          $ref: '#/components/schemas/PawnId'
         currentTileId:
           $ref: '#/components/schemas/PositionKey'
         nestTileId:

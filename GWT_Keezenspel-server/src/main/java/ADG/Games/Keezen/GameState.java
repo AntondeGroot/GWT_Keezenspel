@@ -2,22 +2,17 @@ package ADG.Games.Keezen;
 
 import ADG.util.PlayerStatus;
 import com.adg.openapi.model.Card;
+import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.Player;
 import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveResponse;
-import ADG.Games.Keezen.Move.MoveType;
-import ADG.Games.Keezen.Player.Pawn;
-import ADG.Games.Keezen.Player.PawnId;
 import ADG.Log;
+import com.adg.openapi.model.PositionKey;
+import com.adg.openapi.model.PawnId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ADG.Games.Keezen.Move.MessageType.*;
-import static ADG.Games.Keezen.Move.MoveResult.*;
-import static ADG.Games.Keezen.Move.MoveType.*;
-import static ADG.Games.Keezen.logic.BoardLogic.isPawnOnFinish;
-import static ADG.Games.Keezen.logic.BoardLogic.isPawnOnNest;
-import static ADG.util.CardValueCheck.isJack;
+import static ADG.util.BoardLogic.isPawnOnFinish;
 import static ADG.util.PlayerStatus.hasFinished;
 import static ADG.util.PlayerStatus.setActive;
 import static ADG.util.PlayerStatus.setInactive;
@@ -75,10 +70,14 @@ public class GameState {
                 activePlayers.add(player.getId());
                 playerColors.put(player.getId(), playerInt);
                 for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
+                    PositionKey currentPosition = new PositionKey(player.getId(),-1 - pawnNr);
+                    PositionKey nestPosition = currentPosition;
                     pawns.add(new Pawn(
+                          player.getId(),
                             new PawnId(player.getId(), pawnNr),
-                            new TileId(player.getId(),-1 - pawnNr),
-                            playerInt));
+                            currentPosition,
+                            nestPosition
+                    ));
                 }
                 playerInt++;
             }
@@ -208,7 +207,7 @@ public class GameState {
     private boolean isPawnClosedInFromBehind(PawnId pawnId, TileId tileId){
         int tileNr = tileId.getTileNr();
         while (tileNr > 15){
-            if(!canMoveToTile(pawnId, new TileId(pawnId.getPlayerId(), tileNr-1))){
+            if(!canMoveToTile(pawnId, new PositionKey(pawnId.getPlayerId(), tileNr-1))){
                 return true;
             }
             tileNr--;
@@ -229,7 +228,7 @@ public class GameState {
         }
 
         for (int i = tileId.getTileNr(); i > 16; i--) {
-            if(!canMoveToTile(pawnId, new TileId(playerId, i-1))){
+            if(!canMoveToTile(pawnId, new PositionKey(playerId, i-1))){
                 return true;
             }
         }
@@ -240,19 +239,19 @@ public class GameState {
     private boolean isPawnTightlyClosedIn(PawnId pawnId, TileId tileId){
 
         if(tileId.getTileNr() == 19
-                && !canMoveToTile(pawnId,new TileId(pawnId.getPlayerId(), 18))){
+                && !canMoveToTile(pawnId,new PositionKey(pawnId.getPlayerId(), 18))){
             return true;
         }
 
         if(tileId.getTileNr() == 18
-                && !canMoveToTile(pawnId,new TileId(pawnId.getPlayerId(), 19))
-                && !canMoveToTile(pawnId,new TileId(pawnId.getPlayerId(), 17))){
+                && !canMoveToTile(pawnId,new PositionKey(pawnId.getPlayerId(), 19))
+                && !canMoveToTile(pawnId,new PositionKey(pawnId.getPlayerId(), 17))){
             return true;
         }
 
         if(tileId.getTileNr() == 17
-                && !canMoveToTile(pawnId, new TileId(pawnId.getPlayerId(), 18))
-                && !canMoveToTile(pawnId,new TileId(pawnId.getPlayerId(), 16))){
+                && !canMoveToTile(pawnId, new PositionKey(pawnId.getPlayerId(), 18))
+                && !canMoveToTile(pawnId,new PositionKey(pawnId.getPlayerId(), 16))){
             return true;
         }
 
@@ -267,7 +266,7 @@ public class GameState {
      * @Return False if it ends on blockaded starting tile
      *
      */
-    private boolean canMoveToTile(PawnId selectedPawnId, TileId nextTileId){
+    private boolean canMoveToTile(PawnId selectedPawnId, PositionKey nextTileId){
         if(nextTileId.getTileNr() > 19){
             return false;
         }
@@ -288,7 +287,7 @@ public class GameState {
         return true;
     }
 
-    private boolean cannotMoveToTileBecauseSamePlayer(PawnId selectedPawnId, TileId nextTileId){
+    private boolean cannotMoveToTileBecauseSamePlayer(PawnId selectedPawnId, PositionKey nextTileId){
         Pawn pawn = getPawn(nextTileId);
         if(pawn != null) {
             if (Objects.equals(pawn.getPlayerId(), selectedPawnId.getPlayerId()) && !pawn.getPawnId().equals(selectedPawnId)) {
@@ -298,7 +297,7 @@ public class GameState {
         return false;
     }
 
-    public TileId getPawnTileId(PawnId pawnId){
+    public PositionKey getPawnTileId(PawnId pawnId){
         for(Pawn pawn : pawns){
             if(pawn.getPawnId().equals(pawnId)){
                 return pawn.getCurrentTileId();
@@ -499,32 +498,32 @@ public class GameState {
 //            Log.info("GameState: OnMove: normal route between 0,15 but could move to next section");
 //            // check
 //
-//            if(currentTileId.getTileNr() < 1){moves.add(new TileId(currentTileId.getPlayerId(), 1));}
-//            if(currentTileId.getTileNr() < 7){moves.add(new TileId(currentTileId.getPlayerId(), 7));}
-//            if(currentTileId.getTileNr() < 13){moves.add(new TileId(currentTileId.getPlayerId(), 13));}
-//            if(currentTileId.getTileNr() < 15){moves.add(new TileId(currentTileId.getPlayerId(), 15));}
+//            if(currentTileId.getTileNr() < 1){moves.add(new PositionKey(currentTileId.getPlayerId(), 1));}
+//            if(currentTileId.getTileNr() < 7){moves.add(new PositionKey(currentTileId.getPlayerId(), 7));}
+//            if(currentTileId.getTileNr() < 13){moves.add(new PositionKey(currentTileId.getPlayerId(), 13));}
+//            if(currentTileId.getTileNr() < 15){moves.add(new PositionKey(currentTileId.getPlayerId(), 15));}
 //
-//            startTileId = new TileId(nextPlayerId(playerIdOfTile), 0);
+//            startTileId = new PositionKey(nextPlayerId(playerIdOfTile), 0);
 //            if (canPassStartTile(pawnId1, startTileId)){
-//                Log.info("GameState: OnMove: can move past StartTile "+new TileId(playerIdOfTile+1,0));
+//                Log.info("GameState: OnMove: can move past StartTile "+new PositionKey(playerIdOfTile+1,0));
 //                Log.info("GameState: OnMove: normal route can move to the next section");
 //                next = next % 16;
 //                playerIdOfTile = nextPlayerId(playerIdOfTile);
-//                if(next > 1){moves.add(new TileId(playerIdOfTile, 1));}
-//                if(next > 7){moves.add(new TileId(playerIdOfTile, 7));}
+//                if(next > 1){moves.add(new PositionKey(playerIdOfTile, 1));}
+//                if(next > 7){moves.add(new PositionKey(playerIdOfTile, 7));}
 //            }else { // or turn back
 //                Log.info("GameState: OnMove: normal route is blocked by a start tile, move backwards");
 //                next = 15 - next%15;
-//                moves.add(new TileId(playerIdOfTile, 15));
-//                if(next < 13){moves.add(new TileId(playerIdOfTile, 13));}
-//                if(next < 7){moves.add(new TileId(playerIdOfTile, 7));}
+//                moves.add(new PositionKey(playerIdOfTile, 15));
+//                if(next < 13){moves.add(new PositionKey(playerIdOfTile, 13));}
+//                if(next < 7){moves.add(new PositionKey(playerIdOfTile, 7));}
 //            }
 //
-//            TileId nextTileId = new TileId(playerIdOfTile, next);
+//            TileId nextTileId = new PositionKey(playerIdOfTile, next);
 //            moves.add(nextTileId);
 //            if(canMoveToTile(pawnId1, nextTileId)){
 //                response.setMovePawn1(moves);
-//                processMove(pawnId1, new TileId(playerIdOfTile,next), moveMessage, response, goToNextPlayer);
+//                processMove(pawnId1, new PositionKey(playerIdOfTile,next), moveMessage, response, goToNextPlayer);
 //            }else{
 //                response.setResult(CANNOT_MAKE_MOVE);
 //            }
@@ -537,7 +536,7 @@ public class GameState {
 //                !isPawnOnFinish(pawn1)){
 //            Log.info("GameState: OnMove: normal route between 0,15");
 //            // check if you can kill an opponent
-//            TileId nextTileId = new TileId(playerIdOfTile, next);
+//            TileId nextTileId = new PositionKey(playerIdOfTile, next);
 //
 //            // in case you end up on your own pawn
 //            if(!canMoveToTile(pawnId1,nextTileId)){
@@ -546,24 +545,24 @@ public class GameState {
 //            }
 //            if(nrSteps > 0) {
 //                if (next > 1 && currentTileId.getTileNr() < 1) {
-//                    moves.add(new TileId(playerIdOfTile, 1));
+//                    moves.add(new PositionKey(playerIdOfTile, 1));
 //                }
 //                if (next > 7 && currentTileId.getTileNr() < 7) {
-//                    moves.add(new TileId(playerIdOfTile, 7));
+//                    moves.add(new PositionKey(playerIdOfTile, 7));
 //                }
 //                if (next > 13 && currentTileId.getTileNr() < 13) {
-//                    moves.add(new TileId(playerIdOfTile, 13));
+//                    moves.add(new PositionKey(playerIdOfTile, 13));
 //                }
 //            }else{
-//                if(next < 13 && currentTileId.getTileNr() > 13){moves.add(new TileId(playerIdOfTile, 13));}
-//                if(next < 7 && currentTileId.getTileNr() > 7){moves.add(new TileId(playerIdOfTile, 7));}
-//                if(next < 1 && currentTileId.getTileNr() > 1){moves.add(new TileId(playerIdOfTile, 1));}
+//                if(next < 13 && currentTileId.getTileNr() > 13){moves.add(new PositionKey(playerIdOfTile, 13));}
+//                if(next < 7 && currentTileId.getTileNr() > 7){moves.add(new PositionKey(playerIdOfTile, 7));}
+//                if(next < 1 && currentTileId.getTileNr() > 1){moves.add(new PositionKey(playerIdOfTile, 1));}
 //            }
 //
 //            moves.add(nextTileId);
 //            response.setMovePawn1(moves);
 //
-//            processMove(pawnId1, new TileId(playerIdOfTile,next), moveMessage, response, goToNextPlayer);
+//            processMove(pawnId1, new PositionKey(playerIdOfTile,next), moveMessage, response, goToNextPlayer);
 //
 //            return;
 //        }
@@ -571,20 +570,20 @@ public class GameState {
 //        // you go negative
 //        if(next < 0){
 //            Log.info("GameState: OnMove: pawn goes backwards");
-//            if(currentTileId.getTileNr() > 1){moves.add(new TileId(playerIdOfTile, 1));}
+//            if(currentTileId.getTileNr() > 1){moves.add(new PositionKey(playerIdOfTile, 1));}
 //
 //            // check if you can pass || otherwise turn back i.e. forward
-//            startTileId = new TileId(playerIdOfTile, 0);
+//            startTileId = new PositionKey(playerIdOfTile, 0);
 //            if (canPassStartTile(pawnId1, startTileId)){
 //                next = 16 + next;
 //                playerIdOfTile = previousPlayerId(playerIdOfTile);
-//                if(next < 13){moves.add(new TileId(playerIdOfTile, 13));}
+//                if(next < 13){moves.add(new PositionKey(playerIdOfTile, 13));}
 //            }else { // or turn back (forwards since next is negative)
 //                Log.info("GameState: OnMove: pawn wants to go backwards but is blocked by a start tile, goes forwards");
 //                next = -next+2; // +1 : you can't move on tile 0 and would then move on tile 1 twice.
 //            }
 //
-//            TileId nextTileId = new TileId(playerIdOfTile, next);
+//            TileId nextTileId = new PositionKey(playerIdOfTile, next);
 //            moves.add(nextTileId);
 //            if(canMoveToTile(pawnId1, nextTileId)){
 //                response.setMovePawn1(moves);
@@ -598,24 +597,24 @@ public class GameState {
 //        // when moving backwards and ending exactly on the starttile
 //        if(next == 0){
 //            Log.info("GameState: OnMove: pawn ends exactly on start tile");
-//            if(currentTileId.getTileNr() > 1){moves.add(new TileId(playerIdOfTile, 1));}
-//            if (canMoveToTile(pawnId1, new TileId(playerIdOfTile,0))) {
-//                moves.add(new TileId(playerIdOfTile, 0));
+//            if(currentTileId.getTileNr() > 1){moves.add(new PositionKey(playerIdOfTile, 1));}
+//            if (canMoveToTile(pawnId1, new PositionKey(playerIdOfTile,0))) {
+//                moves.add(new PositionKey(playerIdOfTile, 0));
 //                response.setMovePawn1(moves);
-//                processMove(pawnId1, new TileId(playerIdOfTile,0), moveMessage, response, goToNextPlayer);
+//                processMove(pawnId1, new PositionKey(playerIdOfTile,0), moveMessage, response, goToNextPlayer);
 //                return;
 //            }
 //
 //            // if your own pawn is on start, but it is not a blockade: your move is invalid
-//            if(!tileIsABlockade(new TileId(playerIdOfTile,0)) && cannotMoveToTileBecauseSamePlayer(pawnId1, new TileId(playerIdOfTile,0))){
+//            if(!tileIsABlockade(new PositionKey(playerIdOfTile,0)) && cannotMoveToTileBecauseSamePlayer(pawnId1, new PositionKey(playerIdOfTile,0))){
 //                response.setResult(CANNOT_MAKE_MOVE);
 //                return;
 //            }
 //            // move forwards to tile 2 if you can
-//            if(canMoveToTile(pawnId1, new TileId(playerIdOfTile, 2))){
-//                moves.add(new TileId(playerIdOfTile, 2));
+//            if(canMoveToTile(pawnId1, new PositionKey(playerIdOfTile, 2))){
+//                moves.add(new PositionKey(playerIdOfTile, 2));
 //                response.setMovePawn1(moves);
-//                processMove(pawnId1, new TileId(playerIdOfTile,2), moveMessage, response, goToNextPlayer);
+//                processMove(pawnId1, new PositionKey(playerIdOfTile,2), moveMessage, response, goToNextPlayer);
 //                return;
 //            }else{
 //                response.setResult(CANNOT_MAKE_MOVE);
@@ -647,12 +646,12 @@ public class GameState {
 //                tileHighestTileNr = checkHighestTileNrYouCanMoveTo(pawnId1, currentTileId, nrSteps);
 //                if (tileHighestTileNr > targetTileId.getTileNr()) {
 //                    Log.info("GameState: OnMove: pawn moves out of the finish");
-//                    moves.add(new TileId(playerIdOfTile, tileHighestTileNr));
+//                    moves.add(new PositionKey(playerIdOfTile, tileHighestTileNr));
 //                }
 //            }
-//            if (targetTileId.getTileNr() < 15) {moves.add(new TileId(targetTileId.getPlayerId(), 15));}
-//            if (targetTileId.getTileNr() < 13) {moves.add(new TileId(targetTileId.getPlayerId(), 13));}
-//            if (targetTileId.getTileNr() < 7) {moves.add(new TileId(targetTileId.getPlayerId(), 7));}
+//            if (targetTileId.getTileNr() < 15) {moves.add(new PositionKey(targetTileId.getPlayerId(), 15));}
+//            if (targetTileId.getTileNr() < 13) {moves.add(new PositionKey(targetTileId.getPlayerId(), 13));}
+//            if (targetTileId.getTileNr() < 7) {moves.add(new PositionKey(targetTileId.getPlayerId(), 7));}
 //
 //            moves.add(targetTileId);
 //            response.setMovePawn1(moves);
@@ -663,9 +662,9 @@ public class GameState {
 //        if(next > 15 &&
 //                isPawnOnLastSection(playerId, playerIdOfTile)){
 //            Log.info("GameState: OnMove: pawn is on last section and goes into finish");
-//            if(currentTileId.getTileNr() < 7){moves.add(new TileId(currentTileId.getPlayerId(), 7));}
-//            if(currentTileId.getTileNr() < 13){moves.add(new TileId(currentTileId.getPlayerId(), 13));}
-//            if(currentTileId.getTileNr() < 15){moves.add(new TileId(currentTileId.getPlayerId(), 15));}
+//            if(currentTileId.getTileNr() < 7){moves.add(new PositionKey(currentTileId.getPlayerId(), 7));}
+//            if(currentTileId.getTileNr() < 13){moves.add(new PositionKey(currentTileId.getPlayerId(), 13));}
+//            if(currentTileId.getTileNr() < 15){moves.add(new PositionKey(currentTileId.getPlayerId(), 15));}
 //
 //            TileId targetTileId = moveAndCheckEveryTile(pawnId1, currentTileId, nrSteps);
 //
@@ -673,13 +672,13 @@ public class GameState {
 //            if(tileHighestTileNr > targetTileId.getTileNr()){
 //                if(tileHighestTileNr > 15){
 //                    // move to finish
-//                    moves.add(new TileId(nextPlayerId(playerIdOfTile), tileHighestTileNr));
+//                    moves.add(new PositionKey(nextPlayerId(playerIdOfTile), tileHighestTileNr));
 //                    // possibly move back out of finish
 //                    // otherwise if 16 was taken, then it would move (0,15) (1,15) (0,15) and then correctly back
-//                    if(targetTileId.getTileNr() < 15){moves.add(new TileId(targetTileId.getPlayerId(), 15));}
+//                    if(targetTileId.getTileNr() < 15){moves.add(new PositionKey(targetTileId.getPlayerId(), 15));}
 //                }
-//                if(targetTileId.getTileNr() < 13){moves.add(new TileId(targetTileId.getPlayerId(), 13));}
-//                if(targetTileId.getTileNr() < 7){moves.add(new TileId(targetTileId.getPlayerId(), 7));}
+//                if(targetTileId.getTileNr() < 13){moves.add(new PositionKey(targetTileId.getPlayerId(), 13));}
+//                if(targetTileId.getTileNr() < 7){moves.add(new PositionKey(targetTileId.getPlayerId(), 7));}
 //            }
 //
 //            if(cannotMoveToTileBecauseSamePlayer(pawnId1, targetTileId)){
@@ -714,7 +713,7 @@ public class GameState {
         for (int i = 0; i < nrSteps; i++) {
             tileNrToCheck = tileNrToCheck + direction;
 
-            if (!canMoveToTile(pawnId, new TileId(pawnId.getPlayerId(), tileNrToCheck))) {
+            if (!canMoveToTile(pawnId, new PositionKey(pawnId.getPlayerId(), tileNrToCheck))) {
                 return tileNrToCheck - 1;
             }
         }
@@ -734,7 +733,7 @@ public class GameState {
 
         for (int i = 0; i < nrSteps; i++) {
             tileNrToCheck = tileNrToCheck + direction;
-            if(!canMoveToTile(pawnId, new TileId(pawnId.getPlayerId(), tileNrToCheck))) {
+            if(!canMoveToTile(pawnId, new PositionKey(pawnId.getPlayerId(), tileNrToCheck))) {
                 moves.add(new TileId(pawnId.getPlayerId(), tileNrToCheck-direction));
                 direction = - direction;
                 tileNrToCheck = tileNrToCheck + 2*direction;
@@ -764,7 +763,7 @@ public class GameState {
         for (int i = 0; i < nrSteps; i++) {
             tileNrToCheck = tileNrToCheck + direction;
             if(tileNrToCheck > 15){// only check tiles when they are on the finish
-                if(!canMoveToTile(pawnId, new TileId(pawnId.getPlayerId(), tileNrToCheck))) {
+                if(!canMoveToTile(pawnId, new PositionKey(pawnId.getPlayerId(), tileNrToCheck))) {
                     direction = - direction;
                     tileNrToCheck = tileNrToCheck + 2*direction;
                 }
@@ -1028,7 +1027,7 @@ public class GameState {
         }
         return null;
     }
-    public Pawn getPawn(TileId selectedTileId){
+    public Pawn getPawn(PositionKey selectedTileId){
         for (Pawn pawn : pawns) {
             if (pawn.getCurrentTileId().equals(selectedTileId)){
                 return pawn;
@@ -1037,7 +1036,7 @@ public class GameState {
         return null;
     }
 
-    public boolean tileIsABlockade(TileId selectedStartTile){
+    public boolean tileIsABlockade(PositionKey selectedStartTile){
         Pawn pawnOnStart = getPawn(selectedStartTile);
         if(pawnOnStart == null){
             return false;
@@ -1064,7 +1063,7 @@ public class GameState {
         return winners;
     }
 
-    public boolean canPassStartTile(PawnId selectedPawnId, TileId tileId){
+    public boolean canPassStartTile(PawnId selectedPawnId, PositionKey tileId){
         Pawn pawnOnTile = getPawn(tileId);
 
         if(pawnOnTile == null){

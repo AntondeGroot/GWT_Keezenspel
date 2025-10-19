@@ -6,10 +6,10 @@ import ADG.Games.Keezen.GameState;
 import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Move.MoveType;
-import ADG.Games.Keezen.Player.Pawn;
-import ADG.Games.Keezen.Player.PawnId;
-import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.TileId;
+import com.adg.openapi.model.Pawn;
+import com.adg.openapi.model.PawnId;
+import com.adg.openapi.model.PositionKey;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -18,16 +18,17 @@ import static ADG.Games.Keezen.Move.MoveType.*;
 
 public class GameStateUtil {
 
-    public static Pawn placePawnOnNest(GameState gameState, String playerId, TileId currentTileId){
+    public static Pawn placePawnOnNest(GameState gameState, String playerId, PositionKey currentTile){
         // for creating pawns for different players
         PawnId pawnId1 = new PawnId(playerId,0);
-        Pawn pawn1 = new Pawn(pawnId1, new TileId(playerId, -1));
-        pawn1.setCurrentTileId(currentTileId);
+        PositionKey nestTile = new PositionKey(playerId, -1);
+        Pawn pawn1 = new Pawn(playerId, pawnId1, currentTile, nestTile);
+        pawn1.setCurrentTileId(currentTile);
         gameState.movePawn(pawn1);
         return pawn1;
     }
 
-    public static Pawn placePawnOnBoard(GameState gameState, PawnId pawnId, TileId currentTileId){
+    public static Pawn placePawnOnBoard(GameState gameState, PawnId pawnId, PositionKey currentTileId){
         // for creating multiple pawns for the same player
         Pawn pawn1 = new Pawn(pawnId, new TileId(pawnId.getPlayerId(), -pawnId.getPawnNr()-1));
         pawn1.setCurrentTileId(currentTileId);
