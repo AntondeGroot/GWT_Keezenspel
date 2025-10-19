@@ -8,9 +8,9 @@ import ADG.Games.Keezen.Move.MessageType;
 import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Move.MoveResult;
-import ADG.Games.Keezen.Player.Pawn;
-import ADG.Games.Keezen.Player.PawnId;
-import ADG.Games.Keezen.TileId;
+import com.adg.openapi.model.Pawn;
+import com.adg.openapi.model.PawnId;
+import com.adg.openapi.model.PositionKey;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,8 +52,8 @@ class MovingOnSwitchTest {
         // GIVEN
         Card card = givePlayerJack(cardsDeck , 0);
         String playerId = "0";
-        TileId tileId1 = new TileId(playerId, 5);
-        TileId tileId2 = new TileId("1", 3);
+        PositionKey tileId1 = new PositionKey(playerId, 5);
+        PositionKey tileId2 = new PositionKey("1", 3);
         Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
         Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
 
@@ -68,8 +68,8 @@ class MovingOnSwitchTest {
     void playerPlaysJackAsLastCard_ThenNextPlayerPlays() {
         // GIVEN
         String playerId = "0";
-        TileId tileId1 = new TileId(playerId, 5);
-        TileId tileId2 = new TileId("1", 3);
+        PositionKey tileId1 = new PositionKey(playerId, 5);
+        PositionKey tileId2 = new PositionKey("1", 3);
         Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
         Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
 
@@ -94,8 +94,8 @@ class MovingOnSwitchTest {
         // GIVEN
         Card card = givePlayerJack(cardsDeck , 0);
         String playerId = "0";
-        TileId tileId1 = new TileId(playerId, 5);
-        TileId tileId2 = new TileId("1", 3);
+        PositionKey tileId1 = new PositionKey(playerId, 5);
+        PositionKey tileId2 = new PositionKey("1", 3);
         Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
         Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
 
@@ -117,8 +117,8 @@ class MovingOnSwitchTest {
         // GIVEN
         String playerId = "0";
         Card card = givePlayerJack(cardsDeck , 0);
-        TileId tileId1 = new TileId(playerId, 5);
-        TileId tileId2 = new TileId("1", 3);
+        PositionKey tileId1 = new PositionKey(playerId, 5);
+        PositionKey tileId2 = new PositionKey("1", 3);
         Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
         Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
 
@@ -141,8 +141,8 @@ class MovingOnSwitchTest {
         String playerId = "0";
         Card card = givePlayerJack(cardsDeck , 0);
         Card card2 = givePlayerJack(cardsDeck , 2);
-        TileId tileId1 = new TileId(playerId, 5);
-        TileId tileId2 = new TileId("1", 3);
+        PositionKey tileId1 = new PositionKey(playerId, 5);
+        PositionKey tileId2 = new PositionKey("1", 3);
         Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
         Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
 
@@ -164,8 +164,8 @@ class MovingOnSwitchTest {
         // GIVEN
         String playerId = "0";
         Card card = givePlayerJack(cardsDeck , 0);
-        TileId tileId1 = new TileId(playerId, -1);
-        TileId tileId2 = new TileId("1", 3);
+        PositionKey tileId1 = new PositionKey(playerId, -1);
+        PositionKey tileId2 = new PositionKey("1", 3);
         Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
         Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
 
@@ -186,8 +186,8 @@ class MovingOnSwitchTest {
         // GIVEN
         String playerId = "0";
         Card card = givePlayerJack(cardsDeck , 0);
-        TileId tileId1 = new TileId(playerId, 16);
-        TileId tileId2 = new TileId("1", 3);
+        PositionKey tileId1 = new PositionKey(playerId, 16);
+        PositionKey tileId2 = new PositionKey("1", 3);
         Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
         Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
 
@@ -208,8 +208,8 @@ class MovingOnSwitchTest {
         // GIVEN
         String playerId = "0";
         Card card = givePlayerJack(cardsDeck , 0);
-        TileId tileId1 = new TileId(playerId, 4);
-        TileId tileId2 = new TileId("1", 0);
+        PositionKey tileId1 = new PositionKey(playerId, 4);
+        PositionKey tileId2 = new PositionKey("1", 0);
         Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
         Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
 
@@ -230,8 +230,8 @@ class MovingOnSwitchTest {
         // GIVEN
         String playerId = "0";
         Card card = givePlayerJack(cardsDeck , 0);
-        TileId tileId1 = new TileId(playerId, 0);
-        TileId tileId2 = new TileId("1", 5);
+        PositionKey tileId1 = new PositionKey(playerId, 0);
+        PositionKey tileId2 = new PositionKey("1", 5);
         Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
         Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
 
@@ -252,8 +252,8 @@ class MovingOnSwitchTest {
         // GIVEN
         String playerId = "0";
         Card card = givePlayerJack(cardsDeck , Integer.valueOf(playerId));
-        TileId tileId1 = new TileId(playerId, 4);
-        TileId tileId2 = new TileId(playerId, 2);
+        PositionKey tileId1 = new PositionKey(playerId, 4);
+        PositionKey tileId2 = new PositionKey(playerId, 2);
         Pawn pawn1 = placePawnOnBoard(gameState , new PawnId(playerId,0), tileId1);
         Pawn pawn2 = placePawnOnBoard(gameState , new PawnId(playerId, 1), tileId2);
 
@@ -272,8 +272,8 @@ class MovingOnSwitchTest {
     @Test
     void testWhenPawnsSwitch_CardGetsRemovedFromHand_AndNextPlayerPlays(){
         Card card = givePlayerJack(cardsDeck , 0);
-        Pawn pawn1 = placePawnOnNest(gameState , "0", new TileId("0",12));
-        Pawn pawn2 = placePawnOnNest(gameState , "1", new TileId("0",5));
+        Pawn pawn1 = placePawnOnNest(gameState , "0", new PositionKey("0",12));
+        Pawn pawn2 = placePawnOnNest(gameState , "1", new PositionKey("0",5));
         assertEquals(5, cardsDeck.getCardsForPlayer("0").size());
 
         createSwitchMessage(moveMessage, pawn1, pawn2, card);
@@ -285,8 +285,8 @@ class MovingOnSwitchTest {
     @Test
     void testingWhenPawnsSwitch_CardNotRemovedFromHand(){
         Card card = givePlayerJack(cardsDeck , 0);
-        Pawn pawn1 = placePawnOnNest(gameState , "0", new TileId("0",12));
-        Pawn pawn2 = placePawnOnNest(gameState , "1", new TileId("0",5));
+        Pawn pawn1 = placePawnOnNest(gameState , "0", new PositionKey("0",12));
+        Pawn pawn2 = placePawnOnNest(gameState , "1", new PositionKey("0",5));
         assertEquals(5, cardsDeck.getCardsForPlayer("0").size());
 
         createSwitchMessage(moveMessage, pawn1, pawn2, card);
