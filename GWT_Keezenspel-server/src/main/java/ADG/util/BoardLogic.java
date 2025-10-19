@@ -20,4 +20,8 @@ public class BoardLogic {
   private static boolean isInvalidPawn(Pawn pawn) {
     return pawn == null || pawn.getCurrentTileId() == null;
   }
+
+  public static Integer getTileNr(Pawn pawn){
+    return pawn.getCurrentTileId().getTileNr();
+  }
 }
