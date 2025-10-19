@@ -1,6 +1,10 @@
 package ADG.Games.Keezen;
 
+import static com.adg.openapi.model.GameInfo.StatusEnum.IN_PROGRESS;
+import static com.adg.openapi.model.GameInfo.StatusEnum.WAITING;
+
 import com.adg.openapi.model.GameInfo;
+import com.adg.openapi.model.GameInfo.StatusEnum;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,11 +61,14 @@ public class GameRegistry {
   public static List<GameInfo> getAllGames(){
     ArrayList<GameInfo> gameInfos = new ArrayList<>();
     for(GameSession session : games.values()){
-      GameInfo gameInfo = new GameInfo();
-      gameInfo.setId(session.getSessionId());
-      gameInfo.setMaxNrPlayers(session.getMaxPlayers());
-      gameInfo.setRoomName(session.getRoomName());
-      gameInfo.setNrPlayers(session.getGameState().getPlayers().size());
+      GameState gameState = session.getGameState();
+      GameInfo gameInfo = new GameInfo(
+          session.getSessionId(),
+          session.getRoomName(),
+          gameState.getNrPlayers(),
+          session.getMaxPlayers(),
+          gameState.hasStarted() ? IN_PROGRESS : WAITING
+      );
       gameInfos.add(gameInfo);
     }
     return gameInfos;

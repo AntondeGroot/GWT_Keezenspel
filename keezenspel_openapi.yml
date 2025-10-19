@@ -215,7 +215,6 @@ paths:
                 $ref: '#/components/schemas/GameInfo'
         404:
           description: Game not found
-
 components:
   parameters:
     sessionId:
@@ -243,6 +242,12 @@ components:
         - split
     GameInfo:
       type: object
+      required:
+        - id
+        - roomName
+        - nrPlayers
+        - maxNrPlayers
+        - status
       properties:
         id:
           type: string
@@ -257,8 +262,12 @@ components:
           enum:
             - waiting
             - inProgress
-    PawnId:
+
+    PositionKey:
       type: object
+      required:
+        - playerId
+        - pawnNr
       properties:
         playerId:
           type: string
@@ -267,22 +276,28 @@ components:
 
     Pawn:
       type: object
+      required:
+        - playerId
+        - pawnId
+        - currentTileId
+        - nestTileId
       properties:
         playerId:
           type: string
         pawnId:
+          $ref: '#/components/schemas/PositionKey'
+        currentTileId:
+          $ref: '#/components/schemas/PositionKey'
+        nestTileId:
+          $ref: '#/components/schemas/PositionKey'
+        uri:
           type: string
-        positionId:
-          type: object
-          playerId:
-            type: string
-          tileNr:
-            type: integer
 
     Player:
       type: object
       required:
         - id
+        - name
       properties:
         id:
           type: string
@@ -302,6 +317,11 @@ components:
 
     GameState:
       type: object
+      required:
+        - currentPlayerId
+        - pawns
+        - players
+        - winners
       properties:
         currentPlayerId:
           type: string
@@ -317,10 +337,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Player'
-        board:
-          type: array
-          items:
-            type: string
 
     NewGameRequest:
       type: object
@@ -336,15 +352,19 @@ components:
 
     MoveRequest:
       type: object
+      required:
+        - playerId
+        - requestType
+        - moveType
       properties:
         playerId:
           type: string
         card:
           $ref: '#/components/schemas/Card'
         pawnId1:
-          $ref: '#/components/schemas/PawnId'
+          $ref: '#/components/schemas/PositionKey'
         pawnId2:
-          $ref: '#/components/schemas/PawnId'
+          $ref: '#/components/schemas/PositionKey'
         requestType:
           $ref: '#/components/schemas/RequestType'
         moveType:
@@ -354,6 +374,10 @@ components:
         stepsPawn2:
           type: integer
     Card:
+      required:
+        - suit
+        - value
+        - uuid
       properties:
         suit:
           description: |
