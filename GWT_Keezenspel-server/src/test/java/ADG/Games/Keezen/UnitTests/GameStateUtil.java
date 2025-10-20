@@ -87,25 +87,25 @@ public class GameStateUtil {
       Pawn pawn2, Integer nrSteps2, Card card) {
     //todo: replace with rest call
 
-        moveMessage.setPlayerId(pawn.getPlayerId());
-        moveMessage.setPawn1(pawn);
-        moveMessage.setStepsPawn1(nrSteps1);
-        moveMessage.setStepsPawn2(nrSteps2);
-        moveMessage.setPawn2(pawn2);
-        moveMessage.setMoveType(SPLIT);
-        moveMessage.setCard(card);
-        moveMessage.setTempMessageType(MAKE_MOVE);
+    moveMessage.setPlayerId(pawn.getPlayerId());
+    moveMessage.setPawn1(pawn);
+    moveMessage.setStepsPawn1(nrSteps1);
+    moveMessage.setStepsPawn2(nrSteps2);
+    moveMessage.setPawn2(pawn2);
+    moveMessage.setMoveType(SPLIT);
+    moveMessage.setCard(card);
+    moveMessage.setTempMessageType(MAKE_MOVE);
   }
 
   public static void createMoveRequest(MoveRequest moveMessage, Pawn pawn, Card card) {
     // todo: replace with restcall
 
-//        moveMessage.setPlayerId(pawn.getPlayerId());
-//        moveMessage.setPawnId1(pawn.getPawnId());
-//        moveMessage.setMoveType(MOVE);
-//        moveMessage.setStepsPawn1(card.getValue());
-//        moveMessage.setCard(card);
-//        moveMessage.setMessageType(MAKE_MOVE);
+    moveMessage.setPlayerId(pawn.getPlayerId());
+    moveMessage.setPawn1(pawn);
+    moveMessage.setMoveType(MOVE);
+    moveMessage.setStepsPawn1(card.getValue());
+    moveMessage.setCard(card);
+    moveMessage.setTempMessageType(MAKE_MOVE);
   }
 
   public static void createSwitchMessage(MoveRequest moveMessage, Pawn pawn1, Pawn pawn2,
@@ -122,37 +122,37 @@ public class GameStateUtil {
 
   public static void sendForfeitMessage(GameState gameState, String playerId) {
     // todo: replace with rest call
-        gameState.processOnForfeit(playerId);
+    gameState.processOnForfeit(playerId);
   }
 
   public static void sendValidMoveRequest(GameState gameState, CardsDeckInterface cardsDeck,
       String playerId) {
     // todo: replace with rest call
 
-        // get the first pawn of the player
-        Pawn pawn = gameState.getPawn(new Pawn().playerId(playerId).pawnId(new PawnId(playerId, 0)));
+    // get the first pawn of the player
+    Pawn pawn = gameState.getPawn(new Pawn().playerId(playerId).pawnId(new PawnId(playerId, 0)));
 
-        // place the pawn on the board (playerId,1)
-        placePawnOnNest(gameState, playerId, new PositionKey(playerId,1));
+    // place the pawn on the board (playerId,1)
+    placePawnOnNest(gameState, playerId, new PositionKey(playerId, 1));
 
-        // fake a valid card
-        Card card = new Card().suit(0).value(5);
+    // fake a valid card
+    Card card = new Card().suit(0).value(5);
 
-        // replace a card from the players hand with this card
-        cardsDeck.giveCardToPlayerForTesting(playerId, card);
+    // replace a card from the players hand with this card
+    cardsDeck.giveCardToPlayerForTesting(playerId, card);
 
-        // send move message
-        MoveRequest moveMessage = new MoveRequest();
-        moveMessage.setPlayerId(playerId);
-        moveMessage.setPawn1(pawn);
-        moveMessage.setMoveType(MOVE);
-        moveMessage.setStepsPawn1(card.getValue());
-        moveMessage.setCard(card);
-        moveMessage.setTempMessageType(MAKE_MOVE);
+    // send move message
+    MoveRequest moveMessage = new MoveRequest();
+    moveMessage.setPlayerId(playerId);
+    moveMessage.setPawn1(pawn);
+    moveMessage.setMoveType(MOVE);
+    moveMessage.setStepsPawn1(card.getValue());
+    moveMessage.setCard(card);
+    moveMessage.setTempMessageType(MAKE_MOVE);
 
-        // process
-        MoveResponse moveResponse = new MoveResponse();
-        gameState.processOnMove(moveMessage, moveResponse);
+    // process
+    MoveResponse moveResponse = new MoveResponse();
+    gameState.processOnMove(moveMessage, moveResponse);
   }
 
   public static void playRemainingCards(GameState gameState, CardsDeckInterface cardsDeck,
