@@ -1,6 +1,5 @@
 package ADG.Games.Keezen;
 
-import ADG.Games.Keezen.Move.MessageType;
 import ADG.util.PlayerStatus;
 import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveRequest;
@@ -23,7 +22,6 @@ import static ADG.util.CardValueCheck.isKing;
 import static ADG.util.CardValueCheck.isSeven;
 import static ADG.util.PlayerStatus.hasFinished;
 import static ADG.util.PlayerStatus.setActive;
-import static ADG.util.PlayerStatus.setInactive;
 import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
 import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
 import static com.adg.openapi.model.MoveResult.INVALID_SELECTION;
@@ -32,8 +30,6 @@ import static com.adg.openapi.model.MoveType.MOVE;
 import static com.adg.openapi.model.MoveType.ON_BOARD;
 import static com.adg.openapi.model.MoveType.SPLIT;
 import static com.adg.openapi.model.MoveType.SWITCH;
-import static com.adg.openapi.model.RequestType.CHECK_MOVE;
-import static com.adg.openapi.model.RequestType.MAKE_MOVE;
 
 public class GameState {
 
@@ -430,21 +426,23 @@ public class GameState {
       moveMessagePawn2.setTempMessageType(TempMessageType.MAKE_MOVE);
       processOnMove(moveMessagePawn1, moveResponsePawn1, false);
       processOnMove(moveMessagePawn2, moveResponsePawn2, true);
-      //response.setMessageType(MAKE_MOVE);
+//      response.setTempMessageType(MAKE_MOVE);
     } else {
-      //response.setMessageType(CHECK_MOVE);
+//      response.setTempMessageType(CHECK_MOVE);
     }
     response.setPawn1(moveMessage.getPawn1());
     response.setPawn2(moveMessage.getPawn2());
     response.setMovePawn1(moveResponsePawn1.getMovePawn1());
     response.setMovePawn2(moveResponsePawn2.getMovePawn1());
     if (moveResponsePawn1.getMovePawnKilledByPawn1() != null) {
-//            response.setMovePawnKilledByPawn1(moveResponsePawn1. getPawnIdKilled1());// only the first one is filled in with a kill when you check only 1 pawn
-//            response.setMoveKilledPawn1(moveResponsePawn1.getMoveKilledPawn1());
+      response.setPawnKilledByPawn1(moveResponsePawn1.getPawnKilledByPawn1());
+      response.setMovePawnKilledByPawn1(moveResponsePawn1.getMovePawnKilledByPawn1());// only the first one is filled in with a kill when you check only 1 pawn
     }
+    // aggregate
+    // there are 2 moveResponses in both cases the pawn and the moves set are filled in for the "first pawn"
     if (moveResponsePawn2.getMovePawnKilledByPawn2() != null) {
-//            response.setMovePawnKilledByPawn2(moveMessagePawn2); setPawnIdKilled2(moveResponsePawn2.getPawnIdKilled1());// only the first one is filled in with a kill when you check only 1 pawn
-      response.setMovePawnKilledByPawn2(moveResponsePawn2.getMovePawnKilledByPawn2());
+      response.setPawnKilledByPawn2(moveResponsePawn2.getPawnKilledByPawn1());
+      response.setMovePawnKilledByPawn2(moveResponsePawn2.getMovePawnKilledByPawn1());
     }
     response.setResult(CAN_MAKE_MOVE);
     response.setMoveType(SPLIT);
@@ -1038,7 +1036,7 @@ public class GameState {
         move2.add(pawn.getNestTileId());
         response.setPawnKilledByPawn1(pawn);
         response.setMovePawnKilledByPawn1(move2);
-        if (moveMessage.getTempMessageType().equals(MAKE_MOVE)) {
+        if (moveMessage.getTempMessageType().equals(TempMessageType.MAKE_MOVE)) {
           movePawn(new Pawn(
               pawn.getPlayerId(),
               pawn.getPawnId(),
