@@ -3,6 +3,7 @@ package ADG.Games.Keezen.UnitTests;
 import static ADG.Games.Keezen.Move.MoveType.FORFEIT;
 import static com.adg.openapi.model.MoveType.MOVE;
 import static com.adg.openapi.model.MoveType.SPLIT;
+import static com.adg.openapi.model.MoveType.SWITCH;
 import static com.adg.openapi.model.TempMessageType.MAKE_MOVE;
 
 import com.adg.openapi.model.Card;
@@ -112,12 +113,12 @@ public class GameStateUtil {
       Card card) {
     // todo: replace with rest call
 
-//        moveMessage.setPlayerId(pawn1.getPlayerId());
-//        moveMessage.setPawnId1(pawn1.getPawnId());
-//        moveMessage.setPawnId2(pawn2.getPawnId());
-//        moveMessage.setCard(card);
-//        moveMessage.setMoveType(SWITCH);
-//        moveMessage.setMessageType(MAKE_MOVE);
+        moveMessage.setPlayerId(pawn1.getPlayerId());
+        moveMessage.setPawn1(pawn1);
+        moveMessage.setPawn2(pawn2);
+        moveMessage.setCard(card);
+        moveMessage.setMoveType(SWITCH);
+        moveMessage.setTempMessageType(MAKE_MOVE);
   }
 
   public static void sendForfeitMessage(GameState gameState, String playerId) {
