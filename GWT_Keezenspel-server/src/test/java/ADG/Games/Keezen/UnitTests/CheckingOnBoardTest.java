@@ -4,8 +4,6 @@ import com.adg.openapi.model.Card;
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
-import ADG.Games.Keezen.Move.MessageType;
-import ADG.Games.Keezen.Move.MoveMessage;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
 import com.adg.openapi.model.Pawn;
@@ -17,8 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
+import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class CheckingOnBoardTest {
 
@@ -50,31 +48,32 @@ public class CheckingOnBoardTest {
   @Test
   void checkOnBoard_DoesNotRemoveCardFromHand() {
     // GIVEN
-        Card card = givePlayerAce(cardsDeck, 0);
-        int nrCards = cardsDeck.getCardsForPlayer("0").size();
-        Pawn pawn1 = new Pawn().pawnId(new PawnId("0",1)).currentTileId(new PositionKey("0", -1));
+    Card card = givePlayerAce(cardsDeck, 0);
+    int nrCards = cardsDeck.getCardsForPlayer("0").size();
+    Pawn pawn1 = new Pawn().playerId("0").pawnId(new PawnId("0", 1))
+        .currentTileId(new PositionKey("0", -1));
 
-        // WHEN
-        createMoveRequest(moveMessage, pawn1, card);
-        moveMessage.setTempMessageType(TempMessageType.CHECK_MOVE);
-        gameState.processOnBoard(moveMessage, moveResponse);
+    // WHEN
+    createMoveRequest(moveMessage, pawn1, card);
+    moveMessage.setTempMessageType(TempMessageType.CHECK_MOVE);
+    gameState.processOnBoard(moveMessage, moveResponse);
 
-        // THEN response message is correct
-        assertEquals(nrCards, cardsDeck.getCardsForPlayer("0").size());
+    // THEN response message is correct
+    assertEquals(nrCards, cardsDeck.getCardsForPlayer("0").size());
   }
 
   @Test
   void checkOnBoard_WrongCard_DoesNotShow() {
     // GIVEN
-//        Card card = givePlayerCard(cardsDeck, 0, 3);
-//        Pawn pawn1 = new Pawn(new PawnId("0",1), new PositionKey("0", -1));
-//
-//        // WHEN
-//        createMoveMessage(moveMessage, pawn1, card);
-//        moveMessage.setMessageType(MessageType.CHECK_MOVE);
-//        gameState.processOnBoard(moveMessage, moveResponse);
-//
-//        assertEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
-    fail();
+    Card card = givePlayerCard(cardsDeck, 0, 3);
+    Pawn pawn1 = new Pawn().playerId("0").pawnId(new PawnId("0", 1))
+        .currentTileId(new PositionKey("0", -1));
+
+    // WHEN
+    createMoveRequest(moveMessage, pawn1, card);
+    moveMessage.setTempMessageType(TempMessageType.CHECK_MOVE);
+    gameState.processOnBoard(moveMessage, moveResponse);
+
+    assertEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
   }
 }

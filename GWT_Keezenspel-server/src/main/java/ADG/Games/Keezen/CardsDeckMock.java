@@ -82,7 +82,7 @@ public class CardsDeckMock implements CardsDeckInterface, IsSerializable {
         }
 
         for(Player player: gameState.getPlayers()){
-            if(player.getIsActive()){
+            if(player.getIsActive() && player.getPlace() < 0){
                 for(Card card: allCardsFromAceToKing){
                     setPlayerCard(player.getId(), card);
                 }
