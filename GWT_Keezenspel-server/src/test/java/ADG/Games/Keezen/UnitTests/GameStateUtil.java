@@ -3,10 +3,7 @@ package ADG.Games.Keezen.UnitTests;
 import com.adg.openapi.model.Card;
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameState;
-import ADG.Games.Keezen.Move.MoveMessage;
-import ADG.Games.Keezen.Move.MoveResponse;
-import ADG.Games.Keezen.Move.MoveType;
-import ADG.Games.Keezen.TileId;
+import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PawnId;
 import com.adg.openapi.model.Player;
@@ -14,8 +11,6 @@ import com.adg.openapi.model.PositionKey;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static ADG.Games.Keezen.Move.MessageType.MAKE_MOVE;
-import static ADG.Games.Keezen.Move.MoveType.*;
 
 public class GameStateUtil {
 
@@ -81,7 +76,7 @@ public class GameStateUtil {
     return jack;
   }
 
-  public static void createSplitMessage(MoveMessage moveMessage, Pawn pawn, int nrSteps1,
+  public static void createSplitMessage(MoveRequest moveMessage, Pawn pawn, int nrSteps1,
       Pawn pawn2, Integer nrSteps2, Card card) {
     //todo: replace with rest call
 
@@ -95,7 +90,7 @@ public class GameStateUtil {
 //        moveMessage.setMessageType(MAKE_MOVE);
   }
 
-  public static void createMoveMessage(MoveMessage moveMessage, Pawn pawn, Card card) {
+  public static void createMoveRequest(MoveRequest moveMessage, Pawn pawn, Card card) {
     // todo: replace with restcall
 
 //        moveMessage.setPlayerId(pawn.getPlayerId());
@@ -106,7 +101,7 @@ public class GameStateUtil {
 //        moveMessage.setMessageType(MAKE_MOVE);
   }
 
-  public static void createSwitchMessage(MoveMessage moveMessage, Pawn pawn1, Pawn pawn2,
+  public static void createSwitchMessage(MoveRequest moveMessage, Pawn pawn1, Pawn pawn2,
       Card card) {
     // todo: replace with rest call
 
@@ -121,14 +116,14 @@ public class GameStateUtil {
   public static void sendForfeitMessage(GameState gameState, String playerId) {
     // todo: replace with rest call
 
-//        MoveMessage moveMessage = new MoveMessage();
+//        MoveRequest moveMessage = new MoveRequest();
 //        moveMessage.setPlayerId(playerId);
 //        moveMessage.setMoveType(MoveType.FORFEIT);
 //        moveMessage.setMessageType(MAKE_MOVE);
 //        gameState.processOnForfeit(moveMessage);
   }
 
-  public static void sendValidMoveMessage(GameState gameState, CardsDeckInterface cardsDeck,
+  public static void sendValidMoveRequest(GameState gameState, CardsDeckInterface cardsDeck,
       String playerId) {
     // todo: replace with rest call
 
@@ -145,7 +140,7 @@ public class GameStateUtil {
 //        cardsDeck.giveCardToPlayerForTesting(playerId, card);
 //
 //        // send move message
-//        MoveMessage moveMessage = new MoveMessage();
+//        MoveRequest moveMessage = new MoveRequest();
 //        moveMessage.setPlayerId(playerId);
 //        moveMessage.setPawnId1(pawn.getPawnId());
 //        moveMessage.setMoveType(MOVE);
@@ -162,7 +157,7 @@ public class GameStateUtil {
       String playerId) {
     int nrCards = cardsDeck.getCardsForPlayer(playerId).size();
     for (int i = 0; i < nrCards; i++) {
-      sendValidMoveMessage(gameState, cardsDeck, playerId);
+      sendValidMoveRequest(gameState, cardsDeck, playerId);
     }
   }
 

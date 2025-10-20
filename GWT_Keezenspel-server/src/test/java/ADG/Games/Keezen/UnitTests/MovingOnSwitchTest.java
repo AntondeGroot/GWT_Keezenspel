@@ -6,8 +6,9 @@ import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
 import ADG.Games.Keezen.Move.MessageType;
 import ADG.Games.Keezen.Move.MoveMessage;
-import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Move.MoveResult;
+import com.adg.openapi.model.MoveRequest;
+import com.adg.openapi.model.MoveResponse;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PawnId;
 import com.adg.openapi.model.PositionKey;
@@ -23,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 class MovingOnSwitchTest {
 
-  private MoveMessage moveMessage = new MoveMessage();
+  private MoveRequest moveMessage = new MoveRequest();
   private MoveResponse moveResponse = new MoveResponse();
 
   private GameSession engine;
@@ -37,7 +38,7 @@ class MovingOnSwitchTest {
     cardsDeck = engine.getCardsDeck();
 
     createGame_With_NPlayers(gameState, 3);
-    moveMessage = new MoveMessage();
+    moveMessage = new MoveRequest();
     moveResponse = new MoveResponse();
   }
 
@@ -51,21 +52,21 @@ class MovingOnSwitchTest {
 
   @Test
   void playerPlaysJack_ThenNextPlayerPlays() {
-//        // GIVEN
-//        Card card = givePlayerJack(cardsDeck , 0);
-//        String playerId = "0";
-//        PositionKey tileId1 = new PositionKey(playerId, 5);
-//        PositionKey tileId2 = new PositionKey("1", 3);
-//        Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
-//        Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
-//
-//        // WHEN
-//        createSwitchMessage(moveMessage, pawn1, pawn2, card);
-//        gameState.processOnSwitch(moveMessage, moveResponse);
-//
-//        // THEN: response message is correct
-//        assertEquals("1", gameState.getPlayerIdTurn());
-    fail();
+        // GIVEN
+        Card card = givePlayerJack(cardsDeck , 0);
+        String playerId = "0";
+        PositionKey tileId1 = new PositionKey(playerId, 5);
+        PositionKey tileId2 = new PositionKey("1", 3);
+        Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
+        Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
+
+        // WHEN
+        createSwitchMessage(moveMessage, pawn1, pawn2, card);
+        gameState.processOnSwitch(moveMessage, moveResponse);
+
+        // THEN: response message is correct
+        assertEquals("1", gameState.getPlayerIdTurn());
+//    fail();
   }
 
   @Test

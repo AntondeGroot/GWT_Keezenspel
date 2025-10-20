@@ -102,7 +102,7 @@ public class TurnBasedTest {
   @Test
   void player1PlaysCard_4_5_5_CardsInTheGame() {
     // WHEN
-    sendValidMoveMessage(gameState, cardsDeck, "0");
+    sendValidMoveRequest(gameState, cardsDeck, "0");
 
     // THEN
     HashMap<String, Integer> nrCardsPerPlayer = new HashMap<>();
@@ -116,10 +116,10 @@ public class TurnBasedTest {
   void player1Forfeits_Player1GetsSkippedInNextTurn() {
     // GIVEN
     sendForfeitMessage(gameState, "0");
-    sendValidMoveMessage(gameState, cardsDeck, "1");
+    sendValidMoveRequest(gameState, cardsDeck, "1");
 
     // WHEN
-    sendValidMoveMessage(gameState, cardsDeck, "2");
+    sendValidMoveRequest(gameState, cardsDeck, "2");
 
     // THEN
     assertEquals("1", gameState.getPlayerIdTurn());
@@ -189,12 +189,12 @@ public class TurnBasedTest {
   @Test
   void player2Forfeits_WhenPlayer1HasPlayed_Player3WillPlayNext() {
     // GIVEN
-    sendValidMoveMessage(gameState, cardsDeck, "0");
+    sendValidMoveRequest(gameState, cardsDeck, "0");
     sendForfeitMessage(gameState, "1");
-    sendValidMoveMessage(gameState, cardsDeck, "2");
+    sendValidMoveRequest(gameState, cardsDeck, "2");
 
     // WHEN
-    sendValidMoveMessage(gameState, cardsDeck, "0");
+    sendValidMoveRequest(gameState, cardsDeck, "0");
 
     // THEN
     assertTrue(cardsDeck.getCardsForPlayer("1").isEmpty());
@@ -209,7 +209,7 @@ public class TurnBasedTest {
 
     for (int i = 0; i < 5; i++) {
       // WHEN
-      sendValidMoveMessage(gameState, cardsDeck, "2");
+      sendValidMoveRequest(gameState, cardsDeck, "2");
 
       // THEN
       if (i < 4) {
@@ -224,7 +224,7 @@ public class TurnBasedTest {
   void playerCanOnlyMoveHisOwnPawn() {
 
 //        // WHEN
-//        sendValidMoveMessage(gameState , cardsDeck , "0");
+//        sendValidMoveRequest(gameState , cardsDeck , "0");
 //
 //        // send a valid move for the wrong player
 //        Pawn pawn = new Pawn(new PawnId("0",0),new PositionKey("0",6));
@@ -258,14 +258,14 @@ public class TurnBasedTest {
   void playersPlayAllTheirCards_ExceptLastPlayer_OnlyLastPlayerIsActive() {
     // GIVEN
     for (int i = 0; i < 4; i++) {
-      sendValidMoveMessage(gameState, cardsDeck, "0");
-      sendValidMoveMessage(gameState, cardsDeck, "1");
-      sendValidMoveMessage(gameState, cardsDeck, "2");
+      sendValidMoveRequest(gameState, cardsDeck, "0");
+      sendValidMoveRequest(gameState, cardsDeck, "1");
+      sendValidMoveRequest(gameState, cardsDeck, "2");
     }
 
     // WHEN
-    sendValidMoveMessage(gameState, cardsDeck, "0");
-    sendValidMoveMessage(gameState, cardsDeck, "1");
+    sendValidMoveRequest(gameState, cardsDeck, "0");
+    sendValidMoveRequest(gameState, cardsDeck, "1");
 
     // THEN
     assertEquals(stringsToList(new String[]{"2"}), gameState.getActivePlayers());
@@ -300,13 +300,13 @@ public class TurnBasedTest {
     // GIVEN
     gameState.setPlayerIdTurn("1");
     for (int i = 0; i < 4; i++) {
-      sendValidMoveMessage(gameState, cardsDeck, "1");
-      sendValidMoveMessage(gameState, cardsDeck, "2");
-      sendValidMoveMessage(gameState, cardsDeck, "0");
+      sendValidMoveRequest(gameState, cardsDeck, "1");
+      sendValidMoveRequest(gameState, cardsDeck, "2");
+      sendValidMoveRequest(gameState, cardsDeck, "0");
     }
 
     // WHEN
-    sendValidMoveMessage(gameState, cardsDeck, "1");
+    sendValidMoveRequest(gameState, cardsDeck, "1");
 
     // THEN
     Assertions.assertEquals("2", gameState.getPlayerIdTurn());
@@ -317,13 +317,13 @@ public class TurnBasedTest {
     // GIVEN
     gameState.setPlayerIdTurn("2");
     for (int i = 0; i < 4; i++) {
-      sendValidMoveMessage(gameState, cardsDeck, "2");
-      sendValidMoveMessage(gameState, cardsDeck, "0");
-      sendValidMoveMessage(gameState, cardsDeck, "1");
+      sendValidMoveRequest(gameState, cardsDeck, "2");
+      sendValidMoveRequest(gameState, cardsDeck, "0");
+      sendValidMoveRequest(gameState, cardsDeck, "1");
     }
 
     // WHEN
-    sendValidMoveMessage(gameState, cardsDeck, "2");
+    sendValidMoveRequest(gameState, cardsDeck, "2");
 
     // THEN
     Assertions.assertEquals("0", gameState.getPlayerIdTurn());
@@ -334,13 +334,13 @@ public class TurnBasedTest {
     // GIVEN
     gameState.setPlayerIdTurn("2");
     for (int i = 0; i < 4; i++) {
-      sendValidMoveMessage(gameState, cardsDeck, "2");
-      sendValidMoveMessage(gameState, cardsDeck, "0");
-      sendValidMoveMessage(gameState, cardsDeck, "1");
+      sendValidMoveRequest(gameState, cardsDeck, "2");
+      sendValidMoveRequest(gameState, cardsDeck, "0");
+      sendValidMoveRequest(gameState, cardsDeck, "1");
     }
 
     // WHEN
-    sendValidMoveMessage(gameState, cardsDeck, "2");
+    sendValidMoveRequest(gameState, cardsDeck, "2");
     sendForfeitMessage(gameState, "0");
 
     // THEN
@@ -352,15 +352,15 @@ public class TurnBasedTest {
     // GIVEN
     gameState.setPlayerIdTurn("0");
     sendForfeitMessage(gameState, "0");
-    sendValidMoveMessage(gameState, cardsDeck, "1");
+    sendValidMoveRequest(gameState, cardsDeck, "1");
     sendForfeitMessage(gameState, "2");
 
     for (int i = 0; i < 3; i++) {
-      sendValidMoveMessage(gameState, cardsDeck, "1");
+      sendValidMoveRequest(gameState, cardsDeck, "1");
     }
 
     // WHEN send last card
-    sendValidMoveMessage(gameState, cardsDeck, "1");
+    sendValidMoveRequest(gameState, cardsDeck, "1");
 
     // THEN
     Assertions.assertEquals("1", gameState.getPlayerIdTurn());
@@ -372,7 +372,7 @@ public class TurnBasedTest {
     createGame_With_NPlayers(gameState, 3);
 
     // WHEN
-    sendValidMoveMessage(gameState, cardsDeck, "0");
+    sendValidMoveRequest(gameState, cardsDeck, "0");
     gameState.forfeitPlayer("1");
     gameState.forfeitPlayer("2");
     playRemainingCards(gameState, cardsDeck, "0");
@@ -387,8 +387,8 @@ public class TurnBasedTest {
     createGame_With_NPlayers(gameState, 3);
 
     // WHEN
-    sendValidMoveMessage(gameState, cardsDeck, "0");
-    sendValidMoveMessage(gameState, cardsDeck, "1");
+    sendValidMoveRequest(gameState, cardsDeck, "0");
+    sendValidMoveRequest(gameState, cardsDeck, "1");
     gameState.forfeitPlayer("2");
     gameState.forfeitPlayer("0");
     playRemainingCards(gameState, cardsDeck, "1");
@@ -452,7 +452,7 @@ public class TurnBasedTest {
     gameState.forfeitPlayer("1");
     gameState.forfeitPlayer("2");
     // WHEN round 2
-    sendValidMoveMessage(gameState, cardsDeck, "1");
+    sendValidMoveRequest(gameState, cardsDeck, "1");
     gameState.forfeitPlayer("2");
     gameState.forfeitPlayer("0");
     playRemainingCards(gameState, cardsDeck, "1");
@@ -472,7 +472,7 @@ public class TurnBasedTest {
     gameState.forfeitPlayer("2");
     // WHEN round 2
     gameState.forfeitPlayer("1");
-    sendValidMoveMessage(gameState, cardsDeck, "2");
+    sendValidMoveRequest(gameState, cardsDeck, "2");
     gameState.forfeitPlayer("0");
     playRemainingCards(gameState, cardsDeck, "2");
     // THEN
@@ -494,7 +494,7 @@ public class TurnBasedTest {
     gameState.forfeitPlayer("0");
     // WHEN round 3
     gameState.forfeitPlayer("2");
-    sendValidMoveMessage(gameState, cardsDeck, "0");
+    sendValidMoveRequest(gameState, cardsDeck, "0");
     gameState.forfeitPlayer("1");
     playRemainingCards(gameState, cardsDeck, "0");
 
@@ -538,7 +538,7 @@ public class TurnBasedTest {
     gameState.forfeitPlayer("2");
     gameState.forfeitPlayer("0");
     // WHEN round 3
-    sendValidMoveMessage(gameState, cardsDeck, "2");
+    sendValidMoveRequest(gameState, cardsDeck, "2");
     gameState.forfeitPlayer("0");
     gameState.forfeitPlayer("1");
     playRemainingCards(gameState, cardsDeck, "2");
