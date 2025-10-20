@@ -113,6 +113,11 @@ paths:
       responses:
         201:
           description: "Player was added successfully"
+          content:
+            application/json:
+              schema:
+                playerId:
+                  type: string
         400:
           description: "Player could not be added"
 #  /moves/{sessionId}:
@@ -392,6 +397,9 @@ components:
 
     NewGameRequest:
       type: object
+      required:
+        - roomName
+        - maxPlayers
       properties:
         roomName:
           type: string
