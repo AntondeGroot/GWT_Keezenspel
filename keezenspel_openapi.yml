@@ -224,7 +224,7 @@ paths:
         - $ref: '#/components/parameters/sessionId'
         - $ref: '#/components/parameters/playerId'
       tags:
-        - moves
+        - cards
       responses:
         200:
           description: player forfeited successfully
