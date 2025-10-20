@@ -15,12 +15,14 @@ import ADG.Games.Keezen.Player.PawnId;
 import org.openqa.selenium.WebDriver;
 
 public class Steps {
+
   public static void playerForfeits(WebDriver driver, String playerId) {
-    setPlayerIdPlaying(driver,playerId);
+    setPlayerIdPlaying(driver, playerId);
     clickForfeitButton(driver);
   }
 
-  public static void playerPlaysCard(WebDriver driver, String playerId, PawnId pawnId, int cardValue) {
+  public static void playerPlaysCard(WebDriver driver, String playerId, PawnId pawnId,
+      int cardValue) {
     setPlayerIdPlaying(driver, playerId);
     waitUntilCardsAreLoaded(driver);
     clickCardByValue(driver, cardValue);
@@ -31,7 +33,8 @@ public class Steps {
     waitUntilPawnStopsMoving(driver, pawnId);
   }
 
-  public static void playerSwitchesPawns(WebDriver driver, String playerId, PawnId ownPawnId, PawnId otherPawnId) {
+  public static void playerSwitchesPawns(WebDriver driver, String playerId, PawnId ownPawnId,
+      PawnId otherPawnId) {
     setPlayerIdPlaying(driver, playerId);
     waitUntilCardsAreLoaded(driver);
     clickPawn(driver, ownPawnId);
@@ -54,7 +57,7 @@ public class Steps {
         {1, 4, 3, 1}  // Pawn 3
     };
 
-    setPlayerIdPlaying(driver,playerId);
+    setPlayerIdPlaying(driver, playerId);
     for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
       for (int step : winningMoves[pawnNr]) {
         playerPlaysCard(driver, playerId, new PawnId(playerId, pawnNr), step);

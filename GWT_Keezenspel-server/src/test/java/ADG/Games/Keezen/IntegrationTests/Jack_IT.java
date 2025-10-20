@@ -26,15 +26,15 @@ import org.openqa.selenium.WebDriver;
 public class Jack_IT {
 
   static WebDriver driver;
-  private final PawnId pawnId10 = new PawnId("1",0);
-  private final PawnId pawnId20 = new PawnId("2",0);
+  private final PawnId pawnId10 = new PawnId("1", 0);
+  private final PawnId pawnId20 = new PawnId("2", 0);
 
   @BeforeEach
   public void setUp() {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver,"0");
+    setPlayerIdPlaying(driver, "0");
   }
 
   @AfterAll
@@ -46,21 +46,22 @@ public class Jack_IT {
   }
 
   @Test
-  public void playersSwitchWithJack(){
+  public void playersSwitchWithJack() {
     // GIVEN
     waitUntilCardsAreLoaded(driver);
 
     playerForfeits(driver, "0");
 
     // get on board
-    playerPlaysCard(driver, "1", pawnId10,1);
-    playerPlaysCard(driver, "2", pawnId20,1);
+    playerPlaysCard(driver, "1", pawnId10, 1);
+    playerPlaysCard(driver, "2", pawnId20, 1);
 
     // move on board
     Point start = getPawnLocation(driver, pawnId10);
-    playerPlaysCard(driver, "1", pawnId10,2);
+    playerPlaysCard(driver, "1", pawnId10, 2);
     Point end = getPawnLocation(driver, pawnId10);
-    assertPointsNotEqual("The pawn of player 1 did not move with 2 steps after coming on board", start, end);
+    assertPointsNotEqual("The pawn of player 1 did not move with 2 steps after coming on board",
+        start, end);
 
     // now player 2 can switch using a Jack
     Point positionPlayer1 = getPawnLocation(driver, pawnId10);
@@ -70,8 +71,12 @@ public class Jack_IT {
     // THEN
     TestUtils.wait(400);
 
-    System.out.println("original position player 1 :"+positionPlayer2+" original position player 2 :"+positionPlayer1);
-    assertPointsEqual("Expected player 2 to be at position 1", positionPlayer1, getPawnLocation(driver, pawnId20));
-    assertPointsEqual("Expected player 1 to be at point 2", positionPlayer2, getPawnLocation(driver, pawnId10));
+    System.out.println(
+        "original position player 1 :" + positionPlayer2 + " original position player 2 :"
+            + positionPlayer1);
+    assertPointsEqual("Expected player 2 to be at position 1", positionPlayer1,
+        getPawnLocation(driver, pawnId20));
+    assertPointsEqual("Expected player 1 to be at point 2", positionPlayer2,
+        getPawnLocation(driver, pawnId10));
   }
 }

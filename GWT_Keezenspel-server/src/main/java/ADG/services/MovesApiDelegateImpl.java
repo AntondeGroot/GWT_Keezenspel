@@ -1,10 +1,7 @@
 package ADG.services;
 
-import static ADG.Processing.ProcessOnBoard.processOnBoard;
-import static ADG.Processing.ProcessOnMove.processOnMove;
-import static ADG.Processing.ProcessOnSplit.processOnSplit;
-import static ADG.Processing.ProcessOnSwitch.processOnSwitch;
 import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
+import static com.adg.openapi.model.TempMessageType.MAKE_MOVE;
 
 import ADG.Games.Keezen.GameRegistry;
 import ADG.Games.Keezen.GameSession;
@@ -44,7 +41,8 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     TestMoveResponse testMoveResponse = new TestMoveResponse();
-    gameState.processTestMove(moveRequest, testMoveResponse);
+//    gameState.processTestMove(moveRequest, testMoveResponse);
+    return null;
   }
 
   @Override
@@ -72,12 +70,13 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
     if(!validation.isValid()){
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-
+    moveRequest.setTempMessageType(MAKE_MOVE);
     switch(validation.getMoveType()){
-      case MOVE -> processOnMove(gameState, ,response);
-      case SPLIT -> processOnSplit(gameState,,response);
-      case SWITCH -> processOnSwitch(gameState,,response);
-      case ON_BOARD -> processOnBoard(gameState, ,response);
+      case MOVE -> gameState.processOnMove(moveRequest,response);
+      case SPLIT -> gameState.processOnSplit(moveRequest,response);
+      case SWITCH -> gameState.processOnSwitch(moveRequest,response);
+      case ON_BOARD -> gameState.processOnBoard(moveRequest,response);
+    }
 
     // if you want to make a move for real && it is possible to do so
     // todo: move to gamestate itself
@@ -88,9 +87,9 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
       if(moves.size() > 1){
         moves.removeFirst();
       }
-      gameSession.saveMoves(moves);
+//      gameSession.saveMoves(moves);
     }
 
-    return response;
+    return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

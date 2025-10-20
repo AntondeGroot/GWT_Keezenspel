@@ -25,6 +25,7 @@ import org.openqa.selenium.WebElement;
 
 @ExtendWith(ScreenshotOnFailure.class)
 public class PlayerStatusMock_IT {
+
   static WebDriver driver;
 
   @BeforeEach
@@ -32,7 +33,7 @@ public class PlayerStatusMock_IT {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver,"0");
+    setPlayerIdPlaying(driver, "0");
     waitUntilCardsAreLoaded(driver);
   }
 
@@ -58,7 +59,7 @@ public class PlayerStatusMock_IT {
   }
 
   @Test
-  public void player0IsPlayingWhenStartingGame(){
+  public void player0IsPlayingWhenStartingGame() {
     WebElement player0 = driver.findElement(By.id("player0"));
     assertEquals("playerPlaying playerActive", player0.getAttribute("class"));
   }
@@ -68,14 +69,15 @@ public class PlayerStatusMock_IT {
     // GIVEN game started
 
     // WHEN
-    Steps.playerForfeits(driver,"0");
+    Steps.playerForfeits(driver, "0");
 
     // THEN
-    setPlayerIdPlaying(driver,"1");
+    setPlayerIdPlaying(driver, "1");
     waitUntilCardsAreLoaded(driver);
     WebElement player0 = driver.findElement(By.id("player0"));
     assertEquals("playerNotPlaying playerInactive", player0.getAttribute("class"));
   }
+
   @Test
   public void player1IsPlayingWhenPlayer0Forfeits() throws InterruptedException {
     // GIVEN game started
@@ -85,29 +87,31 @@ public class PlayerStatusMock_IT {
     TestUtils.wait(200);
 
     // THEN
-    setPlayerIdPlaying(driver,"1");
+    setPlayerIdPlaying(driver, "1");
     waitUntilCardsAreLoaded(driver);
     WebElement player1 = driver.findElement(By.id("player1"));
     assertEquals("playerPlaying playerActive", player1.getAttribute("class"));
   }
+
   @Test
   public void player2IsPlayingWhen0And1Forfeit() throws InterruptedException {
     // GIVEN game started
 
     // WHEN
-    playerForfeits(driver,"0");
-    playerForfeits(driver,"1");
+    playerForfeits(driver, "0");
+    playerForfeits(driver, "1");
 
     // THEN
     WebElement player = driver.findElement(By.id("player2"));
     assertEquals("playerPlaying playerActive", player.getAttribute("class"));
   }
+
   @Test
   public void player0IsStilActiveAfterPlayingCard() throws InterruptedException {
     // GIVEN game started
 
     // WHEN
-    PawnId pawnId00 = new PawnId("0",0);
+    PawnId pawnId00 = new PawnId("0", 0);
     playerPlaysCard(driver, "0", pawnId00, 1);
     TestUtils.wait(400);
 

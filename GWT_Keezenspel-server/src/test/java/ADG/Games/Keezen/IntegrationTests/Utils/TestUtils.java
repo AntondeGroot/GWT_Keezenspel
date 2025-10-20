@@ -104,9 +104,9 @@ public class TestUtils {
     String initialBorder = card.getCssValue("border-color");
 
     Log.info("border: " + initialBorder);
-    if(initialBorder.equals("rgb(0, 0, 0)")) {
+    if (initialBorder.equals("rgb(0, 0, 0)")) {
       card.click();
-    }else{
+    } else {
       // in a mocked cardsdeck you can keep on playing the exact same card. This does not change
       // movetype for an ace. Realistically you would chose another Ace card if you had two, this
       // would trigger the reevaluation of the movetype
@@ -118,27 +118,27 @@ public class TestUtils {
   }
 
   public static Point getPawnLocation(WebDriver driver, PawnId pawnId) {
-      WebElement pawnElement = driver.findElement(By.id(pawnId.toString()));
-      String x = pawnElement.getCssValue("left").replace("px", "");
-      String y = pawnElement.getCssValue("top").replace("px", "");
-      return new Point(Double.parseDouble(x), Double.parseDouble(y));
-    }
+    WebElement pawnElement = driver.findElement(By.id(pawnId.toString()));
+    String x = pawnElement.getCssValue("left").replace("px", "");
+    String y = pawnElement.getCssValue("top").replace("px", "");
+    return new Point(Double.parseDouble(x), Double.parseDouble(y));
+  }
 
-    public static void scrollUp(WebDriver driver) {
+  public static void scrollUp(WebDriver driver) {
     // useful when you select a Jack
-      JavascriptExecutor js = (JavascriptExecutor) driver;
-      js.executeScript("window.scrollTo(0, 0);"); // Scroll to top
-      TestUtils.wait(200);
-    }
+    JavascriptExecutor js = (JavascriptExecutor) driver;
+    js.executeScript("window.scrollTo(0, 0);"); // Scroll to top
+    TestUtils.wait(200);
+  }
 
   public static Point clickPawn(WebDriver driver, PawnId pawnId) {
     WebElement pawnOverlay = driver.findElement(By.className(pawnId + "Overlay"));
     WebElement pawnElement = driver.findElement(By.id(pawnId.toString()));
 
     // Check if the overlay is not visible
-    if(!pawnIsSelected(driver, pawnId)){
+    if (!pawnIsSelected(driver, pawnId)) {
       pawnElement.click();
-    }else{
+    } else {
       pawnElement.click();
 
       pawnElement = driver.findElement(By.id(pawnId.toString()));
@@ -150,11 +150,11 @@ public class TestUtils {
     return new Point(Double.parseDouble(x), Double.parseDouble(y));
   }
 
-  public static boolean pawnIsSelected(WebDriver driver, PawnId pawnId){
-    WebElement updatedElement = driver.findElement(By.className(pawnId.toString()+"Overlay"));
+  public static boolean pawnIsSelected(WebDriver driver, PawnId pawnId) {
+    WebElement updatedElement = driver.findElement(By.className(pawnId.toString() + "Overlay"));
     String output = updatedElement.getCssValue("visibility");
-    Log.info("pawnIsSelected: " + output+" for element "+updatedElement);
-    return Objects.equals(output,"visible");
+    Log.info("pawnIsSelected: " + output + " for element " + updatedElement);
+    return Objects.equals(output, "visible");
   }
 
   public static void clickPlayCardButton(WebDriver driver) {
@@ -188,7 +188,7 @@ public class TestUtils {
   }
 
   public static void playerForfeits(WebDriver driver, String playerId) {
-    setPlayerIdPlaying(driver,playerId);
+    setPlayerIdPlaying(driver, playerId);
     clickForfeitButton(driver);
   }
 
@@ -222,9 +222,10 @@ public class TestUtils {
    *
    * <p>TestUtils.wait() will execute it in the thread the test is running in
    * wait() creates a separate thread and will then not actually wait</p>
+   *
    * @param millis
    */
-  public static void wait(int millis){
+  public static void wait(int millis) {
     try {
       Thread.sleep(millis);
     } catch (InterruptedException e) {
@@ -232,12 +233,13 @@ public class TestUtils {
     }
   }
 
-  public static void assertPointsNotEqual(String msg, Point p1, Point p2){
-    assertNotEquals(msg, p1.getX(), p2.getX(),2);
-    assertNotEquals(msg, p1.getY(), p2.getY(),2);
+  public static void assertPointsNotEqual(String msg, Point p1, Point p2) {
+    assertNotEquals(msg, p1.getX(), p2.getX(), 2);
+    assertNotEquals(msg, p1.getY(), p2.getY(), 2);
   }
-  public static void assertPointsEqual(String msg, Point p1, Point p2){
-    assertEquals(msg, p1.getX(), p2.getX(),2);
-    assertEquals(msg, p1.getY(), p2.getY(),2);
+
+  public static void assertPointsEqual(String msg, Point p1, Point p2) {
+    assertEquals(msg, p1.getX(), p2.getX(), 2);
+    assertEquals(msg, p1.getY(), p2.getY(), 2);
   }
 }
