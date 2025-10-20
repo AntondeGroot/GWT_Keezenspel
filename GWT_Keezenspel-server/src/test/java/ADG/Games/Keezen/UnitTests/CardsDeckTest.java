@@ -188,9 +188,9 @@ class CardsDeckTest {
     createGame_With_NPlayers(gameState, 3);
     gameState.setPlayerIdTurn("0");
     for (int i = 0; i < 4; i++) {
-      sendValidMoveMessage(gameState, cardsDeck, "0");
-      sendValidMoveMessage(gameState, cardsDeck, "1");
-      sendValidMoveMessage(gameState, cardsDeck, "2");
+      sendValidMoveRequest(gameState, cardsDeck, "0");
+      sendValidMoveRequest(gameState, cardsDeck, "1");
+      sendValidMoveRequest(gameState, cardsDeck, "2");
     }
     assertEquals(3 * 4, cardsDeck.getPlayedCards().size());
 
@@ -203,9 +203,9 @@ class CardsDeckTest {
     createGame_With_NPlayers(gameState, 3);
     gameState.setPlayerIdTurn("0");
     for (int i = 0; i < 5; i++) {
-      sendValidMoveMessage(gameState, cardsDeck, "0");
-      sendValidMoveMessage(gameState, cardsDeck, "1");
-      sendValidMoveMessage(gameState, cardsDeck, "2");
+      sendValidMoveRequest(gameState, cardsDeck, "0");
+      sendValidMoveRequest(gameState, cardsDeck, "1");
+      sendValidMoveRequest(gameState, cardsDeck, "2");
     }
     assertEquals(3 * 5, cardsDeck.getPlayedCards().size());
 
@@ -218,9 +218,9 @@ class CardsDeckTest {
     createGame_With_NPlayers(gameState, 3);
     gameState.setPlayerIdTurn("0");
     for (int i = 0; i < 9; i++) {
-      sendValidMoveMessage(gameState, cardsDeck, "0");
-      sendValidMoveMessage(gameState, cardsDeck, "1");
-      sendValidMoveMessage(gameState, cardsDeck, "2");
+      sendValidMoveRequest(gameState, cardsDeck, "0");
+      sendValidMoveRequest(gameState, cardsDeck, "1");
+      sendValidMoveRequest(gameState, cardsDeck, "2");
     }
     assertEquals(3 * 5 + 3 * 4, cardsDeck.getPlayedCards().size());
 
@@ -233,9 +233,9 @@ class CardsDeckTest {
     createGame_With_NPlayers(gameState, 3);
     gameState.setPlayerIdTurn("0");
     for (int i = 0; i < 13; i++) {
-      sendValidMoveMessage(gameState, cardsDeck, "0");
-      sendValidMoveMessage(gameState, cardsDeck, "1");
-      sendValidMoveMessage(gameState, cardsDeck, "2");
+      sendValidMoveRequest(gameState, cardsDeck, "0");
+      sendValidMoveRequest(gameState, cardsDeck, "1");
+      sendValidMoveRequest(gameState, cardsDeck, "2");
     }
     assertEquals(0, cardsDeck.getPlayedCards().size());
 

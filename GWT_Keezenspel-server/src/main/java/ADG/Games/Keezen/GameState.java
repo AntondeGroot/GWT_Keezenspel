@@ -1049,7 +1049,7 @@ public class GameState {
     }
 
     response.setPawn1(pawn0);
-    if (Objects.equals(moveMessage.getTempMessageType(), MAKE_MOVE)) {
+    if (Objects.equals(moveMessage.getTempMessageType(), TempMessageType.MAKE_MOVE)) {
       movePawn(new Pawn(
           pawn0.getPlayerId(),
           pawn0.getPawnId(),
@@ -1093,7 +1093,8 @@ public class GameState {
 
   public Pawn getPawn(Pawn selectedPawn) {
     for (Pawn pawn : pawns) {
-      if (pawn.equals(selectedPawn)) {
+      if (pawn.getPawnId().equals(selectedPawn.getPawnId())) {
+        // only the pawnId is important, you want to use the getPawn to acquire the correct state pawn
         return pawn;
       }
     }
