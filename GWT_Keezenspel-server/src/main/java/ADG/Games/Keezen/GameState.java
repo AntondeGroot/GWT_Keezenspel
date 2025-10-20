@@ -934,7 +934,7 @@ public class GameState {
         pawn2.getCurrentTileId().getTileNr());
     // switch in gamestate
     // only use the card when not testing
-    if (moveMessage.getTempMessageType().equals(MAKE_MOVE)) {
+    if (moveMessage.getTempMessageType().equals(TempMessageType.MAKE_MOVE)) {
       movePawn(new Pawn(
           pawn1.getPlayerId(),
           pawn1.getPawnId(),

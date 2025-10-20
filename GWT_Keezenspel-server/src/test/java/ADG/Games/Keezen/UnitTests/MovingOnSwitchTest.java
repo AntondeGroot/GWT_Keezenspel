@@ -6,18 +6,19 @@ import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
+import com.adg.openapi.model.MoveResult;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PawnId;
 import com.adg.openapi.model.PositionKey;
+import com.adg.openapi.model.TempMessageType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
-import static ADG.Games.Keezen.Move.MessageType.MAKE_MOVE;
-import static org.junit.Assert.assertNull;
+import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 class MovingOnSwitchTest {
 
@@ -92,226 +93,214 @@ class MovingOnSwitchTest {
 
   @Test
   void switchPawnsOnNormalTiles_SelectedOwnPawnFirst() {
-//        // GIVEN
-//        Card card = givePlayerJack(cardsDeck , 0);
-//        String playerId = "0";
-//        PositionKey tileId1 = new PositionKey(playerId, 5);
-//        PositionKey tileId2 = new PositionKey("1", 3);
-//        Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
-//        Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
-//
-//        // WHEN
-//        createSwitchMessage(moveMessage, pawn1, pawn2, card);
-//        gameState.processOnSwitch(moveMessage, moveResponse);
-//
-//        // THEN: response message is correct
-//        assertEquals(MAKE_MOVE, moveResponse.getMessageType());
-//        assertEquals(tileId2, moveResponse.getMovePawn1().getLast());
-//        assertEquals(tileId1, moveResponse.getMovePawn2().getLast());
-//        // THEN: GameState is correct
-//        assertEquals(tileId2, gameState.getPawn(pawn1).getCurrentTileId());
-//        assertEquals(tileId1, gameState.getPawn(pawn2).getCurrentTileId());
-    fail();
+    // GIVEN
+    Card card = givePlayerJack(cardsDeck, 0);
+    String playerId = "0";
+    PositionKey tileId1 = new PositionKey(playerId, 5);
+    PositionKey tileId2 = new PositionKey("1", 3);
+    Pawn pawn1 = placePawnOnNest(gameState, playerId, tileId1);
+    Pawn pawn2 = placePawnOnNest(gameState, "1", tileId2);
+
+    // WHEN
+    createSwitchMessage(moveMessage, pawn1, pawn2, card);
+    gameState.processOnSwitch(moveMessage, moveResponse);
+
+    // THEN: response message is correct
+    assertEquals(tileId2, moveResponse.getMovePawn1().getLast());
+    assertEquals(tileId1, moveResponse.getMovePawn2().getLast());
+    // THEN: GameState is correct
+    assertEquals(tileId2, gameState.getPawn(pawn1).getCurrentTileId());
+    assertEquals(tileId1, gameState.getPawn(pawn2).getCurrentTileId());
   }
 
   @Test
   void switchPawnsOnNormalTiles_SelectedOtherPawnFirst() {
-//        // GIVEN
-//        String playerId = "0";
-//        Card card = givePlayerJack(cardsDeck , 0);
-//        PositionKey tileId1 = new PositionKey(playerId, 5);
-//        PositionKey tileId2 = new PositionKey("1", 3);
-//        Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
-//        Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
-//
-//        // WHEN
-//        createSwitchMessage(moveMessage, pawn1, pawn2, card);
-//        gameState.processOnSwitch(moveMessage, moveResponse);
-//
-//        // THEN: response message is correct
-//        assertEquals(MAKE_MOVE, moveResponse.getMessageType());
-//        assertEquals(tileId2, moveResponse.getMovePawn1().getLast());
-//        assertEquals(tileId1, moveResponse.getMovePawn2().getLast());
-//        // THEN: GameState is correct
-//        assertEquals(tileId2, gameState.getPawn(pawn1).getCurrentTileId());
-//        assertEquals(tileId1, gameState.getPawn(pawn2).getCurrentTileId());
-    fail();
+    // GIVEN
+    String playerId = "0";
+    Card card = givePlayerJack(cardsDeck, 0);
+    PositionKey tileId1 = new PositionKey(playerId, 5);
+    PositionKey tileId2 = new PositionKey("1", 3);
+    Pawn pawn1 = placePawnOnNest(gameState, playerId, tileId1);
+    Pawn pawn2 = placePawnOnNest(gameState, "1", tileId2);
+
+    // WHEN
+    createSwitchMessage(moveMessage, pawn1, pawn2, card);
+    gameState.processOnSwitch(moveMessage, moveResponse);
+
+    // THEN: response message is correct
+    assertEquals(tileId2, moveResponse.getMovePawn1().getLast());
+    assertEquals(tileId1, moveResponse.getMovePawn2().getLast());
+    // THEN: GameState is correct
+    assertEquals(tileId2, gameState.getPawn(pawn1).getCurrentTileId());
+    assertEquals(tileId1, gameState.getPawn(pawn2).getCurrentTileId());
   }
 
   @Test
   void doNotSwitchPawnsBelongingToOthers() {
-//        // GIVEN
-//        String playerId = "0";
-//        Card card = givePlayerJack(cardsDeck , 0);
-//        Card card2 = givePlayerJack(cardsDeck , 2);
-//        PositionKey tileId1 = new PositionKey(playerId, 5);
-//        PositionKey tileId2 = new PositionKey("1", 3);
-//        Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
-//        Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
-//
-//        // WHEN
-//        createSwitchMessage(moveMessage, pawn1, pawn2, card);
-//        moveMessage.setPlayerId("2"); // request is made from unrelated player
-//        gameState.processOnSwitch(moveMessage, moveResponse);
-//
-//        // THEN: response message is correct
-//        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
-//        assertNull(moveResponse.getMovePawn1());
-//        assertNull(moveResponse.getMovePawn2());
-//        // THEN: GameState is correct
-//        assertEquals(tileId1, gameState.getPawn(pawn1).getCurrentTileId());
-//        assertEquals(tileId2, gameState.getPawn(pawn2).getCurrentTileId());
-    fail();
+    // GIVEN
+    String playerId = "0";
+    Card card = givePlayerJack(cardsDeck, 0);
+    Card card2 = givePlayerJack(cardsDeck, 2);
+    PositionKey tileId1 = new PositionKey(playerId, 5);
+    PositionKey tileId2 = new PositionKey("1", 3);
+    Pawn pawn1 = placePawnOnNest(gameState, playerId, tileId1);
+    Pawn pawn2 = placePawnOnNest(gameState, "1", tileId2);
+
+    // WHEN
+    createSwitchMessage(moveMessage, pawn1, pawn2, card);
+    moveMessage.setPlayerId("2"); // request is made from unrelated player
+    gameState.processOnSwitch(moveMessage, moveResponse);
+
+    // THEN: response message is correct
+    assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
+    assertTrue(moveResponse.getMovePawn1().isEmpty());
+    assertTrue(moveResponse.getMovePawn2().isEmpty());
+    // THEN: GameState is correct
+    assertEquals(tileId1, gameState.getPawn(pawn1).getCurrentTileId());
+    assertEquals(tileId2, gameState.getPawn(pawn2).getCurrentTileId());
   }
 
   @Test
   void cantSwitchPawnFromNest() {
-//        // GIVEN
-//        String playerId = "0";
-//        Card card = givePlayerJack(cardsDeck , 0);
-//        PositionKey tileId1 = new PositionKey(playerId, -1);
-//        PositionKey tileId2 = new PositionKey("1", 3);
-//        Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
-//        Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
-//
-//        // WHEN
-//        createSwitchMessage(moveMessage, pawn1, pawn2, card); // request is made from unrelated player
-//        gameState.processOnSwitch(moveMessage, moveResponse);
-//
-//        // THEN: response message is correct
-//        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
-//        assertNull(moveResponse.getMovePawn1());
-//        assertNull(moveResponse.getMovePawn2());
-//        // THEN: GameState is correct
-//        assertEquals(tileId1, gameState.getPawn(pawn1).getCurrentTileId());
-//        assertEquals(tileId2, gameState.getPawn(pawn2).getCurrentTileId());
-    fail();
+    // GIVEN
+    String playerId = "0";
+    Card card = givePlayerJack(cardsDeck, 0);
+    PositionKey tileId1 = new PositionKey(playerId, -1);
+    PositionKey tileId2 = new PositionKey("1", 3);
+    Pawn pawn1 = placePawnOnNest(gameState, playerId, tileId1);
+    Pawn pawn2 = placePawnOnNest(gameState, "1", tileId2);
+
+    // WHEN
+    createSwitchMessage(moveMessage, pawn1, pawn2, card); // request is made from unrelated player
+    gameState.processOnSwitch(moveMessage, moveResponse);
+
+    // THEN: response message is correct
+    assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
+    assertTrue(moveResponse.getMovePawn1().isEmpty());
+    assertTrue(moveResponse.getMovePawn2().isEmpty());
+    // THEN: GameState is correct
+    assertEquals(tileId1, gameState.getPawn(pawn1).getCurrentTileId());
+    assertEquals(tileId2, gameState.getPawn(pawn2).getCurrentTileId());
   }
 
   @Test
   void cantSwitchPawnFromFinish() {
-//        // GIVEN
-//        String playerId = "0";
-//        Card card = givePlayerJack(cardsDeck , 0);
-//        PositionKey tileId1 = new PositionKey(playerId, 16);
-//        PositionKey tileId2 = new PositionKey("1", 3);
-//        Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
-//        Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
-//
-//        // WHEN
-//        createSwitchMessage(moveMessage, pawn1, pawn2, card); // request is made from unrelated player
-//        gameState.processOnSwitch(moveMessage, moveResponse);
-//
-//        // THEN: response message is correct
-//        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
-//        assertNull(moveResponse.getMovePawn1());
-//        assertNull(moveResponse.getMovePawn2());
-//        // THEN: GameState is correct
-//        assertEquals(tileId1, gameState.getPawn(pawn1).getCurrentTileId());
-//        assertEquals(tileId2, gameState.getPawn(pawn2).getCurrentTileId());
-    fail();
+    // GIVEN
+    String playerId = "0";
+    Card card = givePlayerJack(cardsDeck, 0);
+    PositionKey tileId1 = new PositionKey(playerId, 16);
+    PositionKey tileId2 = new PositionKey("1", 3);
+    Pawn pawn1 = placePawnOnNest(gameState, playerId, tileId1);
+    Pawn pawn2 = placePawnOnNest(gameState, "1", tileId2);
+
+    // WHEN
+    createSwitchMessage(moveMessage, pawn1, pawn2, card); // request is made from unrelated player
+    gameState.processOnSwitch(moveMessage, moveResponse);
+
+    // THEN: response message is correct
+    assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
+    assertTrue(moveResponse.getMovePawn1().isEmpty());
+    assertTrue(moveResponse.getMovePawn2().isEmpty());
+    // THEN: GameState is correct
+    assertEquals(tileId1, gameState.getPawn(pawn1).getCurrentTileId());
+    assertEquals(tileId2, gameState.getPawn(pawn2).getCurrentTileId());
   }
 
   @Test
   void cantTakeOtherPawnFromStart() {
-//        // GIVEN
-//        String playerId = "0";
-//        Card card = givePlayerJack(cardsDeck , 0);
-//        PositionKey tileId1 = new PositionKey(playerId, 4);
-//        PositionKey tileId2 = new PositionKey("1", 0);
-//        Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
-//        Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
-//
-//        // WHEN
-//        createSwitchMessage(moveMessage, pawn1, pawn2, card); // request is made from unrelated player
-//        gameState.processOnSwitch(moveMessage, moveResponse);
-//
-//        // THEN: response message is correct
-//        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
-//        assertNull(moveResponse.getMovePawn1());
-//        assertNull(moveResponse.getMovePawn2());
-//        // THEN: GameState is correct
-//        assertEquals(tileId1, gameState.getPawn(pawn1).getCurrentTileId());
-//        assertEquals(tileId2, gameState.getPawn(pawn2).getCurrentTileId());
-    fail();
+    // GIVEN
+    String playerId = "0";
+    Card card = givePlayerJack(cardsDeck, 0);
+    PositionKey tileId1 = new PositionKey(playerId, 4);
+    PositionKey tileId2 = new PositionKey("1", 0);
+    Pawn pawn1 = placePawnOnNest(gameState, playerId, tileId1);
+    Pawn pawn2 = placePawnOnNest(gameState, "1", tileId2);
+
+    // WHEN
+    createSwitchMessage(moveMessage, pawn1, pawn2, card); // request is made from unrelated player
+    gameState.processOnSwitch(moveMessage, moveResponse);
+
+    // THEN: response message is correct
+    assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
+    assertTrue(moveResponse.getMovePawn1().isEmpty());
+    assertTrue(moveResponse.getMovePawn2().isEmpty());
+    // THEN: GameState is correct
+    assertEquals(tileId1, gameState.getPawn(pawn1).getCurrentTileId());
+    assertEquals(tileId2, gameState.getPawn(pawn2).getCurrentTileId());
   }
 
   @Test
   void canSwitchPawnFromOwnStart() {
-//        // GIVEN
-//        String playerId = "0";
-//        Card card = givePlayerJack(cardsDeck , 0);
-//        PositionKey tileId1 = new PositionKey(playerId, 0);
-//        PositionKey tileId2 = new PositionKey("1", 5);
-//        Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
-//        Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
-//
-//        // WHEN
-//        createSwitchMessage(moveMessage, pawn1, pawn2, card); // request is made from unrelated player
-//        gameState.processOnSwitch(moveMessage, moveResponse);
-//
-//        // THEN: response message is correct
-//        assertEquals(MAKE_MOVE, moveResponse.getMessageType());
-//        assertEquals(tileId2, moveResponse.getMovePawn1().getLast());
-//        assertEquals(tileId1, moveResponse.getMovePawn2().getLast());
-//        // THEN: GameState is correct
-//        assertEquals(tileId2, gameState.getPawn(pawn1).getCurrentTileId());
-//        assertEquals(tileId1, gameState.getPawn(pawn2).getCurrentTileId());
-    fail();
+    // GIVEN
+    String playerId = "0";
+    Card card = givePlayerJack(cardsDeck, 0);
+    PositionKey tileId1 = new PositionKey(playerId, 0);
+    PositionKey tileId2 = new PositionKey("1", 5);
+    Pawn pawn1 = placePawnOnNest(gameState, playerId, tileId1);
+    Pawn pawn2 = placePawnOnNest(gameState, "1", tileId2);
+
+    // WHEN
+    createSwitchMessage(moveMessage, pawn1, pawn2, card); // request is made from unrelated player
+    gameState.processOnSwitch(moveMessage, moveResponse);
+
+    // THEN: response message is correct
+    assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+    assertEquals(tileId2, moveResponse.getMovePawn1().getLast());
+    assertEquals(tileId1, moveResponse.getMovePawn2().getLast());
+    // THEN: GameState is correct
+    assertEquals(tileId2, gameState.getPawn(pawn1).getCurrentTileId());
+    assertEquals(tileId1, gameState.getPawn(pawn2).getCurrentTileId());
   }
 
   @Test
   void cantSwitchWithOwnPawn() {
-//        // GIVEN
-//        String playerId = "0";
-//        Card card = givePlayerJack(cardsDeck , Integer.valueOf(playerId));
-//        PositionKey tileId1 = new PositionKey(playerId, 4);
-//        PositionKey tileId2 = new PositionKey(playerId, 2);
-//        Pawn pawn1 = placePawnOnBoard(gameState , new PawnId(playerId,0), tileId1);
-//        Pawn pawn2 = placePawnOnBoard(gameState , new PawnId(playerId, 1), tileId2);
-//
-//        // WHEN
-//        createSwitchMessage(moveMessage, pawn1, pawn2, card); // request is made from unrelated player
-//        gameState.processOnSwitch(moveMessage, moveResponse);
-//
-//        // THEN: response message is correct
-//        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
-//        assertNull(moveResponse.getMovePawn1());
-//        assertNull(moveResponse.getMovePawn2());
-//        // THEN: GameState is correct
-//        assertEquals(tileId1, gameState.getPawn(pawn1).getCurrentTileId());
-//        assertEquals(tileId2, gameState.getPawn(pawn2).getCurrentTileId());
-    fail();
+    // GIVEN
+    String playerId = "0";
+    Card card = givePlayerJack(cardsDeck, Integer.valueOf(playerId));
+    PositionKey tileId1 = new PositionKey(playerId, 4);
+    PositionKey tileId2 = new PositionKey(playerId, 2);
+    Pawn pawn1 = placePawnOnBoard(gameState, new PawnId(playerId, 0), tileId1);
+    Pawn pawn2 = placePawnOnBoard(gameState, new PawnId(playerId, 1), tileId2);
+
+    // WHEN
+    createSwitchMessage(moveMessage, pawn1, pawn2, card); // request is made from unrelated player
+    gameState.processOnSwitch(moveMessage, moveResponse);
+
+    // THEN: response message is correct
+    assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
+    assertTrue(moveResponse.getMovePawn1().isEmpty());
+    assertTrue(moveResponse.getMovePawn2().isEmpty());
+    // THEN: GameState is correct
+    assertEquals(tileId1, gameState.getPawn(pawn1).getCurrentTileId());
+    assertEquals(tileId2, gameState.getPawn(pawn2).getCurrentTileId());
   }
 
   @Test
   void testWhenPawnsSwitch_CardGetsRemovedFromHand_AndNextPlayerPlays() {
-//        Card card = givePlayerJack(cardsDeck , 0);
-//        Pawn pawn1 = placePawnOnNest(gameState , "0", new PositionKey("0",12));
-//        Pawn pawn2 = placePawnOnNest(gameState , "1", new PositionKey("0",5));
-//        assertEquals(5, cardsDeck.getCardsForPlayer("0").size());
-//
-//        createSwitchMessage(moveMessage, pawn1, pawn2, card);
-//        gameState.processOnSwitch(moveMessage, moveResponse);
-//
-//        assertEquals(4, cardsDeck.getCardsForPlayer("0").size());
-//        assertEquals("1", gameState.getPlayerIdTurn());
-    fail();
+    Card card = givePlayerJack(cardsDeck, 0);
+    Pawn pawn1 = placePawnOnNest(gameState, "0", new PositionKey("0", 12));
+    Pawn pawn2 = placePawnOnNest(gameState, "1", new PositionKey("0", 5));
+    assertEquals(5, cardsDeck.getCardsForPlayer("0").size());
+
+    createSwitchMessage(moveMessage, pawn1, pawn2, card);
+    gameState.processOnSwitch(moveMessage, moveResponse);
+
+    assertEquals(4, cardsDeck.getCardsForPlayer("0").size());
+    assertEquals("1", gameState.getPlayerIdTurn());
   }
 
   @Test
   void testingWhenPawnsSwitch_CardNotRemovedFromHand() {
-//        Card card = givePlayerJack(cardsDeck , 0);
-//        Pawn pawn1 = placePawnOnNest(gameState , "0", new PositionKey("0",12));
-//        Pawn pawn2 = placePawnOnNest(gameState , "1", new PositionKey("0",5));
-//        assertEquals(5, cardsDeck.getCardsForPlayer("0").size());
-//
-//        createSwitchMessage(moveMessage, pawn1, pawn2, card);
-//        moveMessage.setMessageType(MessageType.CHECK_MOVE);
-//        gameState.processOnSwitch(moveMessage, moveResponse);
-//
-//        assertEquals(5, cardsDeck.getCardsForPlayer("0").size());
-//        assertEquals("0",gameState.getPlayerIdTurn());
-    fail();
+    Card card = givePlayerJack(cardsDeck, 0);
+    Pawn pawn1 = placePawnOnNest(gameState, "0", new PositionKey("0", 12));
+    Pawn pawn2 = placePawnOnNest(gameState, "1", new PositionKey("0", 5));
+    assertEquals(5, cardsDeck.getCardsForPlayer("0").size());
+
+    createSwitchMessage(moveMessage, pawn1, pawn2, card);
+    moveMessage.setTempMessageType(TempMessageType.CHECK_MOVE);
+    gameState.processOnSwitch(moveMessage, moveResponse);
+
+    assertEquals(5, cardsDeck.getCardsForPlayer("0").size());
+    assertEquals("0", gameState.getPlayerIdTurn());
   }
 }
