@@ -555,8 +555,8 @@ public class TurnBasedTest {
     /// GIVEN
     createGame_With_NPlayers(gameState, 3);
     // send a valid move for the wrong player
-    Pawn pawn1 = new Pawn().pawnId(new PawnId("0", 1)).currentTileId(new PositionKey("0", 6));
-    Pawn pawn2 = new Pawn().pawnId(new PawnId("0", 2)).currentTileId(new PositionKey("0", 0));
+    Pawn pawn1 = new Pawn().playerId("0").pawnId(new PawnId("0", 1)).currentTileId(new PositionKey("0", 6));
+    Pawn pawn2 = new Pawn().playerId("0").pawnId(new PawnId("0", 2)).currentTileId(new PositionKey("0", 0));
     placePawnOnBoard(gameState, pawn1);
     placePawnOnBoard(gameState, pawn2);
     // fake a valid card

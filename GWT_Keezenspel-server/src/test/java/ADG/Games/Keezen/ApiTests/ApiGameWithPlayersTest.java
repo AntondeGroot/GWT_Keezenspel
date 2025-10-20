@@ -26,7 +26,7 @@ class ApiGameWithPlayersTest {
 
     // THEN they were added to the game
     var players = apiHelper.getAllPlayersInGame(sessionId);
-    System.out.println(players);
+
     boolean foundPlayer = players.stream().anyMatch(p ->
         p.get("name").equals(player.getName()) &&
             p.get("id").equals(player.getId()));
