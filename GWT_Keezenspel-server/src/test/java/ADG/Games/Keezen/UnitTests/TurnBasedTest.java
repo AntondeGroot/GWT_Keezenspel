@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
-import static ADG.Games.Keezen.Move.MoveResult.CAN_MAKE_MOVE;
+import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
 import static com.adg.openapi.model.MoveType.MOVE;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -552,26 +552,25 @@ public class TurnBasedTest {
 
   @Test
   void test_whenSplitIsPlayed_nextPlayerIs() {
-//        /// GIVEN
-//        createGame_With_NPlayers(gameState , 3);
-//        // send a valid move for the wrong player
-//        Pawn pawn1 = new Pawn(new PawnId("0",1),new PositionKey("0",6));
-//        Pawn pawn2 = new Pawn(new PawnId("0",2),new PositionKey("0",0));
-//        placePawnOnBoard(gameState, pawn1);
-//        placePawnOnBoard(gameState, pawn2);
-//        // fake a valid card
-//        Card card = new Card().suit(0).value(7);
-//        // replace a card from the players hand with this card
-//        cardsDeck.giveCardToPlayerForTesting("0", card);
-//
-//        createSplitMessage(moveMessage, pawn1, 3, pawn2, 4, card);
-//        // process
-//        MoveResponse moveResponse = new MoveResponse();
-//        gameState.processOnSplit(moveMessage, moveResponse);
-//
-//        assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
-//        assertEquals("1", gameState.getPlayerIdTurn());
-    Assertions.fail();
+    /// GIVEN
+    createGame_With_NPlayers(gameState, 3);
+    // send a valid move for the wrong player
+    Pawn pawn1 = new Pawn().pawnId(new PawnId("0", 1)).currentTileId(new PositionKey("0", 6));
+    Pawn pawn2 = new Pawn().pawnId(new PawnId("0", 2)).currentTileId(new PositionKey("0", 0));
+    placePawnOnBoard(gameState, pawn1);
+    placePawnOnBoard(gameState, pawn2);
+    // fake a valid card
+    Card card = new Card().suit(0).value(7);
+    // replace a card from the players hand with this card
+    cardsDeck.giveCardToPlayerForTesting("0", card);
+
+    createSplitMessage(moveMessage, pawn1, 3, pawn2, 4, card);
+    // process
+    MoveResponse moveResponse = new MoveResponse();
+    gameState.processOnSplit(moveMessage, moveResponse);
+
+    assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+    assertEquals("1", gameState.getPlayerIdTurn());
   }
 
   @Test
