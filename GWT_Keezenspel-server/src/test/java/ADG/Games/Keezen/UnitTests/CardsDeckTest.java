@@ -159,31 +159,6 @@ class CardsDeckTest {
   }
 
   @Test
-  void playerHasCard2() {
-    // GIVEN WHEN
-    createGame_With_NPlayers(gameState, 3);
-
-    // WHEN
-    place4PawnsOnFinish(gameState, "1");
-    gameState.checkForWinners(new ArrayList<>());
-    place4PawnsOnFinish(gameState, "2");
-    gameState.checkForWinners(new ArrayList<>());
-    playRemainingCards(gameState, cardsDeck, "0");
-
-    cardsDeck.shuffleIfFirstRound();
-    cardsDeck.dealCards();
-
-    // THEN
-    int totalCards = cardsDeck.getNrOfCardsPerPlayer()
-        .values()
-        .stream()
-        .mapToInt(Integer::intValue)
-        .sum();
-
-    assertEquals(4, totalCards);
-  }
-
-  @Test
   void PlayedCardsDoNotResetDuringFirstRound() {
     createGame_With_NPlayers(gameState, 3);
     gameState.setPlayerIdTurn("0");

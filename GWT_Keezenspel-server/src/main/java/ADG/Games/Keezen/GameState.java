@@ -77,6 +77,12 @@ public class GameState {
 
     playerIdTurn = players.getFirst().getId();
     playerIdStartingRound = playerIdTurn;
+
+    for (Player p : players) {
+      p.setIsActive(true);
+    }
+    players.getFirst().setIsPlaying(true);
+
     if (pawns.isEmpty()) {
       pawns = new ArrayList<>();
       int playerInt = 0;
@@ -154,7 +160,7 @@ public class GameState {
     }
   }
 
-  private void removeWinnerFromActivePlayerList() {
+  public void removeWinnerFromActivePlayerList() {
     for (String winnerId : winners) {
       activePlayers.remove(winnerId);
     }
@@ -1151,7 +1157,7 @@ public class GameState {
       return true;
     }
 
-    if (selectedPawn.equals(pawnOnTile.getPawnId())) {
+    if (selectedPawn.getPawnId().equals(pawnOnTile.getPawnId())) {
       return true;
     }
 
