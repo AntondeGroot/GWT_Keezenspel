@@ -28,9 +28,10 @@ import org.openqa.selenium.WebDriver;
 
 @ExtendWith(ScreenshotOnFailure.class)
 public class MovingOnBoard_IT {
+
   static WebDriver driver;
-  private final PawnId pawnId10 = new PawnId("1",0);
-  private final PawnId pawnId20 = new PawnId("2",0);
+  private final PawnId pawnId10 = new PawnId("1", 0);
+  private final PawnId pawnId20 = new PawnId("2", 0);
 
   @BeforeEach
   public void setUp() {
@@ -38,7 +39,7 @@ public class MovingOnBoard_IT {
 
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver,"0");
+    setPlayerIdPlaying(driver, "0");
   }
 
   @AfterEach
@@ -64,30 +65,30 @@ public class MovingOnBoard_IT {
   }
 
   @Test
-  public void pawnCanMoveOnBoardWithAce(){
+  public void pawnCanMoveOnBoardWithAce() {
     // GIVEN
-    Point start = clickPawn(driver, new PawnId("0",0));
+    Point start = clickPawn(driver, new PawnId("0", 0));
 
     // WHEN
     clickCardByValue(driver, 1);
     clickPlayCardButton(driver);
 
     // THEN
-    Point end = clickPawn(driver, new PawnId("0",0));
+    Point end = clickPawn(driver, new PawnId("0", 0));
     assertNotEquals(start, end);
   }
 
   @Test
   public void pawnCanMoveOnBoardWithKing() throws InterruptedException {
     // GIVEN
-    Point start = clickPawn(driver, new PawnId("0",0));
+    Point start = clickPawn(driver, new PawnId("0", 0));
 
     // WHEN
     clickCardByValue(driver, 13);
     clickPlayCardButton(driver);
 
     // THEN
-    Point end = clickPawn(driver, new PawnId("0",0));
+    Point end = clickPawn(driver, new PawnId("0", 0));
     assertNotEquals(start, end);
   }
 
@@ -97,7 +98,7 @@ public class MovingOnBoard_IT {
    */
   @Test
   @Timeout(25)
-  public void pawnAfterMovingOnboardCanImmediatelyMoveWithAce(){
+  public void pawnAfterMovingOnboardCanImmediatelyMoveWithAce() {
     /***
      *
      */
@@ -108,10 +109,10 @@ public class MovingOnBoard_IT {
 
     // WHEN
     Point nest = getPawnLocation(driver, pawnId20);
-    playerPlaysCard(driver,"2", pawnId20, 13); // onboard with king
+    playerPlaysCard(driver, "2", pawnId20, 13); // onboard with king
     Point start = getPawnLocation(driver, pawnId20);
 
-    playerPlaysCard(driver,"2", pawnId20,1); // move with Ace
+    playerPlaysCard(driver, "2", pawnId20, 1); // move with Ace
     Point end = getPawnLocation(driver, pawnId20);
 
     // THEN
@@ -124,18 +125,18 @@ public class MovingOnBoard_IT {
    * A pawn on a nest tile cannot switch
    */
   @Test
-  public void pawnAfterMovingOnboardCanImmediatelySwitch(){
+  public void pawnAfterMovingOnboardCanImmediatelySwitch() {
     // GIVEN
     playerForfeits(driver, "0");
 
     // WHEN BOTH PLAYERS GET ON BOARD
-    playerPlaysCard(driver,"1", pawnId10, 1);
+    playerPlaysCard(driver, "1", pawnId10, 1);
 
-    playerPlaysCard(driver,"2", pawnId20, 1);
+    playerPlaysCard(driver, "2", pawnId20, 1);
 
     // THEN one pawn moves from starttile so that it can be switched
     Point p1 = getPawnLocation(driver, pawnId10);
-    playerPlaysCard(driver,"1", pawnId10, 5);
+    playerPlaysCard(driver, "1", pawnId10, 5);
     Point p2 = getPawnLocation(driver, pawnId10);
 
     assertPointsNotEqual("The pawn 10 did not move after coming on board", p1, p2);
@@ -147,8 +148,10 @@ public class MovingOnBoard_IT {
     playerSwitchesPawns(driver, "2", pawnId20, pawnId10);
 
     // THEN THE PAWNS SWITCHED PLACE
-    assertPointsEqual("Pawn 2 did not move to pawn 1", positionPawn10, getPawnLocation(driver, pawnId20));
-    assertPointsEqual("Pawn 1 did not move to pawn 2", positionPawn20, getPawnLocation(driver, pawnId10));
+    assertPointsEqual("Pawn 2 did not move to pawn 1", positionPawn10,
+        getPawnLocation(driver, pawnId20));
+    assertPointsEqual("Pawn 1 did not move to pawn 2", positionPawn20,
+        getPawnLocation(driver, pawnId10));
   }
 
   /***
@@ -156,6 +159,7 @@ public class MovingOnBoard_IT {
    * A pawn on a nest tile cannot split
    */
   @Test
-  public void pawnOnboardCanImmediatelyPlay7(){}
+  public void pawnOnboardCanImmediatelyPlay7() {
+  }
 
 }

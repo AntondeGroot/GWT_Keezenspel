@@ -28,6 +28,7 @@ import org.openqa.selenium.WebElement;
 
 @ExtendWith(ScreenshotOnFailure.class)
 public class Pawn_IT {
+
   static WebDriver driver;
 
   @BeforeEach
@@ -36,7 +37,7 @@ public class Pawn_IT {
 
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver,"0");
+    setPlayerIdPlaying(driver, "0");
   }
 
   @AfterEach
@@ -64,22 +65,22 @@ public class Pawn_IT {
   @Test
   public void clickOnOwnPawn_Selected() throws InterruptedException {
     // GIVEN
-    PawnId pawnId = new PawnId("0",0);
+    PawnId pawnId = new PawnId("0", 0);
     WebElement pawn1 = driver.findElement(By.id(pawnId.toString()));
 
     // WHEN
     pawn1.click();
 
     // THEN
-    WebElement pawn1Outline = driver.findElement(By.className(pawnId+"Overlay"));
+    WebElement pawn1Outline = driver.findElement(By.className(pawnId + "Overlay"));
     assertEquals("visible", pawn1Outline.getCssValue("visibility"));
   }
 
   @Test
-  public void clickOnOwnPawn_clickSecondPawn_FirstPawnDeselected(){
+  public void clickOnOwnPawn_clickSecondPawn_FirstPawnDeselected() {
     // GIVEN
-    PawnId pawnId1 = new PawnId("0",1);
-    PawnId pawnId2 = new PawnId("0",2);
+    PawnId pawnId1 = new PawnId("0", 1);
+    PawnId pawnId2 = new PawnId("0", 2);
     WebElement pawn1 = driver.findElement(new ById(pawnId1.toString()));
     pawn1.click();
 
@@ -88,15 +89,15 @@ public class Pawn_IT {
     pawn2.click();
 
     // THEN
-    WebElement pawn1Outline = driver.findElement(By.className(pawnId1+"Overlay"));
+    WebElement pawn1Outline = driver.findElement(By.className(pawnId1 + "Overlay"));
     assertEquals("hidden", pawn1Outline.getCssValue("visibility"));
 
-    WebElement pawn2Outline = driver.findElement(By.className(pawnId2+"Overlay"));
+    WebElement pawn2Outline = driver.findElement(By.className(pawnId2 + "Overlay"));
     assertEquals("visible", pawn2Outline.getCssValue("visibility"));
   }
 
   @Test
-  public void clickOnOtherPawnOnBase_NotSelected(){
+  public void clickOnOtherPawnOnBase_NotSelected() {
     // GIVEN
     WebElement pawnOtherPlayer = driver.findElement(new ById("PawnId{1,1}"));
 
@@ -109,8 +110,8 @@ public class Pawn_IT {
   }
 
   @Test
-  public void playerCanMoveOnBoardAndPlayWithoutHavingToRefreshPage(){
-    PawnId pawnId = new PawnId("2",0);
+  public void playerCanMoveOnBoardAndPlayWithoutHavingToRefreshPage() {
+    PawnId pawnId = new PawnId("2", 0);
 
     // GIVEN player 0 forfeits
     playerForfeits(driver, "0");

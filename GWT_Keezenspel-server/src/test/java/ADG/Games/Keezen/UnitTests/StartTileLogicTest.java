@@ -15,52 +15,60 @@ import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StartTileLogicTest {
-    PositionKey startTileId;
 
-    private GameSession engine;
-    private GameState gameState;
-    private CardsDeckInterface cardsDeck;
+  PositionKey startTileId;
 
-    @BeforeEach
-    void setup(){
-        engine = new GameSession();
-        gameState = engine.getGameState();
-        cardsDeck = engine.getCardsDeck();
+  private GameSession engine;
+  private GameState gameState;
+  private CardsDeckInterface cardsDeck;
 
-        createGame_With_NPlayers(gameState, 3);
-        startTileId = new PositionKey("0", 0);
-    }
+  @BeforeEach
+  void setup() {
+    engine = new GameSession();
+    gameState = engine.getGameState();
+    cardsDeck = engine.getCardsDeck();
 
-    @AfterEach
-    void tearDown(){
-        gameState.tearDown();
-    }
+    createGame_With_NPlayers(gameState, 3);
+    startTileId = new PositionKey("0", 0);
+  }
 
-    @Test
-    void player2_canPassPlayer2_OnStartTile0(){
-        Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",1), new PositionKey("2",12));
-        Pawn pawn2 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",2), new PositionKey("0",0));
+  @AfterEach
+  void tearDown() {
+    gameState.tearDown();
+  }
 
-        Assertions.assertTrue(gameState.canPassStartTile(pawn1.getPawnId(), startTileId));
-    }
-    @Test
-    void player2_canPassPlayer1_OnStartTile0(){
-        Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",1), new PositionKey("2",12));
-        Pawn pawn2 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("1",2), new PositionKey("0",0));
+  @Test
+  void player2_canPassPlayer2_OnStartTile0() {
+//        Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",1), new PositionKey("2",12));
+//        Pawn pawn2 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",2), new PositionKey("0",0));
+//
+//        Assertions.assertTrue(gameState.canPassStartTile(pawn1.getPawnId(), startTileId));
+    fail();
+  }
 
-        assertTrue(gameState.canPassStartTile(pawn1.getPawnId(), startTileId));
-    }
-    @Test
-    void player2_cannotPassPlayer0_OnStartTile0(){
-        Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",1), new PositionKey("2",12));
-        Pawn pawn2 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("0",1), new PositionKey("0",0));
+  @Test
+  void player2_canPassPlayer1_OnStartTile0() {
+//        Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",1), new PositionKey("2",12));
+//        Pawn pawn2 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("1",2), new PositionKey("0",0));
+//
+//        assertTrue(gameState.canPassStartTile(pawn1.getPawnId(), startTileId));
+    fail();
+  }
 
-        assertFalse(gameState.canPassStartTile(pawn1.getPawnId(), startTileId));
-    }
-    @Test
-    void player2_canPassEmptyStartTile0(){
-        Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",1), new PositionKey("2",12));
+  @Test
+  void player2_cannotPassPlayer0_OnStartTile0() {
+//        Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",1), new PositionKey("2",12));
+//        Pawn pawn2 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("0",1), new PositionKey("0",0));
+//
+//        assertFalse(gameState.canPassStartTile(pawn1.getPawnId(), startTileId));
+    fail();
+  }
 
-        assertTrue(gameState.canPassStartTile(pawn1.getPawnId(), startTileId));
-    }
+  @Test
+  void player2_canPassEmptyStartTile0() {
+//        Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",1), new PositionKey("2",12));
+//
+//        assertTrue(gameState.canPassStartTile(pawn1.getPawnId(), startTileId));
+    fail();
+  }
 }

@@ -25,7 +25,7 @@ class Board_IT {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver,"0");
+    setPlayerIdPlaying(driver, "0");
   }
 
   @AfterEach
@@ -55,18 +55,18 @@ class Board_IT {
   }
 
   @Test
-  public void verifyNumberOfTilesFor3Players(){
-    assertEquals(24*3, driver.findElements(By.className("tile")).size());
+  public void verifyNumberOfTilesFor3Players() {
+    assertEquals(24 * 3, driver.findElements(By.className("tile")).size());
   }
 
   @Test
-  public void verifyNumberOfPawnsFor3Players(){
+  public void verifyNumberOfPawnsFor3Players() {
     assertEquals(12, driver.findElements(By.className("pawnDiv")).size());
   }
 
   @Test
-  public void verifyNumberOfCardsForPlayer1(){
-    setPlayerIdPlaying(driver,"0");
+  public void verifyNumberOfCardsForPlayer1() {
+    setPlayerIdPlaying(driver, "0");
 
     assertEquals(5, driver.findElements(By.className("cardDiv")).size());
   }

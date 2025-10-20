@@ -424,6 +424,14 @@ components:
           type: integer
         stepsPawn2:
           type: integer
+        tempMessageType:
+          description: only temporary, to give it test/make_move functionality in order to make the switch to openapi easier
+          $ref: '#/components/schemas/TempMessageType'
+    TempMessageType:
+      description: only temporary, to give it test/make_move functionality in order to make the switch to openapi easier
+      enum:
+        - CHECK_MOVE
+        - MAKE_MOVE
     Card:
       required:
         - suit

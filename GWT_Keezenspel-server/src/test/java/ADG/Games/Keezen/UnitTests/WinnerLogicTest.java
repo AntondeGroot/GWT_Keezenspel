@@ -13,62 +13,65 @@ import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class WinnerLogicTest {
-    ArrayList<String> winners = new ArrayList<>();
 
-    private GameState gameState;
-    private CardsDeckInterface cardsDeck;
+  ArrayList<String> winners = new ArrayList<>();
 
-    @BeforeEach
-    void setup(){
-        GameSession session = new GameSession();
-        gameState = session.getGameState();
-        cardsDeck = session.getCardsDeck();
-        createGame_With_NPlayers(gameState, 3);
-    }
+  private GameState gameState;
+  private CardsDeckInterface cardsDeck;
 
-    @AfterEach
-    void tearDown(){
-        gameState.tearDown();
-        winners.clear();
-    }
+  @BeforeEach
+  void setup() {
+    GameSession session = new GameSession();
+    gameState = session.getGameState();
+    cardsDeck = session.getCardsDeck();
+    createGame_With_NPlayers(gameState, 3);
+  }
 
-    @Test
-    void testOneWinner(){
-        // GIVEN
-        place4PawnsOnFinish(gameState, "0");
+  @AfterEach
+  void tearDown() {
+    gameState.tearDown();
+    winners.clear();
+  }
 
-        // WHEN
-        gameState.checkForWinners(winners);
+  @Test
+  void testOneWinner() {
+    // GIVEN
+    place4PawnsOnFinish(gameState, "0");
 
-        // THEN
-        assertTrue(winners.contains("0"));
-    }
-    @Test
-    void testPlayer2Wins_ThenPlayer1Wins(){
-        // GIVEN
-        place4PawnsOnFinish(gameState, "2");
-        gameState.checkForWinners(winners);
+    // WHEN
+    gameState.checkForWinners(winners);
 
-        // WHEN
-        place4PawnsOnFinish(gameState, "1");
-        gameState.checkForWinners(winners);
+    // THEN
+    assertTrue(winners.contains("0"));
+  }
 
-        // THEN
-        assertEquals(stringsToList(new String[]{"2","1"}), winners);
-    }
-    @Test
-    void testPlayer2Wins_Player0Wins_ThenPlayer1Wins(){
-        // GIVEN
-        place4PawnsOnFinish(gameState, "2");
-        gameState.checkForWinners(winners);
-        place4PawnsOnFinish(gameState, "0");
-        gameState.checkForWinners(winners);
+  @Test
+  void testPlayer2Wins_ThenPlayer1Wins() {
+    // GIVEN
+    place4PawnsOnFinish(gameState, "2");
+    gameState.checkForWinners(winners);
 
-        // WHEN
-        place4PawnsOnFinish(gameState, "1");
-        gameState.checkForWinners(winners);
+    // WHEN
+    place4PawnsOnFinish(gameState, "1");
+    gameState.checkForWinners(winners);
 
-        // THEN
-        assertEquals(stringsToList(new String[]{"2","0","1"}), winners);
-    }
+    // THEN
+    assertEquals(stringsToList(new String[]{"2", "1"}), winners);
+  }
+
+  @Test
+  void testPlayer2Wins_Player0Wins_ThenPlayer1Wins() {
+    // GIVEN
+    place4PawnsOnFinish(gameState, "2");
+    gameState.checkForWinners(winners);
+    place4PawnsOnFinish(gameState, "0");
+    gameState.checkForWinners(winners);
+
+    // WHEN
+    place4PawnsOnFinish(gameState, "1");
+    gameState.checkForWinners(winners);
+
+    // THEN
+    assertEquals(stringsToList(new String[]{"2", "0", "1"}), winners);
+  }
 }

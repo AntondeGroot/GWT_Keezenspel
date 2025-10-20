@@ -21,6 +21,7 @@ import org.openqa.selenium.WebElement;
 
 @ExtendWith(ScreenshotOnFailure.class)
 public class PlayerStatusReal_IT {
+
   static WebDriver driver;
 
 
@@ -29,7 +30,7 @@ public class PlayerStatusReal_IT {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver,"0");
+    setPlayerIdPlaying(driver, "0");
   }
 
   @AfterEach
@@ -54,7 +55,7 @@ public class PlayerStatusReal_IT {
   }
 
   @Test
-  public void player0IsPlayingWhenStartingGame(){
+  public void player0IsPlayingWhenStartingGame() {
     // GIVEN a started game
     waitUntilCardsAreLoaded(driver);
 

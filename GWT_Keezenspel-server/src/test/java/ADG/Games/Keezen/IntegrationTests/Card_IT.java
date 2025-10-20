@@ -21,6 +21,7 @@ import org.openqa.selenium.WebElement;
 
 @ExtendWith(ScreenshotOnFailure.class)
 public class Card_IT {
+
   static WebDriver driver;
 
   @BeforeEach
@@ -28,7 +29,7 @@ public class Card_IT {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver,"0");
+    setPlayerIdPlaying(driver, "0");
   }
 
   @AfterEach
@@ -54,7 +55,7 @@ public class Card_IT {
   }
 
   @Test
-  public void clickOnCard_BorderVisible(){
+  public void clickOnCard_BorderVisible() {
     // GIVEN
     WebElement card0 = findCardByIndex(driver, "cardDiv", 0);
 
@@ -70,7 +71,7 @@ public class Card_IT {
   }
 
   @Test
-  public void clickOnCardTwice_BorderHidden(){
+  public void clickOnCardTwice_BorderHidden() {
     // GIVEN
     // you already clicked on a card
     WebElement card0 = findCardByIndex(driver, "cardDiv", 0);
@@ -91,7 +92,7 @@ public class Card_IT {
   }
 
   @Test
-  public void clickOnCard_ClickOtherCard_BorderFirstCardHidden(){
+  public void clickOnCard_ClickOtherCard_BorderFirstCardHidden() {
     // GIVEN
     WebElement card0 = findCardByIndex(driver, "cardDiv", 0);
     card0.click();
@@ -111,7 +112,7 @@ public class Card_IT {
   }
 
   @Test
-  public void splitBoxes_DefaultNotShown(){
+  public void splitBoxes_DefaultNotShown() {
     WebElement pawnIntegerBox = driver.findElement(By.className("pawnIntegerBoxes"));
     assertFalse(pawnIntegerBox.isDisplayed());
   }
