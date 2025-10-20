@@ -4,9 +4,6 @@ import com.adg.openapi.model.Card;
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
-import ADG.Games.Keezen.Move.MessageType;
-import ADG.Games.Keezen.Move.MoveMessage;
-import ADG.Games.Keezen.Move.MoveResult;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
 import com.adg.openapi.model.Pawn;
@@ -52,47 +49,45 @@ class MovingOnSwitchTest {
 
   @Test
   void playerPlaysJack_ThenNextPlayerPlays() {
-        // GIVEN
-        Card card = givePlayerJack(cardsDeck , 0);
-        String playerId = "0";
-        PositionKey tileId1 = new PositionKey(playerId, 5);
-        PositionKey tileId2 = new PositionKey("1", 3);
-        Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
-        Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
+    // GIVEN
+    Card card = givePlayerJack(cardsDeck, 0);
+    String playerId = "0";
+    PositionKey tileId1 = new PositionKey(playerId, 5);
+    PositionKey tileId2 = new PositionKey("1", 3);
+    Pawn pawn1 = placePawnOnNest(gameState, playerId, tileId1);
+    Pawn pawn2 = placePawnOnNest(gameState, "1", tileId2);
 
-        // WHEN
-        createSwitchMessage(moveMessage, pawn1, pawn2, card);
-        gameState.processOnSwitch(moveMessage, moveResponse);
+    // WHEN
+    createSwitchMessage(moveMessage, pawn1, pawn2, card);
+    gameState.processOnSwitch(moveMessage, moveResponse);
 
-        // THEN: response message is correct
-        assertEquals("1", gameState.getPlayerIdTurn());
-//    fail();
+    // THEN: response message is correct
+    assertEquals("1", gameState.getPlayerIdTurn());
   }
 
   @Test
   void playerPlaysJackAsLastCard_ThenNextPlayerPlays() {
-//        // GIVEN
-//        String playerId = "0";
-//        PositionKey tileId1 = new PositionKey(playerId, 5);
-//        PositionKey tileId2 = new PositionKey("1", 3);
-//        Pawn pawn1 = placePawnOnNest(gameState , playerId, tileId1);
-//        Pawn pawn2 = placePawnOnNest(gameState , "1", tileId2);
-//
-//        for (int i = 0; i < 4; i++) {
-//            sendValidMoveMessage(gameState, cardsDeck, "0");
-//            sendValidMoveMessage(gameState, cardsDeck, "1");
-//            sendValidMoveMessage(gameState, cardsDeck, "2");
-//        }
-//
-//        Card card = givePlayerJack(cardsDeck , 0);
-//
-//        // WHEN
-//        createSwitchMessage(moveMessage, pawn1, pawn2, card);
-//        gameState.processOnSwitch(moveMessage, moveResponse);
-//
-//        // THEN
-//        assertEquals("1", gameState.getPlayerIdTurn());
-    fail();
+    // GIVEN
+    String playerId = "0";
+    PositionKey tileId1 = new PositionKey(playerId, 5);
+    PositionKey tileId2 = new PositionKey("1", 3);
+    Pawn pawn1 = placePawnOnNest(gameState, playerId, tileId1);
+    Pawn pawn2 = placePawnOnNest(gameState, "1", tileId2);
+
+    for (int i = 0; i < 4; i++) {
+      sendValidMoveRequest(gameState, cardsDeck, "0");
+      sendValidMoveRequest(gameState, cardsDeck, "1");
+      sendValidMoveRequest(gameState, cardsDeck, "2");
+    }
+
+    Card card = givePlayerJack(cardsDeck, 0);
+
+    // WHEN
+    createSwitchMessage(moveMessage, pawn1, pawn2, card);
+    gameState.processOnSwitch(moveMessage, moveResponse);
+
+    // THEN
+    assertEquals("1", gameState.getPlayerIdTurn());
   }
 
   @Test

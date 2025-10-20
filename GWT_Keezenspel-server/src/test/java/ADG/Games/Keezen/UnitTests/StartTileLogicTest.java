@@ -39,36 +39,39 @@ class StartTileLogicTest {
 
   @Test
   void player2_canPassPlayer2_OnStartTile0() {
-//        Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",1), new PositionKey("2",12));
-//        Pawn pawn2 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",2), new PositionKey("0",0));
-//
-//        Assertions.assertTrue(gameState.canPassStartTile(pawn1.getPawnId(), startTileId));
-    fail();
+    Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState, new PawnId("2", 1),
+        new PositionKey("2", 12));
+    Pawn pawn2 = GameStateUtil.placePawnOnBoard(gameState, new PawnId("2", 2),
+        new PositionKey("0", 0));
+
+    Assertions.assertTrue(gameState.canPassStartTile(pawn1, startTileId));
   }
 
   @Test
   void player2_canPassPlayer1_OnStartTile0() {
-//        Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",1), new PositionKey("2",12));
-//        Pawn pawn2 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("1",2), new PositionKey("0",0));
-//
-//        assertTrue(gameState.canPassStartTile(pawn1.getPawnId(), startTileId));
-    fail();
+    Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState, new PawnId("2", 1),
+        new PositionKey("2", 12));
+    Pawn pawn2 = GameStateUtil.placePawnOnBoard(gameState, new PawnId("1", 2),
+        new PositionKey("0", 0));
+
+    assertTrue(gameState.canPassStartTile(pawn1, startTileId));
   }
 
   @Test
   void player2_cannotPassPlayer0_OnStartTile0() {
-//        Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",1), new PositionKey("2",12));
-//        Pawn pawn2 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("0",1), new PositionKey("0",0));
-//
-//        assertFalse(gameState.canPassStartTile(pawn1.getPawnId(), startTileId));
-    fail();
+    Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState, new PawnId("2", 1),
+        new PositionKey("2", 12));
+    Pawn pawn2 = GameStateUtil.placePawnOnBoard(gameState, new PawnId("0", 1),
+        new PositionKey("0", 0));
+
+    assertFalse(gameState.canPassStartTile(pawn1, startTileId));
   }
 
   @Test
   void player2_canPassEmptyStartTile0() {
-//        Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState , new PawnId("2",1), new PositionKey("2",12));
-//
-//        assertTrue(gameState.canPassStartTile(pawn1.getPawnId(), startTileId));
-    fail();
+    Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState, new PawnId("2", 1),
+        new PositionKey("2", 12));
+
+    assertTrue(gameState.canPassStartTile(pawn1, startTileId));
   }
 }
