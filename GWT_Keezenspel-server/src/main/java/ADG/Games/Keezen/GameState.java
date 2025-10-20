@@ -372,7 +372,7 @@ public class GameState {
     moveMessagePawn1.setMoveType(SPLIT);
     // pawn2
     moveMessagePawn2.setPlayerId(playerId);
-//        moveMessagePawn2.setCard(card);
+    moveMessagePawn2.setCard(card);
     moveMessagePawn2.setStepsPawn1(nrStepsPawn2);
     moveMessagePawn2.setPawn1(moveMessage.getPawn2());
     moveMessagePawn2.setTempMessageType(TempMessageType.CHECK_MOVE);
