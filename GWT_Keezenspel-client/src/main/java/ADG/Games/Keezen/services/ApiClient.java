@@ -1,7 +1,10 @@
 package ADG.Games.Keezen.services;
 
 import ADG.Games.Keezen.Cards.CardResponse;
+import ADG.Games.Keezen.dto.CardDTO;
 import ADG.Games.Keezen.dto.CardResponseDTO;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.*;
 import com.google.gwt.json.client.*;
 import com.google.gwt.user.client.Window;
@@ -46,8 +49,9 @@ public class ApiClient {
   }
 
   // === CARDS ===
-  public void getPlayerCards(String sessionId, String playerId, ApiCallback<CardResponseDTO> callback) {
-    get("/cards/" + sessionId + "/" + playerId, CardResponseDTO::fromJson, callback);
+  // just an array of CardDTO, use safeEval
+  public void getPlayerCards(String sessionId, String playerId, ApiCallback<JsArray<CardDTO>> callback) {
+    get("/cards/" + sessionId + "/" + playerId, json -> JsonUtils.<JsArray<CardDTO>>safeEval(json), callback);
   }
 
   public void playerForfeits(String sessionId, String playerId, ApiCallback<Void> callback) {
