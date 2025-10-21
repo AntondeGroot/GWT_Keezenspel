@@ -238,13 +238,22 @@ paths:
         - gamestates
       parameters:
         - $ref: '#/components/parameters/sessionId'
+        - name: stateVersion
+          in: query
+          description: The version of the game state currently held by the client
+          required: false
+          schema:
+            type: integer
+            format: int64
       responses:
         200:
-          description: Gamestate
+          description: Gamestate (new version)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameState'
+        304:
+          description: Game state not modified (client is up-to-date)
         404:
           description: Game not found
 
@@ -379,6 +388,7 @@ components:
         - pawns
         - players
         - winners
+        - version
       properties:
         currentPlayerId:
           type: string
@@ -393,7 +403,12 @@ components:
         winners:
           type: array
           items:
-            $ref: '#/components/schemas/Player'
+            type: string
+#            $ref: '#/components/schemas/Player'
+        version:
+          description: this way the client can ask the verser if they need to update anything
+          type: integer
+          format: int64
 
     NewGameRequest:
       type: object

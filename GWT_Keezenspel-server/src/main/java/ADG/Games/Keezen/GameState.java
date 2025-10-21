@@ -44,6 +44,11 @@ public class GameState {
   private final CardsDeckInterface cardsDeck;
   private int animationSpeed;
   private Boolean hasStarted = false;
+  private long version = UUID.randomUUID().getMostSignificantBits();
+
+  public long getVersion() {
+    return version;
+  }
 
   public Boolean hasStarted() {
     return hasStarted;
@@ -118,6 +123,7 @@ public class GameState {
       player.setPlace(-1);
       player.isPlaying(false);
       players.add(player);
+      version++;
     }
   }
 
@@ -158,6 +164,7 @@ public class GameState {
       activePlayers.remove(playerId);
       nextActivePlayer();
     }
+    version++;
   }
 
   public void removeWinnerFromActivePlayerList() {
@@ -457,6 +464,7 @@ public class GameState {
 
   public void processOnMove(MoveRequest moveMessage, MoveResponse response) {
     processOnMove(moveMessage, response, true);
+    version++;
   }
 
   public void processOnMove(MoveRequest moveMessage, MoveResponse response,
@@ -857,6 +865,7 @@ public class GameState {
   public void processOnForfeit(String playerId) {
     cardsDeck.forfeitCardsForPlayer(playerId);
     forfeitPlayer(playerId);
+    version++;
   }
 
   public void processOnSwitch(MoveRequest moveMessage, MoveResponse moveResponse) {
