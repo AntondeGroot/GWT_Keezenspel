@@ -1,22 +1,24 @@
 package ADG.Games.Keezen.dto;
 
-import ADG.Games.Keezen.Cards.Card;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 
-public class CardResponseDTO extends JavaScriptObject {
-  protected CardResponseDTO() {} // required by GWT overlay types
+/**
+ * Represents an array of CardDTO objects.
+ * Example JSON:
+ * [
+ *   { "suit": 2, "value": 6, "uuid": 31 },
+ *   { "suit": 0, "value": 12, "uuid": 11 }
+ * ]
+ */
+public final class CardResponseDTO {
 
-  public final native String getPlayerId() /*-{ return this.playerUUID; }-*/;
-  public final native JsArray<CardDTO> getCards() /*-{ return this.cards; }-*/;
-  public final native JsArray<CardDTO> getPlayedCards() /*-{ return this.playedCards; }-*/;
+  private CardResponseDTO() {
+    // static utility class, no instantiation
+  }
 
-  // If your API uses an object like {"player1":4, "player2":5}, represent it as a JSON string map
-  public final native JavaScriptObject getNrOfCardsPerPlayer() /*-{ return this.nrOfCardsPerPlayer; }-*/;
-
-  public static CardResponseDTO fromJson(String json) {
+  /** Parse a JSON array into a JsArray of CardDTOs. */
+  public static JsArray<CardDTO> fromJson(String json) {
     return JsonUtils.safeEval(json);
   }
 }
-

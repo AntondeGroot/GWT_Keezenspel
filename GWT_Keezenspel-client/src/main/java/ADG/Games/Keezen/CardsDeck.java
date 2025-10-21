@@ -47,9 +47,9 @@ public class CardsDeck {
     this.playedCards = playedList;
   }
 
-  public void processCardResponse(CardResponseDTO cardResponse) {
-    setCardsFromJsArray(cardResponse.getCards());
-    setPlayedCardsFromJsArray(cardResponse.getPlayedCards());
-    setNrCardsPerPlayer(JsInteropUtil.toHashMap(cardResponse.getNrOfCardsPerPlayer()));
+  public void processCardResponse(JsArray<CardDTO> cardResponse) {
+    setCardsFromJsArray(cardResponse);
+    setPlayedCardsFromJsArray(cardResponse);
+    setNrCardsPerPlayer(JsInteropUtil.toHashMap(cardResponse));
   }
 }
