@@ -10,10 +10,13 @@ import ADG.Games.Keezen.TileMapping;
 import ADG.Games.Keezen.animations.AnimationSequence;
 import ADG.Games.Keezen.animations.PawnAnimation;
 import ADG.Games.Keezen.dto.CardDTO;
+import ADG.Games.Keezen.dto.PawnDTO;
+import ADG.Games.Keezen.dto.PlayerDTO;
 import ADG.Games.Keezen.moving.Move;
 import ADG.Games.Keezen.util.Cookie;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.*;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
@@ -26,6 +29,7 @@ import com.google.gwt.user.client.ui.*;
 import java.util.*;
 
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.*;
+import static ADG.Games.Keezen.util.JsUtilities.playersToArrayList;
 import static ADG.Games.Keezen.util.PlayerUUIDUtil.UUIDtoInt;
 
 public class GameBoardView extends Composite {
@@ -133,15 +137,16 @@ public class GameBoardView extends Composite {
         AnimationSequence.reset();
     }
 
-    public void drawBoard(List<TileMapping> tiles, ArrayList<Player> players, double cellDistance) {
+    public void drawBoard(List<TileMapping> tiles, JsArray<PlayerDTO> players, double cellDistance) {
         GWT.log("drawing board");
+
 
         for (TileMapping mapping : tiles) {
             String color = "#f2f2f2";
             int tileNr = mapping.getTileNr();
             // only player tiles get a color
             if (tileNr <= 0 || tileNr >= 16) {
-                color = PlayerColors.getHexColor(UUIDtoInt(mapping.getPlayerId(), players));
+                color = PlayerColors.getHexColor(UUIDtoInt(mapping.getPlayerId(), playersToArrayList(players)));
             }
             DivElement circle = createCircle(mapping.getTileId(), mapping.getPosition().getX()-cellDistance/2, mapping.getPosition().getY()-cellDistance/2, cellDistance/2, color);
             tileBoard.getElement().appendChild(circle);
@@ -153,12 +158,12 @@ public class GameBoardView extends Composite {
         forfeitButton.setEnabled(enabled);
     }
 
-    public void createPawns(ArrayList<Pawn> pawns, PawnAndCardSelection pawnAndCardSelection){
+    public void createPawns(ArrayList<PawnDTO> pawns, PawnAndCardSelection pawnAndCardSelection){
         double desiredWidth = 40;
         double desiredHeight = 40;
         Point point = new Point(0,0);
 
-        for (Pawn pawn : pawns) {
+        for (PawnDTO pawn : pawns) {
             DivElement pawnElement = pawnElements.get(pawn.getPawnId().toString());
             if(pawnElement == null){
                 pawnElement = createPawn(pawn, pawnAndCardSelection);

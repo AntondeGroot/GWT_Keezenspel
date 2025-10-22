@@ -98,12 +98,15 @@ public class GameState {
         for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
           PositionKey currentPosition = new PositionKey(player.getId(), -1 - pawnNr);
           PositionKey nestPosition = currentPosition;
-          pawns.add(new Pawn(
+          Pawn p = new Pawn(
               player.getId(),
               new PawnId(player.getId(), pawnNr),
               currentPosition,
               nestPosition
-          ));
+          );
+          p.setUri("pawn"+playerInt+".png");
+
+          pawns.add(p);
         }
         playerInt++;
       }
@@ -123,6 +126,7 @@ public class GameState {
       player.setIsActive(true);
       player.setPlace(-1);
       player.isPlaying(false);
+
       players.add(player);
       version.incrementAndGet();
     }
