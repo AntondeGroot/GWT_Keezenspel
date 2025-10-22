@@ -3,36 +3,37 @@ package ADG.Games.Keezen;
 import ADG.Games.Keezen.TileId;
 
 public class TileMapping {
-    private final TileId tileId;
-    private Point position;
 
-    public TileMapping(String playerId, int tileNr, Point position) {
-        this.tileId = new TileId(playerId, tileNr);
-        this.position = position;
-    }
+  private final TileId tileId;
+  private Point position;
 
-    public String getPlayerId() {
-        return tileId.getPlayerId();
-    }
+  public TileMapping(String playerId, int tileNr, Point position) {
+    this.tileId = new TileId(playerId, tileNr);
+    this.position = position;
+  }
 
-    public int getTileNr() {
-        return tileId.getTileNr();
-    }
+  public String getPlayerId() {
+    return tileId.getPlayerId();
+  }
 
-    public void setPosition(Point position) {
-        this.position = position;
-    }
+  public int getTileNr() {
+    return tileId.getTileNr();
+  }
 
-    public Point getPosition() {
-        return position;
-    }
+  public void setPosition(Point position) {
+    this.position = position;
+  }
 
-    public TileId getTileId() {
-        return tileId;
-    }
+  public Point getPosition() {
+    return position;
+  }
 
-    @Override
-    public String toString() {
-        return "Mapping{" + tileId + " -> [" + position + "]}";
-    }
+  public TileId getTileId() {
+    return tileId;
+  }
+
+  @Override
+  public String toString() {
+    return "Mapping{" + tileId + " -> [" + position + "]}";
+  }
 }

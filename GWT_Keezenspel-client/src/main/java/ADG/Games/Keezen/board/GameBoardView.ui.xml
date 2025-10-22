@@ -1,37 +1,38 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui">
-    <g:HorizontalPanel ui:field="columnsContainer">
-        <g:HorizontalPanel styleName="column1">
-            <g:HorizontalPanel styleName="columnWrapper">
-                <g:VerticalPanel>
-                    <g:HTMLPanel ui:field="canvasWrapper" styleName="canvasWrapper">
-                        <!-- for canvas use regular id="" -->
-                        <!-- do not use ui:field, see below: -->
-                        <canvas id="canvasCards2" width="700" height="600"/>
-                        <g:HTMLPanel ui:field="tileBoard" width="700" height="600"/>
-                        <g:HTMLPanel ui:field="pawnBoard" width="700" height="600"/>
-                    </g:HTMLPanel>
-                    <g:FlowPanel ui:field="cardsContainer" styleName="cardsContainer"/>
-                </g:VerticalPanel>
-                <g:Label styleName="errorLabel" ui:field="errorLabel"/>
-                <g:VerticalPanel styleName="buttonContainer">
-                    <g:Button ui:field="sendButton" styleName="sendButton">Play Card</g:Button>
-                    <g:Button ui:field="forfeitButton" styleName="forfeitButton">Forfeit</g:Button>
-                    <g:HorizontalPanel ui:field="pawnIntegerBoxes" styleName="pawnIntegerBoxes">
-                        <g:Label styleName="TextBoxLabel">Pawn 1</g:Label>
-                        <g:TextBox ui:field="stepsPawn1" styleName="TextBoxForPawnSteps"/>
-                        <g:Label styleName="TextBoxLabel">Pawn 2</g:Label>
-                        <g:TextBox ui:field="stepsPawn2" styleName="TextBoxForPawnSteps" enabled="false"/>
-                    </g:HorizontalPanel>
-                </g:VerticalPanel>
-            </g:HorizontalPanel>
-        </g:HorizontalPanel>
-        <g:VerticalPanel styleName="column2">
-            <g:VerticalPanel ui:field="playerListContainer2" styleName="playerListContainer" width="50vw"/>
+  xmlns:g="urn:import:com.google.gwt.user.client.ui">
+  <g:HorizontalPanel ui:field="columnsContainer">
+    <g:HorizontalPanel styleName="column1">
+      <g:HorizontalPanel styleName="columnWrapper">
+        <g:VerticalPanel>
+          <g:HTMLPanel ui:field="canvasWrapper" styleName="canvasWrapper">
+            <!-- for canvas use regular id="" -->
+            <!-- do not use ui:field, see below: -->
+            <canvas id="canvasCards2" width="700" height="600"/>
+            <g:HTMLPanel ui:field="tileBoard" width="700" height="600"/>
+            <g:HTMLPanel ui:field="pawnBoard" width="700" height="600"/>
+          </g:HTMLPanel>
+          <g:FlowPanel ui:field="cardsContainer" styleName="cardsContainer"/>
         </g:VerticalPanel>
+        <g:Label styleName="errorLabel" ui:field="errorLabel"/>
+        <g:VerticalPanel styleName="buttonContainer">
+          <g:Button ui:field="sendButton" styleName="sendButton">Play Card</g:Button>
+          <g:Button ui:field="forfeitButton" styleName="forfeitButton">Forfeit</g:Button>
+          <g:HorizontalPanel ui:field="pawnIntegerBoxes" styleName="pawnIntegerBoxes">
+            <g:Label styleName="TextBoxLabel">Pawn 1</g:Label>
+            <g:TextBox ui:field="stepsPawn1" styleName="TextBoxForPawnSteps"/>
+            <g:Label styleName="TextBoxLabel">Pawn 2</g:Label>
+            <g:TextBox ui:field="stepsPawn2" styleName="TextBoxForPawnSteps" enabled="false"/>
+          </g:HorizontalPanel>
+        </g:VerticalPanel>
+      </g:HorizontalPanel>
     </g:HorizontalPanel>
+    <g:VerticalPanel styleName="column2">
+      <g:VerticalPanel ui:field="playerListContainer2" styleName="playerListContainer"
+        width="50vw"/>
+    </g:VerticalPanel>
+  </g:HorizontalPanel>
 </ui:UiBinder>
-<!-- when redrawing a canvas it gives problems and not update it-->
-<!-- instead: use DOM.getElementByID() -->
-<!-- Example: when you draw rect() before a true if-statement it will draw fine -->
-<!-- But when placed in a true if-statement it will not draw whatsoever -->
+  <!-- when redrawing a canvas it gives problems and not update it-->
+  <!-- instead: use DOM.getElementByID() -->
+  <!-- Example: when you draw rect() before a true if-statement it will draw fine -->
+  <!-- But when placed in a true if-statement it will not draw whatsoever -->

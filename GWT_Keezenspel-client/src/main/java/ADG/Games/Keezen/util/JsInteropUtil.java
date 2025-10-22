@@ -9,15 +9,18 @@ import java.util.HashMap;
  */
 public final class JsInteropUtil {
 
-  private JsInteropUtil() {}
+  private JsInteropUtil() {
+  }
 
   /**
-   * Converts a plain JavaScript object (with string keys and numeric values)
-   * into a Java HashMap<String, Integer>.
+   * Converts a plain JavaScript object (with string keys and numeric values) into a Java
+   * HashMap<String, Integer>.
    */
   public static HashMap<String, Integer> toHashMap(JavaScriptObject jsObj) {
     HashMap<String, Integer> map = new HashMap<>();
-    if (jsObj == null) return map;
+    if (jsObj == null) {
+      return map;
+    }
 
     JsArrayString keys = getObjectKeys(jsObj);
     for (int i = 0; i < keys.length(); i++) {

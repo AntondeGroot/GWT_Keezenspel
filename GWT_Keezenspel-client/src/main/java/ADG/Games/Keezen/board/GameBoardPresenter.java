@@ -178,6 +178,8 @@ public class GameBoardPresenter {
     updatePlayerList(gameState);
     view.enableButtons(currentPlayerIsPlaying(gameState));
 
+
+
   }
 
   private void pollServerForGameState() {

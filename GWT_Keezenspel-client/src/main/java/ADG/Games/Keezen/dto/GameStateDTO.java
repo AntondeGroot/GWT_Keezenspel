@@ -5,12 +5,14 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 
 /**
- * DTO representing a GameState object returned by the Keezen Game API.
- * Compatible with GWT overlay types for JSON parsing via JsonUtils.safeEval().
+ * DTO representing a GameState object returned by the Keezen Game API. Compatible with GWT overlay
+ * types for JSON parsing via JsonUtils.safeEval().
  */
 public class GameStateDTO extends JavaScriptObject {
+
   // Required protected constructor for GWT overlay types
-  protected GameStateDTO() {}
+  protected GameStateDTO() {
+  }
 
   /**
    * The ID of the player whose turn it is.

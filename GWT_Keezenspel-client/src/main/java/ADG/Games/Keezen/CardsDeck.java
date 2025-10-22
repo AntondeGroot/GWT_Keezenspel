@@ -1,7 +1,6 @@
 package ADG.Games.Keezen;
 
 import ADG.Games.Keezen.dto.CardDTO;
-import ADG.Games.Keezen.dto.CardResponseDTO;
 import ADG.Games.Keezen.util.JsInteropUtil;
 import com.google.gwt.core.client.JsArray;
 

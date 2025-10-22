@@ -12,7 +12,7 @@ import java.util.LinkedList;
 
 public class MoveController {
 
-    public static void movePawn(MoveResponse moveResponse) {
+  public static void movePawn(MoveResponse moveResponse) {
 //        GWT.log("move response :\n"+moveResponse.toString());
 //
 //        PawnIdDTO pawnId1 = moveResponse.getPawnId1();
@@ -46,5 +46,5 @@ public class MoveController {
 //            Pawn pawnKilled2 = Board.getPawn(pawnIdKilled2);
 //            AnimationSequence.movePawn(pawnKilled2, moveKilledPawn2, false);
 //        }
-    }
+  }
 }

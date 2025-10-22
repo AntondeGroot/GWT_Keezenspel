@@ -7,7 +7,7 @@ public class PlayerUtil {
 
   public static PlayerDTO getPlayerById(String playerId, List<PlayerDTO> players) {
     for (PlayerDTO player : players) {
-      if(player.getId().equals(playerId)) {
+      if (player.getId().equals(playerId)) {
         return player;
       }
     }
@@ -16,7 +16,7 @@ public class PlayerUtil {
 
   public static PlayerDTO getPlayerByInt(int playerInt, List<PlayerDTO> players) {
     for (PlayerDTO player : players) {
-      if(player.getPlayerInt() == playerInt) {
+      if (player.getPlayerInt() == playerInt) {
         return player;
       }
     }
