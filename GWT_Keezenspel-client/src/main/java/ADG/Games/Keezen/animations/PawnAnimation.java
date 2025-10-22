@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Queue;
 
 public class PawnAnimation {
+
   private boolean isFirstSequence = true;
   private double totalDelay;
   private Map<String, DivElement> pawnElements;
@@ -28,7 +29,7 @@ public class PawnAnimation {
     // * determine the speed it will need to travel?
     // * get the DivElement for that Pawn
     // * animate the pawn
-    if(isFirstSequence){
+    if (isFirstSequence) {
       totalDelay = 0;
     }
     for (AnimatePawnPoints p : sequence) {
@@ -44,7 +45,7 @@ public class PawnAnimation {
 
       animateStep(pawnElement, points.get(0), points, pixelsPerMs);
 
-      totalDelay = max(totalDelay, distance/pixelsPerMs);
+      totalDelay = max(totalDelay, distance / pixelsPerMs);
     }
     isFirstSequence = !isFirstSequence;
   }
@@ -52,33 +53,43 @@ public class PawnAnimation {
 
   private double calculateSpeed(double distance) {
     double pixelsPerMs = 0.1;
-    if(distance > 200){ pixelsPerMs = 0.12;};
-    if(distance > 400){ pixelsPerMs = 0.16;};
+    if (distance > 200) {
+      pixelsPerMs = 0.12;
+    }
+    ;
+    if (distance > 400) {
+      pixelsPerMs = 0.16;
+    }
+    ;
     pixelsPerMs = pixelsPerMs * AnimationSpeed.getSpeed();
 
     return pixelsPerMs;
   }
 
-  private void animateStep(DivElement pawn, Point current, Queue<Point> remaining, double speedPixelsPerMs) {
-    if (remaining.isEmpty()) return;
+  private void animateStep(DivElement pawn, Point current, Queue<Point> remaining,
+      double speedPixelsPerMs) {
+    if (remaining.isEmpty()) {
+      return;
+    }
 
     Point next = remaining.poll();
     double dx = next.getX() - current.getX();
     double dy = next.getY() - current.getY();
     double distancePixels = Math.sqrt(dx * dx + dy * dy);
 
-    int duration = (int)(distancePixels / speedPixelsPerMs);
-    GWT.log("duration = "+duration);
+    int duration = (int) (distancePixels / speedPixelsPerMs);
+    GWT.log("duration = " + duration);
 
     // Apply CSS transition
-        pawn.getStyle().setProperty("transition","all " + duration + "ms linear");// setTransition("all " + duration + "ms linear");
-        if(!isFirstSequence){
-          pawn.getStyle().setProperty("animationDelay", totalDelay+"ms");
-        }
+    pawn.getStyle().setProperty("transition",
+        "all " + duration + "ms linear");// setTransition("all " + duration + "ms linear");
+    if (!isFirstSequence) {
+      pawn.getStyle().setProperty("animationDelay", totalDelay + "ms");
+    }
     pawn.getOffsetWidth(); // force reflow
 
-    pawn.getStyle().setLeft(next.getX()-20, Style.Unit.PX);
-    pawn.getStyle().setTop(next.getY()-20-15, Style.Unit.PX);
+    pawn.getStyle().setLeft(next.getX() - 20, Style.Unit.PX);
+    pawn.getStyle().setTop(next.getY() - 20 - 15, Style.Unit.PX);
 
     // Chain to next move
     new com.google.gwt.user.client.Timer() {

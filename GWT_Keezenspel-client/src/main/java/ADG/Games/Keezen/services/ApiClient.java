@@ -1,8 +1,6 @@
 package ADG.Games.Keezen.services;
 
-import ADG.Games.Keezen.Cards.CardResponse;
 import ADG.Games.Keezen.dto.CardDTO;
-import ADG.Games.Keezen.dto.CardResponseDTO;
 import ADG.Games.Keezen.dto.GameStateDTO;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
@@ -72,7 +70,8 @@ public class ApiClient {
   }
 
   // Overload with stateVersion query
-  public void getGameState(String sessionId, Long clientVersion, ApiCallback<GameStateDTO> callback) {
+  public void getGameState(String sessionId, Long clientVersion,
+      ApiCallback<GameStateDTO> callback) {
     String path = "/gamestates/" + sessionId;
     if (clientVersion != null) {
       path += "?stateVersion=" + clientVersion;

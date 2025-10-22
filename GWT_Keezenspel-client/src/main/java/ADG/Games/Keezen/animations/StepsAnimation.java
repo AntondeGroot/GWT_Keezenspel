@@ -7,23 +7,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StepsAnimation {
-    private static ArrayList<String> ids = new ArrayList<>();
-    private static final String CLASS_ANIMATION = "tile-highlight-pulse";
 
-    public static void updateStepsAnimation(List<TileId> tileIds){
-        resetStepsAnimation();
+  private static ArrayList<String> ids = new ArrayList<>();
+  private static final String CLASS_ANIMATION = "tile-highlight-pulse";
 
-        for(TileId tileId: tileIds) {
-            String id = tileId+"Highlight";
-            ids.add(id);
-            Document.get().getElementById(id).addClassName(CLASS_ANIMATION);
-        }
+  public static void updateStepsAnimation(List<TileId> tileIds) {
+    resetStepsAnimation();
+
+    for (TileId tileId : tileIds) {
+      String id = tileId + "Highlight";
+      ids.add(id);
+      Document.get().getElementById(id).addClassName(CLASS_ANIMATION);
     }
+  }
 
-    public static void resetStepsAnimation() {
-        for(String id: ids){
-            Document.get().getElementById(id).removeClassName(CLASS_ANIMATION);
-        }
-        ids.clear();
+  public static void resetStepsAnimation() {
+    for (String id : ids) {
+      Document.get().getElementById(id).removeClassName(CLASS_ANIMATION);
     }
+    ids.clear();
+  }
 }

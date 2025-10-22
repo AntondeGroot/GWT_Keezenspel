@@ -2,9 +2,6 @@ package ADG.Games.Keezen.board;
 
 import ADG.Games.Keezen.CardsDeck;
 import ADG.Games.Keezen.PawnAndCardSelection;
-import ADG.Games.Keezen.Player.Pawn;
-import ADG.Games.Keezen.Player.Player;
-import ADG.Games.Keezen.Player.PlayerColors;
 import ADG.Games.Keezen.Point;
 import ADG.Games.Keezen.TileMapping;
 import ADG.Games.Keezen.animations.AnimationSequence;
@@ -130,7 +127,7 @@ public class GameBoardView extends Composite {
     return (CanvasElement) document.getElementById("canvasCards2");
   }
 
-  public void createPlayerList(ArrayList<Player> players) {
+  public void createPlayerList(ArrayList<PlayerDTO> players) {
     playerListContainer2.clear();
     playerListContainer2.add(createPlayerGrid(players));
   }

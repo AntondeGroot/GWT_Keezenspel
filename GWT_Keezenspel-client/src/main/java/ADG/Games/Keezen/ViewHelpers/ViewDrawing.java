@@ -1,9 +1,7 @@
 package ADG.Games.Keezen.ViewHelpers;
 
 import ADG.Games.Keezen.PawnAndCardSelection;
-import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.Player;
-import ADG.Games.Keezen.Player.PlayerColors;
 import ADG.Games.Keezen.TileId;
 import ADG.Games.Keezen.dto.PawnDTO;
 import ADG.Games.Keezen.dto.PlayerDTO;
@@ -161,7 +159,7 @@ public class ViewDrawing {
     return tileElement;
   }
 
-  public static Grid createPlayerGrid(ArrayList<Player> players) {
+  public static Grid createPlayerGrid(ArrayList<PlayerDTO> players) {
     GWT.log("creates player grid");
     // todo: maybe check player whether they belong in column 1 or 2, so don't expand both when a winner has been declared
     List<Integer> column1 = Arrays.asList(0, 1, 2, 3);
@@ -172,12 +170,12 @@ public class ViewDrawing {
     int rowCount = Math.min(players.size(), 4);
     Grid grid = new Grid(rowCount, colCount);
 
-    List<Player> winners = players.stream()
+    List<PlayerDTO> winners = players.stream()
         .filter(player -> player.getPlace() > -1)
         .collect(Collectors.toList());
 
     int playerId = 0;
-    for (Player player : players) {
+    for (PlayerDTO player : players) {
       int imagePixelSize = 50;
 
       ImageElement img = Document.get().createImageElement();

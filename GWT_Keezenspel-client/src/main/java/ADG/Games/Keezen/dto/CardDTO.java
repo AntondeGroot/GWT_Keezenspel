@@ -3,10 +3,11 @@ package ADG.Games.Keezen.dto;
 import com.google.gwt.core.client.JavaScriptObject;
 
 /**
- * DTO representing a card object returned by the Keezen Game API.
- * Compatible with GWT overlay types for JSON parsing via JsonUtils.safeEval().
+ * DTO representing a card object returned by the Keezen Game API. Compatible with GWT overlay types
+ * for JSON parsing via JsonUtils.safeEval().
  */
 public class CardDTO extends JavaScriptObject {
+
   protected CardDTO() {
     // Required protected constructor for GWT overlay types
   }
