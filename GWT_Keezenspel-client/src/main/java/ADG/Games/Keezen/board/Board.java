@@ -17,6 +17,8 @@ import com.google.gwt.core.client.JsArray;
 import java.util.*;
 
 import static ADG.Games.Keezen.util.PlayerUUIDUtil.*;
+import static ADG.Games.Keezen.util.PlayerUtil.getPlayerById;
+import static ADG.Games.Keezen.util.PlayerUtil.getPlayerByInt;
 
 public class Board {
 
@@ -61,7 +63,7 @@ public class Board {
       // where the playerId is updated based on the rotation.
       int playerId = j < 0 ? lastPlayerInt : 0;
       int tileNr = j < 0 ? j + 16 : j;
-      tiles.add(new TileMapping(playerIntToUUID(playerId, playerList), tileNr, new Point(startPoint)));
+      tiles.add(new TileMapping(getPlayerByInt(playerId, playerList).getId(), tileNr, new Point(startPoint)));
 
       if (j < -3) {
         // move downwards for 6 tiles
@@ -76,10 +78,10 @@ public class Board {
     }
 
     // create finish tiles
-    Point point = new Point(getPosition(playerIntToUUID(lastPlayerInt, playerList), 15));
+    Point point = new Point(getPosition(getPlayerByInt(lastPlayerInt, playerList).getId(), 15));
     for (int i = 1; i <= 4; i++) {
       point.setY(point.getY() - cellDistance);
-      String playerUUID = playerIntToUUID(0, playerList);
+      String playerUUID = getPlayerByInt(0, playerList).getId();
       tiles.add(new TileMapping(playerUUID, 15 + i, new Point(point)));
     }
 
@@ -87,7 +89,7 @@ public class Board {
     // they will be assigned negative values to distinguish them from the playing field
     // they will be assigned different negative values to distinguish them from each other
     // so that 2 pawns cannot end up on the same nest tile
-    String playerUUID = playerIntToUUID(0, playerList);
+    String playerUUID = getPlayerByInt(0, playerList).getId();
 
     point = new Point(getPosition(playerUUID, 1));
     point.setX(point.getX() - 1.5 * cellDistance);
@@ -104,8 +106,8 @@ public class Board {
     String playerId;
     for (TileMapping tile : tiles) {
       for (int k = 1; k < nrPlayers; k++) {
-        int colorInt = (UUIDtoInt(tile.getPlayerId(), playerList) + k) % nrPlayers;
-        playerId = playerIntToUUID(colorInt, playerList);
+        int colorInt = (getPlayerById(tile.getPlayerId(), playerList).getPlayerInt() + k) % nrPlayers;
+        playerId = getPlayerByInt(colorInt, playerList).getId();
         tempTiles.add(new TileMapping(playerId, tile.getTileNr(),
             tile.getPosition().rotate(new Point(300, 300), 360.0 / nrPlayers * k)));
       }
@@ -114,7 +116,7 @@ public class Board {
     ArrayList<Point> cardsDeckPoints = new ArrayList<>();
     Point beginPoint = getPosition(playerUUID, 1);
     beginPoint = new Point(beginPoint.getX(), beginPoint.getY() + cellDistance + 3);
-    Point endPoint = getPosition(playerIntToUUID(lastPlayerInt, playerList), 13);
+    Point endPoint = getPosition(getPlayerByInt(lastPlayerInt, playerList).getId(), 13);
     endPoint = new Point(endPoint.getX(), endPoint.getY() + cellDistance + 3);
     GWT.log("\n\n\n beginpoint" + beginPoint);
     cardsDeckPoints.add(new Point(beginPoint.getX(), beginPoint.getY()));
@@ -130,14 +132,14 @@ public class Board {
       ArrayList<Point> cardsDeckPoints2 = new ArrayList<>();
       cardsDeckPoints2.add(beginPoint);
       cardsDeckPoints2.add(endPoint);
-      cardsDeckPointsPerPlayer.put(playerIntToUUID(k, playerList), cardsDeckPoints2);
+      cardsDeckPointsPerPlayer.put(getPlayerByInt(k, playerList).getId(), cardsDeckPoints2);
     }
 
     tiles.addAll(tempTiles);
 
     // rotate all tiles based on player UUID
     String uuid = Cookie.getPlayerId();
-    int playerint = UUIDtoInt(uuid, playerList);
+    int playerint = getPlayerById(uuid, playerList).getPlayerInt();
     for (TileMapping tile : tiles) {
       tile.setPosition(
           tile.getPosition().rotate(new Point(300, 300), -360.0 / nrPlayers * playerint)

@@ -21,6 +21,7 @@ import static ADG.util.CardValueCheck.isAce;
 import static ADG.util.CardValueCheck.isJack;
 import static ADG.util.CardValueCheck.isKing;
 import static ADG.util.CardValueCheck.isSeven;
+import static ADG.util.PlayerColors.getPlayerColor;
 import static ADG.util.PlayerStatus.hasFinished;
 import static ADG.util.PlayerStatus.setActive;
 import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
@@ -122,11 +123,15 @@ public class GameState {
   }
 
   public void addPlayer(Player player) {
+
     if (!players.contains(player) && players.size() < MAX_PLAYERS) {
+      int playerInt = players.size();
+
       player.setIsActive(true);
       player.setPlace(-1);
       player.isPlaying(false);
-
+      player.setColor(getPlayerColor(playerInt));
+      player.setPlayerInt(playerInt);
       players.add(player);
       version.incrementAndGet();
     }

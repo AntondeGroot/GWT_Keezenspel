@@ -372,6 +372,7 @@ components:
         profilePic:
           type: string
         color:
+          description: Color is HEX
           type: string
         isActive:
           type: boolean
@@ -379,6 +380,9 @@ components:
           type: boolean
         place:
           description: standard value -1, if they won they are either 1st 2nd 3rd
+          type: integer
+        playerInt:
+          description: under the hood this is player 0 til player 8, this makes it easier to see who is the next player etc.
           type: integer
 
     GameState:
