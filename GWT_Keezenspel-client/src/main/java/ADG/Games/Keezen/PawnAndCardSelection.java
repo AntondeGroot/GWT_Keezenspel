@@ -2,7 +2,7 @@ package ADG.Games.Keezen;
 
 import static ADG.Games.Keezen.Move.MessageType.MAKE_MOVE;
 import static ADG.Games.Keezen.Move.MoveType.*;
-import static ADG.Games.Keezen.logic.BoardLogic.pawnIsOnNormalBoard;
+import static ADG.Games.Keezen.util.BoardLogic.pawnIsOnNormalBoard;
 import static ADG.Games.Keezen.util.CardDTOValueCheck.isJack;
 import static ADG.Games.Keezen.util.CardDTOValueCheck.isSeven;
 
@@ -12,7 +12,10 @@ import ADG.Games.Keezen.Move.MoveType;
 import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.dto.CardDTO;
+import ADG.Games.Keezen.dto.PawnDTO;
+import ADG.Games.Keezen.dto.PawnIdDTO;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Style.Visibility;
 import java.util.ArrayList;
@@ -20,15 +23,15 @@ import java.util.Objects;
 
 public class PawnAndCardSelection {
     private String playerId;
-    private Pawn pawn1 = null;
-    private Pawn pawn2 = null;
+    private PawnDTO pawn1 = null;
+    private PawnDTO pawn2 = null;
     private CardDTO card;
     private boolean drawCards = true;
     private MoveType moveType;
     private int nrStepsPawn1 = 0;
     private int nrStepsPawn2 = 0;
     private boolean uiEnabled = true;
-    private ArrayList<Pawn> pawns = new ArrayList<>();
+    private ArrayList<PawnDTO> pawns = new ArrayList<>();
 
     public void disableUIForTests() {
         this.uiEnabled = false;
@@ -44,14 +47,18 @@ public class PawnAndCardSelection {
         playerId = id;
     }
 
-    public void updatePawns(ArrayList<Pawn> pawns){
-        this.pawns = pawns;
+    public void updatePawns(JsArray<PawnDTO> pawns){
+      ArrayList<PawnDTO> tempPawns = new ArrayList<>();
+      for (int i = 0; i < pawns.length(); i++) {
+        tempPawns.add(pawns.get(i));
+      }
+        this.pawns = tempPawns;
         checkIfSelectedPawnsAreUpToDate();
     }
 
     public void checkIfSelectedPawnsAreUpToDate(){
         GWT.log("updatePawns trying to update");
-        for (Pawn pawn : pawns) {
+        for (PawnDTO pawn : pawns) {
             // compares pawnId's then updates current position
             if(Objects.equals(pawn, pawn1)){
                 pawn1 = pawn;
@@ -68,8 +75,8 @@ public class PawnAndCardSelection {
         return playerId;
     }
 
-    private Pawn getPawn(PawnId pawnId){
-        for (Pawn pawn : pawns) {
+    private PawnDTO getPawn(PawnIdDTO pawnId){
+        for (PawnDTO pawn : pawns) {
             if(pawn.getPawnId().equals(pawnId)){
                 return pawn;
             }
@@ -85,8 +92,8 @@ public class PawnAndCardSelection {
      * @param pawnId
      */
     // for real life
-    public void addPawnId(PawnId pawnId) {
-        Pawn pawn = getPawn(pawnId);
+    public void addPawnId(PawnIdDTO pawnId) {
+        PawnDTO pawn = getPawn(pawnId);
         GWT.log("test playerId = "+playerId);
         GWT.log("trying to add pawn = "+pawn);
         validateHowManyPawnsCanBeSelected(pawn); // not accounting for if they are on nest/board/finish
@@ -100,7 +107,7 @@ public class PawnAndCardSelection {
      * locations are
      * @param pawn
      */
-    public void addPawn(Pawn pawn) {
+    public void addPawn(PawnDTO pawn) {
         GWT.log("test playerId = "+playerId);
         GWT.log("trying to add pawn = "+pawn);
         validateHowManyPawnsCanBeSelected(pawn); // not accounting for if they are on nest/board/finish
@@ -146,7 +153,7 @@ public class PawnAndCardSelection {
         }
     }
 
-    private boolean aPawnWasNotDeselected(Pawn pawn) {
+    private boolean aPawnWasNotDeselected(PawnDTO pawn) {
         if (Objects.equals(pawn1, pawn)) {
             // this moves pawn 2 to pawn1 and resets pawn2
             // if pawn 2 was already reset, this changes nothing but clears pawn1
@@ -164,7 +171,7 @@ public class PawnAndCardSelection {
         return true;
     }
 
-    private void handlePlayerCanSelect2Pawns(Pawn pawn) {
+    private void handlePlayerCanSelect2Pawns(PawnDTO pawn) {
         if(aPawnWasNotDeselected(pawn)){
             if (!playerId.equals(pawn.getPlayerId())) {
                 return;
@@ -179,7 +186,7 @@ public class PawnAndCardSelection {
         }
     }
 
-    private void handlePlayerCanSelect1Pawn(Pawn pawn) {
+    private void handlePlayerCanSelect1Pawn(PawnDTO pawn) {
         if(aPawnWasNotDeselected(pawn)){
             if (playerId.equals(pawn.getPlayerId())) {
                 pawn1 = pawn;
@@ -187,7 +194,7 @@ public class PawnAndCardSelection {
         }
     }
 
-    private void handlePlayerCanSelectTheirOwnAndOpponentsPawn(Pawn pawn) {
+    private void handlePlayerCanSelectTheirOwnAndOpponentsPawn(PawnDTO pawn) {
        if(aPawnWasNotDeselected(pawn)){
             // select pawn1
             if (playerId.equals(pawn.getPlayerId())) {
@@ -201,7 +208,7 @@ public class PawnAndCardSelection {
        }
     }
 
-    private void validateHowManyPawnsCanBeSelected(Pawn pawn) {
+    private void validateHowManyPawnsCanBeSelected(PawnDTO pawn) {
         if(card == null){
             handlePlayerCanSelect1Pawn(pawn);
             return;
@@ -233,11 +240,11 @@ public class PawnAndCardSelection {
         validateMoveType();
     }
 
-    public Pawn getPawn1() {
+    public PawnDTO getPawn1() {
         return pawn1;
     }
 
-    public PawnId getPawnId1(){
+    public PawnIdDTO getPawnId1(){
         if(pawn1 == null){
             return null;
         }
@@ -259,14 +266,14 @@ public class PawnAndCardSelection {
         }
     }
 
-    public PawnId getPawnId2(){
+    public PawnIdDTO getPawnId2(){
         if(pawn2 == null){
             return null;
         }
         return pawn2.getPawnId();
     }
 
-    public Pawn getPawn2() {
+    public PawnDTO getPawn2() {
         return pawn2;
     }
 

@@ -5,11 +5,14 @@ import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.Player.PlayerColors;
 import ADG.Games.Keezen.TileId;
+import ADG.Games.Keezen.dto.PawnDTO;
+import ADG.Games.Keezen.dto.PlayerDTO;
 import ADG.Games.Keezen.moving.Move;
 import ADG.Games.Keezen.util.UUID;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
@@ -33,7 +36,7 @@ import static ADG.Games.Keezen.Player.PlayerColors.*;
 
 public class ViewDrawing {
 
-  public static DivElement createPawn(Pawn pawn, PawnAndCardSelection pawnAndCardSelection) {
+  public static DivElement createPawn(PawnDTO pawn, PawnAndCardSelection pawnAndCardSelection) {
     // Create new <div> Element
     GWT.log("A pawn was created");
     DivElement pawnElement = Document.get().createDivElement();
@@ -47,7 +50,7 @@ public class ViewDrawing {
     pawnImage.addClassName("pawnImage");
 
     // set image
-    pawnImage.getStyle().setProperty("backgroundImage", "url(pawn" + pawn.getColorInt() + ".png)");
+    pawnImage.getStyle().setProperty("backgroundImage", "url(" + pawn.getUri() + ")");
 
     // set overlay for when you want to select the pawn
     ImageElement overlayImage = Document.get().createImageElement();
@@ -239,11 +242,16 @@ public class ViewDrawing {
     return grid;
   }
 
-  public static void updatePlayerProfileUI(ArrayList<Player> players) {
+  public static void updatePlayerProfileUI(JsArray<PlayerDTO> playersJs) {
+    ArrayList<PlayerDTO> players = new ArrayList<>();
+    for (int i = 0; i < playersJs.length(); i++) {
+      players.add(playersJs.get(i));
+    }
+
     GWT.log("Players were updated: " + players);
-    for (Player player : players) {
+    for (PlayerDTO player : players) {
       // set color of border around profile pic:
-      String playerColor = PlayerColors.getHexColor(player.getIndex());
+      String playerColor = player.getColor();//gethex color
       String INACTIVE_GREY = "#c2bfb6";
       Document.get()
           .getElementById(player.getName() + "Pic")
@@ -265,8 +273,8 @@ public class ViewDrawing {
     drawMedals(players);
   }
 
-  private static void drawMedals(ArrayList<Player> players) {
-    for (Player player : players) {
+  private static void drawMedals(ArrayList<PlayerDTO> players) {
+    for (PlayerDTO player : players) {
       if (player.getPlace() > -1) {
         // get element
         CanvasElement canvasMedal = (CanvasElement) Document.get()
