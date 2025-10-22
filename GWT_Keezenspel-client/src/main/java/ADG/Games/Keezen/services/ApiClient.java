@@ -3,6 +3,7 @@ package ADG.Games.Keezen.services;
 import ADG.Games.Keezen.Cards.CardResponse;
 import ADG.Games.Keezen.dto.CardDTO;
 import ADG.Games.Keezen.dto.CardResponseDTO;
+import ADG.Games.Keezen.dto.GameStateDTO;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.*;
@@ -19,7 +20,8 @@ public class ApiClient {
   }
 
   public void createNewGame(JSONObject newGameRequest, ApiCallback<JSONObject> callback) {
-    post("/games", newGameRequest, response -> JSONParser.parseStrict(response).isObject(), callback);
+    post("/games", newGameRequest, response -> JSONParser.parseStrict(response).isObject(),
+        callback);
   }
 
   public void getGame(String sessionId, ApiCallback<JSONObject> callback) {
@@ -36,7 +38,8 @@ public class ApiClient {
 
   // === PLAYERS ===
   public void getAllPlayersInGame(String sessionId, ApiCallback<JSONArray> callback) {
-    get("/games/" + sessionId + "/players", response -> JSONParser.parseStrict(response).isArray(), callback);
+    get("/games/" + sessionId + "/players", response -> JSONParser.parseStrict(response).isArray(),
+        callback);
   }
 
   public void addPlayerToGame(String sessionId, JSONObject playerJson, ApiCallback<Void> callback) {
@@ -44,14 +47,17 @@ public class ApiClient {
   }
 
   // === MOVES ===
-  public void makeMove(String sessionId, String playerId, JSONObject moveJson, ApiCallback<Void> callback) {
+  public void makeMove(String sessionId, String playerId, JSONObject moveJson,
+      ApiCallback<Void> callback) {
     post("/moves/" + sessionId + "/" + playerId, moveJson, r -> null, callback);
   }
 
   // === CARDS ===
   // just an array of CardDTO, use safeEval
-  public void getPlayerCards(String sessionId, String playerId, ApiCallback<JsArray<CardDTO>> callback) {
-    get("/cards/" + sessionId + "/" + playerId, json -> JsonUtils.<JsArray<CardDTO>>safeEval(json), callback);
+  public void getPlayerCards(String sessionId, String playerId,
+      ApiCallback<JsArray<CardDTO>> callback) {
+    get("/cards/" + sessionId + "/" + playerId, json -> JsonUtils.<JsArray<CardDTO>>safeEval(json),
+        callback);
   }
 
   public void playerForfeits(String sessionId, String playerId, ApiCallback<Void> callback) {
@@ -60,7 +66,20 @@ public class ApiClient {
 
   // === GAMESTATE ===
   public void getGameState(String sessionId, ApiCallback<JSONObject> callback) {
-    get("/gamestates/" + sessionId, response -> JSONParser.parseStrict(response).isObject(), callback);
+    get("/gamestates/" + sessionId,
+        response -> JSONParser.parseStrict(response).isObject(),
+        callback);
+  }
+
+  // Overload with stateVersion query
+  public void getGameState(String sessionId, Long clientVersion, ApiCallback<GameStateDTO> callback) {
+    String path = "/gamestates/" + sessionId;
+    if (clientVersion != null) {
+      path += "?stateVersion=" + clientVersion;
+    }
+
+    // Use JsonUtils.safeEval() for overlay types (GameStateDTO)
+    get(path, JsonUtils::<GameStateDTO>safeEval, callback);
   }
 
   // === GENERIC HTTP HELPERS ===
@@ -68,7 +87,8 @@ public class ApiClient {
     sendRequest(RequestBuilder.GET, path, null, parser, callback);
   }
 
-  private <T> void post(String path, JSONObject payload, JsonParser<T> parser, ApiCallback<T> callback) {
+  private <T> void post(String path, JSONObject payload, JsonParser<T> parser,
+      ApiCallback<T> callback) {
     sendRequest(RequestBuilder.POST, path, payload, parser, callback);
   }
 
@@ -90,16 +110,37 @@ public class ApiClient {
       builder.sendRequest(data == null ? null : data.toString(), new RequestCallback() {
         @Override
         public void onResponseReceived(Request req, Response res) {
-          if (res.getStatusCode() >= 200 && res.getStatusCode() < 300) {
+          int status = res.getStatusCode();
+
+          // === SUCCESS ===
+          if (status >= 200 && status < 300) {
+            // 200 OK with optional body
+            String text = res.getText();
+
+            if (text == null || text.trim().isEmpty()) {
+              // Allow 204 or empty 200 responses silently
+              callback.onHttpError(status, "Empty body (OK or No Content)");
+              return;
+            }
+
             try {
-              T parsed = parser.parse(res.getText());
+              T parsed = parser.parse(text);
               callback.onSuccess(parsed);
             } catch (Exception e) {
               callback.onFailure(e);
             }
-          } else {
-            callback.onFailure(new Exception("HTTP " + res.getStatusCode() + ": " + res.getStatusText()));
+            return;
           }
+
+          // === NOT MODIFIED ===
+          if (status == 304) {
+            // No body expected — directly notify the callback
+            callback.onHttpError(304, "Not Modified");
+            return;
+          }
+
+          // === OTHER ERRORS ===
+          callback.onHttpError(status, res.getStatusText());
         }
 
         @Override
@@ -115,14 +156,21 @@ public class ApiClient {
   // === Functional interfaces ===
   @FunctionalInterface
   public interface JsonParser<T> {
+
     T parse(String json);
   }
 
   public interface ApiCallback<T> {
+
     void onSuccess(T result);
 
     default void onFailure(Throwable caught) {
       Window.alert("API error: " + caught.getMessage());
+    }
+
+    // Optional override for HTTP responses with specific codes
+    default void onHttpError(int statusCode, String statusText) {
+      onFailure(new Exception("HTTP " + statusCode + ": " + statusText));
     }
   }
 }
