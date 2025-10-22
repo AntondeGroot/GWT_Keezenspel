@@ -13,17 +13,15 @@ import ADG.Games.Keezen.Move.MovingServiceAsync;
 import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.animations.*;
 import ADG.Games.Keezen.dto.CardDTO;
-import ADG.Games.Keezen.dto.CardResponseDTO;
+import ADG.Games.Keezen.dto.GameStateDTO;
 import ADG.Games.Keezen.moving.Move;
 import ADG.Games.Keezen.services.ApiClient;
-import ADG.Games.Keezen.services.ApiClient.ApiCallback;
 import ADG.Games.Keezen.services.PollingService;
 import ADG.Games.Keezen.util.Cookie;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import java.util.ArrayList;
@@ -47,6 +45,7 @@ public class GameBoardPresenter {
   private final PlayerList playerList = new PlayerList();
   private final CardsDeck cardsDeck = new CardsDeck();
   private final ApiClient apiClient = new ApiClient();
+  private long gameStateVersion = 0;
   private final int BOARD_SIZE = 600; // todo: replace with CSS properties
 
   private MoveResponse storedMoveResponse = new MoveResponse();
@@ -106,10 +105,42 @@ public class GameBoardPresenter {
   }
 
   private void pollServerForUpdates() {
-    pollServerForGameState();
-    pollServerForCards();
-    pollServerForMove();
+
+    apiClient.getGameState(Cookie.getSessionID(), gameStateVersion, new ApiClient.ApiCallback<GameStateDTO>() {
+      @Override
+      public void onSuccess(GameStateDTO response) {
+        GWT.log("Game State Response: " + response.getVersion());
+        pollServerForGameState();
+        pollServerForCards();
+        pollServerForMove();
+        gameStateVersion = (long) response.getVersion();
+      }
+
+      @Override
+      public void onHttpError(int statusCode, String statusText) {
+        switch (statusCode) {
+          case 304:
+            GWT.log("ℹ️ Game state not modified — no update needed.");
+            break;
+          case 404:
+            GWT.log("⚠️ Game session not found (404).");
+            break;
+          case 400:
+            GWT.log("🚫 Bad request: " + statusText);
+            break;
+          default:
+            GWT.log("❌ HTTP Error " + statusCode + ": " + statusText);
+            break;
+        }
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+
+      }
+    });
   }
+
 
   private void pollServerForMove() {
     movingService.getMove(Cookie.getSessionID(), new AsyncCallback<MoveResponse>() {

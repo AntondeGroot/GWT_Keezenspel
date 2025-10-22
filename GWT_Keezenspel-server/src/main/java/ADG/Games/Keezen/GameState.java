@@ -12,6 +12,7 @@ import ADG.Log;
 import com.adg.openapi.model.PositionKey;
 import com.adg.openapi.model.TempMessageType;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import static ADG.util.BoardLogic.isPawnOnFinish;
@@ -44,10 +45,10 @@ public class GameState {
   private final CardsDeckInterface cardsDeck;
   private int animationSpeed;
   private Boolean hasStarted = false;
-  private long version = UUID.randomUUID().getMostSignificantBits();
+  private final AtomicLong version = new AtomicLong(0); // to make it compatible with javascript as it doesn't do int64 well!
 
   public long getVersion() {
-    return version;
+    return version.get();
   }
 
   public Boolean hasStarted() {
@@ -123,7 +124,7 @@ public class GameState {
       player.setPlace(-1);
       player.isPlaying(false);
       players.add(player);
-      version++;
+      version.incrementAndGet();
     }
   }
 
@@ -164,7 +165,7 @@ public class GameState {
       activePlayers.remove(playerId);
       nextActivePlayer();
     }
-    version++;
+    version.incrementAndGet();
   }
 
   public void removeWinnerFromActivePlayerList() {
@@ -464,7 +465,7 @@ public class GameState {
 
   public void processOnMove(MoveRequest moveMessage, MoveResponse response) {
     processOnMove(moveMessage, response, true);
-    version++;
+    version.incrementAndGet();
   }
 
   public void processOnMove(MoveRequest moveMessage, MoveResponse response,
@@ -865,7 +866,7 @@ public class GameState {
   public void processOnForfeit(String playerId) {
     cardsDeck.forfeitCardsForPlayer(playerId);
     forfeitPlayer(playerId);
-    version++;
+    version.incrementAndGet();
   }
 
   public void processOnSwitch(MoveRequest moveMessage, MoveResponse moveResponse) {
