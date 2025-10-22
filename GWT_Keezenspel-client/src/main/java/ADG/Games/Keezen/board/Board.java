@@ -16,7 +16,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import java.util.*;
 
-import static ADG.Games.Keezen.util.PlayerUUIDUtil.*;
 import static ADG.Games.Keezen.util.PlayerUtil.getPlayerById;
 import static ADG.Games.Keezen.util.PlayerUtil.getPlayerByInt;
 
