@@ -2,8 +2,8 @@ package ADG.Games.Keezen.animations;
 
 import static java.lang.Math.max;
 
-import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Point;
+import ADG.Games.Keezen.dto.PawnDTO;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style;
@@ -35,13 +35,13 @@ public class PawnAnimation {
     for (AnimatePawnPoints p : sequence) {
       GWT.log("Animating pawn path: " + p);
 
-      Pawn pawn = p.getPawn();
+      PawnDTO pawn = p.getPawn();
       LinkedList<Point> points = p.getPoints();
       double distance = p.getTotalPathLength();
 
       double pixelsPerMs = calculateSpeed(distance);
 
-      DivElement pawnElement = pawnElements.get(pawn.getPawnId().toString());
+      DivElement pawnElement = pawnElements.get(pawn.getPawnId());
 
       animateStep(pawnElement, points.get(0), points, pixelsPerMs);
 

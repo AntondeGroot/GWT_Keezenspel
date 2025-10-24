@@ -3,36 +3,33 @@ package ADG.Games.Keezen;
 import static ADG.Games.Keezen.Move.MessageType.MAKE_MOVE;
 import static ADG.Games.Keezen.Move.MoveType.*;
 import static ADG.Games.Keezen.util.BoardLogic.pawnIsOnNormalBoard;
-import static ADG.Games.Keezen.util.CardDTOValueCheck.isJack;
-import static ADG.Games.Keezen.util.CardDTOValueCheck.isSeven;
+import static ADG.Games.Keezen.util.CardValueCheck.isJack;
+import static ADG.Games.Keezen.util.CardValueCheck.isSeven;
 
 import ADG.Games.Keezen.Move.MessageType;
 import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveType;
-import ADG.Games.Keezen.Player.Pawn;
-import ADG.Games.Keezen.Player.PawnId;
-import ADG.Games.Keezen.dto.CardDTO;
-import ADG.Games.Keezen.dto.PawnDTO;
-import ADG.Games.Keezen.dto.PawnIdDTO;
+import ADG.Games.Keezen.dto.CardClient;
+import ADG.Games.Keezen.dto.PawnClient;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Style.Visibility;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class PawnAndCardSelection {
 
   private String playerId;
-  private PawnDTO pawn1 = null;
-  private PawnDTO pawn2 = null;
-  private CardDTO card;
+  private PawnClient pawn1 = null;
+  private PawnClient pawn2 = null;
+  private CardClient card;
   private boolean drawCards = true;
   private MoveType moveType;
   private int nrStepsPawn1 = 0;
   private int nrStepsPawn2 = 0;
   private boolean uiEnabled = true;
-  private ArrayList<PawnDTO> pawns = new ArrayList<>();
+  private List<PawnClient> pawns = new ArrayList<>();
 
   public void disableUIForTests() {
     this.uiEnabled = false;
@@ -48,18 +45,14 @@ public class PawnAndCardSelection {
     playerId = id;
   }
 
-  public void updatePawns(JsArray<PawnDTO> pawns) {
-    ArrayList<PawnDTO> tempPawns = new ArrayList<>();
-    for (int i = 0; i < pawns.length(); i++) {
-      tempPawns.add(pawns.get(i));
-    }
-    this.pawns = tempPawns;
+  public void updatePawns(List<PawnClient> pawns) {
+    this.pawns = pawns;
     checkIfSelectedPawnsAreUpToDate();
   }
 
   public void checkIfSelectedPawnsAreUpToDate() {
     GWT.log("updatePawns trying to update");
-    for (PawnDTO pawn : pawns) {
+    for (PawnClient pawn : pawns) {
       // compares pawnId's then updates current position
       if (Objects.equals(pawn, pawn1)) {
         pawn1 = pawn;
@@ -76,8 +69,8 @@ public class PawnAndCardSelection {
     return playerId;
   }
 
-  private PawnDTO getPawn(PawnIdDTO pawnId) {
-    for (PawnDTO pawn : pawns) {
+  private PawnClient getPawn(String pawnId) {
+    for (PawnClient pawn : pawns) {
       if (pawn.getPawnId().equals(pawnId)) {
         return pawn;
       }
@@ -93,8 +86,8 @@ public class PawnAndCardSelection {
    * @param pawnId
    */
   // for real life
-  public void addPawnId(PawnIdDTO pawnId) {
-    PawnDTO pawn = getPawn(pawnId);
+  public void addPawnId(String pawnId) {
+    PawnClient pawn = getPawn(pawnId);
     GWT.log("test playerId = " + playerId);
     GWT.log("trying to add pawn = " + pawn);
     validateHowManyPawnsCanBeSelected(pawn); // not accounting for if they are on nest/board/finish
@@ -108,7 +101,7 @@ public class PawnAndCardSelection {
    * locations are
    * @param pawn
    */
-  public void addPawn(PawnDTO pawn) {
+  public void addPawn(PawnClient pawn) {
     GWT.log("test playerId = " + playerId);
     GWT.log("trying to add pawn = " + pawn);
     validateHowManyPawnsCanBeSelected(pawn); // not accounting for if they are on nest/board/finish
@@ -162,7 +155,7 @@ public class PawnAndCardSelection {
     }
   }
 
-  private boolean aPawnWasNotDeselected(PawnDTO pawn) {
+  private boolean aPawnWasNotDeselected(PawnClient pawn) {
     if (Objects.equals(pawn1, pawn)) {
       // this moves pawn 2 to pawn1 and resets pawn2
       // if pawn 2 was already reset, this changes nothing but clears pawn1
@@ -180,7 +173,7 @@ public class PawnAndCardSelection {
     return true;
   }
 
-  private void handlePlayerCanSelect2Pawns(PawnDTO pawn) {
+  private void handlePlayerCanSelect2Pawns(PawnClient pawn) {
     if (aPawnWasNotDeselected(pawn)) {
       if (!playerId.equals(pawn.getPlayerId())) {
         return;
@@ -195,7 +188,7 @@ public class PawnAndCardSelection {
     }
   }
 
-  private void handlePlayerCanSelect1Pawn(PawnDTO pawn) {
+  private void handlePlayerCanSelect1Pawn(PawnClient pawn) {
     if (aPawnWasNotDeselected(pawn)) {
       if (playerId.equals(pawn.getPlayerId())) {
         pawn1 = pawn;
@@ -203,7 +196,7 @@ public class PawnAndCardSelection {
     }
   }
 
-  private void handlePlayerCanSelectTheirOwnAndOpponentsPawn(PawnDTO pawn) {
+  private void handlePlayerCanSelectTheirOwnAndOpponentsPawn(PawnClient pawn) {
     if (aPawnWasNotDeselected(pawn)) {
       // select pawn1
       if (playerId.equals(pawn.getPlayerId())) {
@@ -217,7 +210,7 @@ public class PawnAndCardSelection {
     }
   }
 
-  private void validateHowManyPawnsCanBeSelected(PawnDTO pawn) {
+  private void validateHowManyPawnsCanBeSelected(PawnClient pawn) {
     if (card == null) {
       handlePlayerCanSelect1Pawn(pawn);
       return;
@@ -236,7 +229,7 @@ public class PawnAndCardSelection {
     }
   }
 
-  public void setCard(CardDTO p_card) {
+  public void setCard(CardClient p_card) {
     drawCards = true;
 
     // deselect when clicked twice
@@ -255,11 +248,11 @@ public class PawnAndCardSelection {
     validateMoveType();
   }
 
-  public PawnDTO getPawn1() {
+  public PawnClient getPawn1() {
     return pawn1;
   }
 
-  public PawnIdDTO getPawnId1() {
+  public String getPawnId1() {
     if (pawn1 == null) {
       return null;
     }
@@ -281,18 +274,18 @@ public class PawnAndCardSelection {
     }
   }
 
-  public PawnIdDTO getPawnId2() {
+  public String getPawnId2() {
     if (pawn2 == null) {
       return null;
     }
     return pawn2.getPawnId();
   }
 
-  public PawnDTO getPawn2() {
+  public PawnClient getPawn2() {
     return pawn2;
   }
 
-  public CardDTO getCard() {
+  public CardClient getCard() {
     return card;
   }
 

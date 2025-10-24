@@ -6,14 +6,14 @@ import ADG.Games.Keezen.Point;
 import ADG.Games.Keezen.TileMapping;
 import ADG.Games.Keezen.animations.AnimationSequence;
 import ADG.Games.Keezen.animations.PawnAnimation;
-import ADG.Games.Keezen.dto.CardDTO;
-import ADG.Games.Keezen.dto.PawnDTO;
+import ADG.Games.Keezen.dto.CardClient;
+import ADG.Games.Keezen.dto.PawnClient;
+import ADG.Games.Keezen.dto.PlayerClient;
 import ADG.Games.Keezen.dto.PlayerDTO;
 import ADG.Games.Keezen.moving.Move;
 import ADG.Games.Keezen.util.Cookie;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.*;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
@@ -127,7 +127,7 @@ public class GameBoardView extends Composite {
     return (CanvasElement) document.getElementById("canvasCards2");
   }
 
-  public void createPlayerList(ArrayList<PlayerDTO> players) {
+  public void createPlayerList(List<PlayerClient> players) {
     playerListContainer2.clear();
     playerListContainer2.add(createPlayerGrid(players));
   }
@@ -141,16 +141,15 @@ public class GameBoardView extends Composite {
     AnimationSequence.reset();
   }
 
-  public void drawBoard(List<TileMapping> tiles, JsArray<PlayerDTO> playersJs, double cellDistance) {
+  public void drawBoard(List<TileMapping> tiles, List<PlayerClient> players, double cellDistance) {
     GWT.log("drawing board");
-    ArrayList<PlayerDTO> players = playersToArrayList(playersJs);;
 
     for (TileMapping mapping : tiles) {
       String color = "#f2f2f2";
       int tileNr = mapping.getTileNr();
       // only player tiles get a color
       if (tileNr <= 0 || tileNr >= 16) {
-        PlayerDTO player = getPlayerById(mapping.getPlayerId(), players);
+        PlayerClient player = getPlayerById(mapping.getPlayerId(), players);
         color =  player.getColor();
       }
       DivElement circle = createCircle(mapping.getTileId(),
@@ -165,22 +164,28 @@ public class GameBoardView extends Composite {
     forfeitButton.setEnabled(enabled);
   }
 
-  public void createPawns(ArrayList<PawnDTO> pawns, PawnAndCardSelection pawnAndCardSelection) {
+  public void createPawns(List<PawnClient> pawns, PawnAndCardSelection pawnAndCardSelection) {
     double desiredWidth = 40;
     double desiredHeight = 40;
     Point point = new Point(0, 0);
-
-    for (PawnDTO pawn : pawns) {
-      DivElement pawnElement = pawnElements.get(pawn.getPawnId().toString());
+    GWT.log("createPawns : "+pawns.size()+" pawns to be drawn");
+    for (PawnClient pawn : pawns) {
+      GWT.log("pooo");
+      GWT.log(""+pawn.getPawnId());
+      GWT.log(""+pawn.getPlayerId());
+      String pawnId = pawn.getPawnId();
+      GWT.log("pawnId: "+pawnId);
+      DivElement pawnElement = pawnElements.get(pawn.getPawnId());
       if (pawnElement == null) {
         pawnElement = createPawn(pawn, pawnAndCardSelection);
-        pawnElements.put(pawn.getPawnId().toString(), pawnElement);
+        pawnElements.put(pawn.getPawnId(), pawnElement);
         pawnBoard.getElement().appendChild(pawnElement);
       }
 
       for (TileMapping mapping : Board.getTiles()) {
         if (mapping.getTileId().equals(pawn.getCurrentTileId())) {
           point = mapping.getPosition();
+          System.out.println("");
         }
       }
       pawnElement.getStyle().setLeft(point.getX() - desiredWidth / 2, Style.Unit.PX);
@@ -189,7 +194,7 @@ public class GameBoardView extends Composite {
   }
 
   public void drawCardsIcons(HashMap<String, Integer> nrCardsPerPlayerUUID, Image spriteImage) {
-
+    GWT.log("drawCardsIcons");
     for (Map.Entry<String, Integer> entry : nrCardsPerPlayerUUID.entrySet()) {
       String uuid = entry.getKey();
       if (uuid.equals(Cookie.getPlayerId())) {
@@ -235,15 +240,15 @@ public class GameBoardView extends Composite {
     }
   }
 
-  private void drawPlayerCardsInHand(List<CardDTO> cards, PawnAndCardSelection pawnAndCardSelection,
+  private void drawPlayerCardsInHand(List<CardClient> cards, PawnAndCardSelection pawnAndCardSelection,
       Image spriteImage) {
-    CardDTO selectedCard = pawnAndCardSelection.getCard();
+    CardClient selectedCard = pawnAndCardSelection.getCard();
     // create divs
     cardsContainer.getElement().removeAllChildren();
     GWT.log("cards have now become stale");
 
     GWT.log("cards = " + cards);
-    for (CardDTO card : cards) {
+    for (CardClient card : cards) {
       // Define sprite dimensions
       double spriteWidth = 1920 / 13.0; // One card's width in sprite
       double spriteHeight = 1150 / 5.0; // One card's height in sprite
@@ -306,9 +311,9 @@ public class GameBoardView extends Composite {
   }
 
   public void drawCards(CardsDeck cardsDeck, PawnAndCardSelection pawnAndCardSelection) {
-    List<CardDTO> cards = cardsDeck.getCards();
+    List<CardClient> cards = cardsDeck.getCards();
     HashMap<String, Integer> nrCardsPerPlayerUUID = cardsDeck.getNrCardsPerPlayer();
-    ArrayList<CardDTO> playedCards = (ArrayList<CardDTO>) cardsDeck.getPlayedCards();
+    ArrayList<CardClient> playedCards = (ArrayList<CardClient>) cardsDeck.getPlayedCards();
 
     // Create an image to represent the card deck
     Image img = new Image("/card-deck.png");
@@ -334,7 +339,7 @@ public class GameBoardView extends Composite {
     RootPanel.get().add(img);
   }
 
-  private void drawPlayedCards(ArrayList<CardDTO> playedCards, Image spriteImage) {
+  private void drawPlayedCards(ArrayList<CardClient> playedCards, Image spriteImage) {
     // Loop through the cards to draw them
     // the cards are drawn rotating with an angle of 45 degrees
     // meaning that after 8 cards you will draw a card over a previous drawn card
@@ -350,7 +355,7 @@ public class GameBoardView extends Composite {
       angleDegrees = angleDegrees + 45;
 
       if (i >= startDrawingFromCardIndex) {
-        CardDTO card = playedCards.get(i);
+        CardClient card = playedCards.get(i);
         double angleRadians = Math.toRadians(angleDegrees);
 
         // Define the source rectangle (from the sprite sheet)

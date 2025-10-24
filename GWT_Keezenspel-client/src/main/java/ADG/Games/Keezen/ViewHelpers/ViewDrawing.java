@@ -1,10 +1,10 @@
 package ADG.Games.Keezen.ViewHelpers;
 
 import ADG.Games.Keezen.PawnAndCardSelection;
-import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.TileId;
-import ADG.Games.Keezen.dto.PawnDTO;
-import ADG.Games.Keezen.dto.PlayerDTO;
+import ADG.Games.Keezen.dto.PawnClient;
+import ADG.Games.Keezen.dto.PlayerClient;
+import ADG.Games.Keezen.dto.PlayerClient;
 import ADG.Games.Keezen.moving.Move;
 import ADG.Games.Keezen.util.UUID;
 import com.google.gwt.canvas.client.Canvas;
@@ -34,12 +34,14 @@ import static ADG.Games.Keezen.Player.PlayerColors.*;
 
 public class ViewDrawing {
 
-  public static DivElement createPawn(PawnDTO pawn, PawnAndCardSelection pawnAndCardSelection) {
+  public static DivElement createPawn(PawnClient pawn, PawnAndCardSelection pawnAndCardSelection) {
     // Create new <div> Element
     GWT.log("A pawn was created");
     DivElement pawnElement = Document.get().createDivElement();
     pawnElement.setClassName("pawnDiv");
-    pawnElement.setId(pawn.getPawnId().toString());
+    String pawnId = null;
+
+    pawnElement.setId(pawn.getPawnId());
     String uuid = UUID.get();
     pawnElement.setAttribute("data-uuid", uuid); // for debugging to see when the pawns are replaced, which happens after refreshing the page
 
@@ -100,10 +102,10 @@ public class ViewDrawing {
               // compare with selected pawns
               boolean isSelected = false;
               if (pawnAndCardSelection.getPawn1() != null && pawnAndCardSelection.getPawn1()
-                  .getPawnId().toString().equals(pawnId)) {
+                  .getPawnId().equals(pawnId)) {
                 isSelected = true;
               } else if (pawnAndCardSelection.getPawn2() != null && pawnAndCardSelection.getPawn2()
-                  .getPawnId().toString().equals(pawnId)) {
+                  .getPawnId().equals(pawnId)) {
                 isSelected = true;
               }
 
@@ -117,7 +119,7 @@ public class ViewDrawing {
         }
       }
     });
-
+    GWT.log("a pawn was created");
     return pawnElement;
   }
 
@@ -159,7 +161,7 @@ public class ViewDrawing {
     return tileElement;
   }
 
-  public static Grid createPlayerGrid(ArrayList<PlayerDTO> players) {
+  public static Grid createPlayerGrid(List<PlayerClient> players) {
     GWT.log("creates player grid");
     // todo: maybe check player whether they belong in column 1 or 2, so don't expand both when a winner has been declared
     List<Integer> column1 = Arrays.asList(0, 1, 2, 3);
@@ -170,21 +172,21 @@ public class ViewDrawing {
     int rowCount = Math.min(players.size(), 4);
     Grid grid = new Grid(rowCount, colCount);
 
-    List<PlayerDTO> winners = players.stream()
+    List<PlayerClient> winners = players.stream()
         .filter(player -> player.getPlace() > -1)
         .collect(Collectors.toList());
 
     int playerId = 0;
-    for (PlayerDTO player : players) {
+    for (PlayerClient player : players) {
       int imagePixelSize = 50;
 
       ImageElement img = Document.get().createImageElement();
       img.setSrc("/profilepics.png");
 
       HorizontalPanel hp = new HorizontalPanel();
-      hp.getElement().setId(player.getName());
-      Label playerNameLabel = new Label(player.getName());
-      playerNameLabel.getElement().setId(player.getName() + "Label");
+      hp.getElement().setId(""+player.getPlayerInt());
+      Label playerNameLabel = new Label(""+player.getName());
+      playerNameLabel.getElement().setId(player.getPlayerInt() + "Label");
 
       hp.setHorizontalAlignment(HorizontalPanel.ALIGN_LEFT);
       hp.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
@@ -195,7 +197,7 @@ public class ViewDrawing {
       canvas.setCoordinateSpaceWidth(imagePixelSize);
       canvas.setCoordinateSpaceHeight(imagePixelSize);
       canvas.setStyleName("profilepic");
-      canvas.getElement().setId(player.getName() + "Pic");
+      canvas.getElement().setId(player.getPlayerInt() + "Pic");
 
       Context2d ctx = canvas.getContext2d();
       // source image
@@ -240,30 +242,29 @@ public class ViewDrawing {
     return grid;
   }
 
-  public static void updatePlayerProfileUI(JsArray<PlayerDTO> playersJs) {
-    ArrayList<PlayerDTO> players = new ArrayList<>();
-    for (int i = 0; i < playersJs.length(); i++) {
-      players.add(playersJs.get(i));
-    }
+  public static void updatePlayerProfileUI(List<PlayerClient> players) {
 
     GWT.log("Players were updated: " + players);
-    for (PlayerDTO player : players) {
+    for (PlayerClient player : players) {
       // set color of border around profile pic:
+      GWT.log("Player: " + player.getName());
       String playerColor = player.getColor();//gethex color
+      GWT.log("playercolor = "+playerColor);
       String INACTIVE_GREY = "#c2bfb6";
+      GWT.log("trying to get document");
       Document.get()
-          .getElementById(player.getName() + "Pic")
+          .getElementById(player.getPlayerInt() + "Pic")
           .getStyle()
           .setBorderColor(
               player.isActive() ? playerColor : INACTIVE_GREY);
-
+      GWT.log("finished getting document");
       // set player name label : there's a strikethrough when player is not active
-      Element playerLabel = Document.get().getElementById(player.getName() + "Label");
+      Element playerLabel = Document.get().getElementById(player.getPlayerInt() + "Label");
       playerLabel.setClassName(player.isActive() ? "activePlayerName" : "inactivePlayerName");
       playerLabel.addClassName("playerName");
 
       // set border for Horizontal Panel
-      Element hp = Document.get().getElementById(player.getName());
+      Element hp = Document.get().getElementById(""+player.getPlayerInt());
       hp.setClassName(player.isPlaying() ? "playerPlaying" : "playerNotPlaying");
       hp.addClassName(player.isActive() ? "playerActive" : "playerInactive");
     }
@@ -271,8 +272,8 @@ public class ViewDrawing {
     drawMedals(players);
   }
 
-  private static void drawMedals(ArrayList<PlayerDTO> players) {
-    for (PlayerDTO player : players) {
+  private static void drawMedals(List<PlayerClient> players) {
+    for (PlayerClient player : players) {
       if (player.getPlace() > -1) {
         // get element
         CanvasElement canvasMedal = (CanvasElement) Document.get()

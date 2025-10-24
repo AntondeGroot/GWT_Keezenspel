@@ -1,8 +1,8 @@
 package ADG.Games.Keezen.animations;
 
-import ADG.Games.Keezen.Player.Pawn;
 
 import ADG.Games.Keezen.TileId;
+import ADG.Games.Keezen.dto.PawnDTO;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -24,7 +24,7 @@ public class AnimationSequence {
     sequenceLast.clear();
   }
 
-  public static void movePawn(Pawn pawn, LinkedList<TileId> movePawn, boolean animateFirst) {
+  public static void movePawn(PawnDTO pawn, LinkedList<TileId> movePawn, boolean animateFirst) {
     // animate the movement of the pawn
     if (animateFirst) {
       sequenceFirst.add(new AnimatePawnPoints(pawn, movePawn));

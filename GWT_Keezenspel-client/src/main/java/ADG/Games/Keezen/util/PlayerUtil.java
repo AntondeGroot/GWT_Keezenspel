@@ -1,12 +1,13 @@
 package ADG.Games.Keezen.util;
 
+import ADG.Games.Keezen.dto.PlayerClient;
 import ADG.Games.Keezen.dto.PlayerDTO;
 import java.util.List;
 
 public class PlayerUtil {
 
-  public static PlayerDTO getPlayerById(String playerId, List<PlayerDTO> players) {
-    for (PlayerDTO player : players) {
+  public static PlayerClient getPlayerById(String playerId, List<PlayerClient> players) {
+    for (PlayerClient player : players) {
       if (player.getId().equals(playerId)) {
         return player;
       }
@@ -14,8 +15,8 @@ public class PlayerUtil {
     return null;
   }
 
-  public static PlayerDTO getPlayerByInt(int playerInt, List<PlayerDTO> players) {
-    for (PlayerDTO player : players) {
+  public static PlayerClient getPlayerByInt(int playerInt, List<PlayerClient> players) {
+    for (PlayerClient player : players) {
       if (player.getPlayerInt() == playerInt) {
         return player;
       }

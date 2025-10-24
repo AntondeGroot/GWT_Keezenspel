@@ -1,6 +1,6 @@
 package ADG.Games.Keezen;
 
-import ADG.Games.Keezen.dto.CardDTO;
+import ADG.Games.Keezen.dto.CardClient;
 import ADG.Games.Keezen.util.JsInteropUtil;
 import com.google.gwt.core.client.JsArray;
 
@@ -10,8 +10,8 @@ import java.util.List;
 
 public class CardsDeck {
 
-  private List<CardDTO> cards = new ArrayList<>();
-  private List<CardDTO> playedCards = new ArrayList<>();
+  private List<CardClient> cards = new ArrayList<>();
+  private List<CardClient> playedCards = new ArrayList<>();
   private HashMap<String, Integer> nrCardsPerPlayer = new HashMap<>();
 
   public HashMap<String, Integer> getNrCardsPerPlayer() {
@@ -22,33 +22,25 @@ public class CardsDeck {
     this.nrCardsPerPlayer = nrCardsPerPlayer;
   }
 
-  public List<CardDTO> getCards() {
+  public List<CardClient> getCards() {
     return cards;
   }
 
-  public List<CardDTO> getPlayedCards() {
+  public List<CardClient> getPlayedCards() {
     return playedCards;
   }
 
-  public void setCardsFromJsArray(JsArray<CardDTO> jsCards) {
-    List<CardDTO> cardList = new ArrayList<>();
-    for (int i = 0; i < jsCards.length(); i++) {
-      cardList.add(jsCards.get(i));
-    }
-    this.cards = cardList;
+  public void setCards(List<CardClient> cards) {
+    this.cards = cards;
   }
 
-  public void setPlayedCardsFromJsArray(JsArray<CardDTO> jsPlayedCards) {
-    List<CardDTO> playedList = new ArrayList<>();
-    for (int i = 0; i < jsPlayedCards.length(); i++) {
-      playedList.add(jsPlayedCards.get(i));
-    }
-    this.playedCards = playedList;
+  public void setPlayedCards(List<CardClient> playedCards) {
+    this.playedCards = playedCards;
   }
 
-  public void processCardResponse(JsArray<CardDTO> cardResponse) {
-    setCardsFromJsArray(cardResponse);
-    setPlayedCardsFromJsArray(cardResponse);
-    setNrCardsPerPlayer(JsInteropUtil.toHashMap(cardResponse));
-  }
+//  public void processCardResponse(JsArray<CardClient> cardResponse) {
+//    setCards(cardResponse);
+//    setPlayedCards(cardResponse);
+//    setNrCardsPerPlayer(JsInteropUtil.toHashMap(cardResponse));
+//  }
 }
