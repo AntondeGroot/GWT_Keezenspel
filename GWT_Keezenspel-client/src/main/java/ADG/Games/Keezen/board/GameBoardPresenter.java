@@ -16,6 +16,7 @@ import ADG.Games.Keezen.dto.GameStateClient;
 import ADG.Games.Keezen.dto.GameStateDTO;
 import ADG.Games.Keezen.moving.Move;
 import ADG.Games.Keezen.services.ApiClient;
+import ADG.Games.Keezen.services.ApiClient.ApiCallback;
 import ADG.Games.Keezen.services.PollingService;
 import ADG.Games.Keezen.util.Cookie;
 import com.google.gwt.core.client.GWT;
@@ -87,8 +88,16 @@ public class GameBoardPresenter {
     view.getForfeitButton().addDomHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        pawnAndCardSelection.setMoveType(FORFEIT);
-        Move.makeMove(pawnAndCardSelection.createMoveMessage());
+        pawnAndCardSelection.reset();
+        apiClient.playerForfeits(Cookie.getSessionID(), Cookie.getPlayerId(), new ApiCallback<Void>() {
+          @Override
+          public void onSuccess(Void result) {
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+          }
+        });
       }
     }, ClickEvent.getType());
 

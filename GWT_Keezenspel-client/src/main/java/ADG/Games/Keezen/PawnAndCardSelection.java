@@ -265,13 +265,6 @@ public class PawnAndCardSelection {
 
   public void setMoveType(MoveType moveType) {
     this.moveType = moveType;
-    if (moveType == FORFEIT) {
-      pawn1 = null;
-      pawn2 = null;
-      nrStepsPawn1 = 0;
-      nrStepsPawn2 = 0;
-      card = null;
-    }
   }
 
   public String getPawnId2() {
