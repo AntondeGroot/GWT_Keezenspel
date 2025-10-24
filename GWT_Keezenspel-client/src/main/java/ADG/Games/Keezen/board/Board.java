@@ -1,13 +1,16 @@
 package ADG.Games.Keezen.board;
 
-import ADG.Games.Keezen.dto.PawnDTO;
+import ADG.Games.Keezen.dto.PawnClient;
+import ADG.Games.Keezen.dto.PawnClient;
 import ADG.Games.Keezen.dto.PawnIdDTO;
+import ADG.Games.Keezen.dto.PlayerClient;
 import ADG.Games.Keezen.dto.PlayerDTO;
 import ADG.Games.Keezen.util.CellDistance;
 import ADG.Games.Keezen.PawnComparator;
 import ADG.Games.Keezen.Point;
 import ADG.Games.Keezen.TileMapping;
 import ADG.Games.Keezen.util.Cookie;
+import ADG.Games.Keezen.util.JsUtilities;
 import com.google.gwt.core.client.GWT;
 
 import com.google.gwt.core.client.JsArray;
@@ -19,9 +22,9 @@ import static ADG.Games.Keezen.util.PlayerUtil.getPlayerByInt;
 public class Board {
 
   private static final ArrayList<TileMapping> tiles = new ArrayList<>();
-  private static ArrayList<PawnDTO> pawns = new ArrayList<>();
+  private static ArrayList<PawnClient> pawns = new ArrayList<>();
   private static double cellDistance;
-  private static ArrayList<PlayerDTO> players;
+  private static ArrayList<PlayerClient> players;
   private static final HashMap<String, ArrayList<Point>> cardsDeckPointsPerPlayer = new HashMap<>();
 
   public static ArrayList<Point> getCardsDeckPointsForPlayer(String UUID) {
@@ -32,16 +35,12 @@ public class Board {
     return cardsDeckPointsPerPlayer.get(UUID);
   }
 
-  public void createBoard(JsArray<PlayerDTO> players, double boardSize) {
+  public void createBoard(ArrayList<PlayerClient> players, double boardSize) {
     // Clear the mappings list before creating a new board
-    ArrayList<PlayerDTO> playerList = new ArrayList<>();
-    for (int i = 0; i < players.length(); i++) {
-      playerList.add(players.get(i));
-    }
-
+    GWT.log("create board for players: " + players);
     tiles.clear();
-    Board.players = playerList;
-    int nrPlayers = playerList.size();
+    Board.players = players;
+    int nrPlayers = players.size();
     cellDistance = CellDistance.getCellDistance(nrPlayers, boardSize);
     Point startPoint = CellDistance.getStartPoint(nrPlayers, boardSize);
 
@@ -59,7 +58,8 @@ public class Board {
       // where the playerId is updated based on the rotation.
       int playerId = j < 0 ? lastPlayerInt : 0;
       int tileNr = j < 0 ? j + 16 : j;
-      tiles.add(new TileMapping(getPlayerByInt(playerId, playerList).getId(), tileNr, new Point(startPoint)));
+      tiles.add(new TileMapping(getPlayerByInt(playerId, players).getId(), tileNr,
+          new Point(startPoint)));
 
       if (j < -3) {
         // move downwards for 6 tiles
@@ -72,12 +72,12 @@ public class Board {
         startPoint.setY(startPoint.getY() - cellDistance);
       }
     }
-
+    GWT.log("Board create finish tiles");
     // create finish tiles
-    Point point = new Point(getPosition(getPlayerByInt(lastPlayerInt, playerList).getId(), 15));
+    Point point = new Point(getPosition(getPlayerByInt(lastPlayerInt, players).getId(), 15));
     for (int i = 1; i <= 4; i++) {
       point.setY(point.getY() - cellDistance);
-      String playerUUID = getPlayerByInt(0, playerList).getId();
+      String playerUUID = getPlayerByInt(0, players).getId();
       tiles.add(new TileMapping(playerUUID, 15 + i, new Point(point)));
     }
 
@@ -85,7 +85,7 @@ public class Board {
     // they will be assigned negative values to distinguish them from the playing field
     // they will be assigned different negative values to distinguish them from each other
     // so that 2 pawns cannot end up on the same nest tile
-    String playerUUID = getPlayerByInt(0, playerList).getId();
+    String playerUUID = getPlayerByInt(0, players).getId();
 
     point = new Point(getPosition(playerUUID, 1));
     point.setX(point.getX() - 1.5 * cellDistance);
@@ -102,8 +102,9 @@ public class Board {
     String playerId;
     for (TileMapping tile : tiles) {
       for (int k = 1; k < nrPlayers; k++) {
-        int colorInt = (getPlayerById(tile.getPlayerId(), playerList).getPlayerInt() + k) % nrPlayers;
-        playerId = getPlayerByInt(colorInt, playerList).getId();
+        int colorInt =
+            (getPlayerById(tile.getPlayerId(), players).getPlayerInt() + k) % nrPlayers;
+        playerId = getPlayerByInt(colorInt, players).getId();
         tempTiles.add(new TileMapping(playerId, tile.getTileNr(),
             tile.getPosition().rotate(new Point(300, 300), 360.0 / nrPlayers * k)));
       }
@@ -112,13 +113,14 @@ public class Board {
     ArrayList<Point> cardsDeckPoints = new ArrayList<>();
     Point beginPoint = getPosition(playerUUID, 1);
     beginPoint = new Point(beginPoint.getX(), beginPoint.getY() + cellDistance + 3);
-    Point endPoint = getPosition(getPlayerByInt(lastPlayerInt, playerList).getId(), 13);
+    Point endPoint = getPosition(getPlayerByInt(lastPlayerInt, players).getId(), 13);
     endPoint = new Point(endPoint.getX(), endPoint.getY() + cellDistance + 3);
     GWT.log("\n\n\n beginpoint" + beginPoint);
     cardsDeckPoints.add(new Point(beginPoint.getX(), beginPoint.getY()));
     cardsDeckPoints.add(new Point(endPoint.getX(), endPoint.getY()));
     cardsDeckPointsPerPlayer.put(playerUUID, cardsDeckPoints);
 
+    GWT.log("board test card");
     // add points for cards
     for (int k = 1; k < nrPlayers; k++) {
       beginPoint = beginPoint.rotate(new Point(300, 300), 360.0 / nrPlayers);
@@ -128,19 +130,26 @@ public class Board {
       ArrayList<Point> cardsDeckPoints2 = new ArrayList<>();
       cardsDeckPoints2.add(beginPoint);
       cardsDeckPoints2.add(endPoint);
-      cardsDeckPointsPerPlayer.put(getPlayerByInt(k, playerList).getId(), cardsDeckPoints2);
+      cardsDeckPointsPerPlayer.put(getPlayerByInt(k, players).getId(), cardsDeckPoints2);
     }
 
     tiles.addAll(tempTiles);
 
+    GWT.log("rotate tiles based on player uuid");
     // rotate all tiles based on player UUID
     String uuid = Cookie.getPlayerId();
-    int playerint = getPlayerById(uuid, playerList).getPlayerInt();
+    GWT.log("board test tiles :" + tiles);
+    GWT.log("uuid = " + uuid);
+    int playerint = getPlayerById(uuid, players).getPlayerInt();
+    GWT.log("playerint " + playerint);
     for (TileMapping tile : tiles) {
+      GWT.log("tile " + tile.getTileNr());
       tile.setPosition(
           tile.getPosition().rotate(new Point(300, 300), -360.0 / nrPlayers * playerint)
       );
     }
+    GWT.log("board test");
+
     // rotate all the points where all the players' cards should be displayed
     for (Map.Entry<String, ArrayList<Point>> entry : cardsDeckPointsPerPlayer.entrySet()) {
       String uuidI = entry.getKey();
@@ -150,6 +159,7 @@ public class Board {
         templist.add(p);
       }
       cardsDeckPointsPerPlayer.put(uuidI, templist);
+      GWT.log("finished board creation:");
     }
   }
 
@@ -157,15 +167,11 @@ public class Board {
     return !Board.getPawns().isEmpty();
   }
 
-  public static void setPawns(JsArray<PawnDTO> pawns) {
+  public static void setPawns(ArrayList<PawnClient> pawns) {
     if (Board.pawns.isEmpty()) {
 //      pawns.sort(new PawnComparator());
-      ArrayList<PawnDTO> tempPawns = new ArrayList<>();
-      for (int i = 0; i < pawns.length(); i++) {
-        tempPawns.add(pawns.get(i));
-      }
-      tempPawns.sort(new PawnComparator());
-      Board.pawns = tempPawns;
+      pawns.sort(new PawnComparator());
+      Board.pawns = pawns;
     }
   }
 
@@ -182,12 +188,12 @@ public class Board {
     return tiles;
   }
 
-  public static ArrayList<PawnDTO> getPawns() {
+  public static List<PawnClient> getPawns() {
     return pawns;
   }
 
-  public static PawnDTO getPawn(PawnIdDTO pawnId) {
-    for (PawnDTO pawn : pawns) {
+  public static PawnClient getPawn(String pawnId) {
+    for (PawnClient pawn : pawns) {
       if (pawn.getPawnId().equals(pawnId)) {
         return pawn;
       }

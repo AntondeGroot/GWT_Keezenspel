@@ -20,4 +20,7 @@ public class PawnIdDTO extends JavaScriptObject {
    * The number of this pawn (0–3 per player).
    */
   public final native int getPawnNr() /*-{ return this.pawnNr; }-*/;
+
+  // to string methods do not work with these overlay types!
+  // this mean you also can't compare them with equals methods
 }

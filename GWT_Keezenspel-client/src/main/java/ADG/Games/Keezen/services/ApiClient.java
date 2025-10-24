@@ -2,6 +2,7 @@ package ADG.Games.Keezen.services;
 
 import ADG.Games.Keezen.dto.CardDTO;
 import ADG.Games.Keezen.dto.GameStateDTO;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.*;
@@ -110,7 +111,14 @@ public class ApiClient {
         @Override
         public void onResponseReceived(Request req, Response res) {
           int status = res.getStatusCode();
-
+          GWT.log("HTTP status: " + status + ", body: '" + res.getText() + "'");
+          // === NOT MODIFIED === some browsers GWT clients may consider 304 as succesful, so this would not trigger
+          // if it were placed after the 200> x <300 check
+          if (status == 304) {
+            // No body expected — directly notify the callback
+            callback.onHttpError(304, "Not Modified");
+            return;
+          }
           // === SUCCESS ===
           if (status >= 200 && status < 300) {
             // 200 OK with optional body
@@ -131,12 +139,6 @@ public class ApiClient {
             return;
           }
 
-          // === NOT MODIFIED ===
-          if (status == 304) {
-            // No body expected — directly notify the callback
-            callback.onHttpError(304, "Not Modified");
-            return;
-          }
 
           // === OTHER ERRORS ===
           callback.onHttpError(status, res.getStatusText());

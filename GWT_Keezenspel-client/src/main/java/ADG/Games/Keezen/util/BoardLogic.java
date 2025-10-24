@@ -1,32 +1,32 @@
 package ADG.Games.Keezen.util;
 
-import ADG.Games.Keezen.dto.PawnDTO;
+import ADG.Games.Keezen.dto.PawnClient;
 
 public class BoardLogic {
 
-  public static boolean isPawnOnNest(PawnDTO pawn) {
+  public static boolean isPawnOnNest(PawnClient pawn) {
     if (isInvalidPawn(pawn)) {
       return false;
     }
     return pawn.getCurrentTileId().getTileNr() < 0;
   }
 
-  public static boolean isPawnOnFinish(PawnDTO pawn) {
+  public static boolean isPawnOnFinish(PawnClient pawn) {
     if (isInvalidPawn(pawn)) {
       return false;
     }
     return pawn.getCurrentTileId().getTileNr() >= 16;
   }
 
-  public static boolean pawnIsOnNormalBoard(PawnDTO pawn) {
+  public static boolean pawnIsOnNormalBoard(PawnClient pawn) {
     return !isPawnOnNest(pawn) && !isPawnOnFinish(pawn);
   }
 
-  private static boolean isInvalidPawn(PawnDTO pawn) {
+  private static boolean isInvalidPawn(PawnClient pawn) {
     return pawn == null || pawn.getCurrentTileId() == null;
   }
 
-  public static Integer getTileNr(PawnDTO pawn) {
+  public static Integer getTileNr(PawnClient pawn) {
     return pawn.getCurrentTileId().getTileNr();
   }
 }

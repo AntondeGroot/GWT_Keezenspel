@@ -5,6 +5,7 @@ import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Point;
 import ADG.Games.Keezen.TileId;
 import ADG.Games.Keezen.TileMapping;
+import ADG.Games.Keezen.dto.PawnDTO;
 import com.google.gwt.core.client.GWT;
 
 import java.util.ArrayList;
@@ -12,11 +13,11 @@ import java.util.LinkedList;
 
 public class AnimatePawnPoints {
 
-  private final Pawn pawn;
+  private final PawnDTO pawn;
   private final LinkedList<Point> points = new LinkedList<>();
   private double totalPathLength = 0;
 
-  public AnimatePawnPoints(Pawn pawn, LinkedList<TileId> tileIdList) {
+  public AnimatePawnPoints(PawnDTO pawn, LinkedList<TileId> tileIdList) {
     this.pawn = pawn;
     ArrayList<Point> tempResult = new ArrayList<>();
 
@@ -47,7 +48,7 @@ public class AnimatePawnPoints {
     return new Point(0, 0);
   }
 
-  public Pawn getPawn() {
+  public PawnDTO getPawn() {
     return pawn;
   }
 
