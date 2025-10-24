@@ -2,6 +2,7 @@ package ADG.Games.Keezen.animations;
 
 import ADG.Games.Keezen.TileId;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,9 @@ public class StepsAnimation {
     for (TileId tileId : tileIds) {
       String id = tileId + "Highlight";
       ids.add(id);
+      if(Document.get().getElementById(id) == null){
+        GWT.log("StepsAnimation: No tile found with id :" + id);
+      }
       Document.get().getElementById(id).addClassName(CLASS_ANIMATION);
     }
   }
