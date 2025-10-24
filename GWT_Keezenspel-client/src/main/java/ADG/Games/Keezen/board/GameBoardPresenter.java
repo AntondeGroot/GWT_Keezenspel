@@ -3,14 +3,12 @@ package ADG.Games.Keezen.board;
 import ADG.Games.Keezen.Cards.CardResponse;
 import ADG.Games.Keezen.Cards.CardsServiceAsync;
 import ADG.Games.Keezen.CardsDeck;
-import ADG.Games.Keezen.MoveController;
 import ADG.Games.Keezen.PawnAndCardSelection;
 import ADG.Games.Keezen.PlayerList;
 import ADG.Games.Keezen.State.GameStateResponse;
 import ADG.Games.Keezen.State.GameStateServiceAsync;
 import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Move.MovingServiceAsync;
-import ADG.Games.Keezen.Player.Player;
 import ADG.Games.Keezen.animations.*;
 import ADG.Games.Keezen.dto.CardClient;
 import ADG.Games.Keezen.dto.CardDTO;
@@ -24,14 +22,11 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import java.util.ArrayList;
 
 import static ADG.Games.Keezen.Move.MoveType.FORFEIT;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.updatePlayerProfileUI;
-import static ADG.Games.Keezen.util.JsUtilities.pawnsToArrayList;
-import static ADG.Games.Keezen.util.JsUtilities.playersToArrayList;
 import static java.lang.String.valueOf;
 
 public class GameBoardPresenter {
@@ -152,7 +147,6 @@ public class GameBoardPresenter {
         });
   }
 
-
 //  private void pollServerForMove() {
 //    movingService.getMove(Cookie.getSessionID(), new AsyncCallback<MoveResponse>() {
 //      @Override
@@ -180,18 +174,16 @@ public class GameBoardPresenter {
       AnimationSpeed.setSpeed(1);
       view.createPlayerList(gameState.getPlayers());
     }
-    updatePlayerList(gameState);
+    updatePlayerProfileUI(gameState.getPlayers());
 
     GWT.log("set pawns: ");
     Board.setPawns(gameState.getPawns());
     GWT.log("update pawns");
     pawnAndCardSelection.updatePawns(gameState.getPawns());
 
-
     // only set the board when empty, e.g.
     // when the browser was refreshed or when you join the game for the first time
     view.enableButtons(currentPlayerIsPlaying(gameState));
-
 
 
   }
@@ -200,9 +192,9 @@ public class GameBoardPresenter {
 //    gameStateService.getGameState(Cookie.getSessionID(), new AsyncCallback<GameStateResponse>() {
 //      public void onFailure(Throwable caught) {
 //        StepsAnimation.resetStepsAnimation();
-      }
+  }
 
-      public void onSuccess(GameStateResponse result) {
+  public void onSuccess(GameStateResponse result) {
 //        if (!Board.isInitialized()) {
 //          initializeBoardState(result);
 //          AnimationSpeed.setSpeed(result.getAnimationSpeed());
@@ -235,7 +227,6 @@ public class GameBoardPresenter {
   }
 
   private void updatePlayerList(GameStateClient result) {
-    playerList.setPlayers(result.getPlayers());
     updatePlayerProfileUI(result.getPlayers());
 //    if (!playerList.isIsUpToDate()) {
 //      gameStateService.getPlayers(Cookie.getSessionID(), new AsyncCallback<ArrayList<Player>>() {
@@ -303,10 +294,9 @@ public class GameBoardPresenter {
           @Override
           public void onSuccess(JsArray<CardDTO> cards) {
             ArrayList<CardClient> clientCards = new ArrayList();
-            for (int i = 0; i <cards.length() ; i++) {
+            for (int i = 0; i < cards.length(); i++) {
               clientCards.add(new CardClient(cards.get(i)));
             }
-
 
             GWT.log("Received " + cards.length() + " cards from API:");
             cardsDeck.setCards(clientCards);
