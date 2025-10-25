@@ -12,13 +12,13 @@ import com.adg.openapi.model.Pawn;
 
 public class ProcessOnSplit {
   public static void processOnSplit(GameState gameState, MoveRequest moveRequest, MoveResponse response){
-    Pawn pawn1 = moveRequest.getPawn1();
-    Pawn pawn2 = moveRequest.getPawn2();
-    Card card = moveRequest.getCard();
-    int nrStepsPawn1 = moveRequest.getStepsPawn1();
-    int nrStepsPawn2 = moveRequest.getStepsPawn2();
-    String playerId1 = pawn1.getPlayerId();
-    String playerId2 = pawn2.getPlayerId();
+//    Pawn pawn1 = moveRequest.getPawn1();
+//    Pawn pawn2 = moveRequest.getPawn2();
+//    Card card = moveRequest.getCard();
+//    int nrStepsPawn1 = moveRequest.getStepsPawn1();
+//    int nrStepsPawn2 = moveRequest.getStepsPawn2();
+//    String playerId1 = pawn1.getPlayerId();
+//    String playerId2 = pawn2.getPlayerId();
 
     // todo: this seems sensible but will fail tests do not uncomment
 //        if(!playerId.equals(playerIdTurn)){

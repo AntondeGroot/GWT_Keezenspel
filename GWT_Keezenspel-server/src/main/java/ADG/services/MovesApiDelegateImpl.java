@@ -9,8 +9,10 @@ import ADG.Games.Keezen.GameState;
 import ADG.util.PawnAndCardSelectionValidation;
 import ADG.util.SelectionValidation;
 import com.adg.openapi.api.MovesApiDelegate;
+import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
+import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.TestMoveResponse;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -36,7 +38,10 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    SelectionValidation validation = PawnAndCardSelectionValidation.validate(moveRequest);
+    Card card = gameState.getCard(moveRequest.getCardId(), moveRequest.getPlayerId());
+    Pawn pawn1 = gameState.getPawn(moveRequest.getPawn1Id());
+    Pawn pawn2 = gameState.getPawn(moveRequest.getPawn2Id());
+    SelectionValidation validation = PawnAndCardSelectionValidation.validate(pawn1, pawn2, card);
     if(!validation.isValid()){
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -61,11 +66,15 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
     }
 
     MoveResponse response = new MoveResponse();
-    response.setPawn1(moveRequest.getPawn1());
-    response.setPawn2(moveRequest.getPawn2());
+    //todo: uncomment?
+//    response.setPawn1(moveRequest.getPawn1Id());
+//    response.setPawn2(moveRequest.getPawn2Id());
 
     // change the gamestate
-    SelectionValidation validation = PawnAndCardSelectionValidation.validate(moveRequest);
+    Card card = gameState.getCard(moveRequest.getCardId(), moveRequest.getPlayerId());
+    Pawn pawn1 = gameState.getPawn(moveRequest.getPawn1Id());
+    Pawn pawn2 = gameState.getPawn(moveRequest.getPawn2Id());
+    SelectionValidation validation = PawnAndCardSelectionValidation.validate(pawn1, pawn2, card);
 
     if(!validation.isValid()){
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

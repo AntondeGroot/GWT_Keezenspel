@@ -9,16 +9,11 @@ import static ADG.util.Selection.INVALID;
 import static ADG.util.Selection.VALID;
 
 import com.adg.openapi.model.Card;
-import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveType;
 import com.adg.openapi.model.Pawn;
 
 public class PawnAndCardSelectionValidation {
-    public static SelectionValidation validate(MoveRequest moveRequest) {
-      Card card = moveRequest.getCard();
-      Pawn pawn1 = moveRequest.getPawn1();
-      Pawn pawn2 = moveRequest.getPawn2();
-
+    public static SelectionValidation validate(Pawn pawn1, Pawn pawn2, Card card) {
       // validate on board
       if(getTileNr(pawn1) < 0 && (isKing(card) || isAce(card))){
         // on board

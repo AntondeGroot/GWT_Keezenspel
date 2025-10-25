@@ -433,18 +433,21 @@ components:
 
     MoveRequest:
       type: object
+      description: |
+        only uses Id's for pawns and Cards so that the Server
+        is required to check their real state and not accidentally trust the client.
       required:
         - playerId
         - moveType
       properties:
         playerId:
           type: string
-        card:
-          $ref: '#/components/schemas/Card'
-        pawn1:
-          $ref: '#/components/schemas/Pawn'
-        pawn2:
-          $ref: '#/components/schemas/Pawn'
+        cardId:
+          type: integer
+        pawn1Id:
+          $ref: '#/components/schemas/PawnId'
+        pawn2Id:
+          $ref: '#/components/schemas/PawnId'
         moveType:
           $ref: '#/components/schemas/MoveType'
         stepsPawn1:
