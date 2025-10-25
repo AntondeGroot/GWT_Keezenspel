@@ -89,12 +89,12 @@ public class GameStateUtil {
     //todo: replace with rest call
 
     moveMessage.setPlayerId(pawn.getPlayerId());
-    moveMessage.setPawn1(pawn);
+    moveMessage.setPawn1Id(pawn.getPawnId());
     moveMessage.setStepsPawn1(nrSteps1);
     moveMessage.setStepsPawn2(nrSteps2);
-    moveMessage.setPawn2(pawn2);
+    moveMessage.setPawn2Id(pawn2.getPawnId());
     moveMessage.setMoveType(SPLIT);
-    moveMessage.setCard(card);
+    moveMessage.setCardId(card.getUuid());
     moveMessage.setTempMessageType(MAKE_MOVE);
   }
 
@@ -102,10 +102,10 @@ public class GameStateUtil {
     // todo: replace with restcall
 
     moveMessage.setPlayerId(pawn.getPlayerId());
-    moveMessage.setPawn1(pawn);
+    moveMessage.setPawn1Id(pawn.getPawnId());
     moveMessage.setMoveType(MOVE);
     moveMessage.setStepsPawn1(card.getValue());
-    moveMessage.setCard(card);
+    moveMessage.setCardId(card.getUuid());
     moveMessage.setTempMessageType(MAKE_MOVE);
   }
 
@@ -114,9 +114,9 @@ public class GameStateUtil {
     // todo: replace with rest call
 
         moveMessage.setPlayerId(pawn1.getPlayerId());
-        moveMessage.setPawn1(pawn1);
-        moveMessage.setPawn2(pawn2);
-        moveMessage.setCard(card);
+        moveMessage.setPawn1Id(pawn1.getPawnId());
+        moveMessage.setPawn2Id(pawn2.getPawnId());
+        moveMessage.setCardId(card.getUuid());
         moveMessage.setMoveType(SWITCH);
         moveMessage.setTempMessageType(MAKE_MOVE);
   }
@@ -145,10 +145,10 @@ public class GameStateUtil {
     // send move message
     MoveRequest moveMessage = new MoveRequest();
     moveMessage.setPlayerId(playerId);
-    moveMessage.setPawn1(pawn);
+    moveMessage.setPawn1Id(pawn.getPawnId());
     moveMessage.setMoveType(MOVE);
     moveMessage.setStepsPawn1(card.getValue());
-    moveMessage.setCard(card);
+    moveMessage.setCardId(card.getUuid());
     moveMessage.setTempMessageType(MAKE_MOVE);
 
     // process
