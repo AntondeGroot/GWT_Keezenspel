@@ -63,7 +63,7 @@ class MovingOnBoardTest {
     // response message is correct
     assertEquals(new PositionKey("0", 0),
         moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tileNr
-    assertEquals(pawn1, moveResponse.getPawn1());                          // moves the correct pawn
+    assertEquals(pawn1.getPawnId(), moveResponse.getPawn1().getPawnId());                          // moves the correct pawn
     // GameState is correct
     assertEquals(new PositionKey("0", 0), gameState.getPawn(pawn1).getCurrentTileId());
   }
@@ -160,9 +160,9 @@ class MovingOnBoardTest {
 
   public void createOnBoardMessage(String playerId, Pawn pawn, Card card) {
     moveMessage.setPlayerId(playerId);
-    moveMessage.setPawn1(pawn);
+    moveMessage.setPawn1Id(pawn.getPawnId());
     moveMessage.setMoveType(MoveType.ON_BOARD);
-    moveMessage.setCard(card);
+    moveMessage.setCardId(card.getUuid());
     moveMessage.setTempMessageType(TempMessageType.MAKE_MOVE);
   }
 }

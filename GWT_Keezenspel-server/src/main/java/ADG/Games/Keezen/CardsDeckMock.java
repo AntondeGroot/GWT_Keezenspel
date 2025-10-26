@@ -6,6 +6,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class CardsDeckMock implements CardsDeckInterface, IsSerializable {
     private int roundNr;
@@ -113,6 +114,7 @@ public class CardsDeckMock implements CardsDeckInterface, IsSerializable {
                 new Card()
                     .suit(0)
                     .value(cardValue)
+                    .uuid(new Random().nextInt())
             );
         }
         return all13Cards;

@@ -560,7 +560,7 @@ public class TurnBasedTest {
     placePawnOnBoard(gameState, pawn1);
     placePawnOnBoard(gameState, pawn2);
     // fake a valid card
-    Card card = new Card().suit(0).value(7);
+    Card card = new Card().suit(0).value(7).uuid(999);
     // replace a card from the players hand with this card
     cardsDeck.giveCardToPlayerForTesting("0", card);
 

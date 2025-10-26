@@ -242,7 +242,7 @@ class MovingOverStartTileTest {
   @Test
   void pawnOnNestTile_DoesNotMove() {
     // GIVEN
-    Card card = givePlayerCard(cardsDeck, 0, 10);
+    Card card = givePlayerCard(cardsDeck, 1, 10);
     Pawn pawn1 = placePawnOnNest(gameState, "1", new PositionKey("1", -2));
 
     // WHEN
