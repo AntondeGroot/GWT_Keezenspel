@@ -1099,6 +1099,7 @@ public class GameState {
         return card;
       }
     }
+    System.out.println("Card not found for " + playerId + " " + cardUUID);
     return null;
   }
 

@@ -172,7 +172,7 @@ paths:
         200:
           description: Move is allowed
           content:
-            appplication/json:
+            application/json:
               schema:
                 $ref: '#/components/schemas/TestMoveResponse'
         400:

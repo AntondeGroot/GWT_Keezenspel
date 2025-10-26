@@ -414,11 +414,11 @@ public class PawnAndCardSelection {
     nrStepsPawn2 = steps;
   }
 
-  public MoveMessage createTestMoveMessage() {
-    MoveMessage moveMessage = createMessage();
-    moveMessage.setMessageType(MessageType.CHECK_MOVE);
-    return moveMessage;
-  }
+//  public MoveMessage createTestMoveMessage() {
+//    MoveMessage moveMessage = createMessage();
+//    moveMessage.setMessageType(MessageType.CHECK_MOVE);
+//    return moveMessage;
+//  }
 
   public MoveMessage createMoveMessage() {
     if (pawn1 != null) {

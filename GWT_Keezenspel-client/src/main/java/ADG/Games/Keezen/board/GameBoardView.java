@@ -3,15 +3,21 @@ package ADG.Games.Keezen.board;
 import ADG.Games.Keezen.CardsDeck;
 import ADG.Games.Keezen.PawnAndCardSelection;
 import ADG.Games.Keezen.Point;
+import ADG.Games.Keezen.TileId;
 import ADG.Games.Keezen.TileMapping;
 import ADG.Games.Keezen.animations.AnimationSequence;
 import ADG.Games.Keezen.animations.PawnAnimation;
+import ADG.Games.Keezen.animations.StepsAnimation;
 import ADG.Games.Keezen.dto.CardClient;
 import ADG.Games.Keezen.dto.PawnClient;
 import ADG.Games.Keezen.dto.PlayerClient;
 import ADG.Games.Keezen.dto.PlayerDTO;
+import ADG.Games.Keezen.dto.TestMoveResponseDTO;
 import ADG.Games.Keezen.moving.Move;
+import ADG.Games.Keezen.services.ApiClient;
+import ADG.Games.Keezen.services.ApiClient.ApiCallback;
 import ADG.Games.Keezen.util.Cookie;
+import ADG.Games.Keezen.util.MoveRequestJsonBuilder;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.*;
@@ -150,7 +156,7 @@ public class GameBoardView extends Composite {
       // only player tiles get a color
       if (tileNr <= 0 || tileNr >= 16) {
         PlayerClient player = getPlayerById(mapping.getPlayerId(), players);
-        color =  player.getColor();
+        color = player.getColor();
       }
       DivElement circle = createCircle(mapping.getTileId(),
           mapping.getPosition().getX() - cellDistance / 2,
@@ -168,13 +174,13 @@ public class GameBoardView extends Composite {
     double desiredWidth = 40;
     double desiredHeight = 40;
     Point point = new Point(0, 0);
-    GWT.log("createPawns : "+pawns.size()+" pawns to be drawn");
+    GWT.log("createPawns : " + pawns.size() + " pawns to be drawn");
     for (PawnClient pawn : pawns) {
       GWT.log("pooo");
-      GWT.log(""+pawn.getPawnId());
-      GWT.log(""+pawn.getPlayerId());
+      GWT.log("" + pawn.getPawnId());
+      GWT.log("" + pawn.getPlayerId());
       String pawnId = pawn.getPawnId();
-      GWT.log("pawnId: "+pawnId);
+      GWT.log("pawnId: " + pawnId);
       DivElement pawnElement = pawnElements.get(pawn.getPawnId());
       if (pawnElement == null) {
         pawnElement = createPawn(pawn, pawnAndCardSelection);
@@ -240,7 +246,8 @@ public class GameBoardView extends Composite {
     }
   }
 
-  private void drawPlayerCardsInHand(List<CardClient> cards, PawnAndCardSelection pawnAndCardSelection,
+  private void drawPlayerCardsInHand(List<CardClient> cards,
+      PawnAndCardSelection pawnAndCardSelection,
       Image spriteImage) {
     CardClient selectedCard = pawnAndCardSelection.getCard();
     // create divs
@@ -282,7 +289,44 @@ public class GameBoardView extends Composite {
           if (DOM.eventGetType(event) == Event.ONCLICK) {
             pawnAndCardSelection.setCard(card);
             GWT.log("pawnAndCardSelection = " + pawnAndCardSelection);
-            Move.testMove(pawnAndCardSelection.createTestMoveMessage());//todo: improve elegance
+
+            MoveRequestJsonBuilder builder = new MoveRequestJsonBuilder()
+                .withPlayerId(Cookie.getPlayerId())
+                .withCardId(pawnAndCardSelection.getCard())
+                .withMoveType("move")
+                .withPawn1(pawnAndCardSelection.getPawn1())
+                .withPawn2(pawnAndCardSelection.getPawn2())
+                .withStepsPawn1(pawnAndCardSelection.getNrStepsPawn1())
+                .withStepsPawn2(pawnAndCardSelection.getNrStepsPawn2())
+                .withTempMessageType("CHECK_MOVE");
+
+            GWT.log("testmove anton: " + builder.build());
+            ApiClient apiClient = new ApiClient();
+            GWT.log("pawn 1: " + pawnAndCardSelection.getPawn1());
+            apiClient.checkMove(Cookie.getSessionID(), Cookie.getPlayerId(), builder.build(),
+                new ApiCallback<TestMoveResponseDTO>() {
+                  @Override
+                  public void onSuccess(TestMoveResponseDTO result) {
+                    GWT.log("testmove was successful" + result.toString());
+                    ArrayList<TileId> tiles = new ArrayList<>();
+                    for (int i = 0; i < result.getTiles().length(); i++) {
+                      tiles.add(
+                          new TileId(
+                              result.getTiles().get(i).getPlayerId(),
+                              result.getTiles().get(i).getTileNr()));
+                    }
+                    GWT.log("tiles = " + tiles);
+                    StepsAnimation.updateStepsAnimation(tiles);
+                  }
+
+                  @Override
+                  public void onHttpError(int statusCode, String statusText) {
+                  }
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                  }
+                });
 
             drawPlayerCardsInHand(cards, pawnAndCardSelection, spriteImage);
           }
