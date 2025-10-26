@@ -153,6 +153,7 @@ public class GameBoardPresenter {
         @Override
         public void onSuccess(TestMoveResponseDTO result) {
           ArrayList<TileId> tiles = new ArrayList<>();
+          GWT.log("testmove was successful presenter YYYYYY" + result.toString());
           for (int i = 0; i < result.getTiles().length(); i++) {
             tiles.add(
                 new TileId(

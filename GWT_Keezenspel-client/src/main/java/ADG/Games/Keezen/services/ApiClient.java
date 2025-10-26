@@ -54,7 +54,7 @@ public class ApiClient {
 
   public void checkMove(String sessionId, String playerId, JSONObject moveJson,
       ApiCallback<TestMoveResponseDTO> callback) {
-    post("/moves/" + sessionId + "/" + playerId + "/test", moveJson, r -> null, callback);
+    post("/moves/" + sessionId + "/" + playerId + "/test", moveJson, json -> JsonUtils.<TestMoveResponseDTO>safeEval(json), callback);
   }
 
   // === CARDS ===
@@ -129,6 +129,8 @@ public class ApiClient {
           if (status >= 200 && status < 300) {
             // 200 OK with optional body
             String text = res.getText();
+
+            GWT.log("Anton HTTP status: " + status + ", body: '" + text + "'");
 
             if (text == null || text.trim().isEmpty()) {
               // Allow 204 or empty 200 responses silently

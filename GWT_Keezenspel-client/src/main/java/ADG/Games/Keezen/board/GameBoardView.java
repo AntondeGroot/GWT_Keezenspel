@@ -307,7 +307,7 @@ public class GameBoardView extends Composite {
                 new ApiCallback<TestMoveResponseDTO>() {
                   @Override
                   public void onSuccess(TestMoveResponseDTO result) {
-                    GWT.log("testmove was successful" + result.toString());
+                    GWT.log(" successful XXXX" + result.toString());
                     ArrayList<TileId> tiles = new ArrayList<>();
                     for (int i = 0; i < result.getTiles().length(); i++) {
                       tiles.add(
@@ -316,15 +316,20 @@ public class GameBoardView extends Composite {
                               result.getTiles().get(i).getTileNr()));
                     }
                     GWT.log("tiles = " + tiles);
+                    StepsAnimation.resetStepsAnimation();
                     StepsAnimation.updateStepsAnimation(tiles);
                   }
 
                   @Override
                   public void onHttpError(int statusCode, String statusText) {
+                    GWT.log("anton httperror view"+statusCode+":"+statusText);
+                    StepsAnimation.resetStepsAnimation();
                   }
 
                   @Override
                   public void onFailure(Throwable caught) {
+                    GWT.log("anton failure view"+caught.getMessage());
+                    StepsAnimation.resetStepsAnimation();
                   }
                 });
 
