@@ -115,7 +115,7 @@ public class ViewDrawing {
           }
           GWT.log("Pawn and card selection is after validation: " + pawnAndCardSelection);
           // after you have clicked on a pawn you will test whether it can move
-          Move.testMove(pawnAndCardSelection.createTestMoveMessage());
+//          Move.testMove(pawnAndCardSelection.createTestMoveMessage());
         }
       }
     });

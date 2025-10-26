@@ -8,6 +8,8 @@ public class PawnClient {
 
   private final String pawnId;
 
+  private final int pawnNr;
+
   private TileId currentTileId;
 
   private final TileId nestTileId;
@@ -17,6 +19,7 @@ public class PawnClient {
   public PawnClient(PawnDTO pawnDTO) {
     this.playerId = pawnDTO.getPlayerId();
     this.pawnId = pawnDTO.getPlayerId() + "_" + pawnDTO.getPawnId().getPawnNr();
+    this.pawnNr = pawnDTO.getPawnId().getPawnNr();
     this.currentTileId = new  TileId(pawnDTO.getCurrentTileId().getPlayerId(), pawnDTO.getCurrentTileId().getTileNr());
     this.nestTileId = new  TileId(pawnDTO.getNestTileId().getPlayerId(), pawnDTO.getNestTileId().getTileNr());
     this.uri = pawnDTO.getUri();
@@ -28,6 +31,10 @@ public class PawnClient {
 
   public String getPawnId() {
     return pawnId;
+  }
+
+  public int getPawnNr() {
+    return pawnNr;
   }
 
   public TileId getCurrentTileId() {

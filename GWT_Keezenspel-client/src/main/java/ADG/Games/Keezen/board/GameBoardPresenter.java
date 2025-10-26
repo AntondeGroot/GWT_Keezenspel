@@ -9,16 +9,19 @@ import ADG.Games.Keezen.State.GameStateResponse;
 import ADG.Games.Keezen.State.GameStateServiceAsync;
 import ADG.Games.Keezen.Move.MoveResponse;
 import ADG.Games.Keezen.Move.MovingServiceAsync;
+import ADG.Games.Keezen.TileId;
 import ADG.Games.Keezen.animations.*;
 import ADG.Games.Keezen.dto.CardClient;
 import ADG.Games.Keezen.dto.CardDTO;
 import ADG.Games.Keezen.dto.GameStateClient;
 import ADG.Games.Keezen.dto.GameStateDTO;
+import ADG.Games.Keezen.dto.TestMoveResponseDTO;
 import ADG.Games.Keezen.moving.Move;
 import ADG.Games.Keezen.services.ApiClient;
 import ADG.Games.Keezen.services.ApiClient.ApiCallback;
 import ADG.Games.Keezen.services.PollingService;
 import ADG.Games.Keezen.util.Cookie;
+import ADG.Games.Keezen.util.MoveRequestJsonBuilder;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -81,7 +84,32 @@ public class GameBoardPresenter {
     view.getSendButton().addDomHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        Move.makeMove(pawnAndCardSelection.createMoveMessage());
+        GWT.log("pawn 1: "+pawnAndCardSelection.getPawn1());
+        MoveRequestJsonBuilder builder = new MoveRequestJsonBuilder()
+            .withPlayerId(Cookie.getPlayerId())
+            .withCardId(pawnAndCardSelection.getCard())
+            .withMoveType("move")
+            .withPawn1(pawnAndCardSelection.getPawn1())
+            .withPawn2(pawnAndCardSelection.getPawn2())
+            .withStepsPawn1(pawnAndCardSelection.getNrStepsPawn1())
+            .withStepsPawn2(pawnAndCardSelection.getNrStepsPawn2())
+            .withTempMessageType("CHECK_MOVE");
+
+        GWT.log("testmove anton: "+builder.build());
+
+//        apiClient.makeMove(Cookie.getSessionID(), Cookie.getPlayerId(), builder.build(), new ApiCallback<TestMoveResponseDTO>() {
+//          @Override
+//          public void onSuccess(MoveResponseDTO result) {
+//          }
+//
+//          @Override
+//          public void onHttpError(int statusCode, String statusText) {
+//          }
+//
+//          @Override
+//          public void onFailure(Throwable caught) {
+//          }
+//        });
       }
     }, ClickEvent.getType());
 
@@ -108,7 +136,41 @@ public class GameBoardPresenter {
       view.stepsPawn1.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn1()));
       view.stepsPawn2.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn2()));
 
-      Move.testMove(pawnAndCardSelection.createTestMoveMessage());
+      GWT.log("pawn 1: "+pawnAndCardSelection.getPawn1());
+      MoveRequestJsonBuilder builder = new MoveRequestJsonBuilder()
+          .withPlayerId(Cookie.getPlayerId())
+          .withCardId(pawnAndCardSelection.getCard())
+          .withMoveType("move")
+          .withPawn1(pawnAndCardSelection.getPawn1())
+          .withPawn2(pawnAndCardSelection.getPawn2())
+          .withStepsPawn1(pawnAndCardSelection.getNrStepsPawn1())
+          .withStepsPawn2(pawnAndCardSelection.getNrStepsPawn2())
+          .withTempMessageType("CHECK_MOVE");
+
+      GWT.log("testmove anton: "+builder.build());
+
+      apiClient.checkMove(Cookie.getSessionID(), Cookie.getPlayerId(), builder.build(), new ApiCallback<TestMoveResponseDTO>() {
+        @Override
+        public void onSuccess(TestMoveResponseDTO result) {
+          ArrayList<TileId> tiles = new ArrayList<>();
+          for (int i = 0; i < result.getTiles().length(); i++) {
+            tiles.add(
+                new TileId(
+                    result.getTiles().get(i).getPlayerId(),
+                    result.getTiles().get(i).getTileNr()));
+          }
+          GWT.log("tiles = " + tiles);
+          StepsAnimation.updateStepsAnimation(tiles);
+        }
+
+        @Override
+        public void onHttpError(int statusCode, String statusText) {
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+        }
+      });
     });
   }
 
