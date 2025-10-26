@@ -180,13 +180,13 @@ class MovingAndKillTest {
   @Test
   void killPawnWith7CardPawn1() {
     // GIVEN
-    givePlayerSeven(cardsDeck, 0);
+    Card card = givePlayerSeven(cardsDeck, 0);
     Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("0", 1), new PositionKey("0", 0));
     Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("0", 2), new PositionKey("0", 14));
     Pawn otherPawn1 = placePawnOnBoard(gameState, new PawnId("1", 1), new PositionKey("0", 3));
 
     // WHEN no decision was made how to split the 7 among the two pawns
-    createSplitMessage(moveMessage, pawn1, 3, pawn2, 4, new Card().suit(0).value(7));
+    createSplitMessage(moveMessage, pawn1, 3, pawn2, 4, card);
     gameState.processOnSplit(moveMessage, moveResponse);
 
     // THEN
@@ -198,13 +198,13 @@ class MovingAndKillTest {
   @Test
   void killPawnWith7CardPawn2() {
     // GIVEN
-    givePlayerSeven(cardsDeck, 0);
+    Card card = givePlayerSeven(cardsDeck, 0);
     Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("0", 1), new PositionKey("0", 0));
     Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("0", 2), new PositionKey("0", 6));
     Pawn otherPawn1 = placePawnOnBoard(gameState, new PawnId("1", 1), new PositionKey("0", 8));
 
     // WHEN no decision was made how to split the 7 among the two pawns
-    createSplitMessage(moveMessage, pawn1, 5, pawn2, 2, new Card().suit(0).value(7));
+    createSplitMessage(moveMessage, pawn1, 5, pawn2, 2, card);
     gameState.processOnSplit(moveMessage, moveResponse);
 
     // THEN

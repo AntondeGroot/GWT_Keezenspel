@@ -18,6 +18,7 @@ import com.adg.openapi.model.Player;
 import com.adg.openapi.model.PositionKey;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 
 public class GameStateUtil {
@@ -51,35 +52,35 @@ public class GameStateUtil {
 
   public static Card givePlayerCard(CardsDeckInterface cardsDeck, int playerInt, int nrSteps) {
     String playerId = String.valueOf(playerInt);
-    Card card = new Card().suit(0).value(nrSteps);
+    Card card = new Card().suit(0).value(nrSteps).uuid(999);
     cardsDeck.setPlayerCard(playerId, card);
     return card;
   }
 
   public static Card givePlayerAce(CardsDeckInterface cardsDeck, int playerInt) {
     String playerId = String.valueOf(playerInt);
-    Card ace = new Card().suit(0).value(1);
+    Card ace = new Card().suit(0).value(1).uuid(999);
     cardsDeck.giveCardToPlayerForTesting(playerId, ace);
     return ace;
   }
 
   public static Card givePlayerKing(CardsDeckInterface cardsDeck, int playerInt) {
     String playerId = String.valueOf(playerInt);
-    Card king = new Card().suit(0).value(12);
+    Card king = new Card().suit(0).value(12).uuid(999);
     cardsDeck.giveCardToPlayerForTesting(playerId, king);
     return king;
   }
 
   public static Card givePlayerSeven(CardsDeckInterface cardsDeck, int playerInt) {
     String playerId = String.valueOf(playerInt);
-    Card sevenCard = new Card().suit(0).value(7);
+    Card sevenCard = new Card().suit(0).value(7).uuid(new Random().nextInt());
     cardsDeck.giveCardToPlayerForTesting(playerId, sevenCard);
     return sevenCard;
   }
 
   public static Card givePlayerJack(CardsDeckInterface cardsDeck, int playerInt) {
     String playerId = String.valueOf(playerInt);
-    Card jack = new Card().suit(0).value(11);
+    Card jack = new Card().suit(0).value(11).uuid(999);
     cardsDeck.giveCardToPlayerForTesting(playerId, jack);
     return jack;
   }
@@ -137,7 +138,7 @@ public class GameStateUtil {
     placePawnOnNest(gameState, playerId, new PositionKey(playerId, 1));
 
     // fake a valid card
-    Card card = new Card().suit(0).value(5);
+    Card card = new Card().suit(0).value(5).uuid(new Random().nextInt());
 
     // replace a card from the players hand with this card
     cardsDeck.giveCardToPlayerForTesting(playerId, card);

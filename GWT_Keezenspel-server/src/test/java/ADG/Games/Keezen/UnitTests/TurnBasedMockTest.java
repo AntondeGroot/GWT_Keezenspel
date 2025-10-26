@@ -242,10 +242,10 @@ public class TurnBasedMockTest {
     // send move message
     MoveRequest moveMessage = new MoveRequest();
     moveMessage.setPlayerId("1");
-    moveMessage.setPawn1(pawn);
+    moveMessage.setPawn1Id(pawn.getPawnId());
     moveMessage.setMoveType(MoveType.MOVE);
     moveMessage.setStepsPawn1(card.getValue());
-    moveMessage.setCard(card);
+    moveMessage.setCardId(card.getUuid());
     moveMessage.setTempMessageType(TempMessageType.MAKE_MOVE);
 
     // process
