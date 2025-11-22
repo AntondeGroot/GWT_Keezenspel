@@ -56,7 +56,7 @@ public class CardsDeck implements CardsDeckInterface, IsSerializable {
         ArrayList<Card> cards = new ArrayList<>();
         activePlayers = gameState.getActivePlayers();
         // create cards
-        int uniqueCardNr = 0;
+        int uniqueCardNr = 100; // just any non-zero number so that you can be sure that a value was filled in in the client and not null or something like that
         for (int suit = 0; suit < activePlayers.size(); suit++) {
             for (int cardValue = 1; cardValue < 14; cardValue++) {
                 cards.add(
