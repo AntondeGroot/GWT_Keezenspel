@@ -5,15 +5,13 @@ import ADG.Games.Keezen.PawnAndCardSelection;
 import ADG.Games.Keezen.Point;
 import ADG.Games.Keezen.TileId;
 import ADG.Games.Keezen.TileMapping;
-import ADG.Games.Keezen.animations.AnimationSequence;
 import ADG.Games.Keezen.animations.PawnAnimation;
 import ADG.Games.Keezen.animations.StepsAnimation;
 import ADG.Games.Keezen.dto.CardClient;
+import ADG.Games.Keezen.dto.MoveResponseDTO;
 import ADG.Games.Keezen.dto.PawnClient;
 import ADG.Games.Keezen.dto.PlayerClient;
-import ADG.Games.Keezen.dto.PlayerDTO;
 import ADG.Games.Keezen.dto.TestMoveResponseDTO;
-import ADG.Games.Keezen.moving.Move;
 import ADG.Games.Keezen.services.ApiClient;
 import ADG.Games.Keezen.services.ApiClient.ApiCallback;
 import ADG.Games.Keezen.util.Cookie;
@@ -32,7 +30,6 @@ import com.google.gwt.user.client.ui.*;
 import java.util.*;
 
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.*;
-import static ADG.Games.Keezen.util.JsUtilities.playersToArrayList;
 import static ADG.Games.Keezen.util.PlayerUtil.getPlayerById;
 
 public class GameBoardView extends Composite {
@@ -138,13 +135,14 @@ public class GameBoardView extends Composite {
     playerListContainer2.add(createPlayerGrid(players));
   }
 
-  public void animatePawns() {
+  public void animatePawns(MoveResponseDTO moveResponse) {
     //pawns.sort(new PawnComparator()); // todo: will pawns be drawn incorrectly when on finish tile?
     GWT.log("view.animatepawns");
-    PawnAnimation animation = new PawnAnimation(pawnElements);
-    animation.animateSequence(AnimationSequence.getFirst());
-    animation.animateSequence(AnimationSequence.getLast());
-    AnimationSequence.reset();
+    PawnAnimation.animateSequence(pawnElements, moveResponse);
+//    PawnAnimation animation = new PawnAnimation(pawnElements);
+//    animation.animateSequence(AnimationSequence.getFirst());
+//    animation.animateSequence(AnimationSequence.getLast());
+//    AnimationSequence.reset();
   }
 
   public void drawBoard(List<TileMapping> tiles, List<PlayerClient> players, double cellDistance) {
@@ -293,7 +291,6 @@ public class GameBoardView extends Composite {
             MoveRequestJsonBuilder builder = new MoveRequestJsonBuilder()
                 .withPlayerId(Cookie.getPlayerId())
                 .withCardId(pawnAndCardSelection.getCard())
-                .withMoveType("move")
                 .withPawn1(pawnAndCardSelection.getPawn1())
                 .withPawn2(pawnAndCardSelection.getPawn2())
                 .withStepsPawn1(pawnAndCardSelection.getNrStepsPawn1())
