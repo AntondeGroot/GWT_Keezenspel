@@ -15,8 +15,8 @@ import ADG.Games.Keezen.dto.CardClient;
 import ADG.Games.Keezen.dto.CardDTO;
 import ADG.Games.Keezen.dto.GameStateClient;
 import ADG.Games.Keezen.dto.GameStateDTO;
+import ADG.Games.Keezen.dto.MoveResponseDTO;
 import ADG.Games.Keezen.dto.TestMoveResponseDTO;
-import ADG.Games.Keezen.moving.Move;
 import ADG.Games.Keezen.services.ApiClient;
 import ADG.Games.Keezen.services.ApiClient.ApiCallback;
 import ADG.Games.Keezen.services.PollingService;
@@ -29,7 +29,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 
 import java.util.ArrayList;
 
-import static ADG.Games.Keezen.Move.MoveType.FORFEIT;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.updatePlayerProfileUI;
 import static java.lang.String.valueOf;
 
@@ -88,14 +87,36 @@ public class GameBoardPresenter {
         MoveRequestJsonBuilder builder = new MoveRequestJsonBuilder()
             .withPlayerId(Cookie.getPlayerId())
             .withCardId(pawnAndCardSelection.getCard())
-            .withMoveType("move")
             .withPawn1(pawnAndCardSelection.getPawn1())
             .withPawn2(pawnAndCardSelection.getPawn2())
             .withStepsPawn1(pawnAndCardSelection.getNrStepsPawn1())
             .withStepsPawn2(pawnAndCardSelection.getNrStepsPawn2())
-            .withTempMessageType("CHECK_MOVE");
+            .withTempMessageType("MAKE_MOVE");
 
-        GWT.log("testmove anton: "+builder.build());
+        GWT.log("pawn 1: " + pawnAndCardSelection.getPawn1());
+        apiClient.makeMove(Cookie.getSessionID(), Cookie.getPlayerId(), builder.build(),
+            new ApiCallback<MoveResponseDTO>() {
+              @Override
+              public void onSuccess(MoveResponseDTO result) {
+                //todo: improve animation
+                view.animatePawns(result);
+//                AnimationSequence.movePawn(result.getPawn1(), result.getMovePawn1(), true);
+//                AnimationSequence.movePawn(result.getPawn2(), result.getMovePawn2(), true);
+              }
+
+              @Override
+              public void onHttpError(int statusCode, String statusText) {
+                GWT.log("HTTP error view"+statusCode+":"+statusText);
+                StepsAnimation.resetStepsAnimation();
+              }
+
+              @Override
+              public void onFailure(Throwable caught) {
+                GWT.log("Failure view"+caught.getMessage());
+                StepsAnimation.resetStepsAnimation();
+              }
+            });
+        GWT.log("testmove: "+builder.build());
 
 //        apiClient.makeMove(Cookie.getSessionID(), Cookie.getPlayerId(), builder.build(), new ApiCallback<TestMoveResponseDTO>() {
 //          @Override
@@ -140,7 +161,6 @@ public class GameBoardPresenter {
       MoveRequestJsonBuilder builder = new MoveRequestJsonBuilder()
           .withPlayerId(Cookie.getPlayerId())
           .withCardId(pawnAndCardSelection.getCard())
-          .withMoveType("move")
           .withPawn1(pawnAndCardSelection.getPawn1())
           .withPawn2(pawnAndCardSelection.getPawn2())
           .withStepsPawn1(pawnAndCardSelection.getNrStepsPawn1())
@@ -295,7 +315,7 @@ public class GameBoardPresenter {
     GWT.log("draw board");
     view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
     view.createPawns(result.getPawns(), pawnAndCardSelection);
-    view.animatePawns();
+//    view.animatePawns();
   }
 
   private void updatePlayerList(GameStateClient result) {
@@ -385,16 +405,16 @@ public class GameBoardPresenter {
         });
   }
 
-  public void draw() {
-
-    if (pawnAndCardSelection.getDrawCards()) {
-      view.drawCards(
-          cardsDeck,
-          pawnAndCardSelection);
-      pawnAndCardSelection.setCardsAreDrawn();
-    }
-    view.animatePawns();
-  }
+//  public void draw() {
+//
+//    if (pawnAndCardSelection.getDrawCards()) {
+//      view.drawCards(
+//          cardsDeck,
+//          pawnAndCardSelection);
+//      pawnAndCardSelection.setCardsAreDrawn();
+//    }
+//    view.animatePawns();
+//  }
 
   private boolean currentPlayerIsPlaying(GameStateClient result) {
     return result.getCurrentPlayerId().equals(Cookie.getPlayerId());

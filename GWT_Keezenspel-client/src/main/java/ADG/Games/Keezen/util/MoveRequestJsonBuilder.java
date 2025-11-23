@@ -31,12 +31,6 @@ public class MoveRequestJsonBuilder {
     return this;
   }
 
-  public MoveRequestJsonBuilder withMoveType(String moveType) {
-    // enum: switch, onBoard, move, split
-    root.put("moveType", new JSONString(moveType));
-    return this;
-  }
-
   public MoveRequestJsonBuilder withStepsPawn1(int steps) {
     root.put("stepsPawn1", new JSONNumber(steps));
     return this;

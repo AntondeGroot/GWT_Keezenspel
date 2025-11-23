@@ -30,12 +30,14 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
       MoveRequest moveRequest) {
     System.out.println("server received move request" + moveRequest);
     if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
+      System.out.println("there was no session found with id: " + sessionId);
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     GameState gameState = gameSession.getGameState();
 
     if (!Objects.equals(playerId, gameState.getPlayerIdTurn())) {
+      System.out.println("It was not the player's turn with id: " + playerId + ", it was: "+gameState.getPlayerIdTurn());
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
@@ -48,6 +50,7 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
     SelectionValidation validation = PawnAndCardSelectionValidation.validate(pawn1, pawn2, card);
     System.out.println("card validation resulted in : " + validation.isValid());
     if (!validation.isValid()) {
+      System.out.println("card validation failed");
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     MoveResponse response = new MoveResponse();
@@ -60,10 +63,10 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
     }
 
     TestMoveResponse testMoveResponse = new TestMoveResponse();
-    if(response.getMovePawn1() != null && !response.getMovePawn1().isEmpty()) {
+    if (response.getMovePawn1() != null && !response.getMovePawn1().isEmpty()) {
       testMoveResponse.addTilesItem(response.getMovePawn1().getLast());
     }
-    if(response.getMovePawn2() != null && !response.getMovePawn2().isEmpty()) {
+    if (response.getMovePawn2() != null && !response.getMovePawn2().isEmpty()) {
       testMoveResponse.addTilesItem(response.getMovePawn2().getLast());
     }
     return new ResponseEntity<>(testMoveResponse, HttpStatus.OK);
@@ -75,12 +78,14 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
       MoveRequest moveRequest) {
 
     if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
+      System.out.println("there was no session found with id: " + sessionId);
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     GameState gameState = gameSession.getGameState();
 
     if (!Objects.equals(playerId, gameState.getPlayerIdTurn())) {
+      System.out.println("It was not the player's turn with id: " + playerId + ", it was: "+gameState.getPlayerIdTurn());
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
@@ -96,6 +101,7 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
     SelectionValidation validation = PawnAndCardSelectionValidation.validate(pawn1, pawn2, card);
 
     if (!validation.isValid()) {
+      System.out.println("card validation failed");
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     moveRequest.setTempMessageType(MAKE_MOVE);

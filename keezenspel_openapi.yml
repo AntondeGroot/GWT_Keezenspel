@@ -152,6 +152,10 @@ paths:
                 $ref: '#/components/schemas/MoveResponse'
         400:
           description: Move is not allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /moves/{sessionId}/{playerId}/test:
     post:
@@ -438,7 +442,6 @@ components:
         is required to check their real state and not accidentally trust the client.
       required:
         - playerId
-        - moveType
       properties:
         playerId:
           type: string
@@ -540,3 +543,16 @@ components:
           type: object
           additionalProperties: #for a flexible key value mapping
             type: integer
+
+    ErrorResponse:
+      type: object
+      required:
+        - message
+        - code
+      properties:
+        message:
+          type: string
+          description: Human-readable error message
+        code:
+          type: integer
+          description: HTTP status code

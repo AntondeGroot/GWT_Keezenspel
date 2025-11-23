@@ -1,30 +1,37 @@
 package ADG.Games.Keezen.animations;
 
 import ADG.Games.Keezen.board.Board;
-import ADG.Games.Keezen.Player.Pawn;
 import ADG.Games.Keezen.Point;
 import ADG.Games.Keezen.TileId;
 import ADG.Games.Keezen.TileMapping;
-import ADG.Games.Keezen.dto.PawnDTO;
+import ADG.Games.Keezen.dto.PawnClient;
+import ADG.Games.Keezen.dto.PositionKeyDTO;
 import com.google.gwt.core.client.GWT;
 
+import com.google.gwt.core.client.JsArray;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class AnimatePawnPoints {
 
-  private final PawnDTO pawn;
+  private final PawnClient pawn;
   private final LinkedList<Point> points = new LinkedList<>();
   private double totalPathLength = 0;
 
-  public AnimatePawnPoints(PawnDTO pawn, LinkedList<TileId> tileIdList) {
+  public AnimatePawnPoints(PawnClient pawn, JsArray<PositionKeyDTO> tileList) {
     this.pawn = pawn;
     ArrayList<Point> tempResult = new ArrayList<>();
 
     Point pointTo = new Point(0, 0);
-    for (int i = 0; i < tileIdList.size() - 1; i++) {
-      Point pointFrom = convertTileIdToPoint(tileIdList.get(i));
-      pointTo = convertTileIdToPoint(tileIdList.get(i + 1));
+    for (int i = 0; i < tileList.length() - 1; i++) {
+      PositionKeyDTO tileFrom = tileList.get(i);
+      TileId tileIdFrom = new TileId(tileFrom.getPlayerId(), tileFrom.getTileNr());
+      PositionKeyDTO tileTo = tileList.get(i + 1);
+      TileId tileIdTo = new TileId(tileTo.getPlayerId(), tileTo.getTileNr());
+
+
+      Point pointFrom = convertTileIdToPoint(tileIdFrom);
+      pointTo = convertTileIdToPoint(tileIdTo);
 
       tempResult.add(pointFrom);
     }
@@ -48,7 +55,7 @@ public class AnimatePawnPoints {
     return new Point(0, 0);
   }
 
-  public PawnDTO getPawn() {
+  public PawnClient getPawn() {
     return pawn;
   }
 

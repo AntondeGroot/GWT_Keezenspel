@@ -2,6 +2,7 @@ package ADG.Games.Keezen.services;
 
 import ADG.Games.Keezen.dto.CardDTO;
 import ADG.Games.Keezen.dto.GameStateDTO;
+import ADG.Games.Keezen.dto.MoveResponseDTO;
 import ADG.Games.Keezen.dto.TestMoveResponseDTO;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
@@ -48,8 +49,8 @@ public class ApiClient {
 
   // === MOVES ===
   public void makeMove(String sessionId, String playerId, JSONObject moveJson,
-      ApiCallback<Void> callback) {
-    post("/moves/" + sessionId + "/" + playerId, moveJson, r -> null, callback);
+      ApiCallback<MoveResponseDTO> callback) {
+    post("/moves/" + sessionId + "/" + playerId, moveJson, json -> JsonUtils.<MoveResponseDTO>safeEval(json), callback);
   }
 
   public void checkMove(String sessionId, String playerId, JSONObject moveJson,
