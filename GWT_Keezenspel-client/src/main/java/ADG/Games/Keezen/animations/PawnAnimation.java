@@ -7,6 +7,7 @@ import ADG.Games.Keezen.dto.PawnDTO;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -39,7 +40,12 @@ public class PawnAnimation {
       pixelsPerMs = calculateSpeed(distancePawn1);
       delayPawnKilledByPawn1 = distancePawn1 / pixelsPerMs;
       DivElement pawnElement = pawnElements.get(pawn1.getPawnId());
-      animateStep(pawnElement, animatePawnPointsPawn1.getPoints().get(0), animatePawnPointsPawn1.getPoints(), pixelsPerMs, 0);
+      GWT.log("move pawn 1 distance: " + distancePawn1);
+      GWT.log("move pawn 1 speed: " + pixelsPerMs);
+      LinkedList<Point> points = animatePawnPointsPawn1.getPoints();
+      Point current = points.pop();
+
+      animateStep(pawnElement, current, points, pixelsPerMs, 0);
     }
     if(pawn2 != null){
       AnimatePawnPoints animatePawnPointsPawn2 = new AnimatePawnPoints(new PawnClient(pawn2), moveResponse.getMovePawn2());
@@ -126,8 +132,12 @@ public class PawnAnimation {
     double dy = next.getY() - current.getY();
     double distancePixels = Math.sqrt(dx * dx + dy * dy);
 
-    int duration = (int) (distancePixels / speedPixelsPerMs);
+    double duration = (distancePixels / speedPixelsPerMs);
+    GWT.log("current: "+current);
+    GWT.log("next: "+next);
     GWT.log("duration = " + duration);
+    GWT.log("distancePixels = " + distancePixels);
+    GWT.log("totalDelay = " + totalDelay);
 
     // Apply CSS transition
     pawn.getStyle().setProperty("transition", "all " + duration + "ms linear");
@@ -141,8 +151,8 @@ public class PawnAnimation {
     new com.google.gwt.user.client.Timer() {
       @Override
       public void run() {
-        animateStep(pawn, next, remaining, speedPixelsPerMs,0);
+        animateStep(pawn, next, remaining, speedPixelsPerMs,duration);
       }
-    }.schedule(duration);
+    }.schedule((int) duration);
   }
 }
