@@ -99,6 +99,7 @@ public class GameBoardPresenter {
               @Override
               public void onSuccess(MoveResponseDTO result) {
                 //todo: improve animation
+                GWT.log("make move successful");
                 view.animatePawns(result);
 //                AnimationSequence.movePawn(result.getPawn1(), result.getMovePawn1(), true);
 //                AnimationSequence.movePawn(result.getPawn2(), result.getMovePawn2(), true);
@@ -106,31 +107,17 @@ public class GameBoardPresenter {
 
               @Override
               public void onHttpError(int statusCode, String statusText) {
-                GWT.log("HTTP error view"+statusCode+":"+statusText);
+                GWT.log("make move HTTP error"+statusCode+":"+statusText);
                 StepsAnimation.resetStepsAnimation();
               }
 
               @Override
               public void onFailure(Throwable caught) {
-                GWT.log("Failure view"+caught.getMessage());
+                GWT.log("make move Failure"+caught.getMessage());
                 StepsAnimation.resetStepsAnimation();
               }
             });
         GWT.log("testmove: "+builder.build());
-
-//        apiClient.makeMove(Cookie.getSessionID(), Cookie.getPlayerId(), builder.build(), new ApiCallback<TestMoveResponseDTO>() {
-//          @Override
-//          public void onSuccess(MoveResponseDTO result) {
-//          }
-//
-//          @Override
-//          public void onHttpError(int statusCode, String statusText) {
-//          }
-//
-//          @Override
-//          public void onFailure(Throwable caught) {
-//          }
-//        });
       }
     }, ClickEvent.getType());
 
@@ -238,25 +225,6 @@ public class GameBoardPresenter {
           }
         });
   }
-
-//  private void pollServerForMove() {
-//    movingService.getMove(Cookie.getSessionID(), new AsyncCallback<MoveResponse>() {
-//      @Override
-//      public void onFailure(Throwable throwable) {
-//      }
-//
-//      @Override
-//      public void onSuccess(MoveResponse moveResponse) {
-//        if (!moveResponse.equals(storedMoveResponse) && !moveResponse.equals(new MoveResponse())) {
-//          StepsAnimation.resetStepsAnimation();
-//          MoveController.movePawn(moveResponse);
-//          draw();
-//          GWT.log(moveResponse.toString());
-//          storedMoveResponse = moveResponse;
-//        }
-//      }
-//    });
-//  }
 
   private void updateGameState(GameStateClient gameState) {
     GWT.log("Game State initialize board: ");
