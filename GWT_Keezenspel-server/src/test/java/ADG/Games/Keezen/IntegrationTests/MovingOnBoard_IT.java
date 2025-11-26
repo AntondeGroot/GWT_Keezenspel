@@ -41,7 +41,7 @@ public class MovingOnBoard_IT {
 
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver, "0");
+    setPlayerIdPlaying(driver, "player0");
   }
 
   @AfterEach

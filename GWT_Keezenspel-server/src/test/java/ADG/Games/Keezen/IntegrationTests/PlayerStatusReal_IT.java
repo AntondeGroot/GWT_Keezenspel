@@ -32,12 +32,13 @@ public class PlayerStatusReal_IT {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver, "0");
+    setPlayerIdPlaying(driver, "player0");
   }
 
   @AfterEach
   public void tearDown() {
     SpringAppTestHelper.stopApp();
+    driver.quit();
   }
 
   /***

@@ -7,8 +7,8 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getPawnLocation;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.pawnIsSelected;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
@@ -19,7 +19,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
@@ -27,19 +26,20 @@ import org.openqa.selenium.By.ById;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-@Disabled("Temporarily disabling Selenium integration tests")
 @ExtendWith(ScreenshotOnFailure.class)
 public class Pawn_IT {
 
   static WebDriver driver;
+  String HIDDEN = "hidden";
+  String VISIBLE = "visible";
 
   @BeforeEach
   public void setUp() {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
 
-    SpringAppTestHelper.startTestApp();
+    SpringAppTestHelper.startRealApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver, "0");
+    setPlayerIdPlaying(driver, "player0");
   }
 
   @AfterEach
@@ -65,37 +65,37 @@ public class Pawn_IT {
   }
 
   @Test
-  public void clickOnOwnPawn_Selected() throws InterruptedException {
+  public void clickOnOwnPawn_Selected() {
     // GIVEN
-    PawnId pawnId = new PawnId("0", 0);
-    WebElement pawn1 = driver.findElement(By.id(pawnId.toString()));
+    String pawnId = "player0_0";
+    WebElement pawn1 = driver.findElement(By.id(pawnId));
 
     // WHEN
     pawn1.click();
 
     // THEN
     WebElement pawn1Outline = driver.findElement(By.className(pawnId + "Overlay"));
-    assertEquals("visible", pawn1Outline.getCssValue("visibility"));
+    assertEquals(VISIBLE, pawn1Outline.getCssValue("visibility"));
   }
 
   @Test
   public void clickOnOwnPawn_clickSecondPawn_FirstPawnDeselected() {
     // GIVEN
-    PawnId pawnId1 = new PawnId("0", 1);
-    PawnId pawnId2 = new PawnId("0", 2);
-    WebElement pawn1 = driver.findElement(new ById(pawnId1.toString()));
+    String pawnId1 = "player0_1";
+    String pawnId2 = "player0_2";
+    WebElement pawn1 = driver.findElement(new ById(pawnId1));
     pawn1.click();
 
     // WHEN
-    WebElement pawn2 = driver.findElement(new ById(pawnId2.toString()));
+    WebElement pawn2 = driver.findElement(new ById(pawnId2));
     pawn2.click();
 
     // THEN
     WebElement pawn1Outline = driver.findElement(By.className(pawnId1 + "Overlay"));
-    assertEquals("hidden", pawn1Outline.getCssValue("visibility"));
+    assertEquals(HIDDEN, pawn1Outline.getCssValue("visibility"));
 
     WebElement pawn2Outline = driver.findElement(By.className(pawnId2 + "Overlay"));
-    assertEquals("visible", pawn2Outline.getCssValue("visibility"));
+    assertEquals(VISIBLE, pawn2Outline.getCssValue("visibility"));
   }
 
   @Test
@@ -108,7 +108,7 @@ public class Pawn_IT {
 
     // THEN
     WebElement pawnOtherPlayerOutline = driver.findElement(By.className("PawnId{1,1}Overlay"));
-    assertEquals("hidden", pawnOtherPlayerOutline.getCssValue("visibility"));
+    assertEquals(HIDDEN, pawnOtherPlayerOutline.getCssValue("visibility"));
   }
 
   @Test
