@@ -20,7 +20,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-@Disabled("Temporarily disabling Selenium integration tests")
 @ExtendWith(ScreenshotOnFailure.class)
 public class Card_IT {
 
@@ -31,12 +30,13 @@ public class Card_IT {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver, "0");
+    setPlayerIdPlaying(driver, "player0");
   }
 
   @AfterEach
   public void tearDown() {
     SpringAppTestHelper.stopApp();
+    driver.quit();
   }
 
   /***

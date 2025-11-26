@@ -3,8 +3,6 @@ package ADG.Games.Keezen.IntegrationTests.Utils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.openqa.selenium.support.ui.ExpectedConditions.stalenessOf;
 
 import ADG.Games.Keezen.Cards.Card;
 import ADG.Games.Keezen.Player.PawnId;
@@ -17,7 +15,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -35,7 +32,7 @@ public class TestUtils {
 
   public static WebDriver getDriver() {
     ChromeOptions options = new ChromeOptions();
-    options.addArguments("--headless=new");
+//    options.addArguments("--headless=new");
     options.addArguments("--no-sandbox");
     options.addArguments("--disable-dev-shm-usage");
     options.addArguments("--window-size=1920,1080");
@@ -45,6 +42,7 @@ public class TestUtils {
     WebDriver driver = new ChromeDriver(options);
     driver.get("http://localhost:4200/");
     driver.manage().addCookie(new Cookie("sessionid", "123"));
+    driver.manage().addCookie(new Cookie("playerid", "player0"));
     driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
     return driver;
   }
@@ -100,7 +98,7 @@ public class TestUtils {
   }
 
   public static void clickCardByValue(WebDriver driver, int cardValue) {
-    WebElement card = driver.findElement(By.id(new Card(0, cardValue).toString()));
+    WebElement card = driver.findElement(By.id(new Card(100, cardValue).toString()));
     String initialBorder = card.getCssValue("border-color");
 
     Log.info("border: " + initialBorder);

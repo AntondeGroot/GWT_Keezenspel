@@ -184,7 +184,7 @@ public class ViewDrawing {
       img.setSrc("/profilepics.png");
 
       HorizontalPanel hp = new HorizontalPanel();
-      hp.getElement().setId(""+player.getPlayerInt());
+      hp.getElement().setId("player"+player.getPlayerInt());
       Label playerNameLabel = new Label(""+player.getName());
       playerNameLabel.getElement().setId(player.getPlayerInt() + "Label");
 
@@ -264,7 +264,7 @@ public class ViewDrawing {
       playerLabel.addClassName("playerName");
 
       // set border for Horizontal Panel
-      Element hp = Document.get().getElementById(""+player.getPlayerInt());
+      Element hp = Document.get().getElementById("player"+player.getPlayerInt());
       hp.setClassName(player.isPlaying() ? "playerPlaying" : "playerNotPlaying");
       hp.addClassName(player.isActive() ? "playerActive" : "playerInactive");
     }

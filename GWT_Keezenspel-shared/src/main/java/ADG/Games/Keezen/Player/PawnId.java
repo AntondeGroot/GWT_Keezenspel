@@ -51,6 +51,6 @@ public class PawnId implements IsSerializable {
 
     @Override
     public String toString() {
-        return "PawnId{" + playerId +"," + pawnNr +'}';
+        return playerId +"_" + pawnNr;
     }
 }

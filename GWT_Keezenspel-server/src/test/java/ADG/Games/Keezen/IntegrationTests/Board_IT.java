@@ -16,7 +16,6 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Disabled("Temporarily disabling Selenium integration tests")
 @ExtendWith(ScreenshotOnFailure.class)
 class Board_IT {
 
@@ -27,12 +26,13 @@ class Board_IT {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver, "0");
+    setPlayerIdPlaying(driver, "player0");
   }
 
   @AfterEach
   public void tearDown() {
     SpringAppTestHelper.stopApp();
+    driver.quit();
   }
 
   /***
@@ -68,7 +68,7 @@ class Board_IT {
 
   @Test
   public void verifyNumberOfCardsForPlayer1() {
-    setPlayerIdPlaying(driver, "0");
+    setPlayerIdPlaying(driver, "player0");
 
     assertEquals(5, driver.findElements(By.className("cardDiv")).size());
   }

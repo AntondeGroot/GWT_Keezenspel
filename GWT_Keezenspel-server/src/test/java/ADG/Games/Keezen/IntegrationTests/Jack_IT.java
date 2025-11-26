@@ -28,15 +28,15 @@ import org.openqa.selenium.WebDriver;
 public class Jack_IT {
 
   static WebDriver driver;
-  private final PawnId pawnId10 = new PawnId("1", 0);
-  private final PawnId pawnId20 = new PawnId("2", 0);
+  private final PawnId pawnId10 = new PawnId("player1", 0);
+  private final PawnId pawnId20 = new PawnId("player2", 0);
 
   @BeforeEach
   public void setUp() {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver, "0");
+    setPlayerIdPlaying(driver, "player0");
   }
 
   @AfterAll
@@ -52,15 +52,18 @@ public class Jack_IT {
     // GIVEN
     waitUntilCardsAreLoaded(driver);
 
-    playerForfeits(driver, "0");
+    playerForfeits(driver, "player0");
 
     // get on board
-    playerPlaysCard(driver, "1", pawnId10, 1);
-    playerPlaysCard(driver, "2", pawnId20, 1);
+    setPlayerIdPlaying(driver, "player1");
+    driver.navigate().refresh();
+    playerPlaysCard(driver, "player1", pawnId10, 1);
+    setPlayerIdPlaying(driver, "player2");
+    playerPlaysCard(driver, "player2", pawnId20, 1);
 
     // move on board
     Point start = getPawnLocation(driver, pawnId10);
-    playerPlaysCard(driver, "1", pawnId10, 2);
+    playerPlaysCard(driver, "player1", pawnId10, 2);
     Point end = getPawnLocation(driver, pawnId10);
     assertPointsNotEqual("The pawn of player 1 did not move with 2 steps after coming on board",
         start, end);
@@ -68,7 +71,7 @@ public class Jack_IT {
     // now player 2 can switch using a Jack
     Point positionPlayer1 = getPawnLocation(driver, pawnId10);
     Point positionPlayer2 = getPawnLocation(driver, pawnId20);
-    playerSwitchesPawns(driver, "2", pawnId20, pawnId10);
+    playerSwitchesPawns(driver, "player2", pawnId20, pawnId10);
 
     // THEN
     TestUtils.wait(400);

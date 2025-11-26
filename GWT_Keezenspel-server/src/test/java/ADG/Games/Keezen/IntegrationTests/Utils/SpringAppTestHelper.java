@@ -30,7 +30,7 @@ public class SpringAppTestHelper {
   private static void start(Boolean cardDeckIsReal) {
     resetGameState();
 
-    if (context == null || cardDeckIsReal != isReal) {
+    if (context == null) {
       stopApp();
       SpringApplication app = new SpringApplication(Application.class);
       app.setAdditionalProfiles(cardDeckIsReal ? "realCardDeck" : "mockedCardDeck");

@@ -24,7 +24,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-@Disabled("Temporarily disabling Selenium integration tests")
 @ExtendWith(ScreenshotOnFailure.class)
 public class PlayerStatusMock_IT {
 
@@ -35,7 +34,7 @@ public class PlayerStatusMock_IT {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver, "0");
+    setPlayerIdPlaying(driver, "player0");
     waitUntilCardsAreLoaded(driver);
   }
 
@@ -62,6 +61,7 @@ public class PlayerStatusMock_IT {
 
   @Test
   public void player0IsPlayingWhenStartingGame() {
+    driver.navigate().refresh();
     WebElement player0 = driver.findElement(By.id("player0"));
     assertEquals("playerPlaying playerActive", player0.getAttribute("class"));
   }
@@ -71,10 +71,10 @@ public class PlayerStatusMock_IT {
     // GIVEN game started
 
     // WHEN
-    Steps.playerForfeits(driver, "0");
+    Steps.playerForfeits(driver, "player0");
 
     // THEN
-    setPlayerIdPlaying(driver, "1");
+    setPlayerIdPlaying(driver, "player1");
     waitUntilCardsAreLoaded(driver);
     WebElement player0 = driver.findElement(By.id("player0"));
     assertEquals("playerNotPlaying playerInactive", player0.getAttribute("class"));
@@ -89,7 +89,7 @@ public class PlayerStatusMock_IT {
     TestUtils.wait(200);
 
     // THEN
-    setPlayerIdPlaying(driver, "1");
+    setPlayerIdPlaying(driver, "player1");
     waitUntilCardsAreLoaded(driver);
     WebElement player1 = driver.findElement(By.id("player1"));
     assertEquals("playerPlaying playerActive", player1.getAttribute("class"));
@@ -100,8 +100,8 @@ public class PlayerStatusMock_IT {
     // GIVEN game started
 
     // WHEN
-    playerForfeits(driver, "0");
-    playerForfeits(driver, "1");
+    playerForfeits(driver, "player0");
+    playerForfeits(driver, "player1");
 
     // THEN
     WebElement player = driver.findElement(By.id("player2"));
