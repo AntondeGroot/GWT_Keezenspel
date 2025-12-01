@@ -13,10 +13,12 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
 import static org.junit.Assert.assertNotEquals;
 
+import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Point;
+import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
@@ -30,8 +32,12 @@ import org.openqa.selenium.WebDriver;
 public class MovingOnBoard_IT {
 
   static WebDriver driver;
-  private final PawnId pawnId10 = new PawnId("1", 0);
-  private final PawnId pawnId20 = new PawnId("2", 0);
+  private List<String> playerIds;
+  private PawnId pawnId10;
+  private PawnId pawnId20;
+  private String playerId0;
+  private String playerId1;
+  private String playerId2;
 
   @BeforeEach
   public void setUp() {
@@ -39,7 +45,14 @@ public class MovingOnBoard_IT {
 
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver, "player0");
+    playerIds = ApiUtil.getPlayerIds("123");
+    playerId0 = playerIds.get(0);
+    playerId1 = playerIds.get(1);
+    playerId2 = playerIds.get(2);
+
+    pawnId10 = new PawnId(playerId1, 0);
+    pawnId20 = new PawnId(playerId2, 0);
+    setPlayerIdPlaying(driver, playerId0);
   }
 
   @AfterEach
@@ -67,28 +80,28 @@ public class MovingOnBoard_IT {
   @Test
   public void pawnCanMoveOnBoardWithAce() {
     // GIVEN
-    Point start = clickPawn(driver, new PawnId("0", 0));
+    Point start = clickPawn(driver, new PawnId(playerId0, 0));
 
     // WHEN
     clickCardByValue(driver, 1);
     clickPlayCardButton(driver);
 
     // THEN
-    Point end = clickPawn(driver, new PawnId("0", 0));
+    Point end = clickPawn(driver, new PawnId(playerId0, 0));
     assertNotEquals(start, end);
   }
 
   @Test
   public void pawnCanMoveOnBoardWithKing() throws InterruptedException {
     // GIVEN
-    Point start = clickPawn(driver, new PawnId("0", 0));
+    Point start = clickPawn(driver, new PawnId(playerId0, 0));
 
     // WHEN
     clickCardByValue(driver, 13);
     clickPlayCardButton(driver);
 
     // THEN
-    Point end = clickPawn(driver, new PawnId("0", 0));
+    Point end = clickPawn(driver, new PawnId(playerId0, 0));
     assertNotEquals(start, end);
   }
 
@@ -104,15 +117,15 @@ public class MovingOnBoard_IT {
      */
 
     // GIVEN
-    playerForfeits(driver, "0");
-    playerForfeits(driver, "1");
+    playerForfeits(driver, playerId0);
+    playerForfeits(driver, playerId1);
 
     // WHEN
     Point nest = getPawnLocation(driver, pawnId20);
-    playerPlaysCard(driver, "2", pawnId20, 13); // onboard with king
+    playerPlaysCard(driver, playerId2, pawnId20, 13); // onboard with king
     Point start = getPawnLocation(driver, pawnId20);
 
-    playerPlaysCard(driver, "2", pawnId20, 1); // move with Ace
+    playerPlaysCard(driver, playerId2, pawnId20, 1); // move with Ace
     Point end = getPawnLocation(driver, pawnId20);
 
     // THEN
@@ -127,16 +140,16 @@ public class MovingOnBoard_IT {
   @Test
   public void pawnAfterMovingOnboardCanImmediatelySwitch() {
     // GIVEN
-    playerForfeits(driver, "0");
+    playerForfeits(driver, playerId0);
 
     // WHEN BOTH PLAYERS GET ON BOARD
-    playerPlaysCard(driver, "1", pawnId10, 1);
+    playerPlaysCard(driver, playerId1, pawnId10, 1);
 
-    playerPlaysCard(driver, "2", pawnId20, 1);
+    playerPlaysCard(driver, playerId2, pawnId20, 1);
 
     // THEN one pawn moves from starttile so that it can be switched
     Point p1 = getPawnLocation(driver, pawnId10);
-    playerPlaysCard(driver, "1", pawnId10, 5);
+    playerPlaysCard(driver, playerId1, pawnId10, 5);
     Point p2 = getPawnLocation(driver, pawnId10);
 
     assertPointsNotEqual("The pawn 10 did not move after coming on board", p1, p2);
@@ -145,7 +158,7 @@ public class MovingOnBoard_IT {
     Point positionPawn20 = getPawnLocation(driver, pawnId20);
 
     // WHEN PLAYER 2 SWITCHES WITH PLAYER 1
-    playerSwitchesPawns(driver, "2", pawnId20, pawnId10);
+    playerSwitchesPawns(driver, playerId2, pawnId20, pawnId10);
 
     // THEN THE PAWNS SWITCHED PLACE
     assertPointsEqual(

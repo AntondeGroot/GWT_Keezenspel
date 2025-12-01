@@ -8,6 +8,7 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlayi
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
 import static org.junit.Assert.assertEquals;
 
+import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import ADG.Games.Keezen.IntegrationTests.Utils.Steps;
@@ -27,13 +28,19 @@ import org.openqa.selenium.WebElement;
 public class PlayerStatusMock_IT {
 
   static WebDriver driver;
+  String playerId0;
+  String playerId1;
+  String playerId2;
 
   @BeforeEach
   public void setUp() {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver, "player0");
+    playerId0 = ApiUtil.getPlayerid("123", 0);
+    playerId1 = ApiUtil.getPlayerid("123", 1);
+    playerId2 = ApiUtil.getPlayerid("123", 2);
+    setPlayerIdPlaying(driver, playerId0);
     waitUntilCardsAreLoaded(driver);
   }
 
@@ -61,7 +68,7 @@ public class PlayerStatusMock_IT {
   @Test
   public void player0IsPlayingWhenStartingGame() {
     driver.navigate().refresh();
-    WebElement player0 = driver.findElement(By.id("player0"));
+    WebElement player0 = driver.findElement(By.id(playerId0));
     assertEquals("playerPlaying playerActive", player0.getAttribute("class"));
   }
 
@@ -70,12 +77,12 @@ public class PlayerStatusMock_IT {
     // GIVEN game started
 
     // WHEN
-    Steps.playerForfeits(driver, "player0");
+    Steps.playerForfeits(driver, playerId0);
 
     // THEN
-    setPlayerIdPlaying(driver, "player1");
+    setPlayerIdPlaying(driver, playerId1);
     waitUntilCardsAreLoaded(driver);
-    WebElement player0 = driver.findElement(By.id("player0"));
+    WebElement player0 = driver.findElement(By.id(playerId0));
     assertEquals("playerNotPlaying playerInactive", player0.getAttribute("class"));
   }
 
@@ -88,9 +95,9 @@ public class PlayerStatusMock_IT {
     TestUtils.wait(200);
 
     // THEN
-    setPlayerIdPlaying(driver, "player1");
+    setPlayerIdPlaying(driver, playerId1);
     waitUntilCardsAreLoaded(driver);
-    WebElement player1 = driver.findElement(By.id("player1"));
+    WebElement player1 = driver.findElement(By.id(playerId1));
     assertEquals("playerPlaying playerActive", player1.getAttribute("class"));
   }
 
@@ -99,11 +106,11 @@ public class PlayerStatusMock_IT {
     // GIVEN game started
 
     // WHEN
-    playerForfeits(driver, "player0");
-    playerForfeits(driver, "player1");
+    playerForfeits(driver, playerId0);
+    playerForfeits(driver, playerId1);
 
     // THEN
-    WebElement player = driver.findElement(By.id("player2"));
+    WebElement player = driver.findElement(By.id(playerId2));
     assertEquals("playerPlaying playerActive", player.getAttribute("class"));
   }
 
@@ -112,12 +119,12 @@ public class PlayerStatusMock_IT {
     // GIVEN game started
 
     // WHEN
-    PawnId pawnId00 = new PawnId("player0", 0);
-    playerPlaysCard(driver, "player0", pawnId00, 1);
+    PawnId pawnId00 = new PawnId(playerId0, 0);
+    playerPlaysCard(driver, playerId0, pawnId00, 1);
     TestUtils.wait(400);
 
     // THEN
-    WebElement player0 = driver.findElement(By.id("player0"));
+    WebElement player0 = driver.findElement(By.id(playerId0));
     assertEquals("playerNotPlaying playerActive", player0.getAttribute("class"));
   }
 }

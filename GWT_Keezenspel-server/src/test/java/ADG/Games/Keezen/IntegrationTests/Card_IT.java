@@ -7,6 +7,7 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilDOMElem
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import org.junit.jupiter.api.AfterAll;
@@ -29,7 +30,7 @@ public class Card_IT {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver, "player0");
+    setPlayerIdPlaying(driver, ApiUtil.getPlayerid("123",0));
   }
 
   @AfterEach

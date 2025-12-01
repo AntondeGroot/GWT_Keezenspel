@@ -1,5 +1,6 @@
 package ADG.Games.Keezen.ApiTests;
 
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.utils.ApiModelHelpers.getRandomPlayer;
 import static ADG.Games.Keezen.utils.ApiModelHelpers.getRandomRoomName;
 import static com.adg.openapi.model.GameInfo.StatusEnum.IN_PROGRESS;
@@ -8,14 +9,26 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import ADG.Games.Keezen.utils.ApiCallsHelper;
 import com.adg.openapi.model.Player;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.WebDriver;
 import org.springframework.web.client.HttpClientErrorException;
 
 class ApiGamesEndpointTest {
 
   private final ApiCallsHelper apiHelper = new ApiCallsHelper();
+  static WebDriver driver;
+
+  @BeforeEach
+  public void setUp() {
+    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
+    SpringAppTestHelper.startRealApp();
+    driver = getDriver();
+  }
 
   @Test
   void createGame_isAddedToGamesEndpoint() {

@@ -6,6 +6,7 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlayi
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
 import static org.junit.Assert.assertEquals;
 
+import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import org.junit.jupiter.api.AfterAll;
@@ -22,13 +23,15 @@ import org.openqa.selenium.WebElement;
 public class PlayerStatusReal_IT {
 
   static WebDriver driver;
+  String playerId0;
 
   @BeforeEach
   public void setUp() {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver, "player0");
+    playerId0 = ApiUtil.getPlayerid("123",0);
+    setPlayerIdPlaying(driver, playerId0);
   }
 
   @AfterEach
@@ -59,7 +62,7 @@ public class PlayerStatusReal_IT {
     waitUntilCardsAreLoaded(driver);
 
     // WHEN you look at player 0
-    WebElement player0 = driver.findElement(By.id("player0"));
+    WebElement player0 = driver.findElement(By.id(playerId0));
 
     // THEN it is player 0's turn
     assertEquals("playerPlaying playerActive", player0.getAttribute("class"));
@@ -74,7 +77,7 @@ public class PlayerStatusReal_IT {
     clickForfeitButton(driver);
 
     // THEN;
-    WebElement player1 = driver.findElement(By.id("player0"));
+    WebElement player1 = driver.findElement(By.id(playerId0));
     assertEquals("playerNotPlaying playerInactive", player1.getAttribute("class"));
   }
 }

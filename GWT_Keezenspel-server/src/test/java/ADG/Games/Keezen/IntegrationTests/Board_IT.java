@@ -4,6 +4,7 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import org.junit.jupiter.api.AfterAll;
@@ -25,13 +26,15 @@ class Board_IT {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver, "player0");
+    setPlayerIdPlaying(driver, ApiUtil.getPlayerid("123",0));
   }
 
   @AfterEach
   public void tearDown() {
     SpringAppTestHelper.stopApp();
-    driver.quit();
+    if (driver != null) {
+      driver.quit();
+    }
   }
 
   /***
@@ -67,8 +70,6 @@ class Board_IT {
 
   @Test
   public void verifyNumberOfCardsForPlayer1() {
-    setPlayerIdPlaying(driver, "player0");
-
     assertEquals(5, driver.findElements(By.className("cardDiv")).size());
   }
 }
