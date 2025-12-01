@@ -7,8 +7,8 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 
 /**
- * Utility class to build JSON objects for MoveRequest payloads.
- * Matches the OpenAPI definition for /moves/{sessionId}/{playerId}.
+ * Utility class to build JSON objects for MoveRequest payloads. Matches the OpenAPI definition for
+ * /moves/{sessionId}/{playerId}.
  */
 public class MoveRequestJsonBuilder {
 

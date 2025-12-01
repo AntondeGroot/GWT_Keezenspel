@@ -1,16 +1,15 @@
 package ADG.Games.Keezen.ViewHelpers;
 
+import static ADG.Games.Keezen.Player.PlayerColors.*;
+
 import ADG.Games.Keezen.PawnAndCardSelection;
 import ADG.Games.Keezen.TileId;
 import ADG.Games.Keezen.dto.PawnClient;
 import ADG.Games.Keezen.dto.PlayerClient;
-import ADG.Games.Keezen.dto.PlayerClient;
-import ADG.Games.Keezen.moving.Move;
 import ADG.Games.Keezen.util.UUID;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
@@ -24,13 +23,9 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.EventListener;
 import com.google.gwt.user.client.ui.*;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static ADG.Games.Keezen.Player.PlayerColors.*;
 
 public class ViewDrawing {
 
@@ -43,7 +38,10 @@ public class ViewDrawing {
 
     pawnElement.setId(pawn.getPawnId());
     String uuid = UUID.get();
-    pawnElement.setAttribute("data-uuid", uuid); // for debugging to see when the pawns are replaced, which happens after refreshing the page
+    pawnElement.setAttribute(
+        "data-uuid",
+        uuid); // for debugging to see when the pawns are replaced, which happens after refreshing
+               // the page
 
     // Create new <div> Element
     DivElement pawnImage = Document.get().createDivElement();
@@ -71,60 +69,65 @@ public class ViewDrawing {
     pawnImage.getStyle().setHeight(40, Style.Unit.PX);
     pawnImage.getStyle().setWidth(40, Style.Unit.PX);
 
-    //combine
-    pawnImage.appendChild(overlayImage);  // add overlay inside pawnImage
-    pawnElement.appendChild(pawnImage);  // add pawnImage to outer container
+    // combine
+    pawnImage.appendChild(overlayImage); // add overlay inside pawnImage
+    pawnElement.appendChild(pawnImage); // add pawnImage to outer container
     pawnElement.getStyle().setZIndex(10); // put it on top of any canvas elements
 
     Event.sinkEvents(pawnElement, Event.ONCLICK);
-    Event.setEventListener(pawnElement, new EventListener() {
-      @Override
-      public void onBrowserEvent(Event event) {
-        if (DOM.eventGetType(event) == Event.ONCLICK) {
-          // select the pawnId when you click on the div
-          // we do not want to add the pawn itself as it will contain an outdated currentposition
-          // let pawnandcardselection keep track of where pawns are based on polling the server.
-          pawnAndCardSelection.addPawnId(pawn.getPawnId());
-          GWT.log("Pawn and card selection is: " + pawnAndCardSelection);
+    Event.setEventListener(
+        pawnElement,
+        new EventListener() {
+          @Override
+          public void onBrowserEvent(Event event) {
+            if (DOM.eventGetType(event) == Event.ONCLICK) {
+              // select the pawnId when you click on the div
+              // we do not want to add the pawn itself as it will contain an outdated
+              // currentposition
+              // let pawnandcardselection keep track of where pawns are based on polling the server.
+              pawnAndCardSelection.addPawnId(pawn.getPawnId());
+              GWT.log("Pawn and card selection is: " + pawnAndCardSelection);
 
-          // each time you click on a pawn, you need to check all other pawns
-          // whether they should be selected or not.
-          // there is logic in pawnAndCardSelection so it might have unselected a pawn
-          // in the model.
-          NodeList<Element> overlayImages = Document.get().getElementsByTagName("img");
-          for (int i = 0; i < overlayImages.getLength(); i++) {
-            Element element = overlayImages.getItem(i);
-            String className = element.getClassName(); // e.g., "PawnId{0,0}Overlay"
+              // each time you click on a pawn, you need to check all other pawns
+              // whether they should be selected or not.
+              // there is logic in pawnAndCardSelection so it might have unselected a pawn
+              // in the model.
+              NodeList<Element> overlayImages = Document.get().getElementsByTagName("img");
+              for (int i = 0; i < overlayImages.getLength(); i++) {
+                Element element = overlayImages.getItem(i);
+                String className = element.getClassName(); // e.g., "PawnId{0,0}Overlay"
 
-            // Extract pawnId by removing "Overlay" suffix
-            if (className.endsWith("Overlay")) {
-              String pawnId = className.substring(0, className.length() - "Overlay".length());
-              // compare with selected pawns
-              boolean isSelected = false;
-              if (pawnAndCardSelection.getPawn1() != null && pawnAndCardSelection.getPawn1()
-                  .getPawnId().equals(pawnId)) {
-                isSelected = true;
-              } else if (pawnAndCardSelection.getPawn2() != null && pawnAndCardSelection.getPawn2()
-                  .getPawnId().equals(pawnId)) {
-                isSelected = true;
+                // Extract pawnId by removing "Overlay" suffix
+                if (className.endsWith("Overlay")) {
+                  String pawnId = className.substring(0, className.length() - "Overlay".length());
+                  // compare with selected pawns
+                  boolean isSelected = false;
+                  if (pawnAndCardSelection.getPawn1() != null
+                      && pawnAndCardSelection.getPawn1().getPawnId().equals(pawnId)) {
+                    isSelected = true;
+                  } else if (pawnAndCardSelection.getPawn2() != null
+                      && pawnAndCardSelection.getPawn2().getPawnId().equals(pawnId)) {
+                    isSelected = true;
+                  }
+
+                  element
+                      .getStyle()
+                      .setVisibility(
+                          isSelected ? Style.Visibility.VISIBLE : Style.Visibility.HIDDEN);
+                }
               }
-
-              element.getStyle()
-                  .setVisibility(isSelected ? Style.Visibility.VISIBLE : Style.Visibility.HIDDEN);
+              GWT.log("Pawn and card selection is after validation: " + pawnAndCardSelection);
+              // after you have clicked on a pawn you will test whether it can move
+              //          Move.testMove(pawnAndCardSelection.createTestMoveMessage());
             }
           }
-          GWT.log("Pawn and card selection is after validation: " + pawnAndCardSelection);
-          // after you have clicked on a pawn you will test whether it can move
-//          Move.testMove(pawnAndCardSelection.createTestMoveMessage());
-        }
-      }
-    });
+        });
     GWT.log("a pawn was created");
     return pawnElement;
   }
 
-  public static DivElement createCircle(TileId tileId, double x, double y, double radius,
-      String color) {
+  public static DivElement createCircle(
+      TileId tileId, double x, double y, double radius, String color) {
     // Create a new <div> element
     DivElement tileElement = Document.get().createDivElement();
 
@@ -145,7 +148,8 @@ public class ViewDrawing {
     tileElement.getStyle().setTop(y, Style.Unit.PX);
 
     // Set the size of the circle dynamically
-    //todo: by making the circle a little smaller '-3' the indicator for possible moves is no longer exactly aligned, this can be seen for larger values e.g. -5
+    // todo: by making the circle a little smaller '-3' the indicator for possible moves is no
+    // longer exactly aligned, this can be seen for larger values e.g. -5
     tile.getStyle().setWidth(radius * 2 - 3, Style.Unit.PX);
     tile.getStyle().setHeight(radius * 2 - 3, Style.Unit.PX);
 
@@ -153,8 +157,10 @@ public class ViewDrawing {
     String darkColor = rgbToHex(darkenColor(hexToRgb(color)));
     String lightColor = rgbToHex(lightenColor(hexToRgb(color)));
     tile.getStyle().setProperty("backgroundColor", color);
-    tile.getStyle().setProperty("boxShadow", "inset 3px 3px 4px " + darkColor + "," +
-        "  inset -4px -4px 4px " + lightColor);
+    tile.getStyle()
+        .setProperty(
+            "boxShadow",
+            "inset 3px 3px 4px " + darkColor + "," + "  inset -4px -4px 4px " + lightColor);
 
     tileElement.appendChild(tileHighlight);
     tileElement.appendChild(tile);
@@ -163,7 +169,8 @@ public class ViewDrawing {
 
   public static Grid createPlayerGrid(List<PlayerClient> players) {
     GWT.log("creates player grid");
-    // todo: maybe check player whether they belong in column 1 or 2, so don't expand both when a winner has been declared
+    // todo: maybe check player whether they belong in column 1 or 2, so don't expand both when a
+    // winner has been declared
     List<Integer> column1 = Arrays.asList(0, 1, 2, 3);
     List<Integer> column2 = Arrays.asList(4, 5, 6, 7);
     int colCount = 2;
@@ -172,9 +179,8 @@ public class ViewDrawing {
     int rowCount = Math.min(players.size(), 4);
     Grid grid = new Grid(rowCount, colCount);
 
-    List<PlayerClient> winners = players.stream()
-        .filter(player -> player.getPlace() > -1)
-        .collect(Collectors.toList());
+    List<PlayerClient> winners =
+        players.stream().filter(player -> player.getPlace() > -1).collect(Collectors.toList());
 
     int playerId = 0;
     for (PlayerClient player : players) {
@@ -184,8 +190,8 @@ public class ViewDrawing {
       img.setSrc("/profilepics.png");
 
       HorizontalPanel hp = new HorizontalPanel();
-      hp.getElement().setId("player"+player.getPlayerInt());
-      Label playerNameLabel = new Label(""+player.getName());
+      hp.getElement().setId("player" + player.getPlayerInt());
+      Label playerNameLabel = new Label("" + player.getName());
       playerNameLabel.getElement().setId(player.getPlayerInt() + "Label");
 
       hp.setHorizontalAlignment(HorizontalPanel.ALIGN_LEFT);
@@ -201,7 +207,7 @@ public class ViewDrawing {
 
       Context2d ctx = canvas.getContext2d();
       // source image
-      //todo: use img.width or something instead
+      // todo: use img.width or something instead
       // move this to the server, users should have chosen their profile pic
       double sw = 1024 / 4.0;
       double sh = 1024 / 4.0;
@@ -248,15 +254,14 @@ public class ViewDrawing {
     for (PlayerClient player : players) {
       // set color of border around profile pic:
       GWT.log("Player: " + player.getName());
-      String playerColor = player.getColor();//gethex color
-      GWT.log("playercolor = "+playerColor);
+      String playerColor = player.getColor(); // gethex color
+      GWT.log("playercolor = " + playerColor);
       String INACTIVE_GREY = "#c2bfb6";
       GWT.log("trying to get document");
       Document.get()
           .getElementById(player.getPlayerInt() + "Pic")
           .getStyle()
-          .setBorderColor(
-              player.isActive() ? playerColor : INACTIVE_GREY);
+          .setBorderColor(player.isActive() ? playerColor : INACTIVE_GREY);
       GWT.log("finished getting document");
       // set player name label : there's a strikethrough when player is not active
       Element playerLabel = Document.get().getElementById(player.getPlayerInt() + "Label");
@@ -264,7 +269,7 @@ public class ViewDrawing {
       playerLabel.addClassName("playerName");
 
       // set border for Horizontal Panel
-      Element hp = Document.get().getElementById("player"+player.getPlayerInt());
+      Element hp = Document.get().getElementById("player" + player.getPlayerInt());
       hp.setClassName(player.isPlaying() ? "playerPlaying" : "playerNotPlaying");
       hp.addClassName(player.isActive() ? "playerActive" : "playerInactive");
     }
@@ -276,8 +281,8 @@ public class ViewDrawing {
     for (PlayerClient player : players) {
       if (player.getPlace() > -1) {
         // get element
-        CanvasElement canvasMedal = (CanvasElement) Document.get()
-            .getElementById(player.getName() + "Medal");
+        CanvasElement canvasMedal =
+            (CanvasElement) Document.get().getElementById(player.getName() + "Medal");
         canvasMedal.setClassName("Medal" + player.getPlace());
 
         // fill element

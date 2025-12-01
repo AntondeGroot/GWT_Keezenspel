@@ -4,7 +4,6 @@ import static com.adg.openapi.model.GameInfo.StatusEnum.IN_PROGRESS;
 import static com.adg.openapi.model.GameInfo.StatusEnum.WAITING;
 
 import com.adg.openapi.model.GameInfo;
-import com.adg.openapi.model.GameInfo.StatusEnum;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,17 +57,17 @@ public class GameRegistry {
     return session;
   }
 
-  public static List<GameInfo> getAllGames(){
+  public static List<GameInfo> getAllGames() {
     ArrayList<GameInfo> gameInfos = new ArrayList<>();
-    for(GameSession session : games.values()){
+    for (GameSession session : games.values()) {
       GameState gameState = session.getGameState();
-      GameInfo gameInfo = new GameInfo(
-          session.getSessionId(),
-          session.getRoomName(),
-          gameState.getNrPlayers(),
-          session.getMaxPlayers(),
-          gameState.hasStarted() ? IN_PROGRESS : WAITING
-      );
+      GameInfo gameInfo =
+          new GameInfo(
+              session.getSessionId(),
+              session.getRoomName(),
+              gameState.getNrPlayers(),
+              session.getMaxPlayers(),
+              gameState.hasStarted() ? IN_PROGRESS : WAITING);
       gameInfos.add(gameInfo);
     }
     return gameInfos;

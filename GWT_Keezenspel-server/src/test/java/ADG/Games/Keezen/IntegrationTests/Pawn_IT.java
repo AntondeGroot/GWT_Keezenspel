@@ -44,6 +44,7 @@ public class Pawn_IT {
 
   @AfterEach
   public void tearDown() {
+    driver.quit();
     SpringAppTestHelper.stopApp();
   }
 
@@ -67,8 +68,8 @@ public class Pawn_IT {
   @Test
   public void clickOnOwnPawn_Selected() {
     // GIVEN
-    String pawnId = "player0_0";
-    WebElement pawn1 = driver.findElement(By.id(pawnId));
+    PawnId pawnId = new PawnId("player0", 0);
+    WebElement pawn1 = driver.findElement(By.id(pawnId.toString()));
 
     // WHEN
     pawn1.click();
@@ -101,33 +102,34 @@ public class Pawn_IT {
   @Test
   public void clickOnOtherPawnOnBase_NotSelected() {
     // GIVEN
-    WebElement pawnOtherPlayer = driver.findElement(new ById("PawnId{1,1}"));
+    PawnId pawnId = new PawnId("player1", 1);
+    WebElement pawnOtherPlayer = driver.findElement(new ById(pawnId.toString()));
 
     // WHEN
     pawnOtherPlayer.click();
 
     // THEN
-    WebElement pawnOtherPlayerOutline = driver.findElement(By.className("PawnId{1,1}Overlay"));
+    WebElement pawnOtherPlayerOutline = driver.findElement(By.className(pawnId + "Overlay"));
     assertEquals(HIDDEN, pawnOtherPlayerOutline.getCssValue("visibility"));
   }
 
   @Test
   public void playerCanMoveOnBoardAndPlayWithoutHavingToRefreshPage() {
-    PawnId pawnId = new PawnId("2", 0);
+    PawnId pawnId = new PawnId("player2", 0);
 
     // GIVEN player 0 forfeits
-    playerForfeits(driver, "0");
+    playerForfeits(driver, "player0");
 
     // GIVEN player 1 forfeits
-    playerForfeits(driver, "1");
+    playerForfeits(driver, "player1");
 
     // GIVEN player 2 moves on board
     Point nest = getPawnLocation(driver, pawnId);
-    playerPlaysCard(driver, "2", pawnId, 1);
+    playerPlaysCard(driver, "player2", pawnId, 1);
 
     // WHEN
     Point before = getPawnLocation(driver, pawnId);
-    playerPlaysCard(driver, "2", pawnId, 5);
+    playerPlaysCard(driver, "player2", pawnId, 5);
     TestUtils.wait(1000);
     Point after = getPawnLocation(driver, pawnId);
 

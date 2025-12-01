@@ -27,9 +27,10 @@ class ApiGameWithPlayersTest {
     // THEN they were added to the game
     var players = apiHelper.getAllPlayersInGame(sessionId);
 
-    boolean foundPlayer = players.stream().anyMatch(p ->
-        p.get("name").equals(player.getName()) &&
-            p.get("id").equals(player.getId()));
+    boolean foundPlayer =
+        players.stream()
+            .anyMatch(
+                p -> p.get("name").equals(player.getName()) && p.get("id").equals(player.getId()));
 
     assertTrue(foundPlayer, "Newly created game should have newly added player'");
 
@@ -79,20 +80,29 @@ class ApiGameWithPlayersTest {
     // THEN they were added to the game
     var players = apiHelper.getAllPlayersInGame(sessionId);
 
-    boolean foundPlayer = players.stream().anyMatch(p ->
-            p.get("name").equals(player1.getName()) &&
-            p.get("isActive").equals(true) &&
-            p.get("isPlaying").equals(true));
+    boolean foundPlayer =
+        players.stream()
+            .anyMatch(
+                p ->
+                    p.get("name").equals(player1.getName())
+                        && p.get("isActive").equals(true)
+                        && p.get("isPlaying").equals(true));
     assertTrue(foundPlayer, "First player should be active and playing");
-    boolean foundPlayer2 = players.stream().anyMatch(p ->
-        p.get("name").equals(player2.getName()) &&
-            p.get("isActive").equals(true) &&
-            p.get("isPlaying").equals(false));
+    boolean foundPlayer2 =
+        players.stream()
+            .anyMatch(
+                p ->
+                    p.get("name").equals(player2.getName())
+                        && p.get("isActive").equals(true)
+                        && p.get("isPlaying").equals(false));
     assertTrue(foundPlayer2, "Second player should only be active but not playing");
-    boolean foundPlayer3 = players.stream().anyMatch(p ->
-        p.get("name").equals(player3.getName()) &&
-            p.get("isActive").equals(true) &&
-            p.get("isPlaying").equals(false));
+    boolean foundPlayer3 =
+        players.stream()
+            .anyMatch(
+                p ->
+                    p.get("name").equals(player3.getName())
+                        && p.get("isActive").equals(true)
+                        && p.get("isPlaying").equals(false));
     assertTrue(foundPlayer3, "Third player should be active but not playing");
 
     // cleanup

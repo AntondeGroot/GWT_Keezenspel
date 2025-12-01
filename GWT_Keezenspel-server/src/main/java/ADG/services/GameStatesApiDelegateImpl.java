@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 public class GameStatesApiDelegateImpl implements GamestatesApiDelegate {
 
   @Override
-  public ResponseEntity<com.adg.openapi.model.GameState> getGameStateForGame(String sessionId,
-      Long stateVersion) {
+  public ResponseEntity<com.adg.openapi.model.GameState> getGameStateForGame(
+      String sessionId, Long stateVersion) {
 
     GameSession session = GameRegistry.getGame(sessionId);
     if (session == null) {
@@ -21,7 +21,7 @@ public class GameStatesApiDelegateImpl implements GamestatesApiDelegate {
     }
 
     GameState gameState = session.getGameState();
-    if(stateVersion != null && stateVersion.equals(Long.valueOf(gameState.getVersion()))) {
+    if (stateVersion != null && stateVersion.equals(Long.valueOf(gameState.getVersion()))) {
       return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
     }
 

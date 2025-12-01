@@ -12,19 +12,12 @@ public class CardDTO extends JavaScriptObject {
     // Required protected constructor for GWT overlay types
   }
 
-  /**
-   * The suit index (0–3).
-   */
+  /** The suit index (0–3). */
   public final native int getSuit() /*-{ return this.suit; }-*/;
 
-  /**
-   * The face value (1 = Ace, 2–10, 11 = Jack, 12 = Queen, 13 = King).
-   */
+  /** The face value (1 = Ace, 2–10, 11 = Jack, 12 = Queen, 13 = King). */
   public final native int getValue() /*-{ return this.value; }-*/;
 
-  /**
-   * Unique identifier for duplicate cards (for games with more than 4 players).
-   */
+  /** Unique identifier for duplicate cards (for games with more than 4 players). */
   public final native int getUuid() /*-{ return this.uuid; }-*/;
-
 }

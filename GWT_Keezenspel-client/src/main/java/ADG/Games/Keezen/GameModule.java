@@ -2,10 +2,10 @@ package ADG.Games.Keezen;
 
 import ADG.Games.Keezen.Cards.CardsService;
 import ADG.Games.Keezen.Cards.CardsServiceAsync;
-import ADG.Games.Keezen.State.GameStateService;
-import ADG.Games.Keezen.State.GameStateServiceAsync;
 import ADG.Games.Keezen.Move.MovingService;
 import ADG.Games.Keezen.Move.MovingServiceAsync;
+import ADG.Games.Keezen.State.GameStateService;
+import ADG.Games.Keezen.State.GameStateServiceAsync;
 import ADG.Games.Keezen.board.GameBoardPresenter;
 import ADG.Games.Keezen.board.GameBoardView;
 import ADG.Games.Keezen.services.PollingService;
@@ -33,9 +33,10 @@ public class GameModule {
     gameBoardView = new GameBoardView();
     RootPanel.get().clear();
     RootPanel.get().add(gameBoardView);
-    //todo add model
-    GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(gameBoardView, gameStateService,
-        cardsService, movingService, pollingService);
+    // todo add model
+    GameBoardPresenter gameBoardPresenter =
+        new GameBoardPresenter(
+            gameBoardView, gameStateService, cardsService, movingService, pollingService);
     gameBoardPresenter.start();
   }
 }

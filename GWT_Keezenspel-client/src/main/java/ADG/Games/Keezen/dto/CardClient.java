@@ -15,10 +15,16 @@ public class CardClient {
   public int getSuit() {
     return suit;
   }
-  public int getValue(){
+
+  public int getValue() {
     return value;
   }
-  public int getUuid(){
+
+  public int getUuid() {
     return uuid;
+  }
+
+  public String toString() {
+    return "card_" + this.suit + "_" + this.value;
   }
 }

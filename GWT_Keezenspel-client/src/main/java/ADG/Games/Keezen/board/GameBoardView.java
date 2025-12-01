@@ -1,5 +1,8 @@
 package ADG.Games.Keezen.board;
 
+import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.*;
+import static ADG.Games.Keezen.util.PlayerUtil.getPlayerById;
+
 import ADG.Games.Keezen.CardsDeck;
 import ADG.Games.Keezen.PawnAndCardSelection;
 import ADG.Games.Keezen.Point;
@@ -26,56 +29,39 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.*;
-
 import java.util.*;
-
-import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.*;
-import static ADG.Games.Keezen.util.PlayerUtil.getPlayerById;
 
 public class GameBoardView extends Composite {
 
   private final Document document;
 
-  interface Binder extends UiBinder<Widget, GameBoardView> {
-
-  }
+  interface Binder extends UiBinder<Widget, GameBoardView> {}
 
   private static final Binder uiBinder = GWT.create(Binder.class);
 
-  @UiField
-  Button sendButton;
+  @UiField Button sendButton;
 
-  @UiField
-  Button forfeitButton;
+  @UiField Button forfeitButton;
 
-  @UiField
-  Label errorLabel;
+  @UiField Label errorLabel;
 
-  @UiField
-  VerticalPanel playerListContainer2;
+  @UiField VerticalPanel playerListContainer2;
 
   //    needed to add click listeners to the Canvas. GWT Canvas does not have
   //    a dom element which you could find by .findElementById()
-  @UiField
-  HTMLPanel canvasWrapper;
+  @UiField HTMLPanel canvasWrapper;
 
-  @UiField
-  HTMLPanel tileBoard;
+  @UiField HTMLPanel tileBoard;
 
-  @UiField
-  HTMLPanel pawnBoard;
+  @UiField HTMLPanel pawnBoard;
 
-  @UiField
-  FlowPanel cardsContainer;
+  @UiField FlowPanel cardsContainer;
 
-  @UiField
-  HorizontalPanel pawnIntegerBoxes;
+  @UiField HorizontalPanel pawnIntegerBoxes;
 
-  @UiField
-  TextBox stepsPawn1;
+  @UiField TextBox stepsPawn1;
 
-  @UiField
-  TextBox stepsPawn2;
+  @UiField TextBox stepsPawn2;
 
   @Override
   public void onLoad() {
@@ -136,13 +122,14 @@ public class GameBoardView extends Composite {
   }
 
   public void animatePawns(MoveResponseDTO moveResponse) {
-    //pawns.sort(new PawnComparator()); // todo: will pawns be drawn incorrectly when on finish tile?
+    // pawns.sort(new PawnComparator()); // todo: will pawns be drawn incorrectly when on finish
+    // tile?
     GWT.log("view.animatepawns");
     PawnAnimation.animateSequence(pawnElements, moveResponse);
-//    PawnAnimation animation = new PawnAnimation(pawnElements);
-//    animation.animateSequence(AnimationSequence.getFirst());
-//    animation.animateSequence(AnimationSequence.getLast());
-//    AnimationSequence.reset();
+    //    PawnAnimation animation = new PawnAnimation(pawnElements);
+    //    animation.animateSequence(AnimationSequence.getFirst());
+    //    animation.animateSequence(AnimationSequence.getLast());
+    //    AnimationSequence.reset();
   }
 
   public void drawBoard(List<TileMapping> tiles, List<PlayerClient> players, double cellDistance) {
@@ -156,9 +143,13 @@ public class GameBoardView extends Composite {
         PlayerClient player = getPlayerById(mapping.getPlayerId(), players);
         color = player.getColor();
       }
-      DivElement circle = createCircle(mapping.getTileId(),
-          mapping.getPosition().getX() - cellDistance / 2,
-          mapping.getPosition().getY() - cellDistance / 2, cellDistance / 2, color);
+      DivElement circle =
+          createCircle(
+              mapping.getTileId(),
+              mapping.getPosition().getX() - cellDistance / 2,
+              mapping.getPosition().getY() - cellDistance / 2,
+              cellDistance / 2,
+              color);
       tileBoard.getElement().appendChild(circle);
     }
   }
@@ -202,7 +193,8 @@ public class GameBoardView extends Composite {
     for (Map.Entry<String, Integer> entry : nrCardsPerPlayerUUID.entrySet()) {
       String uuid = entry.getKey();
       if (uuid.equals(Cookie.getPlayerId())) {
-        // skip drawing card icons for the current player, their hand is already drawn showing the cards
+        // skip drawing card icons for the current player, their hand is already drawn showing the
+        // cards
         // so you don't need to draw the back side to indicate how many cards they currently have
         continue;
       }
@@ -211,17 +203,27 @@ public class GameBoardView extends Composite {
       Point endPoint = cardpoints.get(1);
       double dx = (endPoint.getX() - startPoint.getX()) / 4;
       double dy = (endPoint.getY() - startPoint.getY()) / 4;
-      GWT.log("drawCardsIcons \n" +
-          "PlayerUUID " + uuid + "\n" +
-          "Start " + startPoint + "\n" +
-          "End " + endPoint + "\n" +
-          "dx " + dx + "\n" +
-          "dy " + dy
-      );
+      GWT.log(
+          "drawCardsIcons \n"
+              + "PlayerUUID "
+              + uuid
+              + "\n"
+              + "Start "
+              + startPoint
+              + "\n"
+              + "End "
+              + endPoint
+              + "\n"
+              + "dx "
+              + dx
+              + "\n"
+              + "dy "
+              + dy);
 
       Integer nrCards = entry.getValue();
       for (int i = 0; i < nrCards; i++) {
-        // Define the source rectangle (from the sprite sheet): this image belongs to the backside image
+        // Define the source rectangle (from the sprite sheet): this image belongs to the backside
+        // image
         double spriteWidth = 1920 / 13.0;
         double spriteHeight = 1150 / 5.0;
         double sourceX = spriteWidth * 2;
@@ -235,18 +237,23 @@ public class GameBoardView extends Composite {
         double destY = startPoint.getY() - destHeight / 2 + dy * i;
 
         // Draw the card image on the canvas
-        getCanvasCardsContext().drawImage(
-            ImageElement.as(spriteImage.getElement()),
-            sourceX, sourceY, spriteWidth, spriteHeight,
-            destX, destY, destWidth, destHeight
-        );
+        getCanvasCardsContext()
+            .drawImage(
+                ImageElement.as(spriteImage.getElement()),
+                sourceX,
+                sourceY,
+                spriteWidth,
+                spriteHeight,
+                destX,
+                destY,
+                destWidth,
+                destHeight);
       }
     }
   }
 
-  private void drawPlayerCardsInHand(List<CardClient> cards,
-      PawnAndCardSelection pawnAndCardSelection,
-      Image spriteImage) {
+  private void drawPlayerCardsInHand(
+      List<CardClient> cards, PawnAndCardSelection pawnAndCardSelection, Image spriteImage) {
     CardClient selectedCard = pawnAndCardSelection.getCard();
     // create divs
     cardsContainer.getElement().removeAllChildren();
@@ -269,11 +276,13 @@ public class GameBoardView extends Composite {
       DivElement cardElement = Document.get().createDivElement();
       cardElement.setClassName("cardDiv");
       cardElement.setId(card.toString());
-      cardElement.getStyle()
+      cardElement
+          .getStyle()
           .setProperty("backgroundPosition", -sourceX * factor + "px " + -sourceY * factor + "px");
 
       // Scale entire sprite sheet
-      cardElement.getStyle()
+      cardElement
+          .getStyle()
           .setProperty("backgroundSize", (1920 * factor) + "px " + (1150 * factor) + "px");
 
       // Set visible card size
@@ -281,59 +290,65 @@ public class GameBoardView extends Composite {
       cardElement.getStyle().setProperty("height", destHeight + "px");
 
       Event.sinkEvents(cardElement, Event.ONCLICK);
-      Event.setEventListener(cardElement, new com.google.gwt.user.client.EventListener() {
-        @Override
-        public void onBrowserEvent(Event event) {
-          if (DOM.eventGetType(event) == Event.ONCLICK) {
-            pawnAndCardSelection.setCard(card);
-            GWT.log("pawnAndCardSelection = " + pawnAndCardSelection);
+      Event.setEventListener(
+          cardElement,
+          new com.google.gwt.user.client.EventListener() {
+            @Override
+            public void onBrowserEvent(Event event) {
+              if (DOM.eventGetType(event) == Event.ONCLICK) {
+                pawnAndCardSelection.setCard(card);
+                GWT.log("pawnAndCardSelection = " + pawnAndCardSelection);
 
-            MoveRequestJsonBuilder builder = new MoveRequestJsonBuilder()
-                .withPlayerId(Cookie.getPlayerId())
-                .withCardId(pawnAndCardSelection.getCard())
-                .withPawn1(pawnAndCardSelection.getPawn1())
-                .withPawn2(pawnAndCardSelection.getPawn2())
-                .withStepsPawn1(pawnAndCardSelection.getNrStepsPawn1())
-                .withStepsPawn2(pawnAndCardSelection.getNrStepsPawn2())
-                .withTempMessageType("CHECK_MOVE");
+                MoveRequestJsonBuilder builder =
+                    new MoveRequestJsonBuilder()
+                        .withPlayerId(Cookie.getPlayerId())
+                        .withCardId(pawnAndCardSelection.getCard())
+                        .withPawn1(pawnAndCardSelection.getPawn1())
+                        .withPawn2(pawnAndCardSelection.getPawn2())
+                        .withStepsPawn1(pawnAndCardSelection.getNrStepsPawn1())
+                        .withStepsPawn2(pawnAndCardSelection.getNrStepsPawn2())
+                        .withTempMessageType("CHECK_MOVE");
 
-            GWT.log("testmove anton: " + builder.build());
-            ApiClient apiClient = new ApiClient();
-            GWT.log("pawn 1: " + pawnAndCardSelection.getPawn1());
-            apiClient.checkMove(Cookie.getSessionID(), Cookie.getPlayerId(), builder.build(),
-                new ApiCallback<TestMoveResponseDTO>() {
-                  @Override
-                  public void onSuccess(TestMoveResponseDTO result) {
-                    GWT.log(" successful XXXX" + result.toString());
-                    ArrayList<TileId> tiles = new ArrayList<>();
-                    for (int i = 0; i < result.getTiles().length(); i++) {
-                      tiles.add(
-                          new TileId(
-                              result.getTiles().get(i).getPlayerId(),
-                              result.getTiles().get(i).getTileNr()));
-                    }
-                    GWT.log("tiles = " + tiles);
-                    StepsAnimation.resetStepsAnimation();
-                    StepsAnimation.updateStepsAnimation(tiles);
-                  }
+                GWT.log("testmove anton: " + builder.build());
+                ApiClient apiClient = new ApiClient();
+                GWT.log("pawn 1: " + pawnAndCardSelection.getPawn1());
+                apiClient.checkMove(
+                    Cookie.getSessionID(),
+                    Cookie.getPlayerId(),
+                    builder.build(),
+                    new ApiCallback<TestMoveResponseDTO>() {
+                      @Override
+                      public void onSuccess(TestMoveResponseDTO result) {
+                        GWT.log(" successful XXXX" + result.toString());
+                        ArrayList<TileId> tiles = new ArrayList<>();
+                        for (int i = 0; i < result.getTiles().length(); i++) {
+                          tiles.add(
+                              new TileId(
+                                  result.getTiles().get(i).getPlayerId(),
+                                  result.getTiles().get(i).getTileNr()));
+                        }
+                        GWT.log("tiles = " + tiles);
+                        StepsAnimation.resetStepsAnimation();
+                        StepsAnimation.updateStepsAnimation(tiles);
+                      }
 
-                  @Override
-                  public void onHttpError(int statusCode, String statusText) {
-                    GWT.log("anton httperror view"+statusCode+":"+statusText);
-                    StepsAnimation.resetStepsAnimation();
-                  }
+                      @Override
+                      public void onHttpError(int statusCode, String statusText) {
+                        GWT.log("anton httperror view" + statusCode + ":" + statusText);
+                        StepsAnimation.resetStepsAnimation();
+                      }
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    GWT.log("anton failure view"+caught.getMessage());
-                    StepsAnimation.resetStepsAnimation();
-                  }
-                });
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        GWT.log("anton failure view" + caught.getMessage());
+                        StepsAnimation.resetStepsAnimation();
+                      }
+                    });
 
-            drawPlayerCardsInHand(cards, pawnAndCardSelection, spriteImage);
-          }
-        }
-      });
+                drawPlayerCardsInHand(cards, pawnAndCardSelection, spriteImage);
+              }
+            }
+          });
 
       // HorizontalPanel manages layout only for widgets added via add(...),
       // not for raw DOM elements added via getElement().appendChild(...).
@@ -365,19 +380,20 @@ public class GameBoardView extends Composite {
     Image img = new Image("/card-deck.png");
     GWT.log("drawcards method");
     // Add a LoadHandler to ensure the image is fully loaded before drawing
-    img.addLoadHandler(new LoadHandler() {
-      @Override
-      public void onLoad(LoadEvent event) {
-        // Clear the canvas to prepare for drawing new cards
-        getCanvasCardsContext().clearRect(0, 0, getCanvasCards().getWidth(),
-            getCanvasCards().getHeight());
+    img.addLoadHandler(
+        new LoadHandler() {
+          @Override
+          public void onLoad(LoadEvent event) {
+            // Clear the canvas to prepare for drawing new cards
+            getCanvasCardsContext()
+                .clearRect(0, 0, getCanvasCards().getWidth(), getCanvasCards().getHeight());
 
-        GWT.log("\n\ndrawing cards");
-        drawPlayerCardsInHand(cards, pawnAndCardSelection, img);
-        drawCardsIcons(nrCardsPerPlayerUUID, img);
-        drawPlayedCards(playedCards, img);
-      }
-    });
+            GWT.log("\n\ndrawing cards");
+            drawPlayerCardsInHand(cards, pawnAndCardSelection, img);
+            drawCardsIcons(nrCardsPerPlayerUUID, img);
+            drawPlayedCards(playedCards, img);
+          }
+        });
 
     // Trigger the image loading by adding it to the DOM
     removeCardDeckImage();
@@ -418,17 +434,24 @@ public class GameBoardView extends Composite {
         double destY = 300 - destHeight / 2 + 10 * Math.sin(angleRadians);
 
         // Draw the card image on the canvas
-        getCanvasCardsContext().drawImage(
-            ImageElement.as(spriteImage.getElement()),
-            sourceX, sourceY, spriteWidth, spriteHeight,
-            destX, destY, destWidth, destHeight
-        );
+        getCanvasCardsContext()
+            .drawImage(
+                ImageElement.as(spriteImage.getElement()),
+                sourceX,
+                sourceY,
+                spriteWidth,
+                spriteHeight,
+                destX,
+                destY,
+                destWidth,
+                destHeight);
       }
     }
   }
 
   public void removeCardDeckImage() {
-    // todo: can this be done any other way? how was it done for the pawns? There it didn't need a loadHandler
+    // todo: can this be done any other way? how was it done for the pawns? There it didn't need a
+    // loadHandler
     // Get the parent element (e.g., RootPanel)
     Element parentElement = RootPanel.get().getElement();
 
@@ -449,7 +472,7 @@ public class GameBoardView extends Composite {
   }
 
   public void clearCanvasCards() {
-    getCanvasCardsContext().clearRect(0, 0, getCanvasCards().getWidth(),
-        getCanvasCards().getHeight());
+    getCanvasCardsContext()
+        .clearRect(0, 0, getCanvasCards().getWidth(), getCanvasCards().getHeight());
   }
 }

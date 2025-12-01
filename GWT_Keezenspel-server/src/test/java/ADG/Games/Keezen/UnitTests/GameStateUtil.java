@@ -1,17 +1,15 @@
 package ADG.Games.Keezen.UnitTests;
 
-import static ADG.Games.Keezen.Move.MoveType.FORFEIT;
 import static com.adg.openapi.model.MoveType.MOVE;
 import static com.adg.openapi.model.MoveType.SPLIT;
 import static com.adg.openapi.model.MoveType.SWITCH;
 import static com.adg.openapi.model.TempMessageType.MAKE_MOVE;
 
-import com.adg.openapi.model.Card;
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameState;
+import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
-import com.adg.openapi.model.MoveType;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PawnId;
 import com.adg.openapi.model.Player;
@@ -20,11 +18,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-
 public class GameStateUtil {
 
-  public static Pawn placePawnOnNest(GameState gameState, String playerId,
-      PositionKey currentTile) {
+  public static Pawn placePawnOnNest(
+      GameState gameState, String playerId, PositionKey currentTile) {
     // for creating pawns for different players
     PawnId pawnId1 = new PawnId(playerId, 0);
     PositionKey nestTile = new PositionKey(playerId, -1);
@@ -85,9 +82,9 @@ public class GameStateUtil {
     return jack;
   }
 
-  public static void createSplitMessage(MoveRequest moveMessage, Pawn pawn, int nrSteps1,
-      Pawn pawn2, Integer nrSteps2, Card card) {
-    //todo: replace with rest call
+  public static void createSplitMessage(
+      MoveRequest moveMessage, Pawn pawn, int nrSteps1, Pawn pawn2, Integer nrSteps2, Card card) {
+    // todo: replace with rest call
 
     moveMessage.setPlayerId(pawn.getPlayerId());
     moveMessage.setPawn1Id(pawn.getPawnId());
@@ -110,16 +107,16 @@ public class GameStateUtil {
     moveMessage.setTempMessageType(MAKE_MOVE);
   }
 
-  public static void createSwitchMessage(MoveRequest moveMessage, Pawn pawn1, Pawn pawn2,
-      Card card) {
+  public static void createSwitchMessage(
+      MoveRequest moveMessage, Pawn pawn1, Pawn pawn2, Card card) {
     // todo: replace with rest call
 
-        moveMessage.setPlayerId(pawn1.getPlayerId());
-        moveMessage.setPawn1Id(pawn1.getPawnId());
-        moveMessage.setPawn2Id(pawn2.getPawnId());
-        moveMessage.setCardId(card.getUuid());
-        moveMessage.setMoveType(SWITCH);
-        moveMessage.setTempMessageType(MAKE_MOVE);
+    moveMessage.setPlayerId(pawn1.getPlayerId());
+    moveMessage.setPawn1Id(pawn1.getPawnId());
+    moveMessage.setPawn2Id(pawn2.getPawnId());
+    moveMessage.setCardId(card.getUuid());
+    moveMessage.setMoveType(SWITCH);
+    moveMessage.setTempMessageType(MAKE_MOVE);
   }
 
   public static void sendForfeitMessage(GameState gameState, String playerId) {
@@ -127,8 +124,8 @@ public class GameStateUtil {
     gameState.processOnForfeit(playerId);
   }
 
-  public static void sendValidMoveRequest(GameState gameState, CardsDeckInterface cardsDeck,
-      String playerId) {
+  public static void sendValidMoveRequest(
+      GameState gameState, CardsDeckInterface cardsDeck, String playerId) {
     // todo: replace with rest call
 
     // get the first pawn of the player
@@ -157,8 +154,8 @@ public class GameStateUtil {
     gameState.processOnMove(moveMessage, moveResponse);
   }
 
-  public static void playRemainingCards(GameState gameState, CardsDeckInterface cardsDeck,
-      String playerId) {
+  public static void playRemainingCards(
+      GameState gameState, CardsDeckInterface cardsDeck, String playerId) {
     int nrCards = cardsDeck.getCardsForPlayer(playerId).size();
     for (int i = 0; i < nrCards; i++) {
       sendValidMoveRequest(gameState, cardsDeck, playerId);

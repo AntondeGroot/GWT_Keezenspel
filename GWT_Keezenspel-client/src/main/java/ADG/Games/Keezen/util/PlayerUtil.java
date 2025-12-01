@@ -1,7 +1,6 @@
 package ADG.Games.Keezen.util;
 
 import ADG.Games.Keezen.dto.PlayerClient;
-import ADG.Games.Keezen.dto.PlayerDTO;
 import java.util.List;
 
 public class PlayerUtil {

@@ -1,9 +1,15 @@
 package ADG.Games.Keezen.UnitTests;
 
-import com.adg.openapi.model.Card;
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
+import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
+import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
 import com.adg.openapi.model.Pawn;
@@ -12,12 +18,6 @@ import com.adg.openapi.model.PositionKey;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
-import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 class MovingOnBoardSamePlayerBlockingTest {
 
@@ -44,15 +44,14 @@ class MovingOnBoardSamePlayerBlockingTest {
     moveMessage = null;
     moveResponse = null;
     cardsDeck.reset();
-
   }
 
   @Test
   void twoPawnsOnePlayer_CannotEndOnTheSameTile() {
     // GIVEN
     Card card = givePlayerCard(cardsDeck, 0, 1);
-    Pawn pawn1 = GameStateUtil.placePawnOnBoard(gameState, new PawnId("0", 0),
-        new PositionKey("0", 9));
+    Pawn pawn1 =
+        GameStateUtil.placePawnOnBoard(gameState, new PawnId("0", 0), new PositionKey("0", 9));
     Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("0", 1), new PositionKey("0", 10));
 
     // WHEN
@@ -61,8 +60,8 @@ class MovingOnBoardSamePlayerBlockingTest {
 
     // THEN response message is correct
     assertEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
-    assertTrue(moveResponse.getMovePawn1().isEmpty());  // moves the pawn to the correct tile
-    assertNull(moveResponse.getPawn1());                          // moves the correct pawn
+    assertTrue(moveResponse.getMovePawn1().isEmpty()); // moves the pawn to the correct tile
+    assertNull(moveResponse.getPawn1()); // moves the correct pawn
     // THEN Gamestate is correct
     assertEquals(new PositionKey("0", 9), gameState.getPawn(pawn1).getCurrentTileId());
     assertEquals(new PositionKey("0", 10), gameState.getPawn(pawn2).getCurrentTileId());
@@ -98,8 +97,8 @@ class MovingOnBoardSamePlayerBlockingTest {
 
     // THEN response message is correct
     assertEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
-    assertTrue(moveResponse.getMovePawn1().isEmpty());  // moves the pawn to the correct tile
-    assertNull(moveResponse.getPawn1());                          // moves the correct pawn
+    assertTrue(moveResponse.getMovePawn1().isEmpty()); // moves the pawn to the correct tile
+    assertNull(moveResponse.getPawn1()); // moves the correct pawn
     // THEN Gamestate is correct
     assertEquals(new PositionKey("0", 14), gameState.getPawn(pawn1).getCurrentTileId());
     assertEquals(new PositionKey("0", 15), gameState.getPawn(pawn2).getCurrentTileId());
@@ -158,8 +157,8 @@ class MovingOnBoardSamePlayerBlockingTest {
 
     // THEN response message is correct
     assertEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
-    assertTrue(moveResponse.getMovePawn1().isEmpty());  // moves the pawn to the correct tile
-    assertNull(moveResponse.getPawn1());                          // moves the correct pawn
+    assertTrue(moveResponse.getMovePawn1().isEmpty()); // moves the pawn to the correct tile
+    assertNull(moveResponse.getPawn1()); // moves the correct pawn
     // THEN Gamestate is correct
     assertEquals(new PositionKey("1", 1), gameState.getPawn(pawn1).getCurrentTileId());
     assertEquals(new PositionKey("1", 0), gameState.getPawn(pawn2).getCurrentTileId());

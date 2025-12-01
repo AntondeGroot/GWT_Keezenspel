@@ -21,7 +21,10 @@ public class ApiClient {
   }
 
   public void createNewGame(JSONObject newGameRequest, ApiCallback<JSONObject> callback) {
-    post("/games", newGameRequest, response -> JSONParser.parseStrict(response).isObject(),
+    post(
+        "/games",
+        newGameRequest,
+        response -> JSONParser.parseStrict(response).isObject(),
         callback);
   }
 
@@ -39,7 +42,9 @@ public class ApiClient {
 
   // === PLAYERS ===
   public void getAllPlayersInGame(String sessionId, ApiCallback<JSONArray> callback) {
-    get("/games/" + sessionId + "/players", response -> JSONParser.parseStrict(response).isArray(),
+    get(
+        "/games/" + sessionId + "/players",
+        response -> JSONParser.parseStrict(response).isArray(),
         callback);
   }
 
@@ -48,21 +53,37 @@ public class ApiClient {
   }
 
   // === MOVES ===
-  public void makeMove(String sessionId, String playerId, JSONObject moveJson,
+  public void makeMove(
+      String sessionId,
+      String playerId,
+      JSONObject moveJson,
       ApiCallback<MoveResponseDTO> callback) {
-    post("/moves/" + sessionId + "/" + playerId, moveJson, json -> JsonUtils.<MoveResponseDTO>safeEval(json), callback);
+    post(
+        "/moves/" + sessionId + "/" + playerId,
+        moveJson,
+        json -> JsonUtils.<MoveResponseDTO>safeEval(json),
+        callback);
   }
 
-  public void checkMove(String sessionId, String playerId, JSONObject moveJson,
+  public void checkMove(
+      String sessionId,
+      String playerId,
+      JSONObject moveJson,
       ApiCallback<TestMoveResponseDTO> callback) {
-    post("/moves/" + sessionId + "/" + playerId + "/test", moveJson, json -> JsonUtils.<TestMoveResponseDTO>safeEval(json), callback);
+    post(
+        "/moves/" + sessionId + "/" + playerId + "/test",
+        moveJson,
+        json -> JsonUtils.<TestMoveResponseDTO>safeEval(json),
+        callback);
   }
 
   // === CARDS ===
   // just an array of CardDTO, use safeEval
-  public void getPlayerCards(String sessionId, String playerId,
-      ApiCallback<JsArray<CardDTO>> callback) {
-    get("/cards/" + sessionId + "/" + playerId, json -> JsonUtils.<JsArray<CardDTO>>safeEval(json),
+  public void getPlayerCards(
+      String sessionId, String playerId, ApiCallback<JsArray<CardDTO>> callback) {
+    get(
+        "/cards/" + sessionId + "/" + playerId,
+        json -> JsonUtils.<JsArray<CardDTO>>safeEval(json),
         callback);
   }
 
@@ -72,14 +93,15 @@ public class ApiClient {
 
   // === GAMESTATE ===
   public void getGameState(String sessionId, ApiCallback<JSONObject> callback) {
-    get("/gamestates/" + sessionId,
+    get(
+        "/gamestates/" + sessionId,
         response -> JSONParser.parseStrict(response).isObject(),
         callback);
   }
 
   // Overload with stateVersion query
-  public void getGameState(String sessionId, Long clientVersion,
-      ApiCallback<GameStateDTO> callback) {
+  public void getGameState(
+      String sessionId, Long clientVersion, ApiCallback<GameStateDTO> callback) {
     String path = "/gamestates/" + sessionId;
     if (clientVersion != null) {
       path += "?stateVersion=" + clientVersion;
@@ -94,8 +116,8 @@ public class ApiClient {
     sendRequest(RequestBuilder.GET, path, null, parser, callback);
   }
 
-  private <T> void post(String path, JSONObject payload, JsonParser<T> parser,
-      ApiCallback<T> callback) {
+  private <T> void post(
+      String path, JSONObject payload, JsonParser<T> parser, ApiCallback<T> callback) {
     sendRequest(RequestBuilder.POST, path, payload, parser, callback);
   }
 
@@ -103,8 +125,12 @@ public class ApiClient {
     sendRequest(RequestBuilder.DELETE, path, null, parser, callback);
   }
 
-  private <T> void sendRequest(RequestBuilder.Method method, String path, JSONObject data,
-      JsonParser<T> parser, ApiCallback<T> callback) {
+  private <T> void sendRequest(
+      RequestBuilder.Method method,
+      String path,
+      JSONObject data,
+      JsonParser<T> parser,
+      ApiCallback<T> callback) {
 
     String url = BASE_URL + path;
     RequestBuilder builder = new RequestBuilder(method, URL.encode(url));
@@ -114,50 +140,52 @@ public class ApiClient {
     }
 
     try {
-      builder.sendRequest(data == null ? null : data.toString(), new RequestCallback() {
-        @Override
-        public void onResponseReceived(Request req, Response res) {
-          int status = res.getStatusCode();
-          GWT.log("HTTP status: " + status + ", body: '" + res.getText() + "'");
-          // === NOT MODIFIED === some browsers GWT clients may consider 304 as succesful, so this would not trigger
-          // if it were placed after the 200> x <300 check
-          if (status == 304) {
-            // No body expected — directly notify the callback
-            callback.onHttpError(304, "Not Modified");
-            return;
-          }
-          // === SUCCESS ===
-          if (status >= 200 && status < 300) {
-            // 200 OK with optional body
-            String text = res.getText();
+      builder.sendRequest(
+          data == null ? null : data.toString(),
+          new RequestCallback() {
+            @Override
+            public void onResponseReceived(Request req, Response res) {
+              int status = res.getStatusCode();
+              GWT.log("HTTP status: " + status + ", body: '" + res.getText() + "'");
+              // === NOT MODIFIED === some browsers GWT clients may consider 304 as succesful, so
+              // this would not trigger
+              // if it were placed after the 200> x <300 check
+              if (status == 304) {
+                // No body expected — directly notify the callback
+                callback.onHttpError(304, "Not Modified");
+                return;
+              }
+              // === SUCCESS ===
+              if (status >= 200 && status < 300) {
+                // 200 OK with optional body
+                String text = res.getText();
 
-            GWT.log("Anton HTTP status: " + status + ", body: '" + text + "'");
+                GWT.log("Anton HTTP status: " + status + ", body: '" + text + "'");
 
-            if (text == null || text.trim().isEmpty()) {
-              // Allow 204 or empty 200 responses silently
-              callback.onHttpError(status, "Empty body (OK or No Content)");
-              return;
+                if (text == null || text.trim().isEmpty()) {
+                  // Allow 204 or empty 200 responses silently
+                  callback.onHttpError(status, "Empty body (OK or No Content)");
+                  return;
+                }
+
+                try {
+                  T parsed = parser.parse(text);
+                  callback.onSuccess(parsed);
+                } catch (Exception e) {
+                  callback.onFailure(e);
+                }
+                return;
+              }
+
+              // === OTHER ERRORS ===
+              callback.onHttpError(status, res.getStatusText());
             }
 
-            try {
-              T parsed = parser.parse(text);
-              callback.onSuccess(parsed);
-            } catch (Exception e) {
-              callback.onFailure(e);
+            @Override
+            public void onError(Request req, Throwable ex) {
+              callback.onFailure(ex);
             }
-            return;
-          }
-
-
-          // === OTHER ERRORS ===
-          callback.onHttpError(status, res.getStatusText());
-        }
-
-        @Override
-        public void onError(Request req, Throwable ex) {
-          callback.onFailure(ex);
-        }
-      });
+          });
     } catch (RequestException e) {
       callback.onFailure(e);
     }
@@ -184,4 +212,3 @@ public class ApiClient {
     }
   }
 }
-

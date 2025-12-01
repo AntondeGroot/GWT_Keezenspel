@@ -25,10 +25,9 @@ public class TestGameInitializer_RealCards {
     GameSession session = GameRegistry.getGame(sessionId);
     GameState gameState = session.getGameState();
 
-
     if (gameState.getPawns().isEmpty()) {
       for (int i = 0; i < nrPlayers; i++) {
-        Player player = new Player().id("player"+i).name("player "+i);
+        Player player = new Player().id("player" + i).name("player " + i);
         if (i == 0) {
           player.setIsPlaying(true);
         }

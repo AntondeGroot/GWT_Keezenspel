@@ -1,18 +1,17 @@
 package ADG.Games.Keezen.UnitTests;
 
-import com.adg.openapi.model.Card;
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
+import com.adg.openapi.model.Card;
+import java.util.*;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.*;
-
-import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 class CardsDeckTest {
 

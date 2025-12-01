@@ -1,20 +1,19 @@
 package ADG.Games.Keezen.IntegrationTests;
 
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(ScreenshotOnFailure.class)
 class Board_IT {

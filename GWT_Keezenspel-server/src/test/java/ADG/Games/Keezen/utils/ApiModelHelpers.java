@@ -17,15 +17,15 @@ public class ApiModelHelpers {
     return sb.toString();
   }
 
-  public static String getRandomRoomName(){
-    return "TestRoomName-"+ randomAlphaNum(8);
+  public static String getRandomRoomName() {
+    return "TestRoomName-" + randomAlphaNum(8);
   }
 
-  public static Player getRandomPlayer(){
+  public static Player getRandomPlayer() {
     return new Player()
         .id(UUID.randomUUID().toString())
-        .name("TestPlayer_"+randomAlphaNum(4))
+        .name("TestPlayer_" + randomAlphaNum(4))
         .color(randomAlphaNum(8))
-        .profilePic("url_"+randomAlphaNum(8));
+        .profilePic("url_" + randomAlphaNum(8));
   }
 }

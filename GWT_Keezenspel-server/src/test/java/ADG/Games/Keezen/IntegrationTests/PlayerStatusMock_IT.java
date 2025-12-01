@@ -17,7 +17,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
@@ -113,8 +112,8 @@ public class PlayerStatusMock_IT {
     // GIVEN game started
 
     // WHEN
-    PawnId pawnId00 = new PawnId("0", 0);
-    playerPlaysCard(driver, "0", pawnId00, 1);
+    PawnId pawnId00 = new PawnId("player0", 0);
+    playerPlaysCard(driver, "player0", pawnId00, 1);
     TestUtils.wait(400);
 
     // THEN

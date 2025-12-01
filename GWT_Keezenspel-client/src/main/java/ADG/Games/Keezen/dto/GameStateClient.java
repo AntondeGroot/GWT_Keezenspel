@@ -1,11 +1,7 @@
 package ADG.Games.Keezen.dto;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayString;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * DTO representing a GameState object returned by the Keezen Game API. Compatible with GWT overlay
@@ -16,7 +12,6 @@ public class GameStateClient {
   private ArrayList<PawnClient> pawns = new ArrayList<>();
   private String playerIdTurn;
   private ArrayList<PlayerClient> players = new ArrayList<>();
-
 
   public GameStateClient(GameStateDTO gameStateDTO) {
     playerIdTurn = gameStateDTO.getCurrentPlayerId();
@@ -38,10 +33,15 @@ public class GameStateClient {
     pawns = tempPawns;
   }
 
-  public String getCurrentPlayerId() { return this.playerIdTurn; }
+  public String getCurrentPlayerId() {
+    return this.playerIdTurn;
+  }
 
-  public ArrayList<PawnClient> getPawns() { return this.pawns; }
+  public ArrayList<PawnClient> getPawns() {
+    return this.pawns;
+  }
 
-  public ArrayList<PlayerClient> getPlayers() { return this.players; }
-
+  public ArrayList<PlayerClient> getPlayers() {
+    return this.players;
+  }
 }

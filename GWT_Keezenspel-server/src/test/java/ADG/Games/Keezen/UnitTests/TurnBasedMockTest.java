@@ -1,6 +1,5 @@
 package ADG.Games.Keezen.UnitTests;
 
-
 import static ADG.Games.Keezen.UnitTests.GameStateUtil.createGame_With_NPlayers;
 import static ADG.Games.Keezen.UnitTests.GameStateUtil.createSplitMessage;
 import static ADG.Games.Keezen.UnitTests.GameStateUtil.place4PawnsOnFinish;
@@ -12,14 +11,12 @@ import static ADG.Games.Keezen.UnitTests.GameStateUtil.stringsToList;
 import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
-import com.adg.openapi.model.Card;
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.CardsDeckMock;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
-
+import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
 import com.adg.openapi.model.MoveResult;
@@ -221,8 +218,8 @@ public class TurnBasedMockTest {
 
       // THEN
       Assert.assertEquals("playerId turn NOT last round", "2", gameState.getPlayerIdTurn());
-      Assert.assertEquals("cards remaining for player 2", 13,
-          cardsDeck.getCardsForPlayer("2").size());
+      Assert.assertEquals(
+          "cards remaining for player 2", 13, cardsDeck.getCardsForPlayer("2").size());
     }
   }
 
@@ -233,8 +230,8 @@ public class TurnBasedMockTest {
     sendValidMoveRequest(gameState, cardsDeck, "0");
 
     // send a valid move for the wrong player
-    Pawn pawn = new Pawn().playerId("0").pawnId(new PawnId("0", 0))
-        .currentTileId(new PositionKey("0", 6));
+    Pawn pawn =
+        new Pawn().playerId("0").pawnId(new PawnId("0", 0)).currentTileId(new PositionKey("0", 6));
 
     // a valid card that both players will have since they have all 13 cards
     Card card = new Card(0, 5, null);
@@ -271,7 +268,7 @@ public class TurnBasedMockTest {
     sendValidMoveRequest(gameState, cardsDeck, "1");
 
     // THEN
-    assertEquals(stringsToList(new String[]{"0", "1", "2"}), gameState.getActivePlayers());
+    assertEquals(stringsToList(new String[] {"0", "1", "2"}), gameState.getActivePlayers());
   }
 
   @Test
@@ -501,8 +498,10 @@ public class TurnBasedMockTest {
     /// GIVEN
     createGame_With_NPlayers(gameState, 3);
     // send a valid move for the wrong player
-    Pawn pawn1 = new Pawn().playerId("0").pawnId(new PawnId("0", 1)).currentTileId(new PositionKey("0", 6));
-    Pawn pawn2 = new Pawn().playerId("0").pawnId(new PawnId("0", 2)).currentTileId(new PositionKey("0", 0));
+    Pawn pawn1 =
+        new Pawn().playerId("0").pawnId(new PawnId("0", 1)).currentTileId(new PositionKey("0", 6));
+    Pawn pawn2 =
+        new Pawn().playerId("0").pawnId(new PawnId("0", 2)).currentTileId(new PositionKey("0", 0));
     placePawnOnBoard(gameState, pawn1);
     placePawnOnBoard(gameState, pawn2);
     // fake a valid card

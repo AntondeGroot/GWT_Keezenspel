@@ -18,12 +18,10 @@ import ADG.Games.Keezen.Point;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 
-@Disabled("Temporarily disabling Selenium integration tests")
 @ExtendWith(ScreenshotOnFailure.class)
 public class Jack_IT {
 
@@ -65,8 +63,8 @@ public class Jack_IT {
     Point start = getPawnLocation(driver, pawnId10);
     playerPlaysCard(driver, "player1", pawnId10, 2);
     Point end = getPawnLocation(driver, pawnId10);
-    assertPointsNotEqual("The pawn of player 1 did not move with 2 steps after coming on board",
-        start, end);
+    assertPointsNotEqual(
+        "The pawn of player 1 did not move with 2 steps after coming on board", start, end);
 
     // now player 2 can switch using a Jack
     Point positionPlayer1 = getPawnLocation(driver, pawnId10);
@@ -77,11 +75,15 @@ public class Jack_IT {
     TestUtils.wait(400);
 
     System.out.println(
-        "original position player 1 :" + positionPlayer2 + " original position player 2 :"
+        "original position player 1 :"
+            + positionPlayer2
+            + " original position player 2 :"
             + positionPlayer1);
-    assertPointsEqual("Expected player 2 to be at position 1", positionPlayer1,
+    assertPointsEqual(
+        "Expected player 2 to be at position 1",
+        positionPlayer1,
         getPawnLocation(driver, pawnId20));
-    assertPointsEqual("Expected player 1 to be at point 2", positionPlayer2,
-        getPawnLocation(driver, pawnId10));
+    assertPointsEqual(
+        "Expected player 1 to be at point 2", positionPlayer2, getPawnLocation(driver, pawnId10));
   }
 }

@@ -1,14 +1,17 @@
 package ADG.Games.Keezen.board;
 
+import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.updatePlayerProfileUI;
+import static java.lang.String.valueOf;
+
 import ADG.Games.Keezen.Cards.CardResponse;
 import ADG.Games.Keezen.Cards.CardsServiceAsync;
 import ADG.Games.Keezen.CardsDeck;
+import ADG.Games.Keezen.Move.MoveResponse;
+import ADG.Games.Keezen.Move.MovingServiceAsync;
 import ADG.Games.Keezen.PawnAndCardSelection;
 import ADG.Games.Keezen.PlayerList;
 import ADG.Games.Keezen.State.GameStateResponse;
 import ADG.Games.Keezen.State.GameStateServiceAsync;
-import ADG.Games.Keezen.Move.MoveResponse;
-import ADG.Games.Keezen.Move.MovingServiceAsync;
 import ADG.Games.Keezen.TileId;
 import ADG.Games.Keezen.animations.*;
 import ADG.Games.Keezen.dto.CardClient;
@@ -26,11 +29,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-
 import java.util.ArrayList;
-
-import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.updatePlayerProfileUI;
-import static java.lang.String.valueOf;
 
 public class GameBoardPresenter {
 
@@ -52,8 +51,11 @@ public class GameBoardPresenter {
 
   private MoveResponse storedMoveResponse = new MoveResponse();
 
-  public GameBoardPresenter(GameBoardView gameBoardView, GameStateServiceAsync gameStateService,
-      CardsServiceAsync cardsService, MovingServiceAsync movingService,
+  public GameBoardPresenter(
+      GameBoardView gameBoardView,
+      GameStateServiceAsync gameStateService,
+      CardsServiceAsync cardsService,
+      MovingServiceAsync movingService,
       PollingService pollingService) {
     this.view = gameBoardView;
     this.gameStateService = gameStateService;
@@ -80,125 +82,145 @@ public class GameBoardPresenter {
   }
 
   private void bindEventHandlers() {
-    view.getSendButton().addDomHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        GWT.log("pawn 1: "+pawnAndCardSelection.getPawn1());
-        MoveRequestJsonBuilder builder = new MoveRequestJsonBuilder()
-            .withPlayerId(Cookie.getPlayerId())
-            .withCardId(pawnAndCardSelection.getCard())
-            .withPawn1(pawnAndCardSelection.getPawn1())
-            .withPawn2(pawnAndCardSelection.getPawn2())
-            .withStepsPawn1(pawnAndCardSelection.getNrStepsPawn1())
-            .withStepsPawn2(pawnAndCardSelection.getNrStepsPawn2())
-            .withTempMessageType("MAKE_MOVE");
-
-        GWT.log("pawn 1: " + pawnAndCardSelection.getPawn1());
-        apiClient.makeMove(Cookie.getSessionID(), Cookie.getPlayerId(), builder.build(),
-            new ApiCallback<MoveResponseDTO>() {
+    view.getSendButton()
+        .addDomHandler(
+            new ClickHandler() {
               @Override
-              public void onSuccess(MoveResponseDTO result) {
-                //todo: improve animation
-                GWT.log("make move successful");
-                view.animatePawns(result);
-//                AnimationSequence.movePawn(result.getPawn1(), result.getMovePawn1(), true);
-//                AnimationSequence.movePawn(result.getPawn2(), result.getMovePawn2(), true);
-              }
+              public void onClick(ClickEvent event) {
+                GWT.log("pawn 1: " + pawnAndCardSelection.getPawn1());
+                MoveRequestJsonBuilder builder =
+                    new MoveRequestJsonBuilder()
+                        .withPlayerId(Cookie.getPlayerId())
+                        .withCardId(pawnAndCardSelection.getCard())
+                        .withPawn1(pawnAndCardSelection.getPawn1())
+                        .withPawn2(pawnAndCardSelection.getPawn2())
+                        .withStepsPawn1(pawnAndCardSelection.getNrStepsPawn1())
+                        .withStepsPawn2(pawnAndCardSelection.getNrStepsPawn2())
+                        .withTempMessageType("MAKE_MOVE");
 
+                GWT.log("pawn 1: " + pawnAndCardSelection.getPawn1());
+                apiClient.makeMove(
+                    Cookie.getSessionID(),
+                    Cookie.getPlayerId(),
+                    builder.build(),
+                    new ApiCallback<MoveResponseDTO>() {
+                      @Override
+                      public void onSuccess(MoveResponseDTO result) {
+                        // todo: improve animation
+                        GWT.log("make move successful");
+                        view.animatePawns(result);
+                        //                AnimationSequence.movePawn(result.getPawn1(),
+                        // result.getMovePawn1(), true);
+                        //                AnimationSequence.movePawn(result.getPawn2(),
+                        // result.getMovePawn2(), true);
+                      }
+
+                      @Override
+                      public void onHttpError(int statusCode, String statusText) {
+                        GWT.log("make move HTTP error" + statusCode + ":" + statusText);
+                        StepsAnimation.resetStepsAnimation();
+                      }
+
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        GWT.log("make move Failure" + caught.getMessage());
+                        StepsAnimation.resetStepsAnimation();
+                      }
+                    });
+                GWT.log("testmove: " + builder.build());
+              }
+            },
+            ClickEvent.getType());
+
+    view.getForfeitButton()
+        .addDomHandler(
+            new ClickHandler() {
               @Override
-              public void onHttpError(int statusCode, String statusText) {
-                GWT.log("make move HTTP error"+statusCode+":"+statusText);
-                StepsAnimation.resetStepsAnimation();
+              public void onClick(ClickEvent event) {
+                pawnAndCardSelection.reset();
+                apiClient.playerForfeits(
+                    Cookie.getSessionID(),
+                    Cookie.getPlayerId(),
+                    new ApiCallback<Void>() {
+                      @Override
+                      public void onSuccess(Void result) {}
+
+                      @Override
+                      public void onFailure(Throwable caught) {}
+                    });
               }
+            },
+            ClickEvent.getType());
 
-              @Override
-              public void onFailure(Throwable caught) {
-                GWT.log("make move Failure"+caught.getMessage());
-                StepsAnimation.resetStepsAnimation();
-              }
-            });
-        GWT.log("testmove: "+builder.build());
-      }
-    }, ClickEvent.getType());
+    view.stepsPawn1.addChangeHandler(
+        event -> {
+          // validate entry
+          pawnAndCardSelection.setNrStepsPawn1ForSplit(view.stepsPawn1.getValue());
+          // split entry over the 2 text boxes
+          view.stepsPawn1.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn1()));
+          view.stepsPawn2.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn2()));
 
-    view.getForfeitButton().addDomHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        pawnAndCardSelection.reset();
-        apiClient.playerForfeits(Cookie.getSessionID(), Cookie.getPlayerId(), new ApiCallback<Void>() {
-          @Override
-          public void onSuccess(Void result) {
-          }
+          GWT.log("pawn 1: " + pawnAndCardSelection.getPawn1());
+          MoveRequestJsonBuilder builder =
+              new MoveRequestJsonBuilder()
+                  .withPlayerId(Cookie.getPlayerId())
+                  .withCardId(pawnAndCardSelection.getCard())
+                  .withPawn1(pawnAndCardSelection.getPawn1())
+                  .withPawn2(pawnAndCardSelection.getPawn2())
+                  .withStepsPawn1(pawnAndCardSelection.getNrStepsPawn1())
+                  .withStepsPawn2(pawnAndCardSelection.getNrStepsPawn2())
+                  .withTempMessageType("CHECK_MOVE");
 
-          @Override
-          public void onFailure(Throwable caught) {
-          }
+          GWT.log("testmove anton: " + builder.build());
+
+          apiClient.checkMove(
+              Cookie.getSessionID(),
+              Cookie.getPlayerId(),
+              builder.build(),
+              new ApiCallback<TestMoveResponseDTO>() {
+                @Override
+                public void onSuccess(TestMoveResponseDTO result) {
+                  ArrayList<TileId> tiles = new ArrayList<>();
+                  GWT.log("testmove was successful presenter YYYYYY" + result.toString());
+                  for (int i = 0; i < result.getTiles().length(); i++) {
+                    tiles.add(
+                        new TileId(
+                            result.getTiles().get(i).getPlayerId(),
+                            result.getTiles().get(i).getTileNr()));
+                  }
+                  GWT.log("tiles = " + tiles);
+                  StepsAnimation.updateStepsAnimation(tiles);
+                }
+
+                @Override
+                public void onHttpError(int statusCode, String statusText) {}
+
+                @Override
+                public void onFailure(Throwable caught) {}
+              });
         });
-      }
-    }, ClickEvent.getType());
-
-    view.stepsPawn1.addChangeHandler(event -> {
-      // validate entry
-      pawnAndCardSelection.setNrStepsPawn1ForSplit(view.stepsPawn1.getValue());
-      // split entry over the 2 text boxes
-      view.stepsPawn1.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn1()));
-      view.stepsPawn2.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn2()));
-
-      GWT.log("pawn 1: "+pawnAndCardSelection.getPawn1());
-      MoveRequestJsonBuilder builder = new MoveRequestJsonBuilder()
-          .withPlayerId(Cookie.getPlayerId())
-          .withCardId(pawnAndCardSelection.getCard())
-          .withPawn1(pawnAndCardSelection.getPawn1())
-          .withPawn2(pawnAndCardSelection.getPawn2())
-          .withStepsPawn1(pawnAndCardSelection.getNrStepsPawn1())
-          .withStepsPawn2(pawnAndCardSelection.getNrStepsPawn2())
-          .withTempMessageType("CHECK_MOVE");
-
-      GWT.log("testmove anton: "+builder.build());
-
-      apiClient.checkMove(Cookie.getSessionID(), Cookie.getPlayerId(), builder.build(), new ApiCallback<TestMoveResponseDTO>() {
-        @Override
-        public void onSuccess(TestMoveResponseDTO result) {
-          ArrayList<TileId> tiles = new ArrayList<>();
-          GWT.log("testmove was successful presenter YYYYYY" + result.toString());
-          for (int i = 0; i < result.getTiles().length(); i++) {
-            tiles.add(
-                new TileId(
-                    result.getTiles().get(i).getPlayerId(),
-                    result.getTiles().get(i).getTileNr()));
-          }
-          GWT.log("tiles = " + tiles);
-          StepsAnimation.updateStepsAnimation(tiles);
-        }
-
-        @Override
-        public void onHttpError(int statusCode, String statusText) {
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-        }
-      });
-    });
   }
 
   private void pollServerForUpdates() {
 
-    apiClient.getGameState(Cookie.getSessionID(), gameStateVersion,
+    apiClient.getGameState(
+        Cookie.getSessionID(),
+        gameStateVersion,
         new ApiClient.ApiCallback<GameStateDTO>() {
           @Override
           public void onSuccess(GameStateDTO response) {
             GWT.log("Game State Response: " + response.getVersion());
-            // first save the gameStateVersion if something were to crash it won't ask for a state it doesn't need
+            // first save the gameStateVersion if something were to crash it won't ask for a state
+            // it doesn't need
             gameStateVersion = (long) response.getVersion();
 
             // convert DTO objects to 'real' objects
             GameStateClient gameStateClient = new GameStateClient(response);
 
             updateGameState(gameStateClient);
-//            pollServerForGameState();
+            //            pollServerForGameState();
             pollServerForCards();
-//            pollServerForMove();
+            //            pollServerForMove();
           }
 
           @Override
@@ -220,9 +242,7 @@ public class GameBoardPresenter {
           }
 
           @Override
-          public void onFailure(Throwable caught) {
-
-          }
+          public void onFailure(Throwable caught) {}
         });
   }
 
@@ -244,34 +264,33 @@ public class GameBoardPresenter {
     // only set the board when empty, e.g.
     // when the browser was refreshed or when you join the game for the first time
     view.enableButtons(currentPlayerIsPlaying(gameState));
-
-
   }
 
   private void pollServerForGameState() {
-//    gameStateService.getGameState(Cookie.getSessionID(), new AsyncCallback<GameStateResponse>() {
-//      public void onFailure(Throwable caught) {
-//        StepsAnimation.resetStepsAnimation();
+    //    gameStateService.getGameState(Cookie.getSessionID(), new
+    // AsyncCallback<GameStateResponse>() {
+    //      public void onFailure(Throwable caught) {
+    //        StepsAnimation.resetStepsAnimation();
   }
 
   public void onSuccess(GameStateResponse result) {
-//        if (!Board.isInitialized()) {
-//          initializeBoardState(result);
-//          AnimationSpeed.setSpeed(result.getAnimationSpeed());
-//        }
-//
-//        if (!gameStateResponseUpdate.equals(result)) {
-//          GWT.log(result.toString());
-//          gameStateResponseUpdate = result;
-//          Board.setPawns(result.getPawns());
-//          pawnAndCardSelection.updatePawns(result.getPawns());
-//        }
-//        // only set the board when empty, e.g.
-//        // when the browser was refreshed or when you join the game for the first time
-//        updatePlayerList(result);
-//        view.enableButtons(currentPlayerIsPlaying(result));
-//      }
-//    });
+    //        if (!Board.isInitialized()) {
+    //          initializeBoardState(result);
+    //          AnimationSpeed.setSpeed(result.getAnimationSpeed());
+    //        }
+    //
+    //        if (!gameStateResponseUpdate.equals(result)) {
+    //          GWT.log(result.toString());
+    //          gameStateResponseUpdate = result;
+    //          Board.setPawns(result.getPawns());
+    //          pawnAndCardSelection.updatePawns(result.getPawns());
+    //        }
+    //        // only set the board when empty, e.g.
+    //        // when the browser was refreshed or when you join the game for the first time
+    //        updatePlayerList(result);
+    //        view.enableButtons(currentPlayerIsPlaying(result));
+    //      }
+    //    });
   }
 
   private void initializeBoardState(GameStateClient result) {
@@ -283,59 +302,61 @@ public class GameBoardPresenter {
     GWT.log("draw board");
     view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
     view.createPawns(result.getPawns(), pawnAndCardSelection);
-//    view.animatePawns();
+    //    view.animatePawns();
   }
 
   private void updatePlayerList(GameStateClient result) {
     updatePlayerProfileUI(result.getPlayers());
-//    if (!playerList.isIsUpToDate()) {
-//      gameStateService.getPlayers(Cookie.getSessionID(), new AsyncCallback<ArrayList<Player>>() {
-//        @Override
-//        public void onFailure(Throwable throwable) {
-//        }
-//
-//        @Override
-//        public void onSuccess(ArrayList<Player> players) {
-//          updatePlayerProfileUI(players);
-//        }
-//      });
-//    }
+    //    if (!playerList.isIsUpToDate()) {
+    //      gameStateService.getPlayers(Cookie.getSessionID(), new
+    // AsyncCallback<ArrayList<Player>>() {
+    //        @Override
+    //        public void onFailure(Throwable throwable) {
+    //        }
+    //
+    //        @Override
+    //        public void onSuccess(ArrayList<Player> players) {
+    //          updatePlayerProfileUI(players);
+    //        }
+    //      });
+    //    }
   }
 
   private void initializeGame() {
-//    gameStateService.startGame(Cookie.getSessionID(), new AsyncCallback<Void>() {
-//      @Override
-//      public void onFailure(Throwable throwable) {
-//        GWT.log("Game is already running");
-//        try {
-//          fetchAndInitializePlayers();
-//        } catch (Exception ignored) {
-//        }
-//      }
-//
-//      @Override
-//      public void onSuccess(Void o) {
-//        fetchAndInitializePlayers();
-//      }
-//    });
+    //    gameStateService.startGame(Cookie.getSessionID(), new AsyncCallback<Void>() {
+    //      @Override
+    //      public void onFailure(Throwable throwable) {
+    //        GWT.log("Game is already running");
+    //        try {
+    //          fetchAndInitializePlayers();
+    //        } catch (Exception ignored) {
+    //        }
+    //      }
+    //
+    //      @Override
+    //      public void onSuccess(Void o) {
+    //        fetchAndInitializePlayers();
+    //      }
+    //    });
   }
 
   private void fetchAndInitializePlayers() {
-//    gameStateService.getPlayers(Cookie.getSessionID(), new AsyncCallback<ArrayList<Player>>() {
-//      @Override
-//      public void onFailure(Throwable throwable) {
-//      }
-//
-//      @Override
-//      public void onSuccess(ArrayList<Player> players) {
-//        GWT.log("players = " + players);
-//        view.createPlayerList(players);
-//        boardModel = new Board();
-//        GWT.log("gameStateService getPlayers board.create");
-//
-//        boardModel.createBoard(players, BOARD_SIZE);
-//      }
-//    });
+    //    gameStateService.getPlayers(Cookie.getSessionID(), new AsyncCallback<ArrayList<Player>>()
+    // {
+    //      @Override
+    //      public void onFailure(Throwable throwable) {
+    //      }
+    //
+    //      @Override
+    //      public void onSuccess(ArrayList<Player> players) {
+    //        GWT.log("players = " + players);
+    //        view.createPlayerList(players);
+    //        boardModel = new Board();
+    //        GWT.log("gameStateService getPlayers board.create");
+    //
+    //        boardModel.createBoard(players, BOARD_SIZE);
+    //      }
+    //    });
   }
 
   private void pollServerForCards() {
@@ -353,7 +374,7 @@ public class GameBoardPresenter {
         new ApiClient.ApiCallback<JsArray<CardDTO>>() {
           @Override
           public void onSuccess(JsArray<CardDTO> cards) {
-            ArrayList<CardClient> clientCards = new ArrayList();
+            ArrayList<CardClient> clientCards = new ArrayList<>();
             for (int i = 0; i < cards.length(); i++) {
               clientCards.add(new CardClient(cards.get(i)));
             }
@@ -373,16 +394,16 @@ public class GameBoardPresenter {
         });
   }
 
-//  public void draw() {
-//
-//    if (pawnAndCardSelection.getDrawCards()) {
-//      view.drawCards(
-//          cardsDeck,
-//          pawnAndCardSelection);
-//      pawnAndCardSelection.setCardsAreDrawn();
-//    }
-//    view.animatePawns();
-//  }
+  //  public void draw() {
+  //
+  //    if (pawnAndCardSelection.getDrawCards()) {
+  //      view.drawCards(
+  //          cardsDeck,
+  //          pawnAndCardSelection);
+  //      pawnAndCardSelection.setCardsAreDrawn();
+  //    }
+  //    view.animatePawns();
+  //  }
 
   private boolean currentPlayerIsPlaying(GameStateClient result) {
     return result.getCurrentPlayerId().equals(Cookie.getPlayerId());

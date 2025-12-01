@@ -4,17 +4,14 @@ import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameRegistry;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
-import ADG.Games.Keezen.Move.MoveMessage;
-import ADG.Games.Keezen.Move.MoveType;
 import com.adg.openapi.api.CardsApiDelegate;
 import com.adg.openapi.model.Card;
 import com.adg.openapi.model.CardResponse;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CardsApiDelegateImpl implements CardsApiDelegate {
@@ -44,8 +41,7 @@ public class CardsApiDelegateImpl implements CardsApiDelegate {
   }
 
   @Override
-  public ResponseEntity<Void> playerForfeits(String sessionId,
-      String playerId) {
+  public ResponseEntity<Void> playerForfeits(String sessionId, String playerId) {
 
     GameSession session = GameRegistry.getGame(sessionId);
     if (session == null) {
@@ -54,7 +50,7 @@ public class CardsApiDelegateImpl implements CardsApiDelegate {
 
     GameState gameState = session.getGameState();
 
-    if(gameState.hasStarted() && gameState.getPlayerIdTurn().equals(playerId)) {
+    if (gameState.hasStarted() && gameState.getPlayerIdTurn().equals(playerId)) {
       gameState.processOnForfeit(playerId);
       return ResponseEntity.status(HttpStatus.OK).body(null);
     }
@@ -88,14 +84,12 @@ public class CardsApiDelegateImpl implements CardsApiDelegate {
     var nrOfCardsPerPlayer = cardsDeck.getNrOfCardsPerPlayer(); // Map<String, Integer>
 
     // 6️⃣ Construct response DTO
-    CardResponse response = new CardResponse()
-//        .playedCards(playedCards)
-        .nrOfCardsPerPlayer(nrOfCardsPerPlayer);
+    CardResponse response =
+        new CardResponse()
+            //        .playedCards(playedCards)
+            .nrOfCardsPerPlayer(nrOfCardsPerPlayer);
 
     // 7️⃣ Return 200 OK
-    return ResponseEntity
-        .ok()
-        .contentType(MediaType.APPLICATION_JSON)
-        .body(response);
+    return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response);
   }
 }

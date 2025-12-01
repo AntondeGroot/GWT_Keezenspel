@@ -16,5 +16,4 @@ public class Player {
     // the medal should be awarded to the player
     assertEquals("Medal" + finishingPlace, medalForPlayer.get(0).getAttribute("class"));
   }
-
 }

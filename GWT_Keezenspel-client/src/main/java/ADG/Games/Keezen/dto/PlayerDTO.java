@@ -3,8 +3,8 @@ package ADG.Games.Keezen.dto;
 import com.google.gwt.core.client.JavaScriptObject;
 
 /**
- * DTO representing a Player object returned by the Keezen Game API.
- * Compatible with GWT overlay types for JSON parsing via JsonUtils.safeEval().
+ * DTO representing a Player object returned by the Keezen Game API. Compatible with GWT overlay
+ * types for JSON parsing via JsonUtils.safeEval().
  */
 public class PlayerDTO extends JavaScriptObject {
 
@@ -32,6 +32,9 @@ public class PlayerDTO extends JavaScriptObject {
   /** The player's finishing place (1 = first, 2 = second, etc., -1 if not yet finished). */
   public final native int getPlace() /*-{ return this.place == null ? -1 : this.place; }-*/;
 
-  /** The player's numerical value (from 0 til 8 makes it easier to discern who is then ext player). */
-  public final native int getPlayerInt() /*-{ return this.playerInt == null ? -1 : this.playerInt; }-*/;
+  /**
+   * The player's numerical value (from 0 til 8 makes it easier to discern who is then ext player).
+   */
+  public final native int
+      getPlayerInt() /*-{ return this.playerInt == null ? -1 : this.playerInt; }-*/;
 }

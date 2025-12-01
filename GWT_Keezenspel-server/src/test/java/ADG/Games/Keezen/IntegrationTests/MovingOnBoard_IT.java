@@ -5,8 +5,8 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerSwitchesPawns;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.assertPointsEqual;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.assertPointsNotEqual;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickCardByValue;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPlayCardButton;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPawn;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPlayCardButton;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getPawnLocation;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
@@ -21,13 +21,11 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 
-@Disabled("Temporarily disabling Selenium integration tests")
 @ExtendWith(ScreenshotOnFailure.class)
 public class MovingOnBoard_IT {
 
@@ -150,10 +148,10 @@ public class MovingOnBoard_IT {
     playerSwitchesPawns(driver, "2", pawnId20, pawnId10);
 
     // THEN THE PAWNS SWITCHED PLACE
-    assertPointsEqual("Pawn 2 did not move to pawn 1", positionPawn10,
-        getPawnLocation(driver, pawnId20));
-    assertPointsEqual("Pawn 1 did not move to pawn 2", positionPawn20,
-        getPawnLocation(driver, pawnId10));
+    assertPointsEqual(
+        "Pawn 2 did not move to pawn 1", positionPawn10, getPawnLocation(driver, pawnId20));
+    assertPointsEqual(
+        "Pawn 1 did not move to pawn 2", positionPawn20, getPawnLocation(driver, pawnId10));
   }
 
   /***
@@ -161,7 +159,5 @@ public class MovingOnBoard_IT {
    * A pawn on a nest tile cannot split
    */
   @Test
-  public void pawnOnboardCanImmediatelyPlay7() {
-  }
-
+  public void pawnOnboardCanImmediatelyPlay7() {}
 }

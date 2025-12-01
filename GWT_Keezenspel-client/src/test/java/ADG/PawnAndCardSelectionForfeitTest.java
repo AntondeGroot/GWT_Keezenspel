@@ -12,16 +12,17 @@ public class PawnAndCardSelectionForfeitTest {
   private PawnAndCardSelection pawnAndCardSelection;
 
   @BeforeEach
-  void setup(){
+  void setup() {
     pawnAndCardSelection = new PawnAndCardSelection();
     pawnAndCardSelection.disableUIForTests();
   }
 
   @Test
-  public void ClickForfeit_OtherPlayerClicksPlay_DoesNotForfeitAsWell(){
-    /** this is for testing purposes only, where we test using 1 browser.
-     *  Where one player forfeits and another player accidentally
-     *  clicks on the play button, and then accidentally forfeits as well.
+  public void ClickForfeit_OtherPlayerClicksPlay_DoesNotForfeitAsWell() {
+    /**
+     * this is for testing purposes only, where we test using 1 browser. Where one player forfeits
+     * and another player accidentally clicks on the play button, and then accidentally forfeits as
+     * well.
      */
 
     // WHEN player one forfeits

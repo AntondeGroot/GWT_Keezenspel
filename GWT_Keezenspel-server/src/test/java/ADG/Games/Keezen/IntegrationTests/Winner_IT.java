@@ -10,11 +10,10 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAr
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 
@@ -43,42 +42,42 @@ public class Winner_IT {
   public void letPlayer2WinsAndGetsFirstPrize() throws InterruptedException {
     // GIVEN player 0 forfeits
     waitUntilCardsAreLoaded(driver);
-    playerForfeits(driver, "0");
+    playerForfeits(driver, "player0");
 
     // GIVEN player 1 forfeits
-    playerForfeits(driver, "1");
+    playerForfeits(driver, "player1");
 
     // WHEN player 2 plays all cards until he wins
-    whenPlayerWins(driver, "2");
+    whenPlayerWins(driver, "player2");
 
     // THEN player 2 got the first prize medal
-    assertPlayerHasMedal(driver, "2", 1);
+    assertPlayerHasMedal(driver, "player2", 1);
   }
 
   @Test
   public void letPlayer2Win_ThenPlayer0_ThenPlayer1() throws InterruptedException {
     // GIVEN player 0 forfeits
     waitUntilCardsAreLoaded(driver);
-    playerForfeits(driver, "0");
+    playerForfeits(driver, "player0");
 
     // GIVEN player 1 forfeits
-    playerForfeits(driver, "1");
+    playerForfeits(driver, "player1");
 
     // WHEN player 2 plays all cards until he wins
-    whenPlayerWins(driver, "2");
-    playerForfeits(driver, "2");
+    whenPlayerWins(driver, "player2");
+    playerForfeits(driver, "player2");
 
     // When
-    playerForfeits(driver, "1");
+    playerForfeits(driver, "player1");
 
     // WHEN player 0 plays until he wins
-    whenPlayerWins(driver, "0");
-    playerForfeits(driver, "0");
+    whenPlayerWins(driver, "player0");
+    playerForfeits(driver, "player0");
 
-    assertPlayerHasMedal(driver, "0", 2);
+    assertPlayerHasMedal(driver, "player0", 2);
 
-    whenPlayerWins(driver, "1");
+    whenPlayerWins(driver, "player1");
     TestUtils.wait(500);
-    assertPlayerHasMedal(driver, "1", 3);
+    assertPlayerHasMedal(driver, "player1", 3);
   }
 }

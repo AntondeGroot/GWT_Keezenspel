@@ -22,7 +22,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-
 /***
  *  WARNING
  *  Changes to this file may severely impact performance for the Selenium tests.
@@ -32,7 +31,7 @@ public class TestUtils {
 
   public static WebDriver getDriver() {
     ChromeOptions options = new ChromeOptions();
-//    options.addArguments("--headless=new");
+    options.addArguments("--headless=new");
     options.addArguments("--no-sandbox");
     options.addArguments("--disable-dev-shm-usage");
     options.addArguments("--window-size=1920,1080");
@@ -51,14 +50,15 @@ public class TestUtils {
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
 
     try {
-      wait.until(driver1 -> {
-        try {
-          return driver1.findElements(By.className("cardDiv"))
-              .stream().anyMatch(WebElement::isDisplayed);
-        } catch (StaleElementReferenceException e) {
-          return false;
-        }
-      });
+      wait.until(
+          driver1 -> {
+            try {
+              return driver1.findElements(By.className("cardDiv")).stream()
+                  .anyMatch(WebElement::isDisplayed);
+            } catch (StaleElementReferenceException e) {
+              return false;
+            }
+          });
     } catch (WebDriverException timeoutException) {
       Log.info("⚠️ Timeout waiting for game elements — continuing without failure.");
       // Optionally: set a flag or take fallback action
@@ -68,6 +68,7 @@ public class TestUtils {
   public static void setPlayerIdPlaying(WebDriver driver, String playerId) {
     Cookie playerCookie = new Cookie("playerid", playerId);
     driver.manage().addCookie(playerCookie);
+    driver.navigate().refresh();
     wait(200);
   }
 
@@ -81,15 +82,16 @@ public class TestUtils {
   public static void waitUntilDOMElementUpdates(WebDriver driver, String className) {
     // Re-fetch the element after DOM changed
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
-    wait.until(driverTemp -> {
-      try {
-        WebElement updatedCard = driverTemp.findElement(By.className(className));
-        updatedCard.getAttribute("id");
-        return true;
-      } catch (StaleElementReferenceException e) {
-        return false;
-      }
-    });
+    wait.until(
+        driverTemp -> {
+          try {
+            WebElement updatedCard = driverTemp.findElement(By.className(className));
+            updatedCard.getAttribute("id");
+            return true;
+          } catch (StaleElementReferenceException e) {
+            return false;
+          }
+        });
   }
 
   public static WebElement findCardByIndex(WebDriver driver, String className, int index) {
@@ -98,7 +100,7 @@ public class TestUtils {
   }
 
   public static void clickCardByValue(WebDriver driver, int cardValue) {
-    WebElement card = driver.findElement(By.id(new Card(100, cardValue).toString()));
+    WebElement card = driver.findElement(By.id(new Card(0, cardValue).toString()));
     String initialBorder = card.getCssValue("border-color");
 
     Log.info("border: " + initialBorder);
@@ -157,8 +159,8 @@ public class TestUtils {
 
   public static void clickPlayCardButton(WebDriver driver) {
     WebElement sendButton = driver.findElement(By.className("sendButton"));
-    assertTrue("⚠️ sendButton is not enabled: it was not the player's turn",
-        sendButton.isEnabled());
+    assertTrue(
+        "⚠️ sendButton is not enabled: it was not the player's turn", sendButton.isEnabled());
     sendButton.click();
   }
 
@@ -166,23 +168,24 @@ public class TestUtils {
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
     WebElement pawn = driver.findElement(By.id(pawnId.toString()));
 
-    wait.until(driver1 -> {
-      org.openqa.selenium.Point oldPosition = pawn.getLocation();
-      try {
-        Thread.sleep(100); // Wait a bit to allow animation to progress
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
+    wait.until(
+        driver1 -> {
+          org.openqa.selenium.Point oldPosition = pawn.getLocation();
+          try {
+            Thread.sleep(100); // Wait a bit to allow animation to progress
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
 
-      org.openqa.selenium.Point newPosition = pawn.getLocation();
+          org.openqa.selenium.Point newPosition = pawn.getLocation();
 
-      // Check if position has stabilized
-      if (oldPosition.equals(newPosition)) {
-        return true;
-      } else {
-        return null; // keep waiting
-      }
-    });
+          // Check if position has stabilized
+          if (oldPosition.equals(newPosition)) {
+            return true;
+          } else {
+            return null; // keep waiting
+          }
+        });
   }
 
   public static void playerForfeits(WebDriver driver, String playerId) {
@@ -192,8 +195,8 @@ public class TestUtils {
 
   public static void clickForfeitButton(WebDriver driver) {
     WebElement forfeitButton = driver.findElement(By.className("forfeitButton"));
-    assertTrue("⚠️ forfeitButton is not enabled: it was not the player's turn",
-        forfeitButton.isEnabled());
+    assertTrue(
+        "⚠️ forfeitButton is not enabled: it was not the player's turn", forfeitButton.isEnabled());
     assertTrue("forfeitButton is not visible: ", forfeitButton.isDisplayed());
     forfeitButton.click();
 
@@ -201,13 +204,14 @@ public class TestUtils {
 
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
     try {
-      wait.until(driver1 -> {
-        try {
-          return !driver1.findElement(By.className("forfeitButton")).isEnabled();
-        } catch (StaleElementReferenceException e) {
-          return false;
-        }
-      });
+      wait.until(
+          driver1 -> {
+            try {
+              return !driver1.findElement(By.className("forfeitButton")).isEnabled();
+            } catch (StaleElementReferenceException e) {
+              return false;
+            }
+          });
     } catch (WebDriverException timeoutException) {
       System.out.println("⚠️ Timeout waiting for game elements — continuing without failure.");
       // Optionally: set a flag or take fallback action
@@ -215,11 +219,10 @@ public class TestUtils {
   }
 
   /**
-   * <p>This method has to be called using TestUtils.wait()
-   * DO NOT USE only the method call wait()</p>
+   * This method has to be called using TestUtils.wait() DO NOT USE only the method call wait()
    *
-   * <p>TestUtils.wait() will execute it in the thread the test is running in
-   * wait() creates a separate thread and will then not actually wait</p>
+   * <p>TestUtils.wait() will execute it in the thread the test is running in wait() creates a
+   * separate thread and will then not actually wait
    *
    * @param millis
    */

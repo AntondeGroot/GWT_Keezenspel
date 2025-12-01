@@ -1,7 +1,7 @@
 package ADG.Games.Keezen;
 
-import com.adg.openapi.model.Player;
 import com.adg.openapi.model.Card;
+import com.adg.openapi.model.Player;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -25,7 +25,7 @@ public interface CardsDeckInterface {
 
   void dealCards();
 
-  boolean playerHasCard(String playerId, Card card );
+  boolean playerHasCard(String playerId, Card card);
 
   void reset();
 

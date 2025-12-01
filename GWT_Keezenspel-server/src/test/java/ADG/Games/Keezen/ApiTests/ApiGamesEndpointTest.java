@@ -27,9 +27,13 @@ class ApiGamesEndpointTest {
     var allGames = apiHelper.getAllGames();
 
     // THEN
-    boolean found = allGames.stream().anyMatch(
-        game -> roomName.equals(game.get("roomName")) && sessionId.equals(game.get("id"))
-            && WAITING.getValue().equals(game.get("status")));
+    boolean found =
+        allGames.stream()
+            .anyMatch(
+                game ->
+                    roomName.equals(game.get("roomName"))
+                        && sessionId.equals(game.get("id"))
+                        && WAITING.getValue().equals(game.get("status")));
 
     assertTrue(found, "Newly created game should appear in /games list with status 'waiting'");
 
@@ -53,12 +57,15 @@ class ApiGamesEndpointTest {
     apiHelper.addPlayerToGame(sessionId, player3);
 
     // THEN expect 409 Conflict on the 4th player
-    HttpClientErrorException ex = assertThrows(HttpClientErrorException.Conflict.class, () -> {
-      apiHelper.addPlayerToGame(sessionId, player4);
-    });
+    HttpClientErrorException ex =
+        assertThrows(
+            HttpClientErrorException.Conflict.class,
+            () -> {
+              apiHelper.addPlayerToGame(sessionId, player4);
+            });
 
-    assertEquals(409, ex.getStatusCode().value(),
-        "Expected HTTP 409 Conflict when adding 4th player");
+    assertEquals(
+        409, ex.getStatusCode().value(), "Expected HTTP 409 Conflict when adding 4th player");
 
     // cleanup
     apiHelper.stopGame(sessionId);
@@ -79,11 +86,16 @@ class ApiGamesEndpointTest {
     apiHelper.startGame(sessionId);
 
     // THEN expect 409 Conflict when you try to add a new player
-    HttpClientErrorException ex = assertThrows(HttpClientErrorException.Conflict.class, () -> {
-      apiHelper.addPlayerToGame(sessionId, player3);
-    });
+    HttpClientErrorException ex =
+        assertThrows(
+            HttpClientErrorException.Conflict.class,
+            () -> {
+              apiHelper.addPlayerToGame(sessionId, player3);
+            });
 
-    assertEquals(409, ex.getStatusCode().value(),
+    assertEquals(
+        409,
+        ex.getStatusCode().value(),
         "Expected HTTP 409 Conflict when adding player to a started game");
 
     // cleanup
@@ -109,14 +121,17 @@ class ApiGamesEndpointTest {
 
     // THEN
     var allGames = apiHelper.getAllGames();
-    boolean found = allGames.stream().anyMatch(
-        game -> roomName.equals(game.get("roomName")) && id.equals(game.get("id"))
-            && IN_PROGRESS.getValue().equals(game.get("status")));
+    boolean found =
+        allGames.stream()
+            .anyMatch(
+                game ->
+                    roomName.equals(game.get("roomName"))
+                        && id.equals(game.get("id"))
+                        && IN_PROGRESS.getValue().equals(game.get("status")));
 
     assertTrue(found, "Newly created game should appear in /games list with status 'IN_PROGRESS'");
 
     // cleanup
     apiHelper.stopGame(id);
   }
-
 }

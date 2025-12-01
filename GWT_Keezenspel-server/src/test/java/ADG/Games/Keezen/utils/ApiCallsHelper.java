@@ -2,12 +2,11 @@ package ADG.Games.Keezen.utils;
 
 import com.adg.openapi.model.NewGameRequest;
 import com.adg.openapi.model.Player;
+import java.util.List;
+import java.util.Map;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.List;
-import java.util.Map;
 
 public class ApiCallsHelper {
 
@@ -21,8 +20,7 @@ public class ApiCallsHelper {
   // ---------- GAMES ----------
   public List<Map<String, Object>> getAllGames() {
     String url = baseUrl + "/games";
-    ResponseEntity<List> response = restTemplate.exchange(
-        url, HttpMethod.GET, null, List.class);
+    ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, null, List.class);
     return response.getBody();
   }
 
@@ -44,6 +42,7 @@ public class ApiCallsHelper {
     // Return the response body as a Map (can be replaced by a custom class)
     return response.getBody().get("sessionId").toString();
   }
+
   public void startGame(String sessionId) {
     restTemplate.postForEntity(baseUrl + "/games/" + sessionId + "/", null, Void.class);
   }
@@ -54,8 +53,10 @@ public class ApiCallsHelper {
 
   // ---------- PLAYERS ----------
   public List<Map<String, Object>> getAllPlayersInGame(String sessionId) {
-    String url = UriComponentsBuilder.fromHttpUrl(baseUrl + "/games/{sessionId}/players")
-        .buildAndExpand(sessionId).toString();
+    String url =
+        UriComponentsBuilder.fromHttpUrl(baseUrl + "/games/{sessionId}/players")
+            .buildAndExpand(sessionId)
+            .toString();
     ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, null, List.class);
     return response.getBody();
   }
@@ -64,12 +65,14 @@ public class ApiCallsHelper {
     String url = baseUrl + "/games/" + sessionId + "/players";
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
-    ResponseEntity<Map> response = restTemplate.postForEntity(url, new HttpEntity<>(player, headers), Map.class);
+    ResponseEntity<Map> response =
+        restTemplate.postForEntity(url, new HttpEntity<>(player, headers), Map.class);
     return response.getBody().get("playerId").toString();
   }
 
   // ---------- MOVES ----------
-  public Map<String, Object> makeMove(String sessionId, String playerId, Map<String, Object> moveRequest) {
+  public Map<String, Object> makeMove(
+      String sessionId, String playerId, Map<String, Object> moveRequest) {
     String url = baseUrl + "/moves/" + sessionId + "/" + playerId;
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -78,7 +81,8 @@ public class ApiCallsHelper {
     return response.getBody();
   }
 
-  public Map<String, Object> checkMove(String sessionId, String playerId, Map<String, Object> moveRequest) {
+  public Map<String, Object> checkMove(
+      String sessionId, String playerId, Map<String, Object> moveRequest) {
     String url = baseUrl + "/moves/" + sessionId + "/" + playerId + "/test";
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
