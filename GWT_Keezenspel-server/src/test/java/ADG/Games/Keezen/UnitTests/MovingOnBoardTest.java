@@ -1,10 +1,15 @@
 package ADG.Games.Keezen.UnitTests;
 
-import com.adg.openapi.model.MoveRequest;
-import com.adg.openapi.model.Card;
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
+import com.adg.openapi.model.Card;
+import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
 import com.adg.openapi.model.MoveResult;
 import com.adg.openapi.model.MoveType;
@@ -15,11 +20,6 @@ import com.adg.openapi.model.TempMessageType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 class MovingOnBoardTest {
 
@@ -61,9 +61,10 @@ class MovingOnBoardTest {
 
     // THEN
     // response message is correct
-    assertEquals(new PositionKey("0", 0),
-        moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tileNr
-    assertEquals(pawn1.getPawnId(), moveResponse.getPawn1().getPawnId());                          // moves the correct pawn
+    assertEquals(
+        new PositionKey("0", 0),
+        moveResponse.getMovePawn1().getLast()); // moves the pawn to the correct tileNr
+    assertEquals(pawn1.getPawnId(), moveResponse.getPawn1().getPawnId()); // moves the correct pawn
     // GameState is correct
     assertEquals(new PositionKey("0", 0), gameState.getPawn(pawn1).getCurrentTileId());
   }

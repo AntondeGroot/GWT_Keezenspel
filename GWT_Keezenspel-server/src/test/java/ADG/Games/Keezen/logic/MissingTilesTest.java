@@ -1,16 +1,15 @@
 package ADG.Games.Keezen.logic;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
 import com.adg.openapi.model.Player;
 import com.adg.openapi.model.PositionKey;
+import java.util.LinkedList;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.LinkedList;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * this class was originally created to extrapolate and create a list of all tiles between the
@@ -35,8 +34,7 @@ class MissingTilesTest {
   }
 
   @AfterEach
-  void tearDown() {
-  }
+  void tearDown() {}
 
   @Test
   void test_tileNrs0and1_unchanged() {

@@ -1,34 +1,27 @@
 package ADG.Games.Keezen.UnitTests;
 
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
+import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
+import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.adg.openapi.model.Card;
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
-import ADG.Games.Keezen.Move.MessageType;
-import ADG.Games.Keezen.Move.MoveResult;
-import ADG.Games.Keezen.Move.MoveType;
+import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PawnId;
 import com.adg.openapi.model.PositionKey;
-import com.adg.openapi.model.TempMessageType;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-
-import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
-import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
-import static com.adg.openapi.model.MoveType.MOVE;
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TurnBasedTest {
 
@@ -216,8 +209,8 @@ public class TurnBasedTest {
       // THEN
       if (i < 4) {
         Assert.assertEquals("playerId turn NOT last round", "2", gameState.getPlayerIdTurn());
-        Assert.assertEquals("cards remaining for player 2", 4 - i,
-            cardsDeck.getCardsForPlayer("2").size());
+        Assert.assertEquals(
+            "cards remaining for player 2", 4 - i, cardsDeck.getCardsForPlayer("2").size());
       }
     }
   }
@@ -225,36 +218,36 @@ public class TurnBasedTest {
   @Test
   void playerCanOnlyMoveHisOwnPawn() {
 
-//        // WHEN
-//        sendValidMoveRequest(gameState , cardsDeck , "0");
-//
-//        // send a valid move for the wrong player
-//        Pawn pawn = new Pawn().pawnId(new PawnId("0",0))
-//            new PawnId("0",0),new PositionKey("0",6));
-//
-//        // fake a valid card
-//        Card card = new Card().suit(0).value(5);
-//
-//        // replace a card from the players hand with this card
-//        cardsDeck.giveCardToPlayerForTesting("1", card);
-//
-//        // send move message
-//        MoveRequest moveMessage = new MoveRequest();
-//        moveMessage.setPlayerId("1");
-//        moveMessage.setPawn1(pawn);
-//        moveMessage.setMoveType(MOVE);
-//        moveMessage.setStepsPawn1(card.getValue());
-//        moveMessage.setCard(card);
-//        moveMessage.setTempMessageType(TempMessageType.MAKE_MOVE);
-//
-//        // process
-//        MoveResponse moveResponse = new MoveResponse();
-//        gameState.processOnMove(moveMessage, moveResponse);
-//
-//        // THEN
-//        assertNull(moveResponse.getMovePawn1());
-//        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
-//    Assertions.fail();
+    //        // WHEN
+    //        sendValidMoveRequest(gameState , cardsDeck , "0");
+    //
+    //        // send a valid move for the wrong player
+    //        Pawn pawn = new Pawn().pawnId(new PawnId("0",0))
+    //            new PawnId("0",0),new PositionKey("0",6));
+    //
+    //        // fake a valid card
+    //        Card card = new Card().suit(0).value(5);
+    //
+    //        // replace a card from the players hand with this card
+    //        cardsDeck.giveCardToPlayerForTesting("1", card);
+    //
+    //        // send move message
+    //        MoveRequest moveMessage = new MoveRequest();
+    //        moveMessage.setPlayerId("1");
+    //        moveMessage.setPawn1(pawn);
+    //        moveMessage.setMoveType(MOVE);
+    //        moveMessage.setStepsPawn1(card.getValue());
+    //        moveMessage.setCard(card);
+    //        moveMessage.setTempMessageType(TempMessageType.MAKE_MOVE);
+    //
+    //        // process
+    //        MoveResponse moveResponse = new MoveResponse();
+    //        gameState.processOnMove(moveMessage, moveResponse);
+    //
+    //        // THEN
+    //        assertNull(moveResponse.getMovePawn1());
+    //        assertEquals(MoveResult.CANNOT_MAKE_MOVE, moveResponse.getResult());
+    //    Assertions.fail();
   }
 
   @Test
@@ -271,7 +264,7 @@ public class TurnBasedTest {
     sendValidMoveRequest(gameState, cardsDeck, "1");
 
     // THEN
-    assertEquals(stringsToList(new String[]{"2"}), gameState.getActivePlayers());
+    assertEquals(stringsToList(new String[] {"2"}), gameState.getActivePlayers());
   }
 
   @Test
@@ -555,8 +548,10 @@ public class TurnBasedTest {
     /// GIVEN
     createGame_With_NPlayers(gameState, 3);
     // send a valid move for the wrong player
-    Pawn pawn1 = new Pawn().playerId("0").pawnId(new PawnId("0", 1)).currentTileId(new PositionKey("0", 6));
-    Pawn pawn2 = new Pawn().playerId("0").pawnId(new PawnId("0", 2)).currentTileId(new PositionKey("0", 0));
+    Pawn pawn1 =
+        new Pawn().playerId("0").pawnId(new PawnId("0", 1)).currentTileId(new PositionKey("0", 6));
+    Pawn pawn2 =
+        new Pawn().playerId("0").pawnId(new PawnId("0", 2)).currentTileId(new PositionKey("0", 0));
     placePawnOnBoard(gameState, pawn1);
     placePawnOnBoard(gameState, pawn2);
     // fake a valid card

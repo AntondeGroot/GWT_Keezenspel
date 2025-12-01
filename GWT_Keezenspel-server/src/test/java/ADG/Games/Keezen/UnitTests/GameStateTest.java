@@ -1,19 +1,18 @@
 package ADG.Games.Keezen.UnitTests;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.Player;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class GameStateTest {
 

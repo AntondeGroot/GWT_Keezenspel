@@ -13,9 +13,7 @@ public final class CardResponseDTO {
     // static utility class, no instantiation
   }
 
-  /**
-   * Parse a JSON array into a JsArray of CardDTOs.
-   */
+  /** Parse a JSON array into a JsArray of CardDTOs. */
   public static JsArray<CardDTO> fromJson(String json) {
     return JsonUtils.safeEval(json);
   }

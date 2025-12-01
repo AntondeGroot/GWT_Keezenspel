@@ -21,8 +21,8 @@ public class Steps {
     clickForfeitButton(driver);
   }
 
-  public static void playerPlaysCard(WebDriver driver, String playerId, PawnId pawnId,
-      int cardValue) {
+  public static void playerPlaysCard(
+      WebDriver driver, String playerId, PawnId pawnId, int cardValue) {
     setPlayerIdPlaying(driver, playerId);
     waitUntilCardsAreLoaded(driver);
     clickCardByValue(driver, cardValue);
@@ -33,8 +33,8 @@ public class Steps {
     waitUntilPawnStopsMoving(driver, pawnId);
   }
 
-  public static void playerSwitchesPawns(WebDriver driver, String playerId, PawnId ownPawnId,
-      PawnId otherPawnId) {
+  public static void playerSwitchesPawns(
+      WebDriver driver, String playerId, PawnId ownPawnId, PawnId otherPawnId) {
     setPlayerIdPlaying(driver, playerId);
     waitUntilCardsAreLoaded(driver);
     clickPawn(driver, ownPawnId);
@@ -51,10 +51,10 @@ public class Steps {
     // WHEN player plays all cards until he wins
     // This is possible with the mocked CardsDeck as they never run out of cards to play
     int[][] winningMoves = {
-        {1, 4, 7},    // Pawn 0
-        {1, 4, 6},    // Pawn 1
-        {1, 4, 5},    // Pawn 2
-        {1, 4, 3, 1}  // Pawn 3
+      {1, 4, 7}, // Pawn 0
+      {1, 4, 6}, // Pawn 1
+      {1, 4, 5}, // Pawn 2
+      {1, 4, 3, 1} // Pawn 3
     };
 
     setPlayerIdPlaying(driver, playerId);

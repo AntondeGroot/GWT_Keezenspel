@@ -25,9 +25,8 @@ import org.springframework.stereotype.Service;
 public class MovesApiDelegateImpl implements MovesApiDelegate {
 
   @Override
-  public ResponseEntity<TestMoveResponse> checkMove(String sessionId,
-      String playerId,
-      MoveRequest moveRequest) {
+  public ResponseEntity<TestMoveResponse> checkMove(
+      String sessionId, String playerId, MoveRequest moveRequest) {
     System.out.println("server received move request" + moveRequest);
     if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
       System.out.println("there was no session found with id: " + sessionId);
@@ -37,7 +36,11 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
     GameState gameState = gameSession.getGameState();
 
     if (!Objects.equals(playerId, gameState.getPlayerIdTurn())) {
-      System.out.println("It was not the player's turn with id: " + playerId + ", it was: "+gameState.getPlayerIdTurn());
+      System.out.println(
+          "It was not the player's turn with id: "
+              + playerId
+              + ", it was: "
+              + gameState.getPlayerIdTurn());
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
@@ -73,9 +76,8 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
   }
 
   @Override
-  public ResponseEntity<MoveResponse> makeMove(String sessionId,
-      String playerId,
-      MoveRequest moveRequest) {
+  public ResponseEntity<MoveResponse> makeMove(
+      String sessionId, String playerId, MoveRequest moveRequest) {
 
     if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
       System.out.println("there was no session found with id: " + sessionId);
@@ -85,14 +87,18 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
     GameState gameState = gameSession.getGameState();
 
     if (!Objects.equals(playerId, gameState.getPlayerIdTurn())) {
-      System.out.println("It was not the player's turn with id: " + playerId + ", it was: "+gameState.getPlayerIdTurn());
+      System.out.println(
+          "It was not the player's turn with id: "
+              + playerId
+              + ", it was: "
+              + gameState.getPlayerIdTurn());
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     MoveResponse response = new MoveResponse();
-    //todo: uncomment?
-//    response.setPawn1(moveRequest.getPawn1Id());
-//    response.setPawn2(moveRequest.getPawn2Id());
+    // todo: uncomment?
+    //    response.setPawn1(moveRequest.getPawn1Id());
+    //    response.setPawn2(moveRequest.getPawn2Id());
 
     // change the gamestate
     Card card = gameState.getCard(moveRequest.getCardId(), moveRequest.getPlayerId());
@@ -121,7 +127,7 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
       if (moves.size() > 1) {
         moves.removeFirst();
       }
-//      gameSession.saveMoves(moves);
+      //      gameSession.saveMoves(moves);
     }
 
     return new ResponseEntity<>(response, HttpStatus.OK);

@@ -9,11 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.adg.openapi.model.Card;
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.CardsDeckMock;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
+import com.adg.openapi.model.Card;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -182,11 +182,8 @@ class CardsDeckMockTest {
     cardsDeck.dealCards();
 
     // THEN
-    int totalCards = cardsDeck.getNrOfCardsPerPlayer()
-        .values()
-        .stream()
-        .mapToInt(Integer::intValue)
-        .sum();
+    int totalCards =
+        cardsDeck.getNrOfCardsPerPlayer().values().stream().mapToInt(Integer::intValue).sum();
 
     assertEquals(13, totalCards);
   }

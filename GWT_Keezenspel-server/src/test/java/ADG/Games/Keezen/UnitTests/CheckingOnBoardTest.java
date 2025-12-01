@@ -1,9 +1,13 @@
 package ADG.Games.Keezen.UnitTests;
 
-import com.adg.openapi.model.Card;
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
+import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
+import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
 import com.adg.openapi.model.Pawn;
@@ -13,10 +17,6 @@ import com.adg.openapi.model.TempMessageType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
-import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CheckingOnBoardTest {
 
@@ -50,8 +50,8 @@ public class CheckingOnBoardTest {
     // GIVEN
     Card card = givePlayerAce(cardsDeck, 0);
     int nrCards = cardsDeck.getCardsForPlayer("0").size();
-    Pawn pawn1 = new Pawn().playerId("0").pawnId(new PawnId("0", 1))
-        .currentTileId(new PositionKey("0", -1));
+    Pawn pawn1 =
+        new Pawn().playerId("0").pawnId(new PawnId("0", 1)).currentTileId(new PositionKey("0", -1));
 
     // WHEN
     createMoveRequest(moveMessage, pawn1, card);
@@ -66,8 +66,8 @@ public class CheckingOnBoardTest {
   void checkOnBoard_WrongCard_DoesNotShow() {
     // GIVEN
     Card card = givePlayerCard(cardsDeck, 0, 3);
-    Pawn pawn1 = new Pawn().playerId("0").pawnId(new PawnId("0", 1))
-        .currentTileId(new PositionKey("0", -1));
+    Pawn pawn1 =
+        new Pawn().playerId("0").pawnId(new PawnId("0", 1)).currentTileId(new PositionKey("0", -1));
 
     // WHEN
     createMoveRequest(moveMessage, pawn1, card);

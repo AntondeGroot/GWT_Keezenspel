@@ -1,6 +1,5 @@
 package ADG.Games.Keezen;
 
-import ADG.Games.Keezen.TileId;
 
 public class TileMapping {
 

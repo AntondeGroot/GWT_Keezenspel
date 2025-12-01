@@ -1,25 +1,24 @@
 package ADG.Games.Keezen.UnitTests;
 
-import com.adg.openapi.model.Card;
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
+import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
 import ADG.Log;
+import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
-import com.adg.openapi.model.PositionKey;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PawnId;
+import com.adg.openapi.model.PositionKey;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-
-import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
-import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PawnAnimationTest {
 
@@ -323,12 +322,9 @@ public class PawnAnimationTest {
   @Test
   void pawnMoves_FinishIsFull_AnimateToRightTile_BugFix() {
     /**
-     * When the finish tile (1,16) is taken for player1
-     * And player 1 tries to move onto it:
-     * The animation animates a move to tile (1,15)
-     * instead of tile (0,15)
-     * it also had the points (0,15)  (1,15) (0,15) so
-     * it would unnecessarily be doubled.
+     * When the finish tile (1,16) is taken for player1 And player 1 tries to move onto it: The
+     * animation animates a move to tile (1,15) instead of tile (0,15) it also had the points (0,15)
+     * (1,15) (0,15) so it would unnecessarily be doubled.
      */
 
     // setup
@@ -356,7 +352,6 @@ public class PawnAnimationTest {
     assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
     assertEquals(expectedMovement, moveResponse.getMovePawn1());
   }
-
 
   @Test
   void pawnMoves_PingPong_3StepsOnFinish_test() {
@@ -444,8 +439,8 @@ public class PawnAnimationTest {
     expectedMovement.add(new PositionKey("1", 17));
     expectedMovement.add(new PositionKey("1", 18));
 
-    ArrayList<PositionKey> actualMovement = gameState.pingpongMove(pawn1, pawn1.getCurrentTileId(),
-        9);
+    ArrayList<PositionKey> actualMovement =
+        gameState.pingpongMove(pawn1, pawn1.getCurrentTileId(), 9);
     // THEN
     Log.info(actualMovement.toString());
     assertEquals(expectedMovement, actualMovement);
@@ -469,8 +464,8 @@ public class PawnAnimationTest {
     expectedMovement.add(new PositionKey("1", 17));
     expectedMovement.add(new PositionKey("1", 19));
 
-    ArrayList<PositionKey> actualMovement = gameState.pingpongMove(pawn1, pawn1.getCurrentTileId(),
-        nrSteps);
+    ArrayList<PositionKey> actualMovement =
+        gameState.pingpongMove(pawn1, pawn1.getCurrentTileId(), nrSteps);
     // THEN
     Log.info(actualMovement.toString());
     assertEquals(expectedMovement, actualMovement);
@@ -494,8 +489,8 @@ public class PawnAnimationTest {
     expectedMovement.add(new PositionKey("1", 17));
     expectedMovement.add(new PositionKey("1", 18));
 
-    ArrayList<PositionKey> actualMovement = gameState.pingpongMove(pawn1, pawn1.getCurrentTileId(),
-        nrSteps);
+    ArrayList<PositionKey> actualMovement =
+        gameState.pingpongMove(pawn1, pawn1.getCurrentTileId(), nrSteps);
     // THEN
     Log.info(actualMovement.toString());
     assertEquals(expectedMovement, actualMovement);
@@ -518,8 +513,8 @@ public class PawnAnimationTest {
     expectedMovement.add(new PositionKey("1", 19));
     expectedMovement.add(new PositionKey("1", 17));
 
-    ArrayList<PositionKey> actualMovement = gameState.pingpongMove(pawn1, pawn1.getCurrentTileId(),
-        nrSteps);
+    ArrayList<PositionKey> actualMovement =
+        gameState.pingpongMove(pawn1, pawn1.getCurrentTileId(), nrSteps);
     // THEN
     Log.info(actualMovement.toString());
     assertEquals(expectedMovement, actualMovement);
@@ -545,8 +540,8 @@ public class PawnAnimationTest {
     expectedMovement.add(new PositionKey("1", 18));
     expectedMovement.add(new PositionKey("1", 17));
 
-    ArrayList<PositionKey> actualMovement = gameState.pingpongMove(pawn1, pawn1.getCurrentTileId(),
-        nrSteps);
+    ArrayList<PositionKey> actualMovement =
+        gameState.pingpongMove(pawn1, pawn1.getCurrentTileId(), nrSteps);
     // THEN
     Log.info(actualMovement.toString());
     assertEquals(expectedMovement, actualMovement);

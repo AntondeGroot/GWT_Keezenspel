@@ -4,13 +4,10 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
 import java.util.HashMap;
 
-/**
- * Utility functions for converting JS objects into Java collections.
- */
+/** Utility functions for converting JS objects into Java collections. */
 public final class JsInteropUtil {
 
-  private JsInteropUtil() {
-  }
+  private JsInteropUtil() {}
 
   /**
    * Converts a plain JavaScript object (with string keys and numeric values) into a Java

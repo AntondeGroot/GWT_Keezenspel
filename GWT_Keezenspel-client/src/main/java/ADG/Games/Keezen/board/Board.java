@@ -1,23 +1,17 @@
 package ADG.Games.Keezen.board;
 
-import ADG.Games.Keezen.dto.PawnClient;
-import ADG.Games.Keezen.dto.PawnClient;
-import ADG.Games.Keezen.dto.PawnIdDTO;
-import ADG.Games.Keezen.dto.PlayerClient;
-import ADG.Games.Keezen.dto.PlayerDTO;
-import ADG.Games.Keezen.util.CellDistance;
+import static ADG.Games.Keezen.util.PlayerUtil.getPlayerById;
+import static ADG.Games.Keezen.util.PlayerUtil.getPlayerByInt;
+
 import ADG.Games.Keezen.PawnComparator;
 import ADG.Games.Keezen.Point;
 import ADG.Games.Keezen.TileMapping;
+import ADG.Games.Keezen.dto.PawnClient;
+import ADG.Games.Keezen.dto.PlayerClient;
+import ADG.Games.Keezen.util.CellDistance;
 import ADG.Games.Keezen.util.Cookie;
-import ADG.Games.Keezen.util.JsUtilities;
 import com.google.gwt.core.client.GWT;
-
-import com.google.gwt.core.client.JsArray;
 import java.util.*;
-
-import static ADG.Games.Keezen.util.PlayerUtil.getPlayerById;
-import static ADG.Games.Keezen.util.PlayerUtil.getPlayerByInt;
 
 public class Board {
 
@@ -47,9 +41,11 @@ public class Board {
     int lastPlayerInt = nrPlayers - 1;
     // create normal tiles
     for (int j = -9; j < 7; j++) {
-      // for construction purposes it is easier to take one board section that consists only of 90 degrees angles
+      // for construction purposes it is easier to take one board section that consists only of 90
+      // degrees angles
       //
-      // for game purposes it is easier that the starting point is position 0 and the last position is 15
+      // for game purposes it is easier that the starting point is position 0 and the last position
+      // is 15
       //
       // therefore the construction goes from the last playerId, from position 7 til 15 and then
       // starts with playerId 0 from position 0 to 6
@@ -58,8 +54,9 @@ public class Board {
       // where the playerId is updated based on the rotation.
       int playerId = j < 0 ? lastPlayerInt : 0;
       int tileNr = j < 0 ? j + 16 : j;
-      tiles.add(new TileMapping(getPlayerByInt(playerId, players).getId(), tileNr,
-          new Point(startPoint)));
+      tiles.add(
+          new TileMapping(
+              getPlayerByInt(playerId, players).getId(), tileNr, new Point(startPoint)));
 
       if (j < -3) {
         // move downwards for 6 tiles
@@ -102,11 +99,13 @@ public class Board {
     String playerId;
     for (TileMapping tile : tiles) {
       for (int k = 1; k < nrPlayers; k++) {
-        int colorInt =
-            (getPlayerById(tile.getPlayerId(), players).getPlayerInt() + k) % nrPlayers;
+        int colorInt = (getPlayerById(tile.getPlayerId(), players).getPlayerInt() + k) % nrPlayers;
         playerId = getPlayerByInt(colorInt, players).getId();
-        tempTiles.add(new TileMapping(playerId, tile.getTileNr(),
-            tile.getPosition().rotate(new Point(300, 300), 360.0 / nrPlayers * k)));
+        tempTiles.add(
+            new TileMapping(
+                playerId,
+                tile.getTileNr(),
+                tile.getPosition().rotate(new Point(300, 300), 360.0 / nrPlayers * k)));
       }
     }
     // create "Tiles" for where the player's cards should be placed
@@ -145,8 +144,7 @@ public class Board {
     for (TileMapping tile : tiles) {
       GWT.log("tile " + tile.getTileNr());
       tile.setPosition(
-          tile.getPosition().rotate(new Point(300, 300), -360.0 / nrPlayers * playerint)
-      );
+          tile.getPosition().rotate(new Point(300, 300), -360.0 / nrPlayers * playerint));
     }
     GWT.log("board test");
 
@@ -169,7 +167,7 @@ public class Board {
 
   public static void setPawns(ArrayList<PawnClient> pawns) {
     if (Board.pawns.isEmpty()) {
-//      pawns.sort(new PawnComparator());
+      //      pawns.sort(new PawnComparator());
       pawns.sort(new PawnComparator());
       Board.pawns = pawns;
     }

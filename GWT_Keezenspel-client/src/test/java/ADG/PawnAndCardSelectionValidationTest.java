@@ -18,14 +18,13 @@ import org.junit.jupiter.api.Test;
 
 public class PawnAndCardSelectionValidationTest {
   private PawnAndCardSelection pawnAndCardSelection;
-  private Pawn pawn = new Pawn(new PawnId("2",0),new TileId("2",5));
-  private Card ace = new Card(0,1);
+  private Pawn pawn = new Pawn(new PawnId("2", 0), new TileId("2", 5));
+  private Card ace = new Card(0, 1);
 
   @BeforeEach
   public void setUp() {
     pawnAndCardSelection = new PawnAndCardSelection();
     pawnAndCardSelection.disableUIForTests();
-
   }
 
   @AfterEach
@@ -40,13 +39,13 @@ public class PawnAndCardSelectionValidationTest {
     pawnAndCardSelection.setPlayerId("2");
 
     pawnAndCardSelection.addPawn(pawn);
-    pawnAndCardSelection.setCard(new Card(0,5));
+    pawnAndCardSelection.setCard(new Card(0, 5));
     pawnAndCardSelection.addPawn(pawn);
     assertNull(pawnAndCardSelection.getPawn1());
-    assertEquals(new Card(0,5),pawnAndCardSelection.getCard());
+    assertEquals(new Card(0, 5), pawnAndCardSelection.getCard());
 
     // WHEN adding new card
-    pawnAndCardSelection.setCard(new Card(0,9));
+    pawnAndCardSelection.setCard(new Card(0, 9));
 
     // THEN
     assertEquals(9, pawnAndCardSelection.getCard().getCardValue());
@@ -67,7 +66,7 @@ public class PawnAndCardSelectionValidationTest {
     pawnAndCardSelection.setCard(ace);
     pawnAndCardSelection.createMoveMessage();
 
-    pawnAndCardSelection.setCard(new Card(0,9));
+    pawnAndCardSelection.setCard(new Card(0, 9));
     pawnAndCardSelection.addPawn(pawn);
     pawnAndCardSelection.addPawn(pawn);
 
@@ -76,7 +75,7 @@ public class PawnAndCardSelectionValidationTest {
   }
 
   @Test
-  public void deselectingCard_ResetsNrSteps(){
+  public void deselectingCard_ResetsNrSteps() {
     // GIVEN
     pawnAndCardSelection.setPlayerId("2");
     pawnAndCardSelection.setCard(NORMALCARD.get());
@@ -89,7 +88,7 @@ public class PawnAndCardSelectionValidationTest {
   }
 
   @Test
-  public void deselectingKing_ResetsMoveType(){
+  public void deselectingKing_ResetsMoveType() {
     // GIVEN
     pawnAndCardSelection.setPlayerId("2");
     pawnAndCardSelection.setCard(KING.get());
@@ -102,10 +101,10 @@ public class PawnAndCardSelectionValidationTest {
   }
 
   @Test
-  public void updatePawnWithNewCurrentPosition(){
+  public void updatePawnWithNewCurrentPosition() {
     // GIVEN
-    Pawn pawnOld = new Pawn(new PawnId("2",0),new TileId("2",-1));
-    Pawn pawnNew = new Pawn(new PawnId("2",0),new TileId("2",5));
+    Pawn pawnOld = new Pawn(new PawnId("2", 0), new TileId("2", -1));
+    Pawn pawnNew = new Pawn(new PawnId("2", 0), new TileId("2", 5));
 
     pawnAndCardSelection.setPlayerId("2");
     pawnAndCardSelection.addPawn(pawnOld);

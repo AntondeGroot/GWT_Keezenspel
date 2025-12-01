@@ -1,9 +1,6 @@
 package ADG.Games.Keezen;
 
 import ADG.Games.Keezen.dto.CardClient;
-import ADG.Games.Keezen.util.JsInteropUtil;
-import com.google.gwt.core.client.JsArray;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,9 +35,9 @@ public class CardsDeck {
     this.playedCards = playedCards;
   }
 
-//  public void processCardResponse(JsArray<CardClient> cardResponse) {
-//    setCards(cardResponse);
-//    setPlayedCards(cardResponse);
-//    setNrCardsPerPlayer(JsInteropUtil.toHashMap(cardResponse));
-//  }
+  //  public void processCardResponse(JsArray<CardClient> cardResponse) {
+  //    setCards(cardResponse);
+  //    setPlayedCards(cardResponse);
+  //    setNrCardsPerPlayer(JsInteropUtil.toHashMap(cardResponse));
+  //  }
 }

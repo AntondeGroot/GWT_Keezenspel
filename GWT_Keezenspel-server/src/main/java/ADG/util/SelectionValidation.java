@@ -15,7 +15,7 @@ public class SelectionValidation {
     this.selection = selection;
   }
 
-  public boolean isValid(){
+  public boolean isValid() {
     return selection.equals(Selection.VALID);
   }
 

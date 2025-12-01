@@ -49,10 +49,11 @@ public class SpringAppTestHelper {
 
   public static void resetGameState() {
     HttpClient client = HttpClient.newHttpClient();
-    HttpRequest request = HttpRequest.newBuilder()
-        .uri(URI.create("http://localhost:4200/test/reset"))
-        .POST(HttpRequest.BodyPublishers.noBody())
-        .build();
+    HttpRequest request =
+        HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:4200/test/reset"))
+            .POST(HttpRequest.BodyPublishers.noBody())
+            .build();
     try {
       client.send(request, HttpResponse.BodyHandlers.ofString());
     } catch (Exception ignored) {

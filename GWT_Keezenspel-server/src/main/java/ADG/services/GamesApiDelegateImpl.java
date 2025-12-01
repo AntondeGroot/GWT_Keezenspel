@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 @Service
 public class GamesApiDelegateImpl implements GamesApiDelegate {
@@ -28,7 +28,9 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
   public ResponseEntity<Object> createNewGame(NewGameRequest newGameRequest) {
     String roomName = newGameRequest.getRoomName();
 
-    if (roomName == null || roomName.isEmpty() || roomName.isBlank()
+    if (roomName == null
+        || roomName.isEmpty()
+        || roomName.isBlank()
         || roomName.replace(" ", "").length() < 3) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -59,8 +61,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
   }
 
   @Override
-  public ResponseEntity<Object> addPlayerToGame(String sessionId,
-      Player player) {
+  public ResponseEntity<Object> addPlayerToGame(String sessionId, Player player) {
 
     if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -79,9 +80,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
     player.setId(playerId);
 
     gameSession.getGameState().addPlayer(player);
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(Map.of("playerId", playerId));
-
+    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("playerId", playerId));
   }
 
   @Override

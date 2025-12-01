@@ -1,13 +1,12 @@
 package ADG.Games.Keezen.animations;
 
-import ADG.Games.Keezen.board.Board;
 import ADG.Games.Keezen.Point;
 import ADG.Games.Keezen.TileId;
 import ADG.Games.Keezen.TileMapping;
+import ADG.Games.Keezen.board.Board;
 import ADG.Games.Keezen.dto.PawnClient;
 import ADG.Games.Keezen.dto.PositionKeyDTO;
 import com.google.gwt.core.client.GWT;
-
 import com.google.gwt.core.client.JsArray;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -28,7 +27,6 @@ public class AnimatePawnPoints {
       TileId tileIdFrom = new TileId(tileFrom.getPlayerId(), tileFrom.getTileNr());
       PositionKeyDTO tileTo = tileList.get(i + 1);
       TileId tileIdTo = new TileId(tileTo.getPlayerId(), tileTo.getTileNr());
-
 
       Point pointFrom = convertTileIdToPoint(tileIdFrom);
       pointTo = convertTileIdToPoint(tileIdTo);
@@ -84,8 +82,6 @@ public class AnimatePawnPoints {
 
   @Override
   public String toString() {
-    return "PawnAnimationMapping{" +
-        "pawn=" + pawn +
-        ", points=" + points + '}';
+    return "PawnAnimationMapping{" + "pawn=" + pawn + ", points=" + points + '}';
   }
 }

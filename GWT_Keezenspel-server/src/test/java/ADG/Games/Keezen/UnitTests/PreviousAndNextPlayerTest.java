@@ -1,21 +1,13 @@
 package ADG.Games.Keezen.UnitTests;
 
-import static ADG.Games.Keezen.UnitTests.GameStateUtil.createGame_With_NPlayers;
-import static ADG.Games.Keezen.UnitTests.GameStateUtil.createMoveRequest;
-import static ADG.Games.Keezen.UnitTests.GameStateUtil.givePlayerCard;
-import static ADG.Games.Keezen.UnitTests.GameStateUtil.placePawnOnNest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
-import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
-import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.Player;
-import com.adg.openapi.model.PositionKey;
-import java.util.LinkedList;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,6 +46,4 @@ public class PreviousAndNextPlayerTest {
     assertEquals(player2, gameState.previousPlayerId(player3));
     assertEquals(player1, gameState.previousPlayerId(player2));
   }
-
-
 }

@@ -1,16 +1,15 @@
 package ADG.Games.Keezen.UnitTests;
 
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
+import java.util.ArrayList;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-
-import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 class WinnerLogicTest {
 
@@ -56,7 +55,7 @@ class WinnerLogicTest {
     gameState.checkForWinners(winners);
 
     // THEN
-    assertEquals(stringsToList(new String[]{"2", "1"}), winners);
+    assertEquals(stringsToList(new String[] {"2", "1"}), winners);
   }
 
   @Test
@@ -72,6 +71,6 @@ class WinnerLogicTest {
     gameState.checkForWinners(winners);
 
     // THEN
-    assertEquals(stringsToList(new String[]{"2", "0", "1"}), winners);
+    assertEquals(stringsToList(new String[] {"2", "0", "1"}), winners);
   }
 }

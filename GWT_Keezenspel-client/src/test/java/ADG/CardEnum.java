@@ -6,8 +6,8 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public enum CardEnum implements IsSerializable {
   ACE(0, 1),
   JACK(0, 11),
-  KING(0,13),
-  NORMALCARD(0,5);
+  KING(0, 13),
+  NORMALCARD(0, 5);
 
   private final Card card;
 

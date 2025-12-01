@@ -1,10 +1,14 @@
 package ADG.Games.Keezen.UnitTests;
 
-import com.adg.openapi.model.Card;
+import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
+import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
+import static com.adg.openapi.model.TempMessageType.CHECK_MOVE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import ADG.Games.Keezen.CardsDeckInterface;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
-
+import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
 import com.adg.openapi.model.Pawn;
@@ -14,11 +18,6 @@ import java.util.LinkedList;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
-import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
-import static com.adg.openapi.model.TempMessageType.CHECK_MOVE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MovingWithCard7Test {
 
@@ -63,12 +62,14 @@ public class MovingWithCard7Test {
 
     // THEN response is correct
     assertEquals(new PositionKey("0", 4), gameState.getPawn(pawn1).getCurrentTileId());
-    assertEquals(new PositionKey("0", 4),
-        moveResponse.getMovePawn1().getLast());  // moves the pawn to the correct tile
+    assertEquals(
+        new PositionKey("0", 4),
+        moveResponse.getMovePawn1().getLast()); // moves the pawn to the correct tile
 
     assertEquals(new PositionKey("0", 13), gameState.getPawn(pawn2).getCurrentTileId());
-    assertEquals(new PositionKey("0", 13),
-        moveResponse.getMovePawn2().getLast());  // moves the pawn to the correct tile
+    assertEquals(
+        new PositionKey("0", 13),
+        moveResponse.getMovePawn2().getLast()); // moves the pawn to the correct tile
   }
 
   @Test
@@ -106,8 +107,8 @@ public class MovingWithCard7Test {
     Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("0", 2), new PositionKey("0", 14));
 
     // WHEN no decision was made how to split the 7 among the two pawns
-    createSplitMessage(moveMessage, pawn1, 3, pawn2, 4,
-        card); // the second is null because no choice was made
+    createSplitMessage(
+        moveMessage, pawn1, 3, pawn2, 4, card); // the second is null because no choice was made
     moveMessage.setTempMessageType(CHECK_MOVE);
     gameState.processOnSplit(moveMessage, moveResponse);
 

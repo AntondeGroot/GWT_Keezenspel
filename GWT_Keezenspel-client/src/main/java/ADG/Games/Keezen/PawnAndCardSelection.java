@@ -6,7 +6,6 @@ import static ADG.Games.Keezen.util.BoardLogic.pawnIsOnNormalBoard;
 import static ADG.Games.Keezen.util.CardValueCheck.isJack;
 import static ADG.Games.Keezen.util.CardValueCheck.isSeven;
 
-import ADG.Games.Keezen.Move.MessageType;
 import ADG.Games.Keezen.Move.MoveMessage;
 import ADG.Games.Keezen.Move.MoveType;
 import ADG.Games.Keezen.dto.CardClient;
@@ -91,7 +90,7 @@ public class PawnAndCardSelection {
     GWT.log("test playerId = " + playerId);
     GWT.log("trying to add pawn = " + pawn);
     validateHowManyPawnsCanBeSelected(pawn); // not accounting for if they are on nest/board/finish
-    validateSelectionBasedOnLocation();     // validate if they are on nest/board/finish
+    validateSelectionBasedOnLocation(); // validate if they are on nest/board/finish
     validateMoveType();
   }
 
@@ -105,7 +104,7 @@ public class PawnAndCardSelection {
     GWT.log("test playerId = " + playerId);
     GWT.log("trying to add pawn = " + pawn);
     validateHowManyPawnsCanBeSelected(pawn); // not accounting for if they are on nest/board/finish
-    validateSelectionBasedOnLocation();     // validate if they are on nest/board/finish
+    validateSelectionBasedOnLocation(); // validate if they are on nest/board/finish
     validateMoveType();
   }
 
@@ -116,7 +115,7 @@ public class PawnAndCardSelection {
 
     switch (card.getValue()) {
       case 1:
-        break;//always valid: nest/board/finish
+        break; // always valid: nest/board/finish
       case 11:
         secondPawnIsOnNormalBoardWhenYouPlayJack();
         break;
@@ -141,15 +140,15 @@ public class PawnAndCardSelection {
   }
 
   private void validateAllPawnsAreOnBoardOrFinish() {
-// this is only for validating your own pawns, we do not care about this
+    // this is only for validating your own pawns, we do not care about this
   }
 
   private void firstPawnIsOnNestWhenYouPlayKing() {
-//        if(pawn1 != null){
-//            if(!isPawnOnNest(pawn1)){
-//                pawn1 = null;
-//            }
-//        }
+    //        if(pawn1 != null){
+    //            if(!isPawnOnNest(pawn1)){
+    //                pawn1 = null;
+    //            }
+    //        }
     if (pawn2 != null) {
       pawn2 = null;
     }
@@ -414,16 +413,17 @@ public class PawnAndCardSelection {
     nrStepsPawn2 = steps;
   }
 
-//  public MoveMessage createTestMoveMessage() {
-//    MoveMessage moveMessage = createMessage();
-//    moveMessage.setMessageType(MessageType.CHECK_MOVE);
-//    return moveMessage;
-//  }
+  //  public MoveMessage createTestMoveMessage() {
+  //    MoveMessage moveMessage = createMessage();
+  //    moveMessage.setMessageType(MessageType.CHECK_MOVE);
+  //    return moveMessage;
+  //  }
 
   public MoveMessage createMoveMessage() {
     if (pawn1 != null) {
-      GWT.log("PawnAncCardSelection creates move message and thinks pawn is on location "
-          + pawn1.getCurrentTileId());
+      GWT.log(
+          "PawnAncCardSelection creates move message and thinks pawn is on location "
+              + pawn1.getCurrentTileId());
     }
 
     MoveMessage moveMessage = createMessage();
@@ -434,15 +434,15 @@ public class PawnAndCardSelection {
 
   private MoveMessage createMessage() {
     MoveMessage moveMessage = new MoveMessage();
-//        moveMessage.setPlayerId(playerId);
-//        moveMessage.setPawnId1(getPawnId1());
-//        moveMessage.setPawnId2(getPawnId2());
-//        moveMessage.setCard(card);
-//        moveMessage.setMoveType(moveType);
-//        moveMessage.setStepsPawn1(nrStepsPawn1);
-//        if(moveType == SPLIT){ // comparing Enums with == is null safe
-//            moveMessage.setStepsPawn2(nrStepsPawn2);
-//        }
+    //        moveMessage.setPlayerId(playerId);
+    //        moveMessage.setPawnId1(getPawnId1());
+    //        moveMessage.setPawnId2(getPawnId2());
+    //        moveMessage.setCard(card);
+    //        moveMessage.setMoveType(moveType);
+    //        moveMessage.setStepsPawn1(nrStepsPawn1);
+    //        if(moveType == SPLIT){ // comparing Enums with == is null safe
+    //            moveMessage.setStepsPawn2(nrStepsPawn2);
+    //        }
 
     return moveMessage;
   }
@@ -460,15 +460,24 @@ public class PawnAndCardSelection {
 
   @Override
   public String toString() {
-    return "PawnAndCardSelection{" +
-        "playerId='" + playerId + '\'' +
-        ", pawn1=" + pawn1 +
-        ", pawn2=" + pawn2 +
-        ", card=" + card +
-        ", drawCards=" + drawCards +
-        ", moveType=" + moveType +
-        ", nrStepsPawn1=" + nrStepsPawn1 +
-        ", nrStepsPawn2=" + nrStepsPawn2 +
-        '}';
+    return "PawnAndCardSelection{"
+        + "playerId='"
+        + playerId
+        + '\''
+        + ", pawn1="
+        + pawn1
+        + ", pawn2="
+        + pawn2
+        + ", card="
+        + card
+        + ", drawCards="
+        + drawCards
+        + ", moveType="
+        + moveType
+        + ", nrStepsPawn1="
+        + nrStepsPawn1
+        + ", nrStepsPawn2="
+        + nrStepsPawn2
+        + '}';
   }
 }

@@ -19,7 +19,7 @@ public class PawnAndCardSelectionValidation {
       return new SelectionValidation(INVALID);
     }
 
-    if(card == null) {
+    if (card == null) {
       return new SelectionValidation(INVALID);
     }
 
@@ -33,16 +33,19 @@ public class PawnAndCardSelectionValidation {
 
     if (pawn1 != null && pawn2 != null) {
       // validate split
-      if (getTileNr(pawn1) >= 0 &&
-          getTileNr(pawn2) >= 0 &&
-          pawn1.getPlayerId().equals(pawn2.getPlayerId()) &&
-          isSeven(card)) {
+      if (getTileNr(pawn1) >= 0
+          && getTileNr(pawn2) >= 0
+          && pawn1.getPlayerId().equals(pawn2.getPlayerId())
+          && isSeven(card)) {
         return new SelectionValidation(VALID, MoveType.SPLIT);
       }
 
       // validate switch
-      if (getTileNr(pawn1) >= 0 && getTileNr(pawn1) <= 15 &&
-          getTileNr(pawn2) > 0 && getTileNr(pawn2) <= 15 && // can not stand on his own start block
+      if (getTileNr(pawn1) >= 0
+          && getTileNr(pawn1) <= 15
+          && getTileNr(pawn2) > 0
+          && getTileNr(pawn2) <= 15
+          && // can not stand on his own start block
           isJack(card)) {
         return new SelectionValidation(VALID, MoveType.SWITCH);
       }
@@ -53,8 +56,7 @@ public class PawnAndCardSelectionValidation {
     }
 
     // validate move
-    if (getTileNr(pawn1) >= 0 &&
-        !(isKing(card) || isJack(card))) {
+    if (getTileNr(pawn1) >= 0 && !(isKing(card) || isJack(card))) {
       return new SelectionValidation(VALID, MoveType.MOVE);
     }
 
