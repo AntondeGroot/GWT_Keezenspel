@@ -37,24 +37,6 @@ class MissingTilesTest {
   void tearDown() {}
 
   @Test
-  void test_tileNrs0and1_unchanged() {
-    LinkedList<PositionKey> tiles = new LinkedList<>();
-    tiles.add(new PositionKey("0", 0));
-    tiles.add(new PositionKey("0", 1));
-
-    assertEquals(tiles, tiles);
-  }
-
-  @Test
-  void test_tileNrs1and0_unchanged() {
-    LinkedList<PositionKey> tiles = new LinkedList<>();
-    tiles.add(new PositionKey("0", 1));
-    tiles.add(new PositionKey("0", 0));
-
-    assertEquals(tiles, tiles);
-  }
-
-  @Test
   void test_tileNrs0and2_addInBetween() {
     LinkedList<PositionKey> tiles = new LinkedList<>();
     tiles.add(new PositionKey("0", 0));

@@ -4,6 +4,9 @@ import static ADG.Games.Keezen.utils.ApiModelHelpers.getRandomRoomName;
 
 import ADG.Games.Keezen.utils.ApiCallsHelper;
 import com.adg.openapi.model.Player;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class ApiUtil {
 
@@ -19,5 +22,15 @@ public class ApiUtil {
     apiHelper.startGame(sessionId);
 
     return sessionId;
+  }
+
+  public static List<String> getPlayerIds(String sessionId) {
+    List<Map<String, Object>> result = apiHelper.getAllPlayersInGame(sessionId);
+    return result.stream().map(map -> (String) map.get("id")).toList();
+  }
+
+  public static String getPlayerid(String sessionId, int indexOfPlayer) {
+    List<Map<String, Object>> result = apiHelper.getAllPlayersInGame(sessionId);
+    return result.get(indexOfPlayer).get("id").toString();
   }
 }

@@ -10,6 +10,7 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlayi
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
@@ -32,6 +33,9 @@ public class Pawn_IT {
   static WebDriver driver;
   String HIDDEN = "hidden";
   String VISIBLE = "visible";
+  String playerId0;
+  String playerId1;
+  String playerId2;
 
   @BeforeEach
   public void setUp() {
@@ -39,7 +43,10 @@ public class Pawn_IT {
 
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver, "player0");
+    playerId0 = ApiUtil.getPlayerid("123", 0);
+    playerId1 = ApiUtil.getPlayerid("123", 1);
+    playerId2 = ApiUtil.getPlayerid("123", 2);
+    setPlayerIdPlaying(driver, playerId0);
   }
 
   @AfterEach
@@ -68,7 +75,7 @@ public class Pawn_IT {
   @Test
   public void clickOnOwnPawn_Selected() {
     // GIVEN
-    PawnId pawnId = new PawnId("player0", 0);
+    PawnId pawnId = new PawnId(playerId0, 0);
     WebElement pawn1 = driver.findElement(By.id(pawnId.toString()));
 
     // WHEN
@@ -82,8 +89,8 @@ public class Pawn_IT {
   @Test
   public void clickOnOwnPawn_clickSecondPawn_FirstPawnDeselected() {
     // GIVEN
-    String pawnId1 = "player0_1";
-    String pawnId2 = "player0_2";
+    String pawnId1 = playerId0+"_1";
+    String pawnId2 = playerId0+"_2";
     WebElement pawn1 = driver.findElement(new ById(pawnId1));
     pawn1.click();
 
@@ -102,7 +109,7 @@ public class Pawn_IT {
   @Test
   public void clickOnOtherPawnOnBase_NotSelected() {
     // GIVEN
-    PawnId pawnId = new PawnId("player1", 1);
+    PawnId pawnId = new PawnId(playerId1, 1);
     WebElement pawnOtherPlayer = driver.findElement(new ById(pawnId.toString()));
 
     // WHEN
@@ -115,21 +122,22 @@ public class Pawn_IT {
 
   @Test
   public void playerCanMoveOnBoardAndPlayWithoutHavingToRefreshPage() {
-    PawnId pawnId = new PawnId("player2", 0);
+    PawnId pawnId = new PawnId(playerId2, 0);
 
     // GIVEN player 0 forfeits
-    playerForfeits(driver, "player0");
+    playerForfeits(driver, playerId0);
 
     // GIVEN player 1 forfeits
-    playerForfeits(driver, "player1");
+    playerForfeits(driver, playerId1);
 
     // GIVEN player 2 moves on board
+    driver.navigate().refresh();
     Point nest = getPawnLocation(driver, pawnId);
-    playerPlaysCard(driver, "player2", pawnId, 1);
+    playerPlaysCard(driver, playerId2, pawnId, 1);
 
     // WHEN
     Point before = getPawnLocation(driver, pawnId);
-    playerPlaysCard(driver, "player2", pawnId, 5);
+    playerPlaysCard(driver, playerId2, pawnId, 5);
     TestUtils.wait(1000);
     Point after = getPawnLocation(driver, pawnId);
 

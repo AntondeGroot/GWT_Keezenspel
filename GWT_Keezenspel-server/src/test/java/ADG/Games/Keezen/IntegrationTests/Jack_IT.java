@@ -10,6 +10,7 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
 
+import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
@@ -26,15 +27,24 @@ import org.openqa.selenium.WebDriver;
 public class Jack_IT {
 
   static WebDriver driver;
-  private final PawnId pawnId10 = new PawnId("player1", 0);
-  private final PawnId pawnId20 = new PawnId("player2", 0);
-
+  private PawnId pawnId10;
+  private PawnId pawnId20;
+  private String playerId0;
+  private String playerId1;
+  private String playerId2;
+  
   @BeforeEach
   public void setUp() {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
-    setPlayerIdPlaying(driver, "player0");
+
+    playerId0 = ApiUtil.getPlayerid("123",0);
+    playerId1 = ApiUtil.getPlayerid("123",1);
+    playerId2 = ApiUtil.getPlayerid("123",2);
+    pawnId10 = new PawnId(playerId1, 0);
+    pawnId20 = new PawnId(playerId2, 0);
+    setPlayerIdPlaying(driver, playerId0);
   }
 
   @AfterAll
@@ -50,18 +60,18 @@ public class Jack_IT {
     // GIVEN
     waitUntilCardsAreLoaded(driver);
 
-    playerForfeits(driver, "player0");
+    playerForfeits(driver, playerId0);
 
     // get on board
-    setPlayerIdPlaying(driver, "player1");
+    setPlayerIdPlaying(driver, playerId1);
     driver.navigate().refresh();
-    playerPlaysCard(driver, "player1", pawnId10, 1);
-    setPlayerIdPlaying(driver, "player2");
-    playerPlaysCard(driver, "player2", pawnId20, 1);
+    playerPlaysCard(driver, playerId1, pawnId10, 1);
+    setPlayerIdPlaying(driver, playerId2);
+    playerPlaysCard(driver, playerId2, pawnId20, 1);
 
     // move on board
     Point start = getPawnLocation(driver, pawnId10);
-    playerPlaysCard(driver, "player1", pawnId10, 2);
+    playerPlaysCard(driver, playerId1, pawnId10, 2);
     Point end = getPawnLocation(driver, pawnId10);
     assertPointsNotEqual(
         "The pawn of player 1 did not move with 2 steps after coming on board", start, end);
@@ -69,7 +79,7 @@ public class Jack_IT {
     // now player 2 can switch using a Jack
     Point positionPlayer1 = getPawnLocation(driver, pawnId10);
     Point positionPlayer2 = getPawnLocation(driver, pawnId20);
-    playerSwitchesPawns(driver, "player2", pawnId20, pawnId10);
+    playerSwitchesPawns(driver, playerId2, pawnId20, pawnId10);
 
     // THEN
     TestUtils.wait(400);
