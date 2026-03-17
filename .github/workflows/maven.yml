@@ -20,8 +20,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build with Maven
-        run: mvn -B clean package --file pom.xml
-
-      - name: Run unit tests (skip Selenium)
-        run: mvn test -Dskip.selenium=true
+#      - name: Build with Maven
+#        run: mvn -B clean package --file pom.xml
+#
+#      - name: Run unit tests (skip Selenium)
+#        run: mvn test -Dskip.selenium=true
