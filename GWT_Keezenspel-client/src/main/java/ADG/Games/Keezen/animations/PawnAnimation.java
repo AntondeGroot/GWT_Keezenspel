@@ -36,12 +36,13 @@ public class PawnAnimation {
     double pixelsPerMs = 100;
 
     if (pawn1 != null) {
+      PawnClient pawn1Client = new PawnClient(pawn1);
       AnimatePawnPoints animatePawnPointsPawn1 =
-          new AnimatePawnPoints(new PawnClient(pawn1), moveResponse.getMovePawn1());
+          new AnimatePawnPoints(pawn1Client, moveResponse.getMovePawn1());
       double distancePawn1 = animatePawnPointsPawn1.getTotalPathLength();
       pixelsPerMs = calculateSpeed(distancePawn1);
       delayPawnKilledByPawn1 = distancePawn1 / pixelsPerMs;
-      DivElement pawnElement = pawnElements.get(pawn1.getPawnId());
+      DivElement pawnElement = pawnElements.get(pawn1Client.getPawnId());
       GWT.log("move pawn 1 distance: " + distancePawn1);
       GWT.log("move pawn 1 speed: " + pixelsPerMs);
       LinkedList<Point> points = animatePawnPointsPawn1.getPoints();
@@ -50,46 +51,38 @@ public class PawnAnimation {
       animateStep(pawnElement, current, points, pixelsPerMs, 0);
     }
     if (pawn2 != null) {
+      PawnClient pawn2Client = new PawnClient(pawn2);
       AnimatePawnPoints animatePawnPointsPawn2 =
-          new AnimatePawnPoints(new PawnClient(pawn2), moveResponse.getMovePawn2());
+          new AnimatePawnPoints(pawn2Client, moveResponse.getMovePawn2());
       double distancePawn2 = animatePawnPointsPawn2.getTotalPathLength();
       pixelsPerMs = calculateSpeed(distancePawn2);
       delayPawnKilledByPawn2 = distancePawn2 / pixelsPerMs;
-      DivElement pawnElement = pawnElements.get(pawn2.getPawnId());
-      animateStep(
-          pawnElement,
-          animatePawnPointsPawn2.getPoints().get(0),
-          animatePawnPointsPawn2.getPoints(),
-          pixelsPerMs,
-          0);
+      DivElement pawnElement = pawnElements.get(pawn2Client.getPawnId());
+      LinkedList<Point> points = animatePawnPointsPawn2.getPoints();
+      Point current = points.pop();
+      animateStep(pawnElement, current, points, pixelsPerMs, 0);
     }
     if (pawnKilledByPawn1 != null) {
+      PawnClient pawnKilled1Client = new PawnClient(pawnKilledByPawn1);
       AnimatePawnPoints animatePawnPointsPawnKilledByPawn1 =
-          new AnimatePawnPoints(
-              new PawnClient(moveResponse.getPawnKilledByPawn1()), moveResponse.getMovePawn1());
+          new AnimatePawnPoints(pawnKilled1Client, moveResponse.getMovePawnKilledByPawn1());
       double distancePawnKilledByPawn1 = animatePawnPointsPawnKilledByPawn1.getTotalPathLength();
       pixelsPerMs = calculateSpeed(distancePawnKilledByPawn1);
-      DivElement pawnElement = pawnElements.get(pawnKilledByPawn1.getPawnId());
-      animateStep(
-          pawnElement,
-          animatePawnPointsPawnKilledByPawn1.getPoints().get(0),
-          animatePawnPointsPawnKilledByPawn1.getPoints(),
-          pixelsPerMs,
-          delayPawnKilledByPawn1);
+      DivElement pawnElement = pawnElements.get(pawnKilled1Client.getPawnId());
+      LinkedList<Point> points = animatePawnPointsPawnKilledByPawn1.getPoints();
+      Point current = points.pop();
+      animateStep(pawnElement, current, points, pixelsPerMs, delayPawnKilledByPawn1);
     }
     if (pawnKilledByPawn2 != null) {
+      PawnClient pawnKilled2Client = new PawnClient(pawnKilledByPawn2);
       AnimatePawnPoints animatePawnPointsPawnKilledByPawn2 =
-          new AnimatePawnPoints(
-              new PawnClient(moveResponse.getPawnKilledByPawn2()), moveResponse.getMovePawn2());
+          new AnimatePawnPoints(pawnKilled2Client, moveResponse.getMovePawnKilledByPawn2());
       double distancePawnKilledByPawn2 = animatePawnPointsPawnKilledByPawn2.getTotalPathLength();
       pixelsPerMs = calculateSpeed(distancePawnKilledByPawn2);
-      DivElement pawnElement = pawnElements.get(pawnKilledByPawn2.getPawnId());
-      animateStep(
-          pawnElement,
-          animatePawnPointsPawnKilledByPawn2.getPoints().get(0),
-          animatePawnPointsPawnKilledByPawn2.getPoints(),
-          pixelsPerMs,
-          delayPawnKilledByPawn2);
+      DivElement pawnElement = pawnElements.get(pawnKilled2Client.getPawnId());
+      LinkedList<Point> points = animatePawnPointsPawnKilledByPawn2.getPoints();
+      Point current = points.pop();
+      animateStep(pawnElement, current, points, pixelsPerMs, delayPawnKilledByPawn2);
     }
 
     // * get the list of all pawns that should be animated first
