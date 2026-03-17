@@ -8,17 +8,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import ADG.Games.Keezen.*;
-import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.dto.CardClient;
 import ADG.Games.Keezen.Move.MoveType;
-import ADG.Games.Keezen.Player.Pawn;
-import ADG.Games.Keezen.Player.PawnId;
+import ADG.Games.Keezen.dto.PawnClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class PawnAndCardSelectionAceTest {
-  private final Pawn ownPawnOnBoard = new Pawn(new PawnId("1", 1), new TileId("1", 0));
-  private final Pawn ownPawnOnNest = new Pawn(new PawnId("1", 2), new TileId("1", -1));
-  private final Pawn ownPawnOnFinish = new Pawn(new PawnId("1", 3), new TileId("1", 16));
+  private final PawnClient ownPawnOnBoard = new PawnClient("1", 1, new TileId("1", 0));
+  private final PawnClient ownPawnOnNest = new PawnClient("1", 2, new TileId("1", -1));
+  private final PawnClient ownPawnOnFinish = new PawnClient("1", 3, new TileId("1", 16));
   private PawnAndCardSelection pawnAndCardSelection;
 
   @BeforeEach
@@ -146,7 +145,7 @@ public class PawnAndCardSelectionAceTest {
     pawnAndCardSelection.setPlayerId("1");
     pawnAndCardSelection.setCard(ACE.get());
     pawnAndCardSelection.addPawn(ownPawnOnNest);
-    pawnAndCardSelection.setCard(new Card(0, 5));
+    pawnAndCardSelection.setCard(new CardClient(0, 5));
     // giving a non ace card deselects the pawn, but when you select an Ace and the pawn
     // you should no longer see nrStepsPawn1 as 5.
 
@@ -163,7 +162,7 @@ public class PawnAndCardSelectionAceTest {
     // GIVEN
     pawnAndCardSelection.setPlayerId("1");
     pawnAndCardSelection.addPawn(ownPawnOnBoard);
-    pawnAndCardSelection.setCard(new Card(0, 5));
+    pawnAndCardSelection.setCard(new CardClient(0, 5));
     pawnAndCardSelection.setCard(ACE.get());
 
     // THEN
@@ -176,7 +175,7 @@ public class PawnAndCardSelectionAceTest {
     // GIVEN
     pawnAndCardSelection.setPlayerId("1");
     pawnAndCardSelection.addPawn(ownPawnOnBoard);
-    pawnAndCardSelection.setCard(new Card(0, 5));
+    pawnAndCardSelection.setCard(new CardClient(0, 5));
     pawnAndCardSelection.setCard(ACE.get());
 
     // THEN
