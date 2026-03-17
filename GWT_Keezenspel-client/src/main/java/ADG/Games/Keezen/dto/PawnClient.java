@@ -28,6 +28,27 @@ public class PawnClient {
     this.uri = pawnDTO.getUri();
   }
 
+  public PawnClient(String playerId, int pawnNr, TileId currentTileId) {
+    this.playerId = playerId;
+    this.pawnId = playerId + "_" + pawnNr;
+    this.pawnNr = pawnNr;
+    this.currentTileId = currentTileId;
+    this.nestTileId = currentTileId;
+    this.uri = null;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof PawnClient)) return false;
+    return java.util.Objects.equals(pawnId, ((PawnClient) o).pawnId);
+  }
+
+  @Override
+  public int hashCode() {
+    return java.util.Objects.hashCode(pawnId);
+  }
+
   public String getPlayerId() {
     return playerId;
   }

@@ -4,20 +4,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import ADG.Games.Keezen.*;
-import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.dto.CardClient;
 import ADG.Games.Keezen.Move.MoveType;
-import ADG.Games.Keezen.Player.Pawn;
-import ADG.Games.Keezen.Player.PawnId;
+import ADG.Games.Keezen.dto.PawnClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class PawnAndCardSelectionKingTest {
-  private Pawn ownPawnOnBoard;
-  private Pawn ownPawnOnNest;
-  private Pawn ownPawnOnFinish;
-  private Pawn otherPawnOnNest;
-  private Pawn otherPawnOnFinish;
-  private Card kingCard;
+  private PawnClient ownPawnOnBoard;
+  private PawnClient ownPawnOnNest;
+  private PawnClient ownPawnOnFinish;
+  private PawnClient otherPawnOnNest;
+  private PawnClient otherPawnOnFinish;
+  private CardClient kingCard;
   private PawnAndCardSelection pawnAndCardSelection;
 
   @BeforeEach
@@ -26,14 +25,14 @@ public class PawnAndCardSelectionKingTest {
     pawnAndCardSelection.disableUIForTests();
 
     // pawns player playing
-    ownPawnOnBoard = new Pawn(new PawnId("1", 1), new TileId("1", 0));
-    ownPawnOnNest = new Pawn(new PawnId("1", 2), new TileId("1", -1));
-    ownPawnOnFinish = new Pawn(new PawnId("1", 3), new TileId("1", 16));
+    ownPawnOnBoard = new PawnClient("1", 1, new TileId("1", 0));
+    ownPawnOnNest = new PawnClient("1", 2, new TileId("1", -1));
+    ownPawnOnFinish = new PawnClient("1", 3, new TileId("1", 16));
     // other player pawns
-    otherPawnOnNest = new Pawn(new PawnId("2", 1), new TileId("2", -1));
-    otherPawnOnFinish = new Pawn(new PawnId("2", 2), new TileId("2", 16));
+    otherPawnOnNest = new PawnClient("2", 1, new TileId("2", -1));
+    otherPawnOnFinish = new PawnClient("2", 2, new TileId("2", 16));
 
-    kingCard = new Card(0, 13);
+    kingCard = new CardClient(0, 13);
   }
 
   // TEST: NEST
@@ -113,7 +112,7 @@ public class PawnAndCardSelectionKingTest {
   @Test
   public void withNormalCard_ThenKing_ResetsStepsPawn1() {
     // GIVEN
-    pawnAndCardSelection.setCard(new Card(0, 5));
+    pawnAndCardSelection.setCard(new CardClient(0, 5));
 
     // WHEN
     pawnAndCardSelection.setCard(kingCard);

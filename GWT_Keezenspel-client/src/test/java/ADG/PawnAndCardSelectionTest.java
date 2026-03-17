@@ -4,20 +4,19 @@ import static ADG.CardEnum.ACE;
 import static org.junit.jupiter.api.Assertions.*;
 
 import ADG.Games.Keezen.*;
-import ADG.Games.Keezen.Cards.Card;
-import ADG.Games.Keezen.Player.Pawn;
-import ADG.Games.Keezen.Player.PawnId;
+import ADG.Games.Keezen.dto.CardClient;
+import ADG.Games.Keezen.dto.PawnClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class PawnAndCardSelectionTest {
-  private Pawn ownPawnOnBoard;
-  private Pawn ownPawnOnBoard2;
-  private Pawn otherPawn;
-  private Pawn otherPawnOnNest;
-  private Pawn otherPawnOnFinish;
-  private Card jackCard;
-  private Card nonJackCard;
+  private PawnClient ownPawnOnBoard;
+  private PawnClient ownPawnOnBoard2;
+  private PawnClient otherPawn;
+  private PawnClient otherPawnOnNest;
+  private PawnClient otherPawnOnFinish;
+  private CardClient jackCard;
+  private CardClient nonJackCard;
   private PawnAndCardSelection pawnAndCardSelection;
 
   @BeforeEach
@@ -25,14 +24,14 @@ class PawnAndCardSelectionTest {
     pawnAndCardSelection = new PawnAndCardSelection();
     pawnAndCardSelection.disableUIForTests();
 
-    ownPawnOnBoard = new Pawn(new PawnId("1", 1), new TileId("1", 0));
-    ownPawnOnBoard2 = new Pawn(new PawnId("1", 2), new TileId("1", 5));
-    otherPawn = new Pawn(new PawnId("2", 1), new TileId("2", 0));
-    otherPawnOnNest = new Pawn(new PawnId("2", 1), new TileId("2", -1));
-    otherPawnOnFinish = new Pawn(new PawnId("2", 1), new TileId("2", 16));
+    ownPawnOnBoard = new PawnClient("1", 1, new TileId("1", 0));
+    ownPawnOnBoard2 = new PawnClient("1", 2, new TileId("1", 5));
+    otherPawn = new PawnClient("2", 1, new TileId("2", 0));
+    otherPawnOnNest = new PawnClient("2", 1, new TileId("2", -1));
+    otherPawnOnFinish = new PawnClient("2", 1, new TileId("2", 16));
 
-    jackCard = new Card(0, 11);
-    nonJackCard = new Card(0, 5);
+    jackCard = new CardClient(0, 11);
+    nonJackCard = new CardClient(0, 5);
   }
 
   @Test

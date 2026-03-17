@@ -306,7 +306,7 @@ public class GameState {
     Pawn pawn = getPawn(nextTileId);
     if (pawn != null) {
       Log.info("found pawn on start tile: " + pawn);
-      if (pawn.equals(selectedPawn)) {
+      if (pawn.getPawnId().equals(selectedPawn.getPawnId())) {
         return true;
       }
 

@@ -12,6 +12,11 @@ public class PlayerClient {
   private int place = -1;
   private int playerInt; // todo is this necessary?
 
+  public PlayerClient(String id, String name) {
+    this.id = id;
+    this.name = name;
+  }
+
   public PlayerClient(PlayerDTO playerDTO) {
     this.id = playerDTO.getId();
     this.name = playerDTO.getName();

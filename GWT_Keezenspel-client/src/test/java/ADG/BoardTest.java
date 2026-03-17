@@ -2,7 +2,7 @@ package ADG;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import ADG.Games.Keezen.Player.Player;
+import ADG.Games.Keezen.dto.PlayerClient;
 import ADG.Games.Keezen.TileMapping;
 import ADG.Games.Keezen.board.Board;
 import ADG.Games.Keezen.util.Cookie;
@@ -42,10 +42,10 @@ class BoardTest {
     }
   }
 
-  private ArrayList<Player> createPlayers(int nr) {
-    ArrayList<Player> players = new ArrayList<>();
+  private ArrayList<PlayerClient> createPlayers(int nr) {
+    ArrayList<PlayerClient> players = new ArrayList<>();
     for (int i = 0; i < nr; i++) {
-      players.add(new Player(String.valueOf(i), String.valueOf(i)));
+      players.add(new PlayerClient(String.valueOf(i), String.valueOf(i)));
     }
     return players;
   }

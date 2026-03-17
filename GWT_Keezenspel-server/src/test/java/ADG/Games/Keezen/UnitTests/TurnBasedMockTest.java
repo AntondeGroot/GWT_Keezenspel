@@ -27,6 +27,7 @@ import com.adg.openapi.model.PositionKey;
 import com.adg.openapi.model.TempMessageType;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -234,7 +235,8 @@ public class TurnBasedMockTest {
         new Pawn().playerId("0").pawnId(new PawnId("0", 0)).currentTileId(new PositionKey("0", 6));
 
     // a valid card that both players will have since they have all 13 cards
-    Card card = new Card(0, 5, null);
+    Card card = new Card().suit(0).value(5).uuid(new Random().nextInt());
+    cardsDeck.giveCardToPlayerForTesting("1", card);
 
     // send move message
     MoveRequest moveMessage = new MoveRequest();
@@ -505,7 +507,7 @@ public class TurnBasedMockTest {
     placePawnOnBoard(gameState, pawn1);
     placePawnOnBoard(gameState, pawn2);
     // fake a valid card
-    Card card = new Card().suit(0).value(7);
+    Card card = new Card().suit(0).value(7).uuid(new Random().nextInt());
     // replace a card from the players hand with this card
     cardsDeck.giveCardToPlayerForTesting("0", card);
 

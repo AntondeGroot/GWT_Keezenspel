@@ -5,21 +5,21 @@ import static ADG.CardEnum.NORMALCARD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import ADG.Games.Keezen.Cards.Card;
+import ADG.Games.Keezen.dto.CardClient;
 import ADG.Games.Keezen.PawnAndCardSelection;
-import ADG.Games.Keezen.Player.Pawn;
-import ADG.Games.Keezen.Player.PawnId;
+import ADG.Games.Keezen.dto.PawnClient;
 import ADG.Games.Keezen.TileId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class PawnAndCardSelectionValidationTest {
   private PawnAndCardSelection pawnAndCardSelection;
-  private Pawn pawn = new Pawn(new PawnId("2", 0), new TileId("2", 5));
-  private Card ace = new Card(0, 1);
+  private PawnClient pawn = new PawnClient("2", 0, new TileId("2", 5));
+  private CardClient ace = new CardClient(0, 1);
 
   @BeforeEach
   public void setUp() {
@@ -39,13 +39,13 @@ public class PawnAndCardSelectionValidationTest {
     pawnAndCardSelection.setPlayerId("2");
 
     pawnAndCardSelection.addPawn(pawn);
-    pawnAndCardSelection.setCard(new Card(0, 5));
+    pawnAndCardSelection.setCard(new CardClient(0, 5));
     pawnAndCardSelection.addPawn(pawn);
     assertNull(pawnAndCardSelection.getPawn1());
-    assertEquals(new Card(0, 5), pawnAndCardSelection.getCard());
+    assertEquals(new CardClient(0, 5), pawnAndCardSelection.getCard());
 
     // WHEN adding new card
-    pawnAndCardSelection.setCard(new Card(0, 9));
+    pawnAndCardSelection.setCard(new CardClient(0, 9));
 
     // THEN
     assertEquals(9, pawnAndCardSelection.getCard().getCardValue());
@@ -66,7 +66,7 @@ public class PawnAndCardSelectionValidationTest {
     pawnAndCardSelection.setCard(ace);
     pawnAndCardSelection.createMoveMessage();
 
-    pawnAndCardSelection.setCard(new Card(0, 9));
+    pawnAndCardSelection.setCard(new CardClient(0, 9));
     pawnAndCardSelection.addPawn(pawn);
     pawnAndCardSelection.addPawn(pawn);
 
@@ -103,14 +103,14 @@ public class PawnAndCardSelectionValidationTest {
   @Test
   public void updatePawnWithNewCurrentPosition() {
     // GIVEN
-    Pawn pawnOld = new Pawn(new PawnId("2", 0), new TileId("2", -1));
-    Pawn pawnNew = new Pawn(new PawnId("2", 0), new TileId("2", 5));
+    PawnClient pawnOld = new PawnClient("2", 0, new TileId("2", -1));
+    PawnClient pawnNew = new PawnClient("2", 0, new TileId("2", 5));
 
     pawnAndCardSelection.setPlayerId("2");
     pawnAndCardSelection.addPawn(pawnOld);
 
     // WHEN
-    pawnAndCardSelection.updatePawns(new ArrayList<Pawn>(Arrays.asList(pawnNew)));
+    pawnAndCardSelection.updatePawns(Arrays.asList(pawnNew));
 
     // THEN
     assertEquals(5, pawnAndCardSelection.getPawn1().getCurrentTileId().getTileNr());
