@@ -1,26 +1,77 @@
-/** Add css rules here for your application. */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
 
+/** ============================================================
+    Keezenspel – Visual Theme
+    Board-game aesthetic: dark felt, warm wood tones, gold accents
+    ============================================================ */
 
-/** Example rules used by the template application (remove for your app) */
-h1 {
-  font-size: 2em;
-  font-weight: bold;
-  color: #777777;
-  margin: 40px 0px 40px;
-  text-align: center;
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at center, #1a3a1a 0%, #0d1f0d 100%);
+  min-height: 100vh;
+  font-family: 'Lato', 'Helvetica Neue', sans-serif;
 }
+
+h1 {
+  font-size: 2.4em;
+  font-weight: 700;
+  font-family: 'Cinzel', Georgia, serif;
+  color: #f4d03f;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.9), 0 0 24px rgba(244, 208, 63, 0.4);
+  margin: 0;
+  padding: 18px 0 14px;
+  text-align: center;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #6b3a1f 0%, #4a2610 50%, #6b3a1f 100%);
+  border-top: 4px solid #8b5a2b;
+  border-bottom: 6px solid #2a1408;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================================
+   Main Layout
+   ============================================================ */
+
+.columnscontainer {
+  display: flex;
+}
+
+.column {
+  flex: 0;
+  padding: 10px;
+}
+
+.column1 {
+  background: radial-gradient(ellipse at center, #1d4d1d 0%, #0f2b0f 100%);
+  width: 50vw;
+  border-right: 2px solid #c9a227;
+  box-shadow: inset -10px 0 30px rgba(0, 0, 0, 0.3);
+}
+
+.column2 {
+  background: linear-gradient(180deg, #1a2a1a 0%, #0e1e0e 100%);
+  width: 50vw;
+  height: 800px;
+}
+
+/* ============================================================
+   Canvas / Board area
+   ============================================================ */
 
 .canvasWrapper {
   position: relative;
   width: 650px;
   height: 600px;
 }
-.canvasCards2{
+
+.canvasCards2 {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Center it */
+  transform: translate(-50%, -50%);
 }
+
 .columnWrapper {
   position: relative;
   width: 600px;
@@ -33,139 +84,146 @@ h1 {
   left: 0;
 }
 
+/* ============================================================
+   Buttons
+   ============================================================ */
+
 .sendButton {
-  font-size: 16pt;
-  border-radius: 5px;
-  background-color: #96ff8c;
-  border-color: black;
+  font-size: 15pt;
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 1px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #a8f0a0, #60d458);
+  border: 2px solid #3a8c35;
+  color: #0e2b0b;
   margin-bottom: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: all 0.18s ease;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
 }
+
+.sendButton:hover {
+  background: linear-gradient(145deg, #b8f8b0, #72e464);
+  transform: translateY(-1px);
+  box-shadow: 4px 5px 14px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
 .sendButton:active {
-  background-color: #51fc42;
+  background: linear-gradient(145deg, #60d458, #42cc30);
+  transform: translateY(1px);
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
 }
 
-.forfeitButton{
-  font-size: 16pt;
-  border-radius: 5px;
-  background-color: #ffe4ad;
-  border-color: black;
+.forfeitButton {
+  font-size: 15pt;
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 1px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #ffecc0, #ffc850);
+  border: 2px solid #b06010;
+  color: #4a2000;
   margin-bottom: 10px;
-}
-.forfeitButton:active{
-  background-color: orange;
-}
-
-/** Most GWT widgets already have a style name defined */
-.gwt-DialogBox {
-  width: 400px;
+  padding: 8px 14px;
+  cursor: pointer;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.18s ease;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
-.dialogVPanel {
-  margin: 5px;
+.forfeitButton:hover {
+  background: linear-gradient(145deg, #fff0d0, #ffd870);
+  transform: translateY(-1px);
+  box-shadow: 4px 5px 14px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-.serverResponseLabelError {
-  color: red;
+.forfeitButton:active {
+  background: linear-gradient(145deg, #ffc850, #ff9800);
+  transform: translateY(1px);
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
 }
 
-/** Set ids using widget.getElement().setId("idOfElement") */
-#closeButton {
-  margin: 15px 6px 6px;
+/* ============================================================
+   Button Container (absolute panel)
+   ============================================================ */
+
+.buttonContainer {
+  border-radius: 16px;
+  border: 2px solid #c9a227;
+  background: linear-gradient(145deg, #3a2000, #251400);
+  padding: 12px;
+  position: absolute;
+  top: 600px;
+  left: 600px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.columnscontainer {
-  display: flex;
-}
-.column {
-  flex: 0;
-  padding: 10px;
-}
-.column1 {
-  background-color: lightblue;
-  width: 50vw;
-}
-.column2 {
-  background-color: lightsteelblue;
-  width: 50vw;
-  height: 800px;
-}
-.profilepic{
-  border-radius: 50%;
-  border: 10px solid #000000; /* Black border */
-  background-color: #F0F0F0; /* Light grey background */
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3); /* Shadow effect */
-}
-.playerPlaying{
-  border-radius: 10px;
-  border: 3px double darkred;
+/* ============================================================
+   Pawn step inputs
+   ============================================================ */
+
+.pawnIntegerBoxes {
+  border-radius: 8px;
+  padding: 4px;
+  background-color: rgba(255, 200, 100, 0.15);
+  border: 1px solid rgba(201, 162, 39, 0.5);
+  visibility: hidden;
 }
 
-.playerListContainer{
-}
-
-.inactivePlayer{
-  border-color: #c2bfb6;
-}
-.inactivePlayerName{
-  text-decoration: line-through;
-  font-weight: normal;
-  font-style: italic;
-}
-.activePlayerName{
-  font-weight: bold;
-}
-.playerName{
-  font-size: 14pt;
-  font-family: "Helvetica Neue";
-  margin-right: 30px;
-  margin-left: 10px;
-}
-
-.TextBoxForPawnSteps{
-  font-family: "Helvetica Neue";
+.TextBoxForPawnSteps {
+  font-family: 'Lato', 'Helvetica Neue', sans-serif;
   font-size: 12pt;
   width: 20px;
   margin-right: 5px;
   text-align: center;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #8a6a20;
+  border-radius: 4px;
+  color: #2a1800;
 }
-.TextBoxLabel{
+
+.TextBoxLabel {
   font-size: 14pt;
-  font-family: "Helvetica Neue";
+  font-family: 'Lato', 'Helvetica Neue', sans-serif;
+  color: #f0e8c8;
   white-space: nowrap;
   margin-right: 8px;
   margin-left: 10px;
 }
 
-/*
-the tiles of the game are designed to be so called 'neumorphism'
-the design of which can be controlled and copy pasted into this CSS file by visiting the website:
-https://neumorphism.io/
-*/
-.tile{
+/* ============================================================
+   Tiles (neumorphic design)
+   ============================================================ */
+
+.tile {
   border-width: 1px;
   border-style: solid;
-  border-color: black;
+  border-color: rgba(0, 0, 0, 0.4);
   border-radius: 50%;
 }
 
 .tile-highlight {
-  background-color: rgba(255, 165, 0, 0); /* yellow, fully transparent */
+  background-color: rgba(255, 200, 0, 0);
   transition: background-color 0.25s linear;
   border-radius: 50%;
 }
+
 .tile-highlight-active {
-  background-color: rgba(255, 165, 0, 0.6); /* yellow, semi-transparent */
+  background-color: rgba(255, 200, 0, 0.6);
   border-radius: 50%;
 }
 
 @keyframes yellowPulse {
   0% {
-    background-color: rgba(255, 165, 0, 0);
+    background-color: rgba(255, 215, 0, 0);
     width: 0%;
     height: 0%;
   }
   100% {
-    background-color: rgba(255, 165, 0, 0.6);
+    background-color: rgba(255, 215, 0, 0.7);
     width: 100%;
     height: 100%;
   }
@@ -175,45 +233,109 @@ https://neumorphism.io/
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Center it */
+  transform: translate(-50%, -50%);
   animation: yellowPulse 1s ease infinite;
 }
 
-.pawnIntegerBoxes{
-  border-radius: 8px;
-  padding: 4px;
-  background-color: #ffe4ad;
-  visibility: hidden;
-}
-.buttonContainer{
-  border-radius: 20px;
-  border-width: 4px;
-  border-style: solid;
-  border-color: #ffe4ad;
-  background-color: darkorange;
-  padding: 10px;
-  position: absolute;
-  top: 600px;
-  left: 600px;
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3); /* Shadow effect */
-}
-.pawnDiv{
+/* ============================================================
+   Pawns
+   ============================================================ */
+
+.pawnDiv {
   width: 40px;
   height: 40px;
   position: absolute;
   z-index: 10;
 }
-.cardDiv{
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3); /* Shadow effect */
-  background-image: url("card-deck.png");
-  background-repeat: no-repeat;
 
-  display: inline-block; /*fixes adding the cards, otherwise they stack vertically*/
-  margin-right: 5px;
-  margin-left: 5px;
-}
-.pawnImage{
-  background-size: contain; /* scale image to fit in div */
+.pawnImage {
+  background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+}
+
+/* ============================================================
+   Cards
+   ============================================================ */
+
+.cardDiv {
+  box-shadow: 4px 5px 14px rgba(0, 0, 0, 0.55), 1px 1px 4px rgba(0, 0, 0, 0.3);
+  background-image: url("card-deck.png");
+  background-repeat: no-repeat;
+  display: inline-block;
+  margin-right: 5px;
+  margin-left: 5px;
+  border-radius: 5px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cardDiv:hover {
+  transform: translateY(-8px) scale(1.04);
+  box-shadow: 6px 12px 24px rgba(0, 0, 0, 0.65), 0 0 10px rgba(244, 208, 63, 0.25);
+}
+
+/* ============================================================
+   Player list
+   ============================================================ */
+
+.profilepic {
+  border-radius: 50%;
+  border: 4px solid #c9a227;
+  background-color: #2a3a2a;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55), 0 0 8px rgba(201, 162, 39, 0.25);
+}
+
+.playerPlaying {
+  border-radius: 12px;
+  border: 3px solid #f4d03f;
+  background: rgba(244, 208, 63, 0.07);
+  box-shadow: 0 0 14px rgba(244, 208, 63, 0.3);
+}
+
+.playerListContainer {
+}
+
+.inactivePlayer {
+  border-color: #4a4a4a;
+  opacity: 0.6;
+}
+
+.inactivePlayerName {
+  text-decoration: line-through;
+  font-weight: normal;
+  font-style: italic;
+  color: #888;
+}
+
+.activePlayerName {
+  font-weight: bold;
+  color: #f0e8c8;
+}
+
+.playerName {
+  font-size: 14pt;
+  font-family: 'Lato', 'Helvetica Neue', sans-serif;
+  color: #d4c9a0;
+  margin-right: 30px;
+  margin-left: 10px;
+}
+
+/* ============================================================
+   GWT dialogs (keep defaults)
+   ============================================================ */
+
+.gwt-DialogBox {
+  width: 400px;
+}
+
+.dialogVPanel {
+  margin: 5px;
+}
+
+.serverResponseLabelError {
+  color: #ff6b6b;
+}
+
+#closeButton {
+  margin: 15px 6px 6px;
 }
