@@ -76,17 +76,19 @@ public class CardsApiDelegateImpl implements CardsApiDelegate {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
-    // 4️⃣ Collect played cards (convert to String, or adapt based on your domain)
-    List<Card> playedCards = cardsDeck.getPlayedCards();
+    // 4️⃣ Collect played cards as card IDs ("suit_value") for client-side resource lookup
+    List<String> playedCardIds =
+        cardsDeck.getPlayedCards().stream()
+            .map(card -> card.getSuit() + "_" + card.getValue())
+            .toList();
 
     // 5️⃣ Collect number of cards per player
-    // assuming cardsDeck has something like getNrCardsPerPlayer() or similar
     var nrOfCardsPerPlayer = cardsDeck.getNrOfCardsPerPlayer(); // Map<String, Integer>
 
     // 6️⃣ Construct response DTO
     CardResponse response =
         new CardResponse()
-            //        .playedCards(playedCards)
+            .playedCards(playedCardIds)
             .nrOfCardsPerPlayer(nrOfCardsPerPlayer);
 
     // 7️⃣ Return 200 OK
