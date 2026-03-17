@@ -3,15 +3,9 @@ package ADG.Games.Keezen.board;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.updatePlayerProfileUI;
 import static java.lang.String.valueOf;
 
-import ADG.Games.Keezen.Cards.CardResponse;
-import ADG.Games.Keezen.Cards.CardsServiceAsync;
 import ADG.Games.Keezen.CardsDeck;
-import ADG.Games.Keezen.Move.MoveResponse;
-import ADG.Games.Keezen.Move.MovingServiceAsync;
 import ADG.Games.Keezen.PawnAndCardSelection;
 import ADG.Games.Keezen.PlayerList;
-import ADG.Games.Keezen.State.GameStateResponse;
-import ADG.Games.Keezen.State.GameStateServiceAsync;
 import ADG.Games.Keezen.TileId;
 import ADG.Games.Keezen.animations.*;
 import ADG.Games.Keezen.dto.CardClient;
@@ -33,15 +27,10 @@ import java.util.ArrayList;
 
 public class GameBoardPresenter {
 
-  private CardResponse storedCardResponse;
   private boolean requestInProgress = false;
   private Board boardModel;
   private final GameBoardView view;
-  private final GameStateServiceAsync gameStateService;
-  private final CardsServiceAsync cardsService;
-  private final MovingServiceAsync movingService;
   private final PollingService pollingService;
-  private GameStateResponse gameStateResponseUpdate = new GameStateResponse();
   private final PawnAndCardSelection pawnAndCardSelection;
   private final PlayerList playerList = new PlayerList();
   private final CardsDeck cardsDeck = new CardsDeck();
@@ -49,27 +38,15 @@ public class GameBoardPresenter {
   private long gameStateVersion = 0;
   private final int BOARD_SIZE = 600; // todo: replace with CSS properties
 
-  private MoveResponse storedMoveResponse = new MoveResponse();
-
-  public GameBoardPresenter(
-      GameBoardView gameBoardView,
-      GameStateServiceAsync gameStateService,
-      CardsServiceAsync cardsService,
-      MovingServiceAsync movingService,
-      PollingService pollingService) {
+  public GameBoardPresenter(GameBoardView gameBoardView, PollingService pollingService) {
     this.view = gameBoardView;
-    this.gameStateService = gameStateService;
-    this.cardsService = cardsService;
-    this.movingService = movingService;
     this.pollingService = pollingService;
-    this.storedCardResponse = new CardResponse();
     pawnAndCardSelection = new PawnAndCardSelection();
   }
 
   public void start() {
     bindEventHandlers();
     startPollingServer();
-    initializeGame();
   }
 
   private void startPollingServer() {
@@ -109,10 +86,6 @@ public class GameBoardPresenter {
                         // todo: improve animation
                         GWT.log("make move successful");
                         view.animatePawns(result);
-                        //                AnimationSequence.movePawn(result.getPawn1(),
-                        // result.getMovePawn1(), true);
-                        //                AnimationSequence.movePawn(result.getPawn2(),
-                        // result.getMovePawn2(), true);
                       }
 
                       @Override
@@ -218,9 +191,7 @@ public class GameBoardPresenter {
             GameStateClient gameStateClient = new GameStateClient(response);
 
             updateGameState(gameStateClient);
-            //            pollServerForGameState();
             pollServerForCards();
-            //            pollServerForMove();
           }
 
           @Override
@@ -261,36 +232,7 @@ public class GameBoardPresenter {
     GWT.log("update pawns");
     pawnAndCardSelection.updatePawns(gameState.getPawns());
 
-    // only set the board when empty, e.g.
-    // when the browser was refreshed or when you join the game for the first time
     view.enableButtons(currentPlayerIsPlaying(gameState));
-  }
-
-  private void pollServerForGameState() {
-    //    gameStateService.getGameState(Cookie.getSessionID(), new
-    // AsyncCallback<GameStateResponse>() {
-    //      public void onFailure(Throwable caught) {
-    //        StepsAnimation.resetStepsAnimation();
-  }
-
-  public void onSuccess(GameStateResponse result) {
-    //        if (!Board.isInitialized()) {
-    //          initializeBoardState(result);
-    //          AnimationSpeed.setSpeed(result.getAnimationSpeed());
-    //        }
-    //
-    //        if (!gameStateResponseUpdate.equals(result)) {
-    //          GWT.log(result.toString());
-    //          gameStateResponseUpdate = result;
-    //          Board.setPawns(result.getPawns());
-    //          pawnAndCardSelection.updatePawns(result.getPawns());
-    //        }
-    //        // only set the board when empty, e.g.
-    //        // when the browser was refreshed or when you join the game for the first time
-    //        updatePlayerList(result);
-    //        view.enableButtons(currentPlayerIsPlaying(result));
-    //      }
-    //    });
   }
 
   private void initializeBoardState(GameStateClient result) {
@@ -302,61 +244,6 @@ public class GameBoardPresenter {
     GWT.log("draw board");
     view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
     view.createPawns(result.getPawns(), pawnAndCardSelection);
-    //    view.animatePawns();
-  }
-
-  private void updatePlayerList(GameStateClient result) {
-    updatePlayerProfileUI(result.getPlayers());
-    //    if (!playerList.isIsUpToDate()) {
-    //      gameStateService.getPlayers(Cookie.getSessionID(), new
-    // AsyncCallback<ArrayList<Player>>() {
-    //        @Override
-    //        public void onFailure(Throwable throwable) {
-    //        }
-    //
-    //        @Override
-    //        public void onSuccess(ArrayList<Player> players) {
-    //          updatePlayerProfileUI(players);
-    //        }
-    //      });
-    //    }
-  }
-
-  private void initializeGame() {
-    //    gameStateService.startGame(Cookie.getSessionID(), new AsyncCallback<Void>() {
-    //      @Override
-    //      public void onFailure(Throwable throwable) {
-    //        GWT.log("Game is already running");
-    //        try {
-    //          fetchAndInitializePlayers();
-    //        } catch (Exception ignored) {
-    //        }
-    //      }
-    //
-    //      @Override
-    //      public void onSuccess(Void o) {
-    //        fetchAndInitializePlayers();
-    //      }
-    //    });
-  }
-
-  private void fetchAndInitializePlayers() {
-    //    gameStateService.getPlayers(Cookie.getSessionID(), new AsyncCallback<ArrayList<Player>>()
-    // {
-    //      @Override
-    //      public void onFailure(Throwable throwable) {
-    //      }
-    //
-    //      @Override
-    //      public void onSuccess(ArrayList<Player> players) {
-    //        GWT.log("players = " + players);
-    //        view.createPlayerList(players);
-    //        boardModel = new Board();
-    //        GWT.log("gameStateService getPlayers board.create");
-    //
-    //        boardModel.createBoard(players, BOARD_SIZE);
-    //      }
-    //    });
   }
 
   private void pollServerForCards() {
@@ -393,17 +280,6 @@ public class GameBoardPresenter {
           }
         });
   }
-
-  //  public void draw() {
-  //
-  //    if (pawnAndCardSelection.getDrawCards()) {
-  //      view.drawCards(
-  //          cardsDeck,
-  //          pawnAndCardSelection);
-  //      pawnAndCardSelection.setCardsAreDrawn();
-  //    }
-  //    view.animatePawns();
-  //  }
 
   private boolean currentPlayerIsPlaying(GameStateClient result) {
     return result.getCurrentPlayerId().equals(Cookie.getPlayerId());
