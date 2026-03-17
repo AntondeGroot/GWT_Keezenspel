@@ -107,4 +107,20 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
     GameRegistry.removeGame(sessionId);
     return ResponseEntity.status(204).build();
   }
+
+  @Override
+  public ResponseEntity<GameInfo> gamesSessionIdGet(String sessionId) {
+    if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+    GameState gameState = gameSession.getGameState();
+    GameInfo gameInfo =
+        new GameInfo(
+            gameSession.getSessionId(),
+            gameSession.getRoomName(),
+            gameState.getNrPlayers(),
+            gameSession.getMaxPlayers(),
+            gameState.hasStarted() ? GameInfo.StatusEnum.IN_PROGRESS : GameInfo.StatusEnum.WAITING);
+    return ResponseEntity.ok(gameInfo);
+  }
 }

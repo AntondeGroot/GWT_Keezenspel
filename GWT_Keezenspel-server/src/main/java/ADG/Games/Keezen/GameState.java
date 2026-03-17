@@ -485,7 +485,6 @@ public class GameState {
 
   public void processOnMove(MoveRequest moveMessage, MoveResponse response) {
     processOnMove(moveMessage, response, true);
-    version.incrementAndGet();
   }
 
   public void processOnMove(
@@ -978,6 +977,7 @@ public class GameState {
       } else {
         nextActivePlayer();
       }
+      version.incrementAndGet();
     }
   }
 
@@ -1096,6 +1096,7 @@ public class GameState {
         }
         checkForWinners(winners);
         removeWinnerFromActivePlayerList();
+        version.incrementAndGet();
       }
     }
 
