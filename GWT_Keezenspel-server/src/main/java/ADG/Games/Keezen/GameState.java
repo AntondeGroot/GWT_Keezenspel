@@ -29,6 +29,7 @@ import com.adg.openapi.model.PawnId;
 import com.adg.openapi.model.Player;
 import com.adg.openapi.model.PositionKey;
 import com.adg.openapi.model.TempMessageType;
+import jakarta.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -161,10 +162,10 @@ public class GameState {
   }
 
   public void forfeitPlayer(String playerId) {
-    Optional<Player> matchingPlayer =
-        players.stream().filter(player -> player.getId().equals(playerId)).findFirst();
-
-    matchingPlayer.ifPresent(PlayerStatus::setInactive);
+    Player matchingPlayer = findPlayerById(playerId);
+    if (matchingPlayer != null) {
+      PlayerStatus.setInactive(matchingPlayer);
+    }
 
     if (players.stream().noneMatch(Player::getIsActive)) {
       resetActivePlayers();
@@ -191,10 +192,7 @@ public class GameState {
       nextRoundPlayer();
     }
     // todo: check if all players have finished
-    // update player with PlayerId to be playing
-    for (Player player : players) {
-      player.setIsPlaying(player.getId().equals(playerIdTurn));
-    }
+    setPlayingPlayer(playerIdTurn);
   }
 
   private void nextActivePlayer() {
@@ -203,10 +201,7 @@ public class GameState {
       nextActivePlayer();
     }
     // todo: check if all players have finished
-    // update player with PlayerId to be playing
-    for (Player player : players) {
-      player.setIsPlaying(player.getId().equals(playerIdTurn));
-    }
+    setPlayingPlayer(playerIdTurn);
   }
 
   public String getPlayerIdTurn() {
@@ -253,6 +248,22 @@ public class GameState {
 
   public int getNrPlayers() {
     return players.size();
+  }
+
+  @Nullable
+  private Player findPlayerById(String playerId) {
+    for (Player player : players) {
+      if (player.getId().equals(playerId)) {
+        return player;
+      }
+    }
+    return null;
+  }
+
+  private void setPlayingPlayer(String playerId) {
+    for (Player player : players) {
+      player.setIsPlaying(player.getId().equals(playerId));
+    }
   }
 
   private boolean isPawnLooselyClosedIn(Pawn pawn, PositionKey tileId) {
