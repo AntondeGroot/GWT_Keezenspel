@@ -80,6 +80,10 @@
         <configuration>
           <launcherDir>${basedir}/GWT_Keezenspel-server/target/classes/launcherDir/</launcherDir>
           <moduleName/>
+          <codeserverArgs>
+            <arg>-port</arg>
+            <arg>9878</arg>
+          </codeserverArgs>
         </configuration>
       </plugin>
       <plugin>
