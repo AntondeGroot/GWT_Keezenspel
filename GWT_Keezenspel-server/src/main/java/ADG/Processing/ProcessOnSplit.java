@@ -1,108 +1,131 @@
 package ADG.Processing;
 
+import static ADG.util.CardValueCheck.isSeven;
+import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
+import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
+import static com.adg.openapi.model.MoveResult.INVALID_SELECTION;
+import static com.adg.openapi.model.MoveResult.PLAYER_DOES_NOT_HAVE_CARD;
+import static com.adg.openapi.model.MoveType.MOVE;
+import static com.adg.openapi.model.MoveType.SPLIT;
+import static com.adg.openapi.model.TempMessageType.CHECK_MOVE;
 
 import ADG.Games.Keezen.GameState;
+import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
+import com.adg.openapi.model.Pawn;
+import com.adg.openapi.model.TempMessageType;
 
 public class ProcessOnSplit {
-  public static void processOnSplit(
-      GameState gameState, MoveRequest moveRequest, MoveResponse response) {
-    //    Pawn pawn1 = moveRequest.getPawn1();
-    //    Pawn pawn2 = moveRequest.getPawn2();
-    //    Card card = moveRequest.getCard();
-    //    int nrStepsPawn1 = moveRequest.getStepsPawn1();
-    //    int nrStepsPawn2 = moveRequest.getStepsPawn2();
-    //    String playerId1 = pawn1.getPlayerId();
-    //    String playerId2 = pawn2.getPlayerId();
 
-    // todo: this seems sensible but will fail tests do not uncomment
-    //        if(!playerId.equals(playerIdTurn)){
-    //            response.setResult(CANNOT_MAKE_MOVE);
-    //            return;
-    //        }
-    // todo : do not uncomment the above
+  public static void process(GameState gs, MoveRequest moveMessage, MoveResponse response) {
+    Pawn pawn1 = gs.getPawn(moveMessage.getPawn1Id());
+    Pawn pawn2 = gs.getPawn(moveMessage.getPawn2Id());
+    Card card = gs.getCard(moveMessage.getCardId(), moveMessage.getPlayerId());
 
-    //        MoveMessage moveMessagePawn1 = new MoveMessage();
-    //        MoveMessage moveMessagePawn2 = new MoveMessage();
-    //        // pawn1
-    //        moveMessagePawn1.setPlayerId(playerId);
-    //        moveMessagePawn1.setCard(card);
-    //        moveMessagePawn1.setStepsPawn1(nrStepsPawn1);
-    //        moveMessagePawn1.setPawnId1(moveMessage.getPawnId1());
-    //        moveMessagePawn1.setMessageType(CHECK_MOVE);
-    //        moveMessagePawn1.setMoveType(SPLIT);
-    //        // pawn2
-    //        moveMessagePawn2.setPlayerId(playerId);
-    ////        moveMessagePawn2.setCard(card);
-    //        moveMessagePawn2.setStepsPawn1(nrStepsPawn2);
-    //        moveMessagePawn2.setPawnId1(moveMessage.getPawnId2());
-    //        moveMessagePawn2.setMessageType(CHECK_MOVE);
-    //        moveMessagePawn2.setMoveType(SPLIT);
+    if (pawn1 == null || card == null || pawn2 == null) {
+      response.setResult(INVALID_SELECTION);
+      return;
+    }
+
+    com.adg.openapi.model.MoveType moveType = moveMessage.getMoveType();
+    int nrStepsPawn1 = moveMessage.getStepsPawn1();
+    int nrStepsPawn2 = moveMessage.getStepsPawn2();
+    String playerId = pawn1.getPlayerId();
+
+    if (!playerId.equals(pawn2.getPlayerId())) {
+      response.setResult(CANNOT_MAKE_MOVE);
+      return;
+    }
+
+    if (!isSeven(card)) {
+      response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
+      return;
+    }
+
+    if ((nrStepsPawn1 + nrStepsPawn2 != 7) && moveType == MOVE) {
+      response.setResult(INVALID_SELECTION);
+      return;
+    }
+
+    MoveRequest moveMessagePawn1 = new MoveRequest();
+    MoveRequest moveMessagePawn2 = new MoveRequest();
+    // pawn1
+    moveMessagePawn1.setPlayerId(playerId);
+    moveMessagePawn1.setCardId(card.getUuid());
+    moveMessagePawn1.setStepsPawn1(nrStepsPawn1);
+    moveMessagePawn1.setPawn1Id(moveMessage.getPawn1Id());
+    moveMessagePawn1.setTempMessageType(CHECK_MOVE);
+    moveMessagePawn1.setMoveType(SPLIT);
+    // pawn2
+    moveMessagePawn2.setPlayerId(playerId);
+    moveMessagePawn2.setCardId(card.getUuid());
+    moveMessagePawn2.setStepsPawn1(nrStepsPawn2);
+    moveMessagePawn2.setPawn1Id(moveMessage.getPawn2Id());
+    moveMessagePawn2.setTempMessageType(CHECK_MOVE);
+    moveMessagePawn2.setMoveType(SPLIT);
 
     MoveResponse moveResponsePawn1 = new MoveResponse();
     MoveResponse moveResponsePawn2 = new MoveResponse();
 
-    // the following is a bit convoluted
-    // 1. backup Pawn1
-    // 2. move Pawn1 as if it were already done for real
-    // 3. check move Pawn2
-    // 4. move Pawn1 back to its original place
-    // 5. then if the movetype is MAKE_MOVE then do it for real.
-    // make sure to use new Pawn(), otherwise it will refer to the same memory and the backup would
-    // be updated!
-    //    Pawn backupPawn1 = new Pawn(pawnId1,
-    // getPawn(moveMessagePawn1.getPawnId1()).getCurrentTileId());
-    //
-    //    processOnMove(moveMessagePawn1, moveResponsePawn1);
-    //    if(moveResponsePawn1.getResult().equals(CANNOT_MAKE_MOVE)){
-    //      response.setResult(CANNOT_MAKE_MOVE);
-    //      return;
-    //    }
-    //
-    //    // temporarily move Pawn1
-    //    movePawn(new Pawn(pawnId1, moveResponsePawn1.getMovePawn1().getLast()));
-    //
-    //    // check Pawn2, this time it will take in account the new position of Pawn1
-    //    processOnMove(moveMessagePawn2, moveResponsePawn2);
-    //    restore and move Pawn1 back to where it originally was
-    //    movePawn(new Pawn(pawnId1, backupPawn1.getCurrentTileId()));
-    //    if(moveResponsePawn2.getResult().equals(CANNOT_MAKE_MOVE)){
-    //      response.setResult(CANNOT_MAKE_MOVE);
-    //      return;
-    //    }
-    //
-    //    if(moveMessage.getMessageType() == MAKE_MOVE){
-    //      if(moveMessage.getStepsPawn1() + moveMessage.getStepsPawn2() != 7){
-    //        response.setResult(INVALID_SELECTION);
-    //        return;
-    //      }
-    //      // DO IT AGAIN NOW FOR REAL
-    //      moveMessagePawn1.setMessageType(MAKE_MOVE);
-    //      cardsDeck.setPlayerCard(playerId, card); // duplicate the 7 card so that the player can
-    // play both pawns with 1 card
-    //      moveMessagePawn2.setMessageType(MAKE_MOVE);
-    //      processOnMove(moveMessagePawn1, moveResponsePawn1, false);
-    //      processOnMove(moveMessagePawn2, moveResponsePawn2, true);
-    //      response.setMessageType(MAKE_MOVE);
-    //    }else{
-    //      response.setMessageType(CHECK_MOVE);
-    //    }
-    //    response.setPawnId1(moveMessage.getPawnId1());
-    //    response.setPawnId2(moveMessage.getPawnId2());
-    //    response.setMovePawn1(moveResponsePawn1.getMovePawn1());
-    //    response.setMovePawn2(moveResponsePawn2.getMovePawn1());
-    //    if(moveResponsePawn1.getMoveKilledPawn1() != null){
-    //      response.setPawnIdKilled1(moveResponsePawn1.getPawnIdKilled1());// only the first one is
-    // filled in with a kill when you check only 1 pawn
-    //      response.setMoveKilledPawn1(moveResponsePawn1.getMoveKilledPawn1());
-    //    }
-    //    if(moveResponsePawn2.getMoveKilledPawn1() != null){
-    //      response.setPawnIdKilled2(moveResponsePawn2.getPawnIdKilled1());// only the first one is
-    // filled in with a kill when you check only 1 pawn
-    //      response.setMoveKilledPawn2(moveResponsePawn2.getMoveKilledPawn1());
-    //    }
-    //    response.setResult(CAN_MAKE_MOVE);
-    //    response.setMoveType(SPLIT);
+    Pawn backupPawn1 =
+        new Pawn(
+            pawn1.getPlayerId(),
+            pawn1.getPawnId(),
+            gs.getPawn(moveMessagePawn1.getPawn1Id()).getCurrentTileId(),
+            pawn1.getNestTileId());
+
+    ProcessOnMove.process(gs, moveMessagePawn1, moveResponsePawn1);
+    if (moveResponsePawn1.getResult().equals(CANNOT_MAKE_MOVE)) {
+      response.setResult(CANNOT_MAKE_MOVE);
+      return;
+    }
+
+    gs.movePawn(
+        new Pawn(
+            pawn1.getPlayerId(),
+            pawn1.getPawnId(),
+            moveResponsePawn1.getMovePawn1().getLast(),
+            pawn1.getNestTileId()));
+
+    ProcessOnMove.process(gs, moveMessagePawn2, moveResponsePawn2);
+    gs.movePawn(
+        new Pawn(
+            pawn1.getPlayerId(),
+            pawn1.getPawnId(),
+            backupPawn1.getCurrentTileId(),
+            pawn1.getNestTileId()));
+
+    if (moveResponsePawn2.getResult().equals(CANNOT_MAKE_MOVE)) {
+      response.setResult(CANNOT_MAKE_MOVE);
+      return;
+    }
+
+    if (TempMessageType.MAKE_MOVE.equals(moveMessage.getTempMessageType())) {
+      if (moveMessage.getStepsPawn1() + moveMessage.getStepsPawn2() != 7) {
+        response.setResult(INVALID_SELECTION);
+        return;
+      }
+      moveMessagePawn1.setTempMessageType(TempMessageType.MAKE_MOVE);
+      gs.duplicatePlayerCard(playerId, card);
+      moveMessagePawn2.setTempMessageType(TempMessageType.MAKE_MOVE);
+      ProcessOnMove.process(gs, moveMessagePawn1, moveResponsePawn1, false);
+      ProcessOnMove.process(gs, moveMessagePawn2, moveResponsePawn2, true);
+    }
+
+    response.setPawn1(gs.getPawn(moveMessage.getPawn1Id()));
+    response.setPawn2(gs.getPawn(moveMessage.getPawn2Id()));
+    response.setMovePawn1(moveResponsePawn1.getMovePawn1());
+    response.setMovePawn2(moveResponsePawn2.getMovePawn1());
+    if (moveResponsePawn1.getMovePawnKilledByPawn1() != null) {
+      response.setPawnKilledByPawn1(moveResponsePawn1.getPawnKilledByPawn1());
+      response.setMovePawnKilledByPawn1(moveResponsePawn1.getMovePawnKilledByPawn1());
+    }
+    if (moveResponsePawn2.getMovePawnKilledByPawn2() != null) {
+      response.setPawnKilledByPawn2(moveResponsePawn2.getPawnKilledByPawn1());
+      response.setMovePawnKilledByPawn2(moveResponsePawn2.getMovePawnKilledByPawn1());
+    }
+    response.setResult(CAN_MAKE_MOVE);
+    response.setMoveType(SPLIT);
   }
 }
