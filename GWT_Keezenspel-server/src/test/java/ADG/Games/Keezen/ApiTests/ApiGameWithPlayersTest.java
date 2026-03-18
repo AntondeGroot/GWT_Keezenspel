@@ -1,6 +1,5 @@
 package ADG.Games.Keezen.ApiTests;
 
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.utils.ApiModelHelpers.getRandomPlayer;
 import static ADG.Games.Keezen.utils.ApiModelHelpers.getRandomRoomName;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,18 +11,15 @@ import com.adg.openapi.model.Player;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.WebDriver;
 
 class ApiGameWithPlayersTest {
 
   private final ApiCallsHelper apiHelper = new ApiCallsHelper();
-  static WebDriver driver;
 
   @BeforeEach
   public void setUp() {
     Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
-    driver = getDriver();
   }
 
   @Test
