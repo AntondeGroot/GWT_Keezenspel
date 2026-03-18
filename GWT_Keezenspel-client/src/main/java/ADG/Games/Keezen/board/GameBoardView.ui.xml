@@ -1,6 +1,6 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui">
-  <g:HorizontalPanel ui:field="columnsContainer">
+  <g:HorizontalPanel ui:field="columnsContainer" styleName="gameContainer">
     <g:HorizontalPanel styleName="column1">
       <g:HorizontalPanel styleName="columnWrapper">
         <g:VerticalPanel>
