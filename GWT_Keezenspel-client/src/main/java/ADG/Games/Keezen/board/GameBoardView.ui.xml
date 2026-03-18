@@ -28,7 +28,7 @@
     </g:HorizontalPanel>
     <g:VerticalPanel styleName="column2">
       <g:VerticalPanel ui:field="playerListContainer2" styleName="playerListContainer"
-        width="50vw"/>
+        width="320px"/>
     </g:VerticalPanel>
   </g:HorizontalPanel>
 </ui:UiBinder>

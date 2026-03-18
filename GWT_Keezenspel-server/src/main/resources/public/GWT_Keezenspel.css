@@ -5,10 +5,16 @@
     Board-game aesthetic: dark felt, warm wood tones, gold accents
     ============================================================ */
 
+html {
+  height: 100%;
+  background: #0d1f0d;
+}
+
 body {
-  margin: 0;
-  background: radial-gradient(ellipse at center, #1a3a1a 0%, #0d1f0d 100%);
-  min-height: 100vh;
+  margin: 0 !important;
+  height: 100vh;
+  overflow: hidden;
+  background: radial-gradient(ellipse at center, #1a3a1a 0%, #0d1f0d 100%) !important;
   font-family: 'Lato', 'Helvetica Neue', sans-serif;
 }
 
@@ -29,6 +35,18 @@ h1 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
 }
 
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 26px;
+  z-index: 100;
+  background: linear-gradient(180deg, #6b3a1f 0%, #4a2610 50%, #6b3a1f 100%);
+  border-top: 6px solid #2a1408;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
 /* ============================================================
    Main Layout
    ============================================================ */
@@ -36,13 +54,24 @@ h1 {
 .gameContainer {
   width: 100%;
   background: transparent;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+.gameContainer > tbody,
+.gameContainer > tbody > tr {
+  height: 100%;
 }
 
 .gameContainer > tbody > tr > td {
-  width: 50%;
   background: transparent;
   vertical-align: top;
   padding: 0;
+  height: 100%;
+}
+
+.gameContainer > tbody > tr > td:last-child {
+  width: 340px;
 }
 
 .columnscontainer {
@@ -57,14 +86,28 @@ h1 {
 .column1 {
   background: radial-gradient(ellipse at center, #1d4d1d 0%, #0f2b0f 100%);
   width: 100%;
+  min-height: 100vh;
   border-right: 2px solid #c9a227;
   box-shadow: inset -10px 0 30px rgba(0, 0, 0, 0.3);
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+.column1 > tbody,
+.column1 > tbody > tr {
+  height: 100%;
+}
+
+.column1 > tbody > tr > td {
+  height: 100%;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .column2 {
   background: linear-gradient(180deg, #1a2a1a 0%, #0e1e0e 100%);
-  width: 100%;
-  height: 800px;
+  width: 340px;
+  min-height: 100vh;
 }
 
 /* ============================================================
@@ -88,6 +131,7 @@ h1 {
   position: relative;
   width: 600px;
   height: 800px;
+  display: inline-block;
 }
 
 .canvasWrapper canvas {
