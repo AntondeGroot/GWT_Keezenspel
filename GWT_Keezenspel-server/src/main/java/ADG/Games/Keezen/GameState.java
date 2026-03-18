@@ -344,29 +344,20 @@ public class GameState {
   public void processOnSplit(MoveRequest moveMessage, MoveResponse response) {
     Pawn pawn1 = getPawn(moveMessage.getPawn1Id());
     Pawn pawn2 = getPawn(moveMessage.getPawn2Id());
-    // todo: getCard already checks if the player has a a card - this check can be removed from
-    // other places
     Card card = getCard(moveMessage.getCardId(), moveMessage.getPlayerId());
+
+    if (pawn1 == null || card == null || pawn2 == null) {
+      response.setResult(INVALID_SELECTION);
+      return;
+    }
+
     MoveType moveType = moveMessage.getMoveType();
     int nrStepsPawn1 = moveMessage.getStepsPawn1();
     int nrStepsPawn2 = moveMessage.getStepsPawn2();
     String playerId = pawn1.getPlayerId();
-    String playerId2 = pawn2.getPlayerId();
 
-    if (!playerId.equals(playerId2)) {
+    if (!playerId.equals(pawn2.getPlayerId())) {
       response.setResult(CANNOT_MAKE_MOVE);
-      return;
-    }
-
-    // todo: this seems sensible but will fail tests do not uncomment
-    //        if(!playerId.equals(playerIdTurn)){
-    //            response.setResult(CANNOT_MAKE_MOVE);
-    //            return;
-    //        }
-    // todo : do not uncomment the above
-
-    if (pawn1 == null || card == null || pawn2 == null) {
-      response.setResult(INVALID_SELECTION);
       return;
     }
 
@@ -794,6 +785,29 @@ public class GameState {
     }
   }
 
+  private boolean isMakeMove(MoveRequest request) {
+    return TempMessageType.MAKE_MOVE.equals(request.getTempMessageType());
+  }
+
+  /**
+   * Plays the card and advances the game turn. Call this after physically moving pawns.
+   * When goToNextPlayer is false (split first pawn) the card is consumed but the turn is not yet
+   * advanced; the second processOnMove call with goToNextPlayer=true will advance it.
+   */
+  private void finishTurn(String playerId, Card card, boolean goToNextPlayer) {
+    Boolean noCardsLeft = cardsDeck.playerPlaysCard(playerId, card);
+    if (goToNextPlayer) {
+      if (noCardsLeft) {
+        forfeitPlayer(playerId);
+      } else {
+        nextActivePlayer();
+      }
+      checkForWinners(winners);
+      removeWinnerFromActivePlayerList();
+      version.incrementAndGet();
+    }
+  }
+
   private void clearResponse(MoveResponse response) {
     response.setPawn1(null);
     response.setPawn2(null);
@@ -891,7 +905,6 @@ public class GameState {
     Pawn pawn2t = getPawn(moveMessage.getPawn2Id());
     Card card = getCard(moveMessage.getCardId(), moveMessage.getPlayerId());
 
-    // invalid selection
     if (pawn1t == null || card == null || pawn2t == null) {
       moveResponse.setResult(INVALID_SELECTION);
       return;
@@ -900,12 +913,6 @@ public class GameState {
     String selectedPawnPlayerId1 = moveMessage.getPawn1Id().getPlayerId();
     String selectedPawnPlayerId2 = moveMessage.getPawn2Id().getPlayerId();
     String playerId = moveMessage.getPlayerId();
-    // todo: this seems sensible but will fail tests
-    //        if(!playerId.equals(playerIdTurn)){
-    //            moveResponse.setResult(CANNOT_MAKE_MOVE);
-    //            return;
-    //        }
-    // todo: do not uncomment above
     moveResponse.setMoveType(SWITCH);
 
     // You can't switch with yourself
@@ -966,18 +973,10 @@ public class GameState {
     PositionKey tileId2 =
         new PositionKey(
             pawn2.getCurrentTileId().getPlayerId(), pawn2.getCurrentTileId().getTileNr());
-    // switch in gamestate
-    // only use the card when not testing
-    if (moveMessage.getTempMessageType().equals(TempMessageType.MAKE_MOVE)) {
+    if (isMakeMove(moveMessage)) {
       movePawn(new Pawn(pawn1.getPlayerId(), pawn1.getPawnId(), tileId2, pawn1.getNestTileId()));
       movePawn(new Pawn(pawn2.getPlayerId(), pawn2.getPawnId(), tileId1, pawn2.getNestTileId()));
-      Boolean playerHasNoCardsLeft = cardsDeck.playerPlaysCard(playerId, card);
-      if (playerHasNoCardsLeft) {
-        forfeitPlayer(playerId);
-      } else {
-        nextActivePlayer();
-      }
-      version.incrementAndGet();
+      finishTurn(playerId, card, true);
     }
   }
 
@@ -1071,7 +1070,7 @@ public class GameState {
         move2.add(pawn.getNestTileId());
         response.setPawnKilledByPawn1(pawn);
         response.setMovePawnKilledByPawn1(move2);
-        if (moveMessage.getTempMessageType().equals(TempMessageType.MAKE_MOVE)) {
+        if (isMakeMove(moveMessage)) {
           movePawn(
               new Pawn(
                   pawn.getPlayerId(),
@@ -1083,21 +1082,11 @@ public class GameState {
     }
 
     response.setPawn1(pawn0);
-    if (Objects.equals(moveMessage.getTempMessageType(), TempMessageType.MAKE_MOVE)) {
+    if (isMakeMove(moveMessage)) {
       movePawn(
           new Pawn(pawn0.getPlayerId(), pawn0.getPawnId(), targetTileId, pawn0.getNestTileId()));
-      Boolean playerHasNoCardsLeft = cardsDeck.playerPlaysCard(playerId, card);
-      if (goToNextPlayer) { // this is only false when you SPLIT a move, the second time calling it
-                            // will make you go to the next player
-        if (playerHasNoCardsLeft) {
-          forfeitPlayer(playerId);
-        } else {
-          nextActivePlayer();
-        }
-        checkForWinners(winners);
-        removeWinnerFromActivePlayerList();
-        version.incrementAndGet();
-      }
+      // goToNextPlayer is false only for the first pawn of a SPLIT move; the second call advances
+      finishTurn(playerId, card, goToNextPlayer);
     }
 
     response.setResult(CAN_MAKE_MOVE);
