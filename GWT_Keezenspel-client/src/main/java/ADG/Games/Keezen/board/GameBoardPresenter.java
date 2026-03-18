@@ -23,7 +23,10 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class GameBoardPresenter {
 
@@ -255,22 +258,62 @@ public class GameBoardPresenter {
     GWT.log("polling server for cards");
     requestInProgress = true;
     pawnAndCardSelection.setPlayerId(Cookie.getPlayerId());
-    apiClient.getPlayerCards(
-        Cookie.getSessionID(),
-        Cookie.getPlayerId(),
-        new ApiClient.ApiCallback<JsArray<CardDTO>>() {
-          @Override
-          public void onSuccess(JsArray<CardDTO> cards) {
-            ArrayList<CardClient> clientCards = new ArrayList<>();
-            for (int i = 0; i < cards.length(); i++) {
-              clientCards.add(new CardClient(cards.get(i)));
-            }
 
-            GWT.log("Received " + cards.length() + " cards from API:");
-            cardsDeck.setCards(clientCards);
-            view.drawCards(cardsDeck, pawnAndCardSelection);
-            playerList.refresh();
-            requestInProgress = false;
+    apiClient.getPubliclyAvailableCardInformation(
+        Cookie.getSessionID(),
+        new ApiClient.ApiCallback<JSONObject>() {
+          @Override
+          public void onSuccess(JSONObject publicCardInfo) {
+            // parse playedCards from List<String> where each entry is "suit_value"
+            ArrayList<CardClient> playedCards = new ArrayList<>();
+            JSONArray playedCardsJson =
+                publicCardInfo.get("playedCards").isArray();
+            if (playedCardsJson != null) {
+              for (int i = 0; i < playedCardsJson.size(); i++) {
+                String cardId = playedCardsJson.get(i).isString().stringValue();
+                String[] parts = cardId.split("_");
+                playedCards.add(
+                    new CardClient(Integer.parseInt(parts[0]), Integer.parseInt(parts[1])));
+              }
+            }
+            cardsDeck.setPlayedCards(playedCards);
+
+            // parse nrOfCardsPerPlayer
+            JSONObject nrCardsJson =
+                publicCardInfo.get("nrOfCardsPerPlayer").isObject();
+            HashMap<String, Integer> nrCardsMap = new HashMap<>();
+            if (nrCardsJson != null) {
+              for (String key : nrCardsJson.keySet()) {
+                nrCardsMap.put(
+                    key, (int) nrCardsJson.get(key).isNumber().doubleValue());
+              }
+            }
+            cardsDeck.setNrCardsPerPlayer(nrCardsMap);
+
+            // now fetch the player's own hand
+            apiClient.getPlayerCards(
+                Cookie.getSessionID(),
+                Cookie.getPlayerId(),
+                new ApiClient.ApiCallback<JsArray<CardDTO>>() {
+                  @Override
+                  public void onSuccess(JsArray<CardDTO> cards) {
+                    ArrayList<CardClient> clientCards = new ArrayList<>();
+                    for (int i = 0; i < cards.length(); i++) {
+                      clientCards.add(new CardClient(cards.get(i)));
+                    }
+                    GWT.log("Received " + cards.length() + " cards from API:");
+                    cardsDeck.setCards(clientCards);
+                    view.drawCards(cardsDeck, pawnAndCardSelection);
+                    playerList.refresh();
+                    requestInProgress = false;
+                  }
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    StepsAnimation.resetStepsAnimation();
+                    requestInProgress = false;
+                  }
+                });
           }
 
           @Override
