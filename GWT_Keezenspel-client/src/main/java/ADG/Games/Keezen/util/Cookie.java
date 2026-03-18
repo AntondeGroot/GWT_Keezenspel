@@ -1,6 +1,7 @@
 package ADG.Games.Keezen.util;
 
 import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.Window;
 import java.util.Collection;
 
 public class Cookie {
@@ -19,6 +20,11 @@ public class Cookie {
   }
 
   public static void createPlayerIdCookie() {
+    String fromUrl = Window.Location.getParameter(PLAYERID);
+    if (fromUrl != null && !fromUrl.isEmpty()) {
+      Cookies.setCookie(PLAYERID, fromUrl);
+      return;
+    }
     Collection<String> cookieNames = Cookies.getCookieNames();
     if (!cookieNames.contains(PLAYERID)) {
       Cookies.setCookie(PLAYERID, UUID.get());
@@ -26,12 +32,14 @@ public class Cookie {
   }
 
   public static void createSessionIdCookie() {
+    String fromUrl = Window.Location.getParameter(SESSIONID);
+    if (fromUrl != null && !fromUrl.isEmpty()) {
+      Cookies.setCookie(SESSIONID, fromUrl);
+      return;
+    }
     Collection<String> cookieNames = Cookies.getCookieNames();
     if (!cookieNames.contains(SESSIONID)) {
-      Cookies.setCookie(
-          SESSIONID,
-          "123"); // todo: use a way to get the sessionID from the server (for example after joining
-                  // a room_
+      Cookies.setCookie(SESSIONID, "123");
     }
   }
 }
