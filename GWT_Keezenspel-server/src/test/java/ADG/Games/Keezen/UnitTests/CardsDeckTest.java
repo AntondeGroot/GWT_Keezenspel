@@ -53,8 +53,14 @@ class CardsDeckTest {
 
     // THEN
     List<Card> cards = cardsDeck.getCardsForPlayer("0");
-    assertFalse(isSortedNumerically(cards));
     assertEquals(5, cards.size());
+
+    // The unshuffled deck deals values 1,2,3,4,5 in order — a shuffle should change this
+    List<Integer> cardValues = cards.stream().map(Card::getValue).toList();
+    assertNotEquals(
+        List.of(1, 2, 3, 4, 5),
+        cardValues,
+        "Cards should not be in the default unshuffled order");
   }
 
   @Test
@@ -122,17 +128,6 @@ class CardsDeckTest {
 
     assertEquals(nrs, cardsDeck.getNrOfCardsPerPlayer());
     assertTrue(cardsDeck.getCardsForPlayer("0").isEmpty());
-  }
-
-  public static boolean isSortedNumerically(List<Card> cards) {
-    for (int i = 0; i < cards.size() - 1; i++) {
-      int currentValue = cards.get(i).getValue();
-      int nextValue = cards.get(i + 1).getValue();
-      if (currentValue > nextValue) {
-        return false;
-      }
-    }
-    return true;
   }
 
   public static boolean doNotContainTheSameCards(List<Card> cards1, List<Card> cards2) {

@@ -402,6 +402,9 @@ public class GameBoardView extends Composite {
   }
 
   private void drawPlayedCards(ArrayList<CardClient> playedCards, Image spriteImage) {
+    // Expose count for Selenium tests (canvas content is not DOM-inspectable)
+    getCanvasCards().setAttribute("data-played-count", String.valueOf(playedCards.size()));
+
     // Loop through the cards to draw them
     // the cards are drawn rotating with an angle of 45 degrees
     // meaning that after 8 cards you will draw a card over a previous drawn card

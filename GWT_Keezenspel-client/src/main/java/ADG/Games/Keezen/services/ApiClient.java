@@ -78,6 +78,14 @@ public class ApiClient {
   }
 
   // === CARDS ===
+  public void getPubliclyAvailableCardInformation(
+      String sessionId, ApiCallback<JSONObject> callback) {
+    get(
+        "/cards/" + sessionId,
+        response -> JSONParser.parseStrict(response).isObject(),
+        callback);
+  }
+
   // just an array of CardDTO, use safeEval
   public void getPlayerCards(
       String sessionId, String playerId, ApiCallback<JsArray<CardDTO>> callback) {
