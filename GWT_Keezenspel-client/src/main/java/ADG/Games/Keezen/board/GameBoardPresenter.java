@@ -13,10 +13,12 @@ import ADG.Games.Keezen.dto.CardDTO;
 import ADG.Games.Keezen.dto.GameStateClient;
 import ADG.Games.Keezen.dto.GameStateDTO;
 import ADG.Games.Keezen.dto.MoveResponseDTO;
+import ADG.Games.Keezen.dto.PlayerClient;
 import ADG.Games.Keezen.dto.TestMoveResponseDTO;
 import ADG.Games.Keezen.services.ApiClient;
 import ADG.Games.Keezen.services.ApiClient.ApiCallback;
 import ADG.Games.Keezen.services.PollingService;
+import ADG.Games.Keezen.util.ChatCipher;
 import ADG.Games.Keezen.util.Cookie;
 import ADG.Games.Keezen.util.MoveRequestJsonBuilder;
 import com.google.gwt.core.client.GWT;
@@ -25,6 +27,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -39,6 +42,8 @@ public class GameBoardPresenter {
   private final CardsDeck cardsDeck = new CardsDeck();
   private final ApiClient apiClient = new ApiClient();
   private long gameStateVersion = 0;
+  private int chatMessageCount = 0;
+  private String myPlayerName = "";
   private final int BOARD_SIZE = 600; // todo: replace with CSS properties
 
   public GameBoardPresenter(GameBoardView gameBoardView, PollingService pollingService) {
@@ -62,6 +67,26 @@ public class GameBoardPresenter {
   }
 
   private void bindEventHandlers() {
+    view.getChatSendButton()
+        .addDomHandler(
+            new ClickHandler() {
+              @Override
+              public void onClick(ClickEvent event) {
+                String text = view.getChatInput().trim();
+                if (text.isEmpty()) return;
+                view.clearChatInput();
+                JSONObject msg = new JSONObject();
+                msg.put("sender", new JSONString(myPlayerName));
+                msg.put("message", new JSONString(ChatCipher.encrypt(text, Cookie.getSessionID())));
+                apiClient.sendChatMessage(Cookie.getSessionID(), msg, new ApiCallback<Void>() {
+                  @Override public void onSuccess(Void result) {}
+                  @Override public void onHttpError(int statusCode, String statusText) {}
+                  @Override public void onFailure(Throwable caught) {}
+                });
+              }
+            },
+            ClickEvent.getType());
+
     view.getSendButton()
         .addDomHandler(
             new ClickHandler() {
@@ -178,6 +203,7 @@ public class GameBoardPresenter {
   }
 
   private void pollServerForUpdates() {
+    pollServerForChat();
 
     apiClient.getGameState(
         Cookie.getSessionID(),
@@ -227,6 +253,12 @@ public class GameBoardPresenter {
       initializeBoardState(gameState);
       AnimationSpeed.setSpeed(1);
       view.createPlayerList(gameState.getPlayers());
+      for (PlayerClient p : gameState.getPlayers()) {
+        if (p.getId().equals(Cookie.getPlayerId())) {
+          myPlayerName = p.getName();
+          break;
+        }
+      }
     }
     updatePlayerProfileUI(gameState.getPlayers());
 
@@ -236,6 +268,30 @@ public class GameBoardPresenter {
     pawnAndCardSelection.updatePawns(gameState.getPawns());
 
     view.enableButtons(currentPlayerIsPlaying(gameState));
+  }
+
+  private void pollServerForChat() {
+    apiClient.getChatMessages(Cookie.getSessionID(), new ApiCallback<JSONArray>() {
+      @Override
+      public void onSuccess(JSONArray messages) {
+        if (messages.size() == chatMessageCount) return;
+        chatMessageCount = messages.size();
+        String key = Cookie.getSessionID();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < messages.size(); i++) {
+          JSONObject m = messages.get(i).isObject();
+          if (m == null) continue;
+          String timestamp = m.get("timestamp").isString().stringValue();
+          String sender    = m.get("sender").isString().stringValue();
+          String encrypted = m.get("message").isString().stringValue();
+          sb.append(timestamp).append(" ").append(sender).append(": ")
+            .append(ChatCipher.decrypt(encrypted, key)).append("\n");
+        }
+        view.refreshChat(sb.toString());
+      }
+      @Override public void onHttpError(int statusCode, String statusText) {}
+      @Override public void onFailure(Throwable caught) {}
+    });
   }
 
   private void initializeBoardState(GameStateClient result) {

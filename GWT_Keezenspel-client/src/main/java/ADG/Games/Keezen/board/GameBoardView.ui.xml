@@ -29,6 +29,13 @@
     <g:VerticalPanel styleName="column2">
       <g:VerticalPanel ui:field="playerListContainer2" styleName="playerListContainer"
         width="320px"/>
+      <g:VerticalPanel styleName="chatContainer">
+        <g:TextArea ui:field="chatDisplayField" styleName="chatDisplayField" visibleLines="8" readOnly="true"/>
+        <g:HorizontalPanel styleName="chatInputRow">
+          <g:TextBox ui:field="chatInputField" styleName="chatInputField"/>
+          <g:Button ui:field="chatSendButton" styleName="chatSendButton">Send</g:Button>
+        </g:HorizontalPanel>
+      </g:VerticalPanel>
     </g:VerticalPanel>
   </g:HorizontalPanel>
 </ui:UiBinder>
