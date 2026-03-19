@@ -207,12 +207,11 @@ public class ViewDrawing {
 
       Context2d ctx = canvas.getContext2d();
       // source image
-      // todo: use img.width or something instead
-      // move this to the server, users should have chosen their profile pic
       double sw = 1024 / 4.0;
       double sh = 1024 / 4.0;
-      double sx = sw * (playerId % 4);
-      double sy = sh * (playerId > 3 ? 1 : 0);
+      int spriteIndex = parseSpriteIndex(player.getProfilePictureUrl(), playerId);
+      double sx = sw * (spriteIndex % 4);
+      double sy = sh * (spriteIndex / 4);
       // destination
       double dy = -5 / 2.0;
       double dx = -5 / 2.0;
@@ -246,6 +245,16 @@ public class ViewDrawing {
     }
     grid.getElement().getStyle().setMargin(50, Style.Unit.PX);
     return grid;
+  }
+
+  private static int parseSpriteIndex(String profilePictureUrl, int fallback) {
+    if (profilePictureUrl == null) return fallback;
+    try {
+      int index = Integer.parseInt(profilePictureUrl);
+      return (index >= 0 && index < 16) ? index : fallback;
+    } catch (NumberFormatException e) {
+      return fallback;
+    }
   }
 
   public static void updatePlayerProfileUI(List<PlayerClient> players) {
