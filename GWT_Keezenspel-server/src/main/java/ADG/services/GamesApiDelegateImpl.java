@@ -1,5 +1,6 @@
 package ADG.services;
 
+import java.util.UUID;
 import ADG.Games.Keezen.GameRegistry;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
@@ -11,7 +12,6 @@ import com.adg.openapi.model.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -76,11 +76,8 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
       return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
-    String playerId = UUID.randomUUID().toString();
-    player.setId(playerId);
-
     gameSession.getGameState().addPlayer(player);
-    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("playerId", playerId));
+    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("playerId", player.getId()));
   }
 
   @Override
