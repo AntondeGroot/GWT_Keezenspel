@@ -395,3 +395,97 @@ footer {
 #closeButton {
   margin: 15px 6px 6px;
 }
+
+/* ============================================================
+   Chat
+   ============================================================ */
+
+.chatContainer {
+  margin: 12px 8px 8px;
+  border: 2px solid #c9a227;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #111c11 0%, #0a160a 100%);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  width: 300px;
+}
+
+.chatDisplayField {
+  width: 296px;
+  height: 160px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #d4c9a0;
+  font-family: 'Lato', 'Helvetica Neue', sans-serif;
+  font-size: 11pt;
+  line-height: 1.5;
+  border: none;
+  border-bottom: 1px solid rgba(201, 162, 39, 0.3);
+  resize: none;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* GWT TextArea read-only — override the disabled look so text stays legible */
+.chatDisplayField[readonly],
+.chatDisplayField.gwt-TextArea[readonly] {
+  color: #d4c9a0;
+  opacity: 1;
+  cursor: default;
+}
+
+.chatInputRow {
+  display: flex;
+  width: 296px;
+  padding: 6px 8px;
+  box-sizing: border-box;
+  gap: 6px;
+  background: transparent;
+}
+
+.chatInputField {
+  flex: 1;
+  font-family: 'Lato', 'Helvetica Neue', sans-serif;
+  font-size: 11pt;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(201, 162, 39, 0.5);
+  border-radius: 6px;
+  color: #f0e8c8;
+  padding: 5px 8px;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  width: 210px;
+}
+
+.chatInputField:focus {
+  border-color: #c9a227;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.chatSendButton {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 10pt;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: 6px;
+  background: linear-gradient(145deg, #c9a227, #8a6a14);
+  border: 1px solid #7a5a10;
+  color: #1a0e00;
+  padding: 5px 10px;
+  cursor: pointer;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.chatSendButton:hover {
+  background: linear-gradient(145deg, #e0b830, #a07a18);
+  transform: translateY(-1px);
+  box-shadow: 3px 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.chatSendButton:active {
+  background: linear-gradient(145deg, #8a6a14, #c9a227);
+  transform: translateY(1px);
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+}

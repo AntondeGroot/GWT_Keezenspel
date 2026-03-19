@@ -63,6 +63,12 @@ public class GameBoardView extends Composite {
 
   @UiField TextBox stepsPawn2;
 
+  @UiField TextArea chatDisplayField;
+
+  @UiField TextBox chatInputField;
+
+  @UiField Button chatSendButton;
+
   @Override
   public void onLoad() {
     super.onLoad();
@@ -472,6 +478,18 @@ public class GameBoardView extends Composite {
     }
 
     GWT.log("Image not found in DOM.");
+  }
+
+  public Button getChatSendButton() { return chatSendButton; }
+
+  public String getChatInput() { return chatInputField.getText(); }
+
+  public void clearChatInput() { chatInputField.setText(""); }
+
+  public void refreshChat(String chatText) {
+    chatDisplayField.setText(chatText);
+    // scroll to bottom so newest messages are visible
+    chatDisplayField.getElement().setScrollTop(chatDisplayField.getElement().getScrollHeight());
   }
 
   public void clearCanvasCards() {

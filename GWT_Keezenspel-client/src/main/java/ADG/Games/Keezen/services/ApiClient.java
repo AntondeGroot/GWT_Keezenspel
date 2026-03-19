@@ -14,6 +14,7 @@ import com.google.gwt.user.client.Window;
 public class ApiClient {
 
   private static final String BASE_URL = "http://localhost:4200";
+  private static final String CHAT_BASE_URL = "http://localhost:4100";
 
   // === GAMES ===
   public void getAllGames(ApiCallback<JSONArray> callback) {
@@ -99,6 +100,16 @@ public class ApiClient {
     delete("/cards/" + sessionId + "/" + playerId, r -> null, callback);
   }
 
+  // === CHAT (served by GameRoom at port 4100) ===
+  public void sendChatMessage(String sessionId, JSONObject message, ApiCallback<Void> callback) {
+    sendRequest(RequestBuilder.POST, CHAT_BASE_URL + "/chat/" + sessionId, message, r -> null, callback);
+  }
+
+  public void getChatMessages(String sessionId, ApiCallback<JSONArray> callback) {
+    sendRequest(RequestBuilder.GET, CHAT_BASE_URL + "/chat/" + sessionId, null,
+        response -> JSONParser.parseStrict(response).isArray(), callback);
+  }
+
   // === GAMESTATE ===
   public void getGameState(String sessionId, ApiCallback<JSONObject> callback) {
     get(
@@ -121,26 +132,25 @@ public class ApiClient {
 
   // === GENERIC HTTP HELPERS ===
   private <T> void get(String path, JsonParser<T> parser, ApiCallback<T> callback) {
-    sendRequest(RequestBuilder.GET, path, null, parser, callback);
+    sendRequest(RequestBuilder.GET, BASE_URL + path, null, parser, callback);
   }
 
   private <T> void post(
       String path, JSONObject payload, JsonParser<T> parser, ApiCallback<T> callback) {
-    sendRequest(RequestBuilder.POST, path, payload, parser, callback);
+    sendRequest(RequestBuilder.POST, BASE_URL + path, payload, parser, callback);
   }
 
   private <T> void delete(String path, JsonParser<T> parser, ApiCallback<T> callback) {
-    sendRequest(RequestBuilder.DELETE, path, null, parser, callback);
+    sendRequest(RequestBuilder.DELETE, BASE_URL + path, null, parser, callback);
   }
 
   private <T> void sendRequest(
       RequestBuilder.Method method,
-      String path,
+      String url,
       JSONObject data,
       JsonParser<T> parser,
       ApiCallback<T> callback) {
 
-    String url = BASE_URL + path;
     RequestBuilder builder = new RequestBuilder(method, URL.encode(url));
     builder.setHeader("Accept", "application/json");
     if (data != null) {
