@@ -107,8 +107,24 @@ footer {
 .column2 {
   background: linear-gradient(180deg, #1a2a1a 0%, #0e1e0e 100%);
   width: 340px;
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
+
+/* Push chat to the bottom of the right column.
+   GWT VerticalPanel renders as a table; override to flex so the
+   player-list row expands and the chat row stays at the bottom. */
+.column2 > tbody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.column2 > tbody > tr:first-child {
+  flex: 1;
+}
+
 
 /* ============================================================
    Canvas / Board area
@@ -401,7 +417,10 @@ footer {
    ============================================================ */
 
 .chatContainer {
-  margin: 12px 8px 8px;
+  position: fixed;
+  bottom: 44px; /* footer (32px) + 12px gap */
+  right: 20px;
+  margin: 0;
   border: 2px solid #c9a227;
   border-radius: 12px;
   background: linear-gradient(180deg, #111c11 0%, #0a160a 100%);
