@@ -5,6 +5,12 @@
     Board-game aesthetic: dark felt, warm wood tones, gold accents
     ============================================================ */
 
+:root {
+  --header-height: 84px;  /* h1: font + padding (18px+14px) + borders (4px+6px) */
+  --footer-height: 32px;  /* footer: height 26px + border-top 6px              */
+  --wrapper-height: 800px;
+}
+
 html {
   height: 100%;
   background: #0d1f0d;
@@ -53,6 +59,7 @@ footer {
 
 .gameContainer {
   width: 100%;
+  height: 100%;
   background: transparent;
   border-spacing: 0;
   border-collapse: collapse;
@@ -86,20 +93,15 @@ footer {
 .column1 {
   background: radial-gradient(ellipse at center, #1d4d1d 0%, #0f2b0f 100%);
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
   border-right: 2px solid #c9a227;
   box-shadow: inset -10px 0 30px rgba(0, 0, 0, 0.3);
   border-spacing: 0;
   border-collapse: collapse;
 }
 
-.column1 > tbody,
-.column1 > tbody > tr {
-  height: 100%;
-}
-
 .column1 > tbody > tr > td {
-  height: 100%;
+  height: calc(100vh - 90px);
   text-align: center;
   vertical-align: middle;
 }
@@ -130,8 +132,9 @@ footer {
 .columnWrapper {
   position: relative;
   width: 600px;
-  height: 800px;
+  height: var(--wrapper-height);
   display: inline-block;
+  margin-top: max(0px, calc((100vh - var(--header-height) - var(--footer-height) - var(--wrapper-height)) / 2));
 }
 
 .canvasWrapper canvas {
