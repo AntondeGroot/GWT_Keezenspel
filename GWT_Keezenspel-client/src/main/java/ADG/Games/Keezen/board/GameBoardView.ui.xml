@@ -31,7 +31,7 @@
         width="320px"/>
       <g:VerticalPanel styleName="chatContainer">
         <g:TextArea ui:field="chatDisplayField" styleName="chatDisplayField" visibleLines="8" readOnly="true"/>
-        <g:HorizontalPanel styleName="chatInputRow">
+        <g:HorizontalPanel ui:field="chatInputRow" styleName="chatInputRow">
           <g:TextBox ui:field="chatInputField" styleName="chatInputField"/>
           <g:Button ui:field="chatSendButton" styleName="chatSendButton">Send</g:Button>
         </g:HorizontalPanel>

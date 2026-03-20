@@ -402,12 +402,16 @@ footer {
 
 .chatContainer {
   margin: 12px 8px 8px;
+  position: fixed;
+  bottom: 32px;
+  right: 8px;
   border: 2px solid #c9a227;
   border-radius: 12px;
   background: linear-gradient(180deg, #111c11 0%, #0a160a 100%);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   overflow: hidden;
   width: 300px;
+  z-index: 50;
 }
 
 .chatDisplayField {
@@ -488,4 +492,22 @@ footer {
   background: linear-gradient(145deg, #8a6a14, #c9a227);
   transform: translateY(1px);
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.chatDisplayField::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chatDisplayField::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+
+.chatDisplayField::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #c9a227, #8a6a14);
+  border-radius: 3px;
+}
+
+.chatDisplayField::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #e0b830, #a07a18);
 }
