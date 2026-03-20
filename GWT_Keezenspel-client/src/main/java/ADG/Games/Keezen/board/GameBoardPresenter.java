@@ -43,6 +43,7 @@ public class GameBoardPresenter {
   private final ApiClient apiClient = new ApiClient();
   private long gameStateVersion = 0;
   private int chatMessageCount = 0;
+  private boolean chatOffline = false;
   private String myPlayerName = "";
   private final int BOARD_SIZE = 600; // todo: replace with CSS properties
 
@@ -274,6 +275,10 @@ public class GameBoardPresenter {
     apiClient.getChatMessages(Cookie.getSessionID(), new ApiCallback<JSONArray>() {
       @Override
       public void onSuccess(JSONArray messages) {
+        if (chatOffline) {
+          chatOffline = false;
+          view.setChatInputRowVisible(true);
+        }
         if (messages.size() == chatMessageCount) return;
         chatMessageCount = messages.size();
         String key = Cookie.getSessionID();
@@ -289,8 +294,12 @@ public class GameBoardPresenter {
         }
         view.refreshChat(sb.toString());
       }
-      @Override public void onHttpError(int statusCode, String statusText) {}
-      @Override public void onFailure(Throwable caught) {}
+      @Override public void onFailure(Throwable caught) {
+        if (!chatOffline) {
+          chatOffline = true;
+          view.setChatInputRowVisible(false);
+        }
+      }
     });
   }
 

@@ -63,6 +63,8 @@ public class GameBoardView extends Composite {
 
   @UiField TextBox stepsPawn2;
 
+  @UiField HorizontalPanel chatInputRow;
+
   @UiField TextArea chatDisplayField;
 
   @UiField TextBox chatInputField;
@@ -482,14 +484,19 @@ public class GameBoardView extends Composite {
 
   public Button getChatSendButton() { return chatSendButton; }
 
+  public void setChatInputRowVisible(boolean visible) { chatInputRow.setVisible(visible); }
+
   public String getChatInput() { return chatInputField.getText(); }
 
   public void clearChatInput() { chatInputField.setText(""); }
 
   public void refreshChat(String chatText) {
+    Element el = chatDisplayField.getElement();
+    boolean wasAtBottom = el.getScrollTop() + el.getClientHeight() >= el.getScrollHeight() - 5;
     chatDisplayField.setText(chatText);
-    // scroll to bottom so newest messages are visible
-    chatDisplayField.getElement().setScrollTop(chatDisplayField.getElement().getScrollHeight());
+    if (wasAtBottom) {
+      el.setScrollTop(el.getScrollHeight());
+    }
   }
 
   public void clearCanvasCards() {
