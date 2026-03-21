@@ -14,6 +14,7 @@ import com.google.gwt.dom.client.CanvasElement;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style;
@@ -182,12 +183,13 @@ public class ViewDrawing {
     List<PlayerClient> winners =
         players.stream().filter(player -> player.getPlace() > -1).collect(Collectors.toList());
 
+    int playerCount = players.size();
+    Canvas[] canvases = new Canvas[playerCount];
+    int[] spriteIndices = new int[playerCount];
+
     int playerId = 0;
     for (PlayerClient player : players) {
       int imagePixelSize = 50;
-
-      ImageElement img = Document.get().createImageElement();
-      img.setSrc("/profilepics.png");
 
       HorizontalPanel hp = new HorizontalPanel();
       hp.getElement().setId("player" + player.getPlayerInt());
@@ -205,21 +207,9 @@ public class ViewDrawing {
       canvas.setStyleName("profilepic");
       canvas.getElement().setId(player.getPlayerInt() + "Pic");
 
-      Context2d ctx = canvas.getContext2d();
-      // source image
-      double sw = 1024 / 4.0;
-      double sh = 1024 / 4.0;
-      int spriteIndex = parseSpriteIndex(player.getProfilePictureUrl(), playerId);
-      double sx = sw * (spriteIndex % 4);
-      double sy = sh * (spriteIndex / 4);
-      // destination
-      double dy = -5 / 2.0;
-      double dx = -5 / 2.0;
-      double dw = imagePixelSize + 5;
-      double dh = imagePixelSize + 5;
+      canvases[playerId] = canvas;
+      spriteIndices[playerId] = parseSpriteIndex(player.getProfilePictureUrl(), playerId);
 
-      // for spritesheets dx dy
-      ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
       canvas.asWidget().setStyleName("profilepic");
       if (player.isPlaying()) {
         hp.asWidget().setStyleName("playerPlaying");
@@ -243,6 +233,31 @@ public class ViewDrawing {
 
       playerId++;
     }
+
+    // Draw profile pics after the sprite sheet has loaded (avoids race condition).
+    // Add to RootPanel so GWT's event system is properly attached before setting the URL.
+    Image img = new Image();
+    img.setVisible(false);
+    RootPanel.get().add(img);
+    img.addLoadHandler((LoadEvent e) -> {
+      RootPanel.get().remove(img);
+      ImageElement imgEl = ImageElement.as(img.getElement());
+      double sw = 1024 / 4.0;
+      double sh = 1024 / 4.0;
+      int imagePixelSize = 50;
+      double dy = -5 / 2.0;
+      double dx = -5 / 2.0;
+      double dw = imagePixelSize + 5;
+      double dh = imagePixelSize + 5;
+      for (int i = 0; i < canvases.length; i++) {
+        if (canvases[i] == null) continue;
+        double sx = sw * (spriteIndices[i] % 4);
+        double sy = sh * (spriteIndices[i] / 4);
+        canvases[i].getContext2d().drawImage(imgEl, sx, sy, sw, sh, dx, dy, dw, dh);
+      }
+    });
+    img.setUrl("/profilepics.png");
+
     grid.getElement().getStyle().setMargin(50, Style.Unit.PX);
     return grid;
   }
