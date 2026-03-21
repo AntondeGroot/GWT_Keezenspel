@@ -3,11 +3,11 @@ package ADG;
 import ADG.Games.Keezen.GameRegistry;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
-import ADG.Games.Keezen.ImageProcessing;
 import com.adg.openapi.model.Player;
 import java.io.File;
-import java.util.Objects;
+import java.io.IOException;
 import org.springframework.boot.SpringApplication;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
@@ -28,10 +28,6 @@ public class Application extends SpringBootServletInitializer {
     int NrPlayers = 3;
 
     SpringApplication.run(Application.class, args);
-    // Create 8 pawns when missing
-    for (int i = 0; i < 8; i++) {
-      ImageProcessing.create(i);
-    }
 
     String sessionId = GameRegistry.createNewGame("123");
     GameSession session = GameRegistry.getGame(sessionId);
@@ -65,18 +61,17 @@ public class Application extends SpringBootServletInitializer {
       implements WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {
     @Override
     public void customize(ConfigurableServletWebServerFactory factory) {
-      File laucherDirDirectory =
-          new File(Objects.requireNonNull(getClass().getResource("/")).getFile(), "launcherDir");
-      if (laucherDirDirectory.exists()) {
-        // You have to set a document root here, otherwise RemoteServiceServlet will failed to find
-        // the
-        // corresponding serializationPolicyFilePath on a temporary web server started by spring
-        // boot application:
-        // servlet.getServletContext().getResourceAsStream(serializationPolicyFilePath) returns
-        // null.
-        // This has impact that java.io.Serializable can be no more used in RPC, only IsSerializable
-        // works.
-        factory.setDocumentRoot(laucherDirDirectory);
+      // ClassPathResource handles both exploded (dev) and JAR (Pi) deployments.
+      // getResource("/").getFile() breaks inside a fat JAR because the URL uses
+      // the jar: protocol. Without a document root GWT-RPC still works because
+      // all shared classes implement IsSerializable.
+      try {
+        File launcherDir = new ClassPathResource("launcherDir").getFile();
+        if (launcherDir.exists()) {
+          factory.setDocumentRoot(launcherDir);
+        }
+      } catch (IOException e) {
+        // Running from a JAR — launcherDir is not extractable as a File; safe to skip.
       }
     }
   }

@@ -28,7 +28,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
   public ResponseEntity<Object> createNewGame(NewGameRequest newGameRequest) {
     String roomName = newGameRequest.getRoomName();
 
-    if (roomName == null || roomName.isBlank()) {
+    if (roomName == null || roomName.isBlank() || roomName.trim().length() < 3) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 

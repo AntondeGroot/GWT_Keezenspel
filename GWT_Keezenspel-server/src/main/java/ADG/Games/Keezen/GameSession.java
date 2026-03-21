@@ -1,5 +1,6 @@
 package ADG.Games.Keezen;
 
+import com.adg.openapi.model.MoveResponse;
 import java.util.UUID;
 
 public class GameSession {
@@ -8,6 +9,7 @@ public class GameSession {
   private final String sessionId;
   private final String roomName;
   private final int maxPlayers;
+  private MoveResponse lastMoveResponse;
 
   public GameSession(String sessionId, String roomName, Integer maxPlayers) {
     this.sessionId = sessionId;
@@ -76,7 +78,16 @@ public class GameSession {
     return maxPlayers;
   }
 
+  public MoveResponse getLastMoveResponse() {
+    return lastMoveResponse;
+  }
+
+  public void setLastMoveResponse(MoveResponse lastMoveResponse) {
+    this.lastMoveResponse = lastMoveResponse;
+  }
+
   public void reset() {
     this.gameState.reset();
+    this.lastMoveResponse = null;
   }
 }

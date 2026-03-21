@@ -13,8 +13,10 @@ import com.google.gwt.user.client.Window;
 
 public class ApiClient {
 
-  private static final String BASE_URL = "http://localhost:4200";
-  private static final String CHAT_BASE_URL = "http://localhost:4100";
+  private static final String BASE_URL =
+      Window.Location.getProtocol() + "//" + Window.Location.getHost();
+  private static final String CHAT_BASE_URL =
+      Window.Location.getProtocol() + "//" + Window.Location.getHostName() + ":4100";
 
   // === GAMES ===
   public void getAllGames(ApiCallback<JSONArray> callback) {

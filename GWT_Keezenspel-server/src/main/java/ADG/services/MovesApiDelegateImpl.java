@@ -77,6 +77,10 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
       case ON_BOARD -> gameState.processOnBoard(moveRequest, response);
     }
 
+    if (moveRequest.getTempMessageType() == MAKE_MOVE) {
+      gameSession.setLastMoveResponse(response);
+    }
+
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 }

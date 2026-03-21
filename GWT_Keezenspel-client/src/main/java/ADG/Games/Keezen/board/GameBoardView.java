@@ -482,6 +482,25 @@ public class GameBoardView extends Composite {
     GWT.log("Image not found in DOM.");
   }
 
+  public void animatePawnsToPositions(List<PawnClient> pawns) {
+    double desiredWidth = 40;
+    double desiredHeight = 40;
+    for (PawnClient pawn : pawns) {
+      DivElement pawnElement = pawnElements.get(pawn.getPawnId());
+      if (pawnElement == null) continue;
+      for (TileMapping mapping : Board.getTiles()) {
+        if (mapping.getTileId().equals(pawn.getCurrentTileId())) {
+          Point point = mapping.getPosition();
+          pawnElement.getStyle().setProperty("transition", "all 600ms ease-in-out");
+          pawnElement.getOffsetWidth(); // force reflow so transition applies
+          pawnElement.getStyle().setLeft(point.getX() - desiredWidth / 2, Style.Unit.PX);
+          pawnElement.getStyle().setTop(point.getY() - desiredHeight / 2 - 15, Style.Unit.PX);
+          break;
+        }
+      }
+    }
+  }
+
   public Button getChatSendButton() { return chatSendButton; }
 
   public void setChatInputRowVisible(boolean visible) { chatInputRow.setVisible(visible); }

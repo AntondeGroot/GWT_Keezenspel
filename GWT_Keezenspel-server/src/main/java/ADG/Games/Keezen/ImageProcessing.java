@@ -6,46 +6,42 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 public class ImageProcessing {
   public static void create(int colorId) {
-    // Use the correct path to access the image file in the resources directory
-    String resourcePath = "/public/pawn.png"; // Relative to the resources folder
+    create(colorId, System.getProperty("user.dir") + "/public");
+  }
+
+  public static void create(int colorId, String outputDirPath) {
+    String resourcePath = "/public/pawn.png";
     int[] rgb = PlayerColors.getRGBColor(colorId);
-    try {
-      // Load the image from the resources folder
-      URL resourceUrl = ImageProcessing.class.getResource(resourcePath);
-      if (resourceUrl == null) {
+
+    File outputDir = new File(outputDirPath);
+    outputDir.mkdirs();
+    File outputFile = new File(outputDir, "pawn" + colorId + ".png");
+
+    if (outputFile.exists()) {
+      Log.info("Skipping image creation: " + outputFile.getName() + " already exists.");
+      return;
+    }
+
+    try (InputStream is = ImageProcessing.class.getResourceAsStream(resourcePath)) {
+      if (is == null) {
         System.err.println("Image file not found at " + resourcePath);
         return;
       }
 
-      // Read the image file
-      File inputFile = new File(resourceUrl.toURI());
-      // Prepare the output file path
-      String outputImagePath = inputFile.getParent() + File.separator + "pawn" + colorId + ".png";
-      File outputFile = new File(outputImagePath);
-
-      if (outputFile.exists()) {
-        Log.info("Skipping image creation: " + outputFile.getName() + " already exists.");
-        return;
-      }
-
-      // Read the base image
-      BufferedImage image = ImageIO.read(inputFile);
+      BufferedImage image = ImageIO.read(is);
       if (image == null) {
         System.err.println("Failed to load image from " + resourcePath);
         return;
       }
 
-      // Ensure the image is in the correct format
       BufferedImage processedImage =
           new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
-      // Process the image
       int width = image.getWidth();
       int height = image.getHeight();
 
@@ -54,12 +50,8 @@ public class ImageProcessing {
           int pixel = image.getRGB(x, y);
           Color color = new Color(pixel, true);
 
-          // Check if the pixel is white
           if (color.getRed() == 255 && color.getGreen() == 255 && color.getBlue() == 255) {
-            // Replace with red
-            Color newColor =
-                new Color(
-                    rgb[0], rgb[1], rgb[2], color.getAlpha()); // Red color with original alpha
+            Color newColor = new Color(rgb[0], rgb[1], rgb[2], color.getAlpha());
             processedImage.setRGB(x, y, newColor.getRGB());
           } else {
             processedImage.setRGB(x, y, pixel);
@@ -67,11 +59,9 @@ public class ImageProcessing {
         }
       }
 
-      // Save the modified image
       ImageIO.write(processedImage, "png", outputFile);
-
-      Log.info("Image processing completed. The output image is saved at: " + outputImagePath);
-    } catch (IOException | URISyntaxException e) {
+      Log.info("Image processing completed. Output: " + outputFile.getAbsolutePath());
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
