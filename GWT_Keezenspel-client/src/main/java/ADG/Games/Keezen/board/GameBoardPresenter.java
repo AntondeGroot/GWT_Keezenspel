@@ -260,6 +260,8 @@ public class GameBoardPresenter {
           break;
         }
       }
+    } else {
+      view.animatePawnsToPositions(gameState.getPawns());
     }
     updatePlayerProfileUI(gameState.getPlayers());
 
