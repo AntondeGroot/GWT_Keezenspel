@@ -9,6 +9,9 @@ server:
 spring:
   application:
     name: GWT_Keezenspel
+  config:
+    import:
+      - "optional:file:/opt/keezen/application-override.yaml"
 
   devtools:
     restart:

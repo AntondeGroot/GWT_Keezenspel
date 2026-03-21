@@ -15,8 +15,7 @@ public class ApiClient {
 
   private static final String BASE_URL =
       Window.Location.getProtocol() + "//" + Window.Location.getHost();
-  private static final String CHAT_BASE_URL =
-      Window.Location.getProtocol() + "//" + Window.Location.getHostName() + ":4100";
+  private static final String CHAT_BASE_URL = "";
 
   // === GAMES ===
   public void getAllGames(ApiCallback<JSONArray> callback) {
