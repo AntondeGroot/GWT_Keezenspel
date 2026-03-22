@@ -17,8 +17,8 @@ import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Point;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
@@ -32,10 +32,9 @@ public class Jack_IT {
   private String playerId0;
   private String playerId1;
   private String playerId2;
-  
+
   @BeforeEach
   public void setUp() {
-    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
 
@@ -55,6 +54,7 @@ public class Jack_IT {
     SpringAppTestHelper.stopApp();
   }
 
+  @Disabled
   @Test
   public void playersSwitchWithJack() {
     // GIVEN

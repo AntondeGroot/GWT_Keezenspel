@@ -12,7 +12,6 @@ import ADG.Games.Keezen.utils.ApiCallsHelper;
 import com.adg.openapi.model.Player;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +21,6 @@ class ApiPublicCardInfoTest {
 
   @BeforeEach
   public void setUp() {
-    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
   }
 

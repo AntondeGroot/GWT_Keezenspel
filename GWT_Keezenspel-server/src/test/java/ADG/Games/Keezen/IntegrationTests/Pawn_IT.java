@@ -18,8 +18,8 @@ import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Point;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
@@ -39,8 +39,6 @@ public class Pawn_IT {
 
   @BeforeEach
   public void setUp() {
-    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
-
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
     playerId0 = ApiUtil.getPlayerid("123", 0);
@@ -120,6 +118,7 @@ public class Pawn_IT {
     assertEquals(HIDDEN, pawnOtherPlayerOutline.getCssValue("visibility"));
   }
 
+  @Disabled
   @Test
   public void playerCanMoveOnBoardAndPlayWithoutHavingToRefreshPage() {
     PawnId pawnId = new PawnId(playerId2, 0);

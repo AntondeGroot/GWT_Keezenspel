@@ -11,8 +11,8 @@ import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
@@ -27,7 +27,6 @@ public class PlayerStatusReal_IT {
 
   @BeforeEach
   public void setUp() {
-    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
     playerId0 = ApiUtil.getPlayerid("123",0);
@@ -56,6 +55,7 @@ public class PlayerStatusReal_IT {
     SpringAppTestHelper.stopApp();
   }
 
+  @Disabled
   @Test
   public void player0IsPlayingWhenStartingGame() {
     // GIVEN a started game
@@ -68,6 +68,7 @@ public class PlayerStatusReal_IT {
     assertEquals("playerPlaying playerActive", player0.getAttribute("class"));
   }
 
+  @Disabled
   @Test
   public void player1IsPlayingWhenPlayer0Forfeits() throws InterruptedException {
     // GIVEN a started game

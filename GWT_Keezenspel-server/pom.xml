@@ -128,6 +128,10 @@
         <configuration>
           <mainClass>ADG.Application</mainClass>
           <skip>false</skip>
+          <!-- Keep original JAR as the main artifact so the failsafe plugin
+               can load application classes during integration tests.
+               The runnable fat JAR is attached with the 'exec' classifier. -->
+          <classifier>exec</classifier>
         </configuration>
       </plugin>
 
@@ -230,6 +234,21 @@
         </executions>
       </plugin>
 
+      <!-- Run integration tests (*IT.java) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.2.5</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <!-- Add generated sources to the compile path -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -302,6 +321,7 @@
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>selenium-java</artifactId>
           <version>4.31.0</version>
+          <scope>test</scope>
         </dependency>
         <!-- WebDriverManager to manage driver binaries -->
         <dependency>

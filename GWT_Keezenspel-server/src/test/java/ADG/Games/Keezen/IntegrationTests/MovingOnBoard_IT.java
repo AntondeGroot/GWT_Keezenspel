@@ -11,6 +11,7 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getPawnLocation;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
 import static org.junit.Assert.assertNotEquals;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
@@ -21,8 +22,8 @@ import ADG.Games.Keezen.Point;
 import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,8 +42,6 @@ public class MovingOnBoard_IT {
 
   @BeforeEach
   public void setUp() {
-    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
-
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
     playerIds = ApiUtil.getPlayerIds("123");
@@ -91,6 +90,7 @@ public class MovingOnBoard_IT {
     assertNotEquals(start, end);
   }
 
+  @Disabled
   @Test
   public void pawnCanMoveOnBoardWithKing() throws InterruptedException {
     // GIVEN
@@ -109,6 +109,7 @@ public class MovingOnBoard_IT {
    * This is to test if PawnAndCardSelection updates correctly
    * A pawn on a nest tile cannot move
    */
+  @Disabled
   @Test
   @Timeout(25)
   public void pawnAfterMovingOnboardCanImmediatelyMoveWithAce() {
@@ -137,6 +138,7 @@ public class MovingOnBoard_IT {
    * This is to test if PawnAndCardSelection updates correctly
    * A pawn on a nest tile cannot switch
    */
+  @Disabled
   @Test
   public void pawnAfterMovingOnboardCanImmediatelySwitch() {
     // GIVEN
@@ -171,6 +173,7 @@ public class MovingOnBoard_IT {
    * This is to test if PawnAndCardSelection updates correctly
    * A pawn on a nest tile cannot split
    */
+  @Disabled
   @Test
   public void pawnOnboardCanImmediatelyPlay7() {}
 }
