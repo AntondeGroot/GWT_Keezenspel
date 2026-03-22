@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LastMoveController {
 
   @GetMapping("/moves/{sessionId}/last")
-  public ResponseEntity<MoveResponse> getLastMove(@PathVariable String sessionId) {
+  public ResponseEntity<MoveResponse> getLastMove(@PathVariable("sessionId") String sessionId) {
     GameSession session = GameRegistry.getGame(sessionId);
     if (session == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

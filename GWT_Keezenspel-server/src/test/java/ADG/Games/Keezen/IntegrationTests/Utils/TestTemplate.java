@@ -3,7 +3,6 @@ package ADG.Games.Keezen.IntegrationTests.Utils;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
@@ -15,7 +14,6 @@ public class TestTemplate {
 
   @BeforeEach
   public void setUp() {
-    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startRealApp();
     driver = getDriver();
   }

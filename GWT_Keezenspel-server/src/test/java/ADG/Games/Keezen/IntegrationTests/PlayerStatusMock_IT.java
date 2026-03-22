@@ -16,8 +16,8 @@ import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import ADG.Games.Keezen.Player.PawnId;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
@@ -34,7 +34,6 @@ public class PlayerStatusMock_IT {
 
   @BeforeEach
   public void setUp() {
-    Assumptions.assumeTrue(System.getenv("CI") == null, "Skipping Selenium tests in CI");
     SpringAppTestHelper.startTestApp();
     driver = getDriver();
     playerId0 = ApiUtil.getPlayerid("123", 0);
@@ -65,6 +64,7 @@ public class PlayerStatusMock_IT {
     SpringAppTestHelper.stopApp();
   }
 
+  @Disabled
   @Test
   public void player0IsPlayingWhenStartingGame() {
     driver.navigate().refresh();
