@@ -316,8 +316,7 @@ public class ViewDrawing {
         canvasMedal.getStyle().setWidth(imagePixelSize, Style.Unit.PX); // visual size
         canvasMedal.getStyle().setHeight(imagePixelSize, Style.Unit.PX); // visual size
 
-        ImageElement imgMedals = Document.get().createImageElement();
-        imgMedals.setSrc("/medals.png");
+        ImageElement imgMedals = (ImageElement) Document.get().getElementById("medals").cast();
 
         // image has 220px empty space on top and bottom
         // and is 2500px wide and 1668px high
