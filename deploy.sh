@@ -5,7 +5,7 @@ echo "🔨 Building..."
 mvn clean package
 
 echo "📦 Uploading..."
-scp -i ~/.ssh/pi_deploy_key GWT_Keezenspel-server/target/GWT_Keezenspel.jar my-pi:/home/ubuntu/keezen.jar
+scp -i ~/.ssh/pi_deploy_key GWT_Keezenspel-server/target/GWT_Keezenspel-exec.jar my-pi:/home/ubuntu/keezen.jar
 
 echo "📁 Installing..."
 ssh -i ~/.ssh/pi_deploy_key my-pi "sudo mkdir -p /opt/keezen && sudo mv /home/ubuntu/keezen.jar /opt/keezen/keezen.jar"
