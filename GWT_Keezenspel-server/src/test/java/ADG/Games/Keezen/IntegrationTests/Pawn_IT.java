@@ -118,7 +118,6 @@ public class Pawn_IT {
     assertEquals(HIDDEN, pawnOtherPlayerOutline.getCssValue("visibility"));
   }
 
-  @Disabled
   @Test
   public void playerCanMoveOnBoardAndPlayWithoutHavingToRefreshPage() {
     PawnId pawnId = new PawnId(playerId2, 0);

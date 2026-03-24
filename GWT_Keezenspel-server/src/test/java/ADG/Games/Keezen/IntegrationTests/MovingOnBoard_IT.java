@@ -90,7 +90,7 @@ public class MovingOnBoard_IT {
     assertNotEquals(start, end);
   }
 
-  @Disabled
+
   @Test
   public void pawnCanMoveOnBoardWithKing() throws InterruptedException {
     // GIVEN

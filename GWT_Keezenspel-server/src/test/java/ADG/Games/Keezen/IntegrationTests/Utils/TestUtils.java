@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.Cards.Card;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Point;
@@ -102,21 +103,12 @@ public class TestUtils {
   }
 
   public static void clickCardByValue(WebDriver driver, int cardValue) {
-    WebElement card = driver.findElement(By.id(new Card(0, cardValue).toString()));
-    String initialBorder = card.getCssValue("border-color");
-
-    Log.info("border: " + initialBorder);
-    if (initialBorder.equals("rgb(0, 0, 0)")) {
-      card.click();
-    } else {
-      // in a mocked cardsdeck you can keep on playing the exact same card. This does not change
-      // movetype for an ace. Realistically you would chose another Ace card if you had two, this
-      // would trigger the reevaluation of the movetype
-      card.click();
-      // after clicking the card it will become stale
-      card = driver.findElement(By.id(new Card(0, cardValue).toString()));
-      card.click();
-    }
+    String playerId = driver.manage().getCookieNamed("playerid").getValue();
+    ApiUtil.setCardForPlayer(playerId, cardValue);
+    driver.navigate().refresh();
+    waitUntilCardsAreLoaded(driver);
+    // add test condition that the card must now exist
+    driver.findElement(By.id(new Card(0, cardValue).toString())).click();
   }
 
   public static Point getPawnLocation(WebDriver driver, PawnId pawnId) {

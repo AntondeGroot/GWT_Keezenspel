@@ -64,7 +64,6 @@ public class PlayerStatusMock_IT {
     SpringAppTestHelper.stopApp();
   }
 
-  @Disabled
   @Test
   public void player0IsPlayingWhenStartingGame() {
     driver.navigate().refresh();
