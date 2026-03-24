@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNotEquals;
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
 import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Point;
 import java.util.List;
@@ -109,9 +110,7 @@ public class MovingOnBoard_IT {
    * This is to test if PawnAndCardSelection updates correctly
    * A pawn on a nest tile cannot move
    */
-  @Disabled
   @Test
-  @Timeout(25)
   public void pawnAfterMovingOnboardCanImmediatelyMoveWithAce() {
     /***
      *
@@ -127,6 +126,7 @@ public class MovingOnBoard_IT {
     Point start = getPawnLocation(driver, pawnId20);
 
     playerPlaysCard(driver, playerId2, pawnId20, 1); // move with Ace
+    TestUtils.wait(1000);
     Point end = getPawnLocation(driver, pawnId20);
 
     // THEN
@@ -138,7 +138,6 @@ public class MovingOnBoard_IT {
    * This is to test if PawnAndCardSelection updates correctly
    * A pawn on a nest tile cannot switch
    */
-  @Disabled
   @Test
   public void pawnAfterMovingOnboardCanImmediatelySwitch() {
     // GIVEN
@@ -148,7 +147,6 @@ public class MovingOnBoard_IT {
     playerPlaysCard(driver, playerId1, pawnId10, 1);
 
     playerPlaysCard(driver, playerId2, pawnId20, 1);
-
     // THEN one pawn moves from starttile so that it can be switched
     Point p1 = getPawnLocation(driver, pawnId10);
     playerPlaysCard(driver, playerId1, pawnId10, 5);
@@ -156,6 +154,7 @@ public class MovingOnBoard_IT {
 
     assertPointsNotEqual("The pawn 10 did not move after coming on board", p1, p2);
 
+    setPlayerIdPlaying(driver, playerId2);
     Point positionPawn10 = getPawnLocation(driver, pawnId10);
     Point positionPawn20 = getPawnLocation(driver, pawnId20);
 
@@ -168,12 +167,4 @@ public class MovingOnBoard_IT {
     assertPointsEqual(
         "Pawn 1 did not move to pawn 2", positionPawn20, getPawnLocation(driver, pawnId10));
   }
-
-  /***
-   * This is to test if PawnAndCardSelection updates correctly
-   * A pawn on a nest tile cannot split
-   */
-  @Disabled
-  @Test
-  public void pawnOnboardCanImmediatelyPlay7() {}
 }

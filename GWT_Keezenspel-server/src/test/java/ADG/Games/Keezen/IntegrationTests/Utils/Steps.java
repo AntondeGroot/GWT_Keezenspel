@@ -37,11 +37,15 @@ public class Steps {
       WebDriver driver, String playerId, PawnId ownPawnId, PawnId otherPawnId) {
     setPlayerIdPlaying(driver, playerId);
     waitUntilCardsAreLoaded(driver);
-    clickPawn(driver, ownPawnId);
     clickCardByValue(driver, 11);
+    clickPawn(driver, ownPawnId);
+    clickPawn(driver, ownPawnId);
     scrollUp(driver);
     clickPawn(driver, otherPawnId);
-    assertTrue("Own pawn was not selected", pawnIsSelected(driver, ownPawnId));
+    assertTrue("""
+            Own pawn was not selected,
+            Pawn that was looked for: 
+            """+ownPawnId, pawnIsSelected(driver, ownPawnId));
     assertTrue("Other pawn was not selected", pawnIsSelected(driver, otherPawnId));
     clickPlayCardButton(driver);
     waitUntilPawnStopsMoving(driver, ownPawnId);

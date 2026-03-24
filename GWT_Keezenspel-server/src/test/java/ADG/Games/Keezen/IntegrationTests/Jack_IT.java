@@ -54,7 +54,6 @@ public class Jack_IT {
     SpringAppTestHelper.stopApp();
   }
 
-  @Disabled
   @Test
   public void playersSwitchWithJack() {
     // GIVEN
@@ -66,6 +65,7 @@ public class Jack_IT {
     setPlayerIdPlaying(driver, playerId1);
     driver.navigate().refresh();
     playerPlaysCard(driver, playerId1, pawnId10, 1);
+
     setPlayerIdPlaying(driver, playerId2);
     playerPlaysCard(driver, playerId2, pawnId20, 1);
 
@@ -77,6 +77,7 @@ public class Jack_IT {
         "The pawn of player 1 did not move with 2 steps after coming on board", start, end);
 
     // now player 2 can switch using a Jack
+    setPlayerIdPlaying(driver, playerId2);
     Point positionPlayer1 = getPawnLocation(driver, pawnId10);
     Point positionPlayer2 = getPawnLocation(driver, pawnId20);
     playerSwitchesPawns(driver, playerId2, pawnId20, pawnId10);

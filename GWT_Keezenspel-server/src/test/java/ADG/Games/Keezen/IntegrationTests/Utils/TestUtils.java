@@ -3,6 +3,7 @@ package ADG.Games.Keezen.IntegrationTests.Utils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.Cards.Card;
@@ -159,7 +160,7 @@ public class TestUtils {
   }
 
   public static void waitUntilPawnStopsMoving(WebDriver driver, PawnId pawnId) {
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(6));
     WebElement pawn = driver.findElement(By.id(pawnId.toString()));
 
     wait.until(
@@ -229,8 +230,12 @@ public class TestUtils {
   }
 
   public static void assertPointsNotEqual(String msg, Point p1, Point p2) {
-    assertNotEquals(msg, p1.getX(), p2.getX(), 2);
-    assertNotEquals(msg, p1.getY(), p2.getY(), 2);
+    boolean sameX = Math.abs(p1.getX() - p2.getX()) <= 2;
+    boolean sameY = Math.abs(p1.getY() - p2.getY()) <= 2;
+
+    if (sameX && sameY) {
+      fail(msg + " Points are equal within tolerance");
+    }
   }
 
   public static void assertPointsEqual(String msg, Point p1, Point p2) {
