@@ -55,7 +55,6 @@ public class PlayerStatusReal_IT {
     SpringAppTestHelper.stopApp();
   }
 
-  @Disabled
   @Test
   public void player0IsPlayingWhenStartingGame() {
     // GIVEN a started game
@@ -68,7 +67,6 @@ public class PlayerStatusReal_IT {
     assertEquals("playerPlaying playerActive", player0.getAttribute("class"));
   }
 
-  @Disabled
   @Test
   public void player1IsPlayingWhenPlayer0Forfeits() throws InterruptedException {
     // GIVEN a started game

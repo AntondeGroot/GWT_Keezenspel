@@ -86,7 +86,7 @@ public class CardsDeck implements CardsDeckInterface, IsSerializable {
     // this way you can replace one card by another, play a card in a Test, and then know based on
     // the game whether the player should have 5 or 4 cards in their hand left.
     playerHands.get(playerId).getHand().removeFirst();
-    setPlayerCard(playerId, card);
+    playerHands.get(playerId).getHand().add(0, card);
   }
 
   public void setPlayerCard(String playerId, Card card) {

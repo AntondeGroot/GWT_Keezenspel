@@ -108,6 +108,11 @@ public class ApiCallsHelper {
     restTemplate.delete(baseUrl + "/cards/" + sessionId + "/" + playerId);
   }
 
+  public void setCardForPlayer(String playerId, int cardValue) {
+    restTemplate.postForEntity(
+        baseUrl + "/test/set-card/" + playerId + "/" + cardValue, null, Void.class);
+  }
+
   // ---------- GAME STATES ----------
   public Map<String, Object> getGameState(String sessionId) {
     String url = baseUrl + "/gamestates/" + sessionId;

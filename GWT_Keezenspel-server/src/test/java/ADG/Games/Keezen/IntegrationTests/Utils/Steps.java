@@ -1,5 +1,6 @@
 package ADG.Games.Keezen.IntegrationTests.Utils;
 
+import static ADG.Games.Keezen.ApiUtils.ApiUtil.setCardForPlayer;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickCardByValue;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickForfeitButton;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPawn;
@@ -60,6 +61,7 @@ public class Steps {
     setPlayerIdPlaying(driver, playerId);
     for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
       for (int step : winningMoves[pawnNr]) {
+        clickCardByValue(driver, step);
         playerPlaysCard(driver, playerId, new PawnId(playerId, pawnNr), step);
       }
     }

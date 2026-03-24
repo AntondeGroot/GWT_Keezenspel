@@ -29,6 +29,10 @@ public class ApiUtil {
     return result.stream().map(map -> (String) map.get("id")).toList();
   }
 
+  public static void setCardForPlayer(String playerId, int cardValue) {
+    apiHelper.setCardForPlayer(playerId, cardValue);
+  }
+
   public static String getPlayerid(String sessionId, int indexOfPlayer) {
     List<Map<String, Object>> result = apiHelper.getAllPlayersInGame(sessionId);
     return result.get(indexOfPlayer).get("id").toString();
