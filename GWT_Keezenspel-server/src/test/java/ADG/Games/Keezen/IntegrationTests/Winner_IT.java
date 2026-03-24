@@ -13,7 +13,6 @@ import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
@@ -44,7 +43,6 @@ public class Winner_IT {
     SpringAppTestHelper.stopApp();
   }
 
-  @Disabled
   @Test
   public void letPlayer2WinsAndGetsFirstPrize() throws InterruptedException {
     // GIVEN player 0 forfeits
@@ -61,7 +59,6 @@ public class Winner_IT {
     assertPlayerHasMedal(driver, playerId2, 1);
   }
 
-  @Disabled
   @Test
   public void letPlayer2Win_ThenPlayer0_ThenPlayer1() throws InterruptedException {
     // GIVEN player 0 forfeits

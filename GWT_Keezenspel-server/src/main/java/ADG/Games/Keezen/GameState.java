@@ -65,11 +65,23 @@ public class GameState {
 
   public void reset() {
     winners.clear();
+    for (Player player : players) {
+      player.setPlace(-1);
+    }
     for (Pawn p : pawns) {
       p.setCurrentTileId(p.getNestTileId());
     }
     resetActivePlayers();
     cardsDeck.reset();
+    cardsDeck.addPlayers(players);
+    cardsDeck.shuffleIfFirstRound();
+    cardsDeck.dealCards();
+    if (!players.isEmpty()) {
+      playerIdTurn = players.getFirst().getId();
+      playerIdStartingRound = playerIdTurn;
+      setPlayingPlayer(playerIdTurn);
+    }
+    version.incrementAndGet();
   }
 
   public GameState(CardsDeckInterface cardsDeck) {

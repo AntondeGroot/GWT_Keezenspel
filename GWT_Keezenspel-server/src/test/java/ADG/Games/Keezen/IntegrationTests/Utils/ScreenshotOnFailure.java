@@ -1,7 +1,7 @@
 package ADG.Games.Keezen.IntegrationTests.Utils;
 
 import java.io.File;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -41,7 +41,7 @@ public class ScreenshotOnFailure implements TestWatcher {
   private void takeScreenshot(WebDriver driver, String testName) {
     System.out.println("IS TAKING A SCREENSHOT");
     try {
-      String timeForFilename = LocalTime.now().format(DateTimeFormatter.ofPattern("HH_mm_ss"));
+      String timeForFilename = LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM_dd___HH_mm_ss"));
 
       File source = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
       File destination = new File("screenshots/" + timeForFilename + "_" + testName + ".png");
