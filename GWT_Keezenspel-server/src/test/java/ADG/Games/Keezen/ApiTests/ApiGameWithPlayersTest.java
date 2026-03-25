@@ -5,20 +5,14 @@ import static ADG.Games.Keezen.utils.ApiModelHelpers.getRandomRoomName;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import ADG.Games.Keezen.utils.ApiCallsHelper;
+import ADG.Games.Keezen.utils.BaseUnitTest;
 import com.adg.openapi.model.Player;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ApiGameWithPlayersTest {
+class ApiGameWithPlayersTest extends BaseUnitTest {
 
   private final ApiCallsHelper apiHelper = new ApiCallsHelper();
-
-  @BeforeEach
-  public void setUp() {
-    SpringAppTestHelper.startRealApp();
-  }
 
   @Test
   void createGame_addPlayer_gameContainsThatPlayer() {

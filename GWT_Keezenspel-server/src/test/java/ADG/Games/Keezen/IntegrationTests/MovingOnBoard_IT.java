@@ -11,27 +11,21 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getPawnLocation;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
 import static org.junit.Assert.assertNotEquals;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
-import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
-import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.utils.ApiCallsHelper;
+import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Point;
 import java.util.List;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 
-@ExtendWith(ScreenshotOnFailure.class)
-public class MovingOnBoard_IT {
+public class MovingOnBoard_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
   private List<String> playerIds;
@@ -43,7 +37,6 @@ public class MovingOnBoard_IT {
 
   @BeforeEach
   public void setUp() {
-    SpringAppTestHelper.startTestApp();
     driver = getDriver();
     playerIds = ApiUtil.getPlayerIds("123");
     playerId0 = playerIds.get(0);
@@ -53,11 +46,6 @@ public class MovingOnBoard_IT {
     pawnId10 = new PawnId(playerId1, 0);
     pawnId20 = new PawnId(playerId2, 0);
     setPlayerIdPlaying(driver, playerId0);
-  }
-
-  @AfterEach
-  public void tearDown() {
-    SpringAppTestHelper.stopApp();
   }
 
   /***
@@ -74,11 +62,12 @@ public class MovingOnBoard_IT {
     if (driver != null) {
       driver.quit();
     }
-    SpringAppTestHelper.stopApp();
   }
 
   @Test
   public void pawnCanMoveOnBoardWithAce() {
+//    ApiCallsHelper.createGameWith3Players()
+//    createGameWith3Players
     // GIVEN
     Point start = clickPawn(driver, new PawnId(playerId0, 0));
 

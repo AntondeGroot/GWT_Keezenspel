@@ -50,6 +50,24 @@ public class TestUtils {
     return driver;
   }
 
+  public static WebDriver getDriver(String sessionId) {
+    WebDriverManager.chromedriver().setup();
+    ChromeOptions options = new ChromeOptions();
+    options.addArguments("--headless=new");
+    options.addArguments("--no-sandbox");
+    options.addArguments("--disable-dev-shm-usage");
+    options.addArguments("--window-size=1920,1080");
+
+    // this line is here to fix a CI error
+    options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.nanoTime());
+    WebDriver driver = new ChromeDriver(options);
+    driver.get("http://localhost:4200/");
+    driver.manage().addCookie(new Cookie("sessionid", sessionId));
+    driver.manage().addCookie(new Cookie("playerid", "player0"));
+    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+    return driver;
+  }
+
   public static void waitUntilCardsAreLoaded(WebDriver driver) {
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
 

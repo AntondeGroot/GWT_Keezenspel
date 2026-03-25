@@ -8,8 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
-import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
-import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import ADG.Games.Keezen.IntegrationTests.Utils.Steps;
 import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import ADG.Games.Keezen.utils.ApiCallsHelper;
@@ -20,29 +19,25 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-@ExtendWith(ScreenshotOnFailure.class)
-class CardDisplay_IT {
+class CardDisplay_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
   private final ApiCallsHelper apiHelper = new ApiCallsHelper();
 
   @BeforeEach
   public void setUp() {
-    SpringAppTestHelper.startRealApp();
     driver = getDriver();
     setPlayerIdPlaying(driver, ApiUtil.getPlayerid("123", 0));
   }
 
   @AfterEach
   public void tearDown() {
-    SpringAppTestHelper.stopApp();
     if (driver != null) {
       driver.quit();
     }
@@ -53,7 +48,6 @@ class CardDisplay_IT {
     if (driver != null) {
       driver.quit();
     }
-    SpringAppTestHelper.stopApp();
   }
 
   @Test

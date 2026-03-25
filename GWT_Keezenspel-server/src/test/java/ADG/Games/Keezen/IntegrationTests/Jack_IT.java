@@ -11,20 +11,17 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlayi
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
-import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
-import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Point;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 
-@ExtendWith(ScreenshotOnFailure.class)
-public class Jack_IT {
+
+public class Jack_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
   private PawnId pawnId10;
@@ -35,7 +32,6 @@ public class Jack_IT {
 
   @BeforeEach
   public void setUp() {
-    SpringAppTestHelper.startTestApp();
     driver = getDriver();
 
     playerId0 = ApiUtil.getPlayerid("123",0);
@@ -51,7 +47,6 @@ public class Jack_IT {
     if (driver != null) {
       driver.quit();
     }
-    SpringAppTestHelper.stopApp();
   }
 
   @Test

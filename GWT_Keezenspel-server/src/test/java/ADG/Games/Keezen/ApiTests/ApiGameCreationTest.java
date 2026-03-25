@@ -2,20 +2,15 @@ package ADG.Games.Keezen.ApiTests;
 
 import static org.junit.Assert.assertThrows;
 
-import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import ADG.Games.Keezen.utils.ApiCallsHelper;
-import org.junit.jupiter.api.BeforeEach;
+import ADG.Games.Keezen.utils.BaseUnitTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.HttpClientErrorException;
 
-class ApiGameCreationTest {
+class ApiGameCreationTest extends BaseUnitTest {
 
   private final ApiCallsHelper apiHelper = new ApiCallsHelper();
 
-  @BeforeEach
-  public void setUp() {
-    SpringAppTestHelper.startRealApp();
-  }
   @Test
   void cannotCreateGame_withEmptyRoomName_throws400ErrorCode() {
     // GIVEN a game has started

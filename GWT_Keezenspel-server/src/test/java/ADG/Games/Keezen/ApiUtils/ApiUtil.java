@@ -4,7 +4,6 @@ import static ADG.Games.Keezen.utils.ApiModelHelpers.getRandomRoomName;
 
 import ADG.Games.Keezen.utils.ApiCallsHelper;
 import com.adg.openapi.model.Player;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +15,8 @@ public class ApiUtil {
     // GIVEN a game has started
     String sessionId = apiHelper.createNewGame(getRandomRoomName(), 3);
     for (int i = 0; i < 3; i++) {
-      Player player = new Player("Player" + i, "player " + i);
+      // todo: maybe an identical playername and playerId is not smart
+      Player player = new Player("Player" + i, "player" + i);
       apiHelper.addPlayerToGame(sessionId, player);
     }
     apiHelper.startGame(sessionId);
@@ -36,5 +36,19 @@ public class ApiUtil {
   public static String getPlayerid(String sessionId, int indexOfPlayer) {
     List<Map<String, Object>> result = apiHelper.getAllPlayersInGame(sessionId);
     return result.get(indexOfPlayer).get("id").toString();
+  }
+
+  public static String getPlayerIdTurn(String sessionId) {
+    List<Map<String, Object>> players = apiHelper.getAllPlayersInGame(sessionId);
+    for (Map<String, Object> player : players) {
+      if (Boolean.TRUE.equals(player.get("isPlaying"))) {
+        return (String) player.get("id");
+      }
+    }
+    return null;
+  }
+
+  public static void forfeitPlayerViaApi(String sessionId, String playerId) {
+    apiHelper.playerForfeits(sessionId, playerId);
   }
 }

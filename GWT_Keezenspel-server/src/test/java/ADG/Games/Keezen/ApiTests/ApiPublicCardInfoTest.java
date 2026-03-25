@@ -7,22 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import ADG.Games.Keezen.utils.ApiCallsHelper;
+import ADG.Games.Keezen.utils.BaseUnitTest;
 import com.adg.openapi.model.Player;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ApiPublicCardInfoTest {
+class ApiPublicCardInfoTest extends BaseUnitTest {
 
   private final ApiCallsHelper apiHelper = new ApiCallsHelper();
-
-  @BeforeEach
-  public void setUp() {
-    SpringAppTestHelper.startRealApp();
-  }
 
   @Test
   void startGame_publicCardInfo_returnsNrOfCardsPerPlayer() {

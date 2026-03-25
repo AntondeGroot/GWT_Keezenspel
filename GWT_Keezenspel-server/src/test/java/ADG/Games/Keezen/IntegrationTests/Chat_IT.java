@@ -6,27 +6,23 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
+import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import ADG.Games.Keezen.IntegrationTests.Utils.ChatServerMock;
-import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
-import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-@ExtendWith(ScreenshotOnFailure.class)
-class Chat_IT {
+class Chat_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
 
   @BeforeEach
   public void setUp() {
-    SpringAppTestHelper.startRealApp();
     driver = getDriver();
     setPlayerIdPlaying(driver, ApiUtil.getPlayerid("123", 0));
   }
@@ -34,7 +30,6 @@ class Chat_IT {
   @AfterEach
   public void tearDown() {
     ChatServerMock.stop();
-    SpringAppTestHelper.stopApp();
     if (driver != null) {
       driver.quit();
     }
@@ -46,7 +41,6 @@ class Chat_IT {
     if (driver != null) {
       driver.quit();
     }
-    SpringAppTestHelper.stopApp();
   }
 
   @Test

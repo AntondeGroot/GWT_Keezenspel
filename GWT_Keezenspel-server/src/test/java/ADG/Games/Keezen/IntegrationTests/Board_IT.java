@@ -5,31 +5,26 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlayi
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
-import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
-import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-@ExtendWith(ScreenshotOnFailure.class)
-class Board_IT {
+class Board_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
 
   @BeforeEach
   public void setUp() {
-    SpringAppTestHelper.startRealApp();
     driver = getDriver();
     setPlayerIdPlaying(driver, ApiUtil.getPlayerid("123",0));
   }
 
   @AfterEach
   public void tearDown() {
-    SpringAppTestHelper.stopApp();
     if (driver != null) {
       driver.quit();
     }
@@ -48,25 +43,28 @@ class Board_IT {
     if (driver != null) {
       driver.quit();
     }
-    SpringAppTestHelper.stopApp();
   }
 
   @Test
+  public void verifyLayout(){
+    verifyTitle();
+    verifyNumberOfTilesFor3Players();
+    verifyNumberOfPawnsFor3Players();
+    verifyNumberOfCardsForPlayer1();
+  }
+
   public void verifyTitle() {
     assertEquals("Keezenspel", driver.getTitle());
   }
 
-  @Test
   public void verifyNumberOfTilesFor3Players() {
     assertEquals(24 * 3, driver.findElements(By.className("tile")).size());
   }
 
-  @Test
   public void verifyNumberOfPawnsFor3Players() {
     assertEquals(12, driver.findElements(By.className("pawnDiv")).size());
   }
 
-  @Test
   public void verifyNumberOfCardsForPlayer1() {
     assertEquals(5, driver.findElements(By.className("cardDiv")).size());
   }

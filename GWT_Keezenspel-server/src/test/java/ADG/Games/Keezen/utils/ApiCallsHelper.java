@@ -8,6 +8,7 @@ import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+//todo: make methods and class variables static
 public class ApiCallsHelper {
 
   private final RestTemplate restTemplate;
