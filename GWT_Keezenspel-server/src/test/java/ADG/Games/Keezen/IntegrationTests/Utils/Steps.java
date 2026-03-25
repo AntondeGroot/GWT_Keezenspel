@@ -11,6 +11,7 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAr
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilPawnStopsMoving;
 import static org.junit.Assert.assertTrue;
 
+import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.Player.PawnId;
 import org.openqa.selenium.WebDriver;
 
@@ -52,8 +53,6 @@ public class Steps {
   }
 
   public static void whenPlayerWins(WebDriver driver, String playerId) {
-    // WHEN player plays all cards until he wins
-    // This is possible with the mocked CardsDeck as they never run out of cards to play
     int[][] winningMoves = {
       {1, 4, 7}, // Pawn 0
       {1, 4, 6}, // Pawn 1
@@ -63,6 +62,12 @@ public class Steps {
 
     for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
       for (int step : winningMoves[pawnNr]) {
+        // Ensure it's this player's turn before playing (handles real deck round transitions)
+        String currentTurn = ApiUtil.getPlayerIdTurn("123");
+        while (currentTurn != null && !currentTurn.equals(playerId)) {
+          ApiUtil.forfeitPlayerViaApi("123", currentTurn);
+          currentTurn = ApiUtil.getPlayerIdTurn("123");
+        }
         playerPlaysCard(driver, playerId, new PawnId(playerId, pawnNr), step);
       }
     }

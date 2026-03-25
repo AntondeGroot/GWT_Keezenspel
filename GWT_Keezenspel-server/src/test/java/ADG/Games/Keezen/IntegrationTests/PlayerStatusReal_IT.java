@@ -7,27 +7,22 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAr
 import static org.junit.Assert.assertEquals;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
-import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
-import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-@ExtendWith(ScreenshotOnFailure.class)
-public class PlayerStatusReal_IT {
+public class PlayerStatusReal_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
   String playerId0;
 
   @BeforeEach
   public void setUp() {
-    SpringAppTestHelper.startRealApp();
     driver = getDriver();
     playerId0 = ApiUtil.getPlayerid("123",0);
     setPlayerIdPlaying(driver, playerId0);
@@ -35,7 +30,6 @@ public class PlayerStatusReal_IT {
 
   @AfterEach
   public void tearDown() {
-    SpringAppTestHelper.stopApp();
     driver.quit();
   }
 
@@ -52,7 +46,6 @@ public class PlayerStatusReal_IT {
     if (driver != null) {
       driver.quit();
     }
-    SpringAppTestHelper.stopApp();
   }
 
   @Test

@@ -8,32 +8,27 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
-import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
-import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-@ExtendWith(ScreenshotOnFailure.class)
-public class Card_IT {
+public class Card_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
 
   @BeforeEach
   public void setUp() {
-    SpringAppTestHelper.startRealApp();
     driver = getDriver();
     setPlayerIdPlaying(driver, ApiUtil.getPlayerid("123",0));
   }
 
   @AfterEach
   public void tearDown() {
-    SpringAppTestHelper.stopApp();
     driver.quit();
   }
 
@@ -51,7 +46,6 @@ public class Card_IT {
     if (driver != null) {
       driver.quit();
     }
-    SpringAppTestHelper.stopApp();
   }
 
   @Test

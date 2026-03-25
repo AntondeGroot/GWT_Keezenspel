@@ -9,23 +9,19 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAr
 import static org.junit.Assert.assertEquals;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
-import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
-import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import ADG.Games.Keezen.IntegrationTests.Utils.Steps;
 import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import ADG.Games.Keezen.Player.PawnId;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-@ExtendWith(ScreenshotOnFailure.class)
-public class PlayerStatusMock_IT {
+
+public class PlayerStatusMock_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
   String playerId0;
@@ -34,18 +30,12 @@ public class PlayerStatusMock_IT {
 
   @BeforeEach
   public void setUp() {
-    SpringAppTestHelper.startTestApp();
     driver = getDriver();
     playerId0 = ApiUtil.getPlayerid("123", 0);
     playerId1 = ApiUtil.getPlayerid("123", 1);
     playerId2 = ApiUtil.getPlayerid("123", 2);
     setPlayerIdPlaying(driver, playerId0);
     waitUntilCardsAreLoaded(driver);
-  }
-
-  @AfterEach
-  public void tearDown() {
-    SpringAppTestHelper.stopApp();
   }
 
   /***
@@ -61,7 +51,6 @@ public class PlayerStatusMock_IT {
     if (driver != null) {
       driver.quit();
     }
-    SpringAppTestHelper.stopApp();
   }
 
   @Test

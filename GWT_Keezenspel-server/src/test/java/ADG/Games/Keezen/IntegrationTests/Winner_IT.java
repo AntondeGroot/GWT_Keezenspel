@@ -8,17 +8,14 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlayi
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
-import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
-import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 
-@ExtendWith(ScreenshotOnFailure.class)
-public class Winner_IT {
+public class Winner_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
   String playerId0;
@@ -27,7 +24,6 @@ public class Winner_IT {
 
   @BeforeEach
   public void setUp() {
-    SpringAppTestHelper.startTestApp();
     driver = getDriver();
     playerId0 = ApiUtil.getPlayerid("123",0);
     playerId1 = ApiUtil.getPlayerid("123",1);
@@ -40,7 +36,6 @@ public class Winner_IT {
     if (driver != null) {
       driver.quit();
     }
-    SpringAppTestHelper.stopApp();
   }
 
   @Test
@@ -70,14 +65,9 @@ public class Winner_IT {
 
     // WHEN player 2 plays all cards until he wins
     whenPlayerWins(driver, playerId2);
-    playerForfeits(driver, playerId2);
-
-    // When
-    playerForfeits(driver, playerId1);
 
     // WHEN player 0 plays until he wins
     whenPlayerWins(driver, playerId0);
-    playerForfeits(driver, playerId0);
 
     assertPlayerHasMedal(driver, playerId0, 2);
 

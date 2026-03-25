@@ -11,24 +11,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
-import ADG.Games.Keezen.IntegrationTests.Utils.ScreenshotOnFailure;
-import ADG.Games.Keezen.IntegrationTests.Utils.SpringAppTestHelper;
+import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Point;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.By.ById;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-@ExtendWith(ScreenshotOnFailure.class)
-public class Pawn_IT {
+public class Pawn_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
   String HIDDEN = "hidden";
@@ -39,7 +35,6 @@ public class Pawn_IT {
 
   @BeforeEach
   public void setUp() {
-    SpringAppTestHelper.startRealApp();
     driver = getDriver();
     playerId0 = ApiUtil.getPlayerid("123", 0);
     playerId1 = ApiUtil.getPlayerid("123", 1);
@@ -50,7 +45,6 @@ public class Pawn_IT {
   @AfterEach
   public void tearDown() {
     driver.quit();
-    SpringAppTestHelper.stopApp();
   }
 
   /***
@@ -67,7 +61,6 @@ public class Pawn_IT {
     if (driver != null) {
       driver.quit();
     }
-    SpringAppTestHelper.stopApp();
   }
 
   @Test
