@@ -47,6 +47,23 @@ public class Steps {
   }
 
   public static void playerSwitchesPawns(
+      WebDriver driver, String sessionId, String playerId, PawnId ownPawnId, PawnId otherPawnId) {
+    setPlayerIdPlaying(driver, playerId);
+    waitUntilCardsAreLoaded(driver);
+
+    clickCardByValue(driver, sessionId, 11);
+    clickPawn(driver, ownPawnId);
+    clickPawn(driver, otherPawnId);
+    assertTrue("""
+            Own pawn was not selected,
+            Pawn that was looked for: 
+            """+ownPawnId, pawnIsSelected(driver, ownPawnId));
+    assertTrue("Other pawn was not selected", pawnIsSelected(driver, otherPawnId));
+    clickPlayCardButton(driver);
+    waitUntilPawnStopsMoving(driver, ownPawnId);
+  }
+
+  public static void playerSwitchesPawns(
       WebDriver driver, String playerId, PawnId ownPawnId, PawnId otherPawnId) {
     setPlayerIdPlaying(driver, playerId);
     waitUntilCardsAreLoaded(driver);
