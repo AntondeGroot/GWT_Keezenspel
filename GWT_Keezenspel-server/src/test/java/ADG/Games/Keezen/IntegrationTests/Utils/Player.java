@@ -14,7 +14,8 @@ public class Player {
 
   public static void assertPlayerHasMedal(WebDriver driver, String playerId, int finishingPlace) {
     //todo: this is a clunky bug fix, I expected player2 but got player 2, i Winner_IT test.
-    String medalId = playerId.replaceAll("([a-zA-Z])(\\d)", "$1 $2") + "Medal";
+    String medalId = playerId+"Medal";
+//    String medalId = playerId.replaceAll("([a-zA-Z])(\\d)", "$1 $2") + "Medal";
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(7));
     try {
       wait.until(driver1 -> {

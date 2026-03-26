@@ -7,44 +7,45 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getPawnLocation;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.pawnIsSelected;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilPawnStopsMoving;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.utils.BaseIntegrationTest;
-import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Point;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.By.ById;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+// optimized
+@TestMethodOrder(OrderAnnotation.class)
 public class Pawn_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
+  static String sessionId;
   String HIDDEN = "hidden";
   String VISIBLE = "visible";
-  String playerId0;
-  String playerId1;
-  String playerId2;
+  static String player0Id;
+  static String player1Id;
+  static String player2Id;
 
-  @BeforeEach
-  public void setUp() {
-    driver = getDriver();
-    playerId0 = ApiUtil.getPlayerid("123", 0);
-    playerId1 = ApiUtil.getPlayerid("123", 1);
-    playerId2 = ApiUtil.getPlayerid("123", 2);
-    setPlayerIdPlaying(driver, playerId0);
-  }
-
-  @AfterEach
-  public void tearDown() {
-    driver.quit();
+  @BeforeAll
+  static void setUp() {
+    sessionId = ApiUtil.createStandardGame();
+    driver = getDriver(sessionId);
+    setPlayerIdPlaying(driver, ApiUtil.getPlayerid(sessionId,0));
+    player0Id = ApiUtil.getPlayerid(sessionId, 0);
+    player1Id = ApiUtil.getPlayerid(sessionId, 1);
+    player2Id = ApiUtil.getPlayerid(sessionId, 2);
   }
 
   /***
@@ -64,9 +65,10 @@ public class Pawn_IT extends BaseIntegrationTest {
   }
 
   @Test
+  @Order(1)
   public void clickOnOwnPawn_Selected() {
     // GIVEN
-    PawnId pawnId = new PawnId(playerId0, 0);
+    PawnId pawnId = new PawnId(player0Id, 0);
     WebElement pawn1 = driver.findElement(By.id(pawnId.toString()));
 
     // WHEN
@@ -78,15 +80,16 @@ public class Pawn_IT extends BaseIntegrationTest {
   }
 
   @Test
+  @Order(2)
   public void clickOnOwnPawn_clickSecondPawn_FirstPawnDeselected() {
     // GIVEN
-    String pawnId1 = playerId0+"_1";
-    String pawnId2 = playerId0+"_2";
-    WebElement pawn1 = driver.findElement(new ById(pawnId1));
+    PawnId pawnId1 = new PawnId(player0Id, 1);
+    PawnId pawnId2 = new PawnId(player0Id, 2);
+    WebElement pawn1 = driver.findElement(new ById(pawnId1.toString()));
     pawn1.click();
 
     // WHEN
-    WebElement pawn2 = driver.findElement(new ById(pawnId2));
+    WebElement pawn2 = driver.findElement(new ById(pawnId2.toString()));
     pawn2.click();
 
     // THEN
@@ -98,9 +101,10 @@ public class Pawn_IT extends BaseIntegrationTest {
   }
 
   @Test
+  @Order(3)
   public void clickOnOtherPawnOnBase_NotSelected() {
     // GIVEN
-    PawnId pawnId = new PawnId(playerId1, 1);
+    PawnId pawnId = new PawnId(player1Id, 1);
     WebElement pawnOtherPlayer = driver.findElement(new ById(pawnId.toString()));
 
     // WHEN
@@ -112,24 +116,24 @@ public class Pawn_IT extends BaseIntegrationTest {
   }
 
   @Test
+  @Order(4)
   public void playerCanMoveOnBoardAndPlayWithoutHavingToRefreshPage() {
-    PawnId pawnId = new PawnId(playerId2, 0);
+    PawnId pawnId = new PawnId(player2Id, 0);
 
     // GIVEN player 0 forfeits
-    playerForfeits(driver, playerId0);
+    playerForfeits(driver, player0Id);
 
     // GIVEN player 1 forfeits
-    playerForfeits(driver, playerId1);
+    playerForfeits(driver, player1Id);
 
     // GIVEN player 2 moves on board
-    driver.navigate().refresh();
     Point nest = getPawnLocation(driver, pawnId);
-    playerPlaysCard(driver, playerId2, pawnId, 1);
+    playerPlaysCard(driver, sessionId, player2Id, pawnId, 1);
 
     // WHEN
     Point before = getPawnLocation(driver, pawnId);
-    playerPlaysCard(driver, playerId2, pawnId, 5);
-    TestUtils.wait(1000);
+    playerPlaysCard(driver,sessionId, player2Id, pawnId, 2);
+    waitUntilPawnStopsMoving(driver, pawnId);
     Point after = getPawnLocation(driver, pawnId);
 
     // THEN

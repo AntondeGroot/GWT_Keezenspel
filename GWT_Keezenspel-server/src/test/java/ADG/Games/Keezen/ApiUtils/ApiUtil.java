@@ -16,7 +16,7 @@ public class ApiUtil {
     String sessionId = apiHelper.createNewGame(getRandomRoomName(), 3);
     for (int i = 0; i < 3; i++) {
       // todo: maybe an identical playername and playerId is not smart
-      Player player = new Player("Player" + i, "player" + i);
+      Player player = new Player("player" + i, "player" + i);
       apiHelper.addPlayerToGame(sessionId, player);
     }
     apiHelper.startGame(sessionId);
@@ -31,6 +31,10 @@ public class ApiUtil {
 
   public static void setCardForPlayer(String playerId, int cardValue) {
     apiHelper.setCardForPlayer(playerId, cardValue);
+  }
+
+  public static void setCardForPlayer(String sessionId, String playerId, int cardValue) {
+    apiHelper.setCardForPlayer(sessionId, playerId, cardValue);
   }
 
   public static String getPlayerid(String sessionId, int indexOfPlayer) {
@@ -50,5 +54,9 @@ public class ApiUtil {
 
   public static void forfeitPlayerViaApi(String sessionId, String playerId) {
     apiHelper.playerForfeits(sessionId, playerId);
+  }
+
+  public static void setPawnPosition(String sessionId, String playerId, int pawnNr, String sectionOwnerId, int tileNr) {
+    apiHelper.setPawnPosition(sessionId, playerId, pawnNr, sectionOwnerId, tileNr);
   }
 }
