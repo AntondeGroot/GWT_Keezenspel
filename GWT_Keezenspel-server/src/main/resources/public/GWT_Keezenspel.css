@@ -253,6 +253,22 @@ footer {
   margin-left: 10px;
 }
 
+.pawn1Label {
+  color: #ef5350;
+}
+
+.pawn2Label {
+  color: #66bb6a;
+}
+
+.TextBoxForPawnSteps1 {
+  border: 2px solid #ef5350;
+}
+
+.TextBoxForPawnSteps2 {
+  border: 2px solid #66bb6a;
+}
+
 /* ============================================================
    Tiles (neumorphic design)
    ============================================================ */

@@ -18,10 +18,10 @@
           <g:Button ui:field="sendButton" styleName="sendButton">Play Card</g:Button>
           <g:Button ui:field="forfeitButton" styleName="forfeitButton">Forfeit</g:Button>
           <g:HorizontalPanel ui:field="pawnIntegerBoxes" styleName="pawnIntegerBoxes">
-            <g:Label styleName="TextBoxLabel">Pawn 1</g:Label>
-            <g:TextBox ui:field="stepsPawn1" styleName="TextBoxForPawnSteps"/>
-            <g:Label styleName="TextBoxLabel">Pawn 2</g:Label>
-            <g:TextBox ui:field="stepsPawn2" styleName="TextBoxForPawnSteps" enabled="false"/>
+            <g:Label styleName="TextBoxLabel pawn1Label">Pawn 1</g:Label>
+            <g:TextBox ui:field="stepsPawn1" styleName="TextBoxForPawnSteps TextBoxForPawnSteps1"/>
+            <g:Label styleName="TextBoxLabel pawn2Label">Pawn 2</g:Label>
+            <g:TextBox ui:field="stepsPawn2" styleName="TextBoxForPawnSteps TextBoxForPawnSteps2" enabled="false"/>
           </g:HorizontalPanel>
         </g:VerticalPanel>
       </g:HorizontalPanel>
