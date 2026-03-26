@@ -9,28 +9,31 @@ import static org.junit.Assert.assertEquals;
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+// optimized
+@TestMethodOrder(OrderAnnotation.class)
 public class PlayerStatusReal_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
-  String playerId0;
+  static String player0Id;
+  static String player1Id;
+  static String sessionId;
 
-  @BeforeEach
-  public void setUp() {
-    driver = getDriver();
-    playerId0 = ApiUtil.getPlayerid("123",0);
-    setPlayerIdPlaying(driver, playerId0);
-  }
-
-  @AfterEach
-  public void tearDown() {
-    driver.quit();
+  @BeforeAll
+  static void setUp() {
+    sessionId = ApiUtil.createStandardGame();
+    driver = getDriver(sessionId);
+    setPlayerIdPlaying(driver, ApiUtil.getPlayerid(sessionId,0));
+    player0Id = ApiUtil.getPlayerid(sessionId, 0);
+    player1Id = ApiUtil.getPlayerid(sessionId, 1);
   }
 
   /***
@@ -49,27 +52,30 @@ public class PlayerStatusReal_IT extends BaseIntegrationTest {
   }
 
   @Test
+  @Order(1)
   public void player0IsPlayingWhenStartingGame() {
     // GIVEN a started game
     waitUntilCardsAreLoaded(driver);
 
     // WHEN you look at player 0
-    WebElement player0 = driver.findElement(By.id(playerId0));
+    WebElement player0 = driver.findElement(By.id(player0Id));
 
     // THEN it is player 0's turn
     assertEquals("playerPlaying playerActive", player0.getAttribute("class"));
   }
 
   @Test
+  @Order(2)
   public void player1IsPlayingWhenPlayer0Forfeits() throws InterruptedException {
-    // GIVEN a started game
+    // GIVEN player 0's view is loaded
+    setPlayerIdPlaying(driver, player0Id);
     waitUntilCardsAreLoaded(driver);
 
     // WHEN
     clickForfeitButton(driver);
 
     // THEN;
-    WebElement player1 = driver.findElement(By.id(playerId0));
+    WebElement player1 = driver.findElement(By.id(player0Id));
     assertEquals("playerNotPlaying playerInactive", player1.getAttribute("class"));
   }
 }

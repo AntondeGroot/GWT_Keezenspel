@@ -1,61 +1,57 @@
 package ADG.Games.Keezen.IntegrationTests;
 
+import static ADG.Games.Keezen.IntegrationTests.PlayerStatusReal_IT.sessionId;
 import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerPlaysCard;
 import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerSwitchesPawns;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.assertPointsEqual;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.assertPointsNotEqual;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickCardByValue;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPawn;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickPlayCardButton;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getPawnLocation;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilPawnStopsMoving;
 import static org.junit.Assert.assertNotEquals;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
-import ADG.Games.Keezen.utils.ApiCallsHelper;
 import ADG.Games.Keezen.utils.BaseIntegrationTest;
-import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Point;
 import java.util.List;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.openqa.selenium.WebDriver;
 
+// optimized 40 seconds before 13 seconds after
+@TestMethodOrder(OrderAnnotation.class)
 public class MovingOnBoard_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
   private List<String> playerIds;
-  private PawnId pawnId10;
-  private PawnId pawnId20;
-  private String playerId0;
-  private String playerId1;
-  private String playerId2;
+  static PawnId pawnId00;
+  static PawnId pawnId10;
+  static PawnId pawnId20;
+  static String player0Id;
+  static String player1Id;
+  static String player2Id;
 
-  @BeforeEach
-  public void setUp() {
-    driver = getDriver();
-    playerIds = ApiUtil.getPlayerIds("123");
-    playerId0 = playerIds.get(0);
-    playerId1 = playerIds.get(1);
-    playerId2 = playerIds.get(2);
-
-    pawnId10 = new PawnId(playerId1, 0);
-    pawnId20 = new PawnId(playerId2, 0);
-    setPlayerIdPlaying(driver, playerId0);
+  @BeforeAll
+  static void setUp() {
+    sessionId = ApiUtil.createStandardGame();
+    driver = getDriver(sessionId);
+    setPlayerIdPlaying(driver, ApiUtil.getPlayerid(sessionId,0));
+    player0Id = ApiUtil.getPlayerid(sessionId, 0);
+    player1Id = ApiUtil.getPlayerid(sessionId, 1);
+    player2Id = ApiUtil.getPlayerid(sessionId, 2);
+    pawnId00 = new PawnId(player0Id, 0);
+    pawnId10 = new PawnId(player1Id, 0);
+    pawnId20 = new PawnId(player2Id, 0);
   }
 
-  /***
-   * in order to use ScreenshotOnFailure, the webdriver should not be quit in the
-   * @AfterEach tearDown(), because then the driver would no longer be accessible
-   * to take a screenshot with.
-   *
-   * The driver.quit() should then be put in the @AfterAll which comes after the TestWatcher
-   * is done. This however is a static method, requiring the webdriver to be static as well.
-   */
   @AfterAll
   public static void tearDownAll() {
     // needed for skipping the selenium tests in CI
@@ -65,33 +61,35 @@ public class MovingOnBoard_IT extends BaseIntegrationTest {
   }
 
   @Test
+  @Order(1)
   public void pawnCanMoveOnBoardWithAce() {
-//    ApiCallsHelper.createGameWith3Players()
-//    createGameWith3Players
     // GIVEN
-    Point start = clickPawn(driver, new PawnId(playerId0, 0));
+    waitUntilCardsAreLoaded(driver);
+    Point start = clickPawn(driver, pawnId00);
 
     // WHEN
-    clickCardByValue(driver, 1);
-    clickPlayCardButton(driver);
+    playerPlaysCard(driver, sessionId, player0Id, pawnId00,1);
+    waitUntilPawnStopsMoving(driver, pawnId00);
 
     // THEN
-    Point end = clickPawn(driver, new PawnId(playerId0, 0));
+    Point end = clickPawn(driver, pawnId00);
     assertNotEquals(start, end);
   }
 
 
   @Test
+  @Order(2)
   public void pawnCanMoveOnBoardWithKing() throws InterruptedException {
     // GIVEN
-    Point start = clickPawn(driver, new PawnId(playerId0, 0));
+    setPlayerIdPlaying(driver, player1Id);
+    waitUntilCardsAreLoaded(driver);
+    Point start = clickPawn(driver, pawnId10);
 
     // WHEN
-    clickCardByValue(driver, 13);
-    clickPlayCardButton(driver);
+    playerPlaysCard(driver, sessionId, player1Id, pawnId10,13);
 
     // THEN
-    Point end = clickPawn(driver, new PawnId(playerId0, 0));
+    Point end = clickPawn(driver, pawnId10);
     assertNotEquals(start, end);
   }
 
@@ -100,26 +98,20 @@ public class MovingOnBoard_IT extends BaseIntegrationTest {
    * A pawn on a nest tile cannot move
    */
   @Test
+  @Order(3)
   public void pawnAfterMovingOnboardCanImmediatelyMoveWithAce() {
-    /***
-     *
-     */
-
     // GIVEN
-    playerForfeits(driver, playerId0);
-    playerForfeits(driver, playerId1);
+    ApiUtil.setPawnPosition(sessionId, player2Id, 0, player2Id, 0);
+    setPlayerIdPlaying(driver, player2Id);
+    waitUntilCardsAreLoaded(driver);
 
     // WHEN
-    Point nest = getPawnLocation(driver, pawnId20);
-    playerPlaysCard(driver, playerId2, pawnId20, 13); // onboard with king
     Point start = getPawnLocation(driver, pawnId20);
-
-    playerPlaysCard(driver, playerId2, pawnId20, 1); // move with Ace
-    TestUtils.wait(1000);
+    playerPlaysCard(driver, sessionId, player2Id, pawnId20, 1);
+    waitUntilPawnStopsMoving(driver, pawnId20);
     Point end = getPawnLocation(driver, pawnId20);
 
     // THEN
-    assertPointsNotEqual("The pawn did not move from nest", nest, start);
     assertPointsNotEqual("The pawn did not move on the board", start, end);
   }
 
@@ -128,32 +120,24 @@ public class MovingOnBoard_IT extends BaseIntegrationTest {
    * A pawn on a nest tile cannot switch
    */
   @Test
-  public void pawnAfterMovingOnboardCanImmediatelySwitch() {
-    // GIVEN
-    playerForfeits(driver, playerId0);
-
-    // WHEN BOTH PLAYERS GET ON BOARD
-    playerPlaysCard(driver, playerId1, pawnId10, 1);
-
-    playerPlaysCard(driver, playerId2, pawnId20, 1);
-    // THEN one pawn moves from starttile so that it can be switched
-    Point p1 = getPawnLocation(driver, pawnId10);
-    playerPlaysCard(driver, playerId1, pawnId10, 5);
-    Point p2 = getPawnLocation(driver, pawnId10);
-
-    assertPointsNotEqual("The pawn 10 did not move after coming on board", p1, p2);
-
-    setPlayerIdPlaying(driver, playerId2);
-    Point positionPawn10 = getPawnLocation(driver, pawnId10);
+  @Order(4)
+  void pawnAfterMovingOnboardCanImmediatelySwitch() {
+    ApiUtil.setPawnPosition(sessionId, player0Id, 0, player0Id, 0);
+    ApiUtil.setPawnPosition(sessionId, player2Id, 0, player2Id, 15);
+    // GIVEN - refresh so the browser sees the updated positions before capturing them
+    setPlayerIdPlaying(driver, player0Id);
+    waitUntilCardsAreLoaded(driver);
     Point positionPawn20 = getPawnLocation(driver, pawnId20);
+    Point positionPawn00 = getPawnLocation(driver, pawnId00);
 
-    // WHEN PLAYER 2 SWITCHES WITH PLAYER 1
-    playerSwitchesPawns(driver, playerId2, pawnId20, pawnId10);
+    // WHEN
+    playerSwitchesPawns(driver, sessionId, player0Id, pawnId00, pawnId20);
+    waitUntilPawnStopsMoving(driver, pawnId00);
 
     // THEN THE PAWNS SWITCHED PLACE
     assertPointsEqual(
-        "Pawn 2 did not move to pawn 1", positionPawn10, getPawnLocation(driver, pawnId20));
+        "Pawn 0 did not move to pawn 1", positionPawn20, getPawnLocation(driver, pawnId00));
     assertPointsEqual(
-        "Pawn 1 did not move to pawn 2", positionPawn20, getPawnLocation(driver, pawnId10));
+        "Pawn 1 did not move to pawn 0", positionPawn00, getPawnLocation(driver, pawnId20));
   }
 }

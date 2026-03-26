@@ -143,10 +143,6 @@ public class TestUtils {
     driver.findElement(By.id(new Card(0, cardValue).toString())).click();
   }
 
-
-
-
-
   public static Point getPawnLocation(WebDriver driver, PawnId pawnId) {
     WebElement pawnElement = driver.findElement(By.id(pawnId.toString()));
     String x = pawnElement.getCssValue("left").replace("px", "");
