@@ -89,7 +89,11 @@ public class TestUtils {
 
   public static void setPlayerIdPlaying(WebDriver driver, String playerId) {
     Cookie playerCookie = new Cookie("playerid", playerId);
-    driver.manage().addCookie(playerCookie);
+    try {
+      // ignored because setting cookie for a player that is already playing
+      // would otherwise result in an error, but that is just overly safe behavior
+      driver.manage().addCookie(playerCookie);
+    }catch (Exception ignored){};
     driver.navigate().refresh();
     wait(200);
   }
@@ -129,6 +133,19 @@ public class TestUtils {
     // add test condition that the card must now exist
     driver.findElement(By.id(new Card(0, cardValue).toString())).click();
   }
+
+  public static void clickCardByValue(WebDriver driver, String sessionId, int cardValue) {
+    String playerId = driver.manage().getCookieNamed("playerid").getValue();
+    ApiUtil.setCardForPlayer(sessionId, playerId, cardValue);
+    driver.navigate().refresh();
+    waitUntilCardsAreLoaded(driver);
+    // add test condition that the card must now exist
+    driver.findElement(By.id(new Card(0, cardValue).toString())).click();
+  }
+
+
+
+
 
   public static Point getPawnLocation(WebDriver driver, PawnId pawnId) {
     WebElement pawnElement = driver.findElement(By.id(pawnId.toString()));

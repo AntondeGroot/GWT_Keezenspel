@@ -114,6 +114,17 @@ public class ApiCallsHelper {
         baseUrl + "/test/set-card/" + playerId + "/" + cardValue, null, Void.class);
   }
 
+  public void setCardForPlayer(String sessionId, String playerId, int cardValue) {
+    restTemplate.postForEntity(
+        baseUrl + "/test/set-card/" + sessionId + "/" + playerId + "/" + cardValue, null, Void.class);
+  }
+
+  public void setPawnPosition(String sessionId, String playerId, int pawnNr, String sectionOwnerId, int tileNr) {
+    restTemplate.postForEntity(
+        baseUrl + "/test/set-pawn/" + sessionId + "/" + playerId + "/" + pawnNr + "/" + sectionOwnerId + "/" + tileNr,
+        null, Void.class);
+  }
+
   // ---------- GAME STATES ----------
   public Map<String, Object> getGameState(String sessionId) {
     String url = baseUrl + "/gamestates/" + sessionId;

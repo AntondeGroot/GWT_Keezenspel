@@ -34,6 +34,18 @@ public class Steps {
     waitUntilPawnStopsMoving(driver, pawnId);
   }
 
+  public static void playerPlaysCard(
+      WebDriver driver, String sessionId, String playerId, PawnId pawnId, int cardValue) {
+    setPlayerIdPlaying(driver, playerId);
+    waitUntilCardsAreLoaded(driver);
+    clickCardByValue(driver, sessionId, cardValue);
+    clickPawn(driver, pawnId);
+
+    TestUtils.wait(100);
+    clickPlayCardButton(driver);
+    waitUntilPawnStopsMoving(driver, pawnId);
+  }
+
   public static void playerSwitchesPawns(
       WebDriver driver, String playerId, PawnId ownPawnId, PawnId otherPawnId) {
     setPlayerIdPlaying(driver, playerId);

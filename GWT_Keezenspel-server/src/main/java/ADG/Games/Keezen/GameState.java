@@ -1,22 +1,12 @@
 package ADG.Games.Keezen;
 
 import static ADG.util.BoardLogic.isPawnOnFinish;
-import static ADG.util.BoardLogic.isPawnOnNest;
-import static ADG.util.CardValueCheck.isAce;
-import static ADG.util.CardValueCheck.isJack;
-import static ADG.util.CardValueCheck.isKing;
-import static ADG.util.CardValueCheck.isSeven;
 import static ADG.util.PlayerColors.getPlayerColor;
 import static ADG.util.PlayerStatus.hasFinished;
 import static ADG.util.PlayerStatus.setActive;
 import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
 import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
-import static com.adg.openapi.model.MoveResult.INVALID_SELECTION;
 import static com.adg.openapi.model.MoveResult.PLAYER_DOES_NOT_HAVE_CARD;
-import static com.adg.openapi.model.MoveType.MOVE;
-import static com.adg.openapi.model.MoveType.ON_BOARD;
-import static com.adg.openapi.model.MoveType.SPLIT;
-import static com.adg.openapi.model.MoveType.SWITCH;
 
 import ADG.Log;
 import ADG.Processing.ProcessOnBoard;
@@ -215,9 +205,10 @@ public class GameState {
     playerIdTurn = nextPlayerId(playerIdTurn);
     if (!activePlayers.isEmpty() && !activePlayers.contains(playerIdTurn)) {
       nextActivePlayer();
+    } else if (activePlayers.contains(playerIdTurn)) {
+      setPlayingPlayer(playerIdTurn);
     }
-    // todo: check if all players have finished
-    setPlayingPlayer(playerIdTurn);
+    // If activePlayers is empty, no one is set as playing (game is between rounds or over)
   }
 
   public String getPlayerIdTurn() {
@@ -400,6 +391,12 @@ public class GameState {
       }
       checkForWinners(winners);
       removeWinnerFromActivePlayerList();
+      if (activePlayers.isEmpty() && winners.size() < players.size()) {
+        resetActivePlayers();
+        cardsDeck.shuffleIfFirstRound();
+        cardsDeck.dealCards();
+        nextRoundPlayer();
+      }
       version.incrementAndGet();
     }
   }
@@ -684,6 +681,8 @@ public class GameState {
       if (nrPawnsFinished == 4 && !winners.contains(playerId)) {
         player.setPlace(winners.size() + 1);
         winners.add(playerId);
+        cardsDeck.forfeitCardsForPlayer(playerId);
+        player.setIsPlaying(false);
       }
     }
   }

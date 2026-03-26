@@ -10,25 +10,26 @@ import static org.junit.Assert.assertFalse;
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+// optimized
 public class Card_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
 
-  @BeforeEach
-  public void setUp() {
-    driver = getDriver();
-    setPlayerIdPlaying(driver, ApiUtil.getPlayerid("123",0));
+  @BeforeAll
+  public static void setUp() {
+    String sessionId = ApiUtil.createStandardGame();
+    driver = getDriver(sessionId);
+    setPlayerIdPlaying(driver, ApiUtil.getPlayerid(sessionId,0));
   }
 
-  @AfterEach
-  public void tearDown() {
+  @AfterAll
+  public static void tearDown() {
     driver.quit();
   }
 

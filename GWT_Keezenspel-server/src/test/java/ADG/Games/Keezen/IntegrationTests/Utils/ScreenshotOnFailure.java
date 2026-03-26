@@ -11,7 +11,14 @@ import org.junit.jupiter.api.extension.TestWatcher;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-
+/***
+ * in order to use ScreenshotOnFailure, the webdriver should not be quit in the
+ * @AfterEach tearDown(), because then the driver would no longer be accessible
+ * to take a screenshot with.
+ *
+ * The driver.quit() should then be put in the @AfterAll which comes after the TestWatcher
+ * is done. This however is a static method, requiring the webdriver to be static as well.
+ */
 public class ScreenshotOnFailure implements TestWatcher, BeforeAllCallback {
 
   private static final String SCREENSHOT_DIR = "screenshots";
