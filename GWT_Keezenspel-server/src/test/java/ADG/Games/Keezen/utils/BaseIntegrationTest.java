@@ -9,6 +9,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @Tag("browser")
-@ExtendWith(ScreenshotOnFailure.class)
+//@ExtendWith(ScreenshotOnFailure.class)//todo: screenshot on failure can clash with parallel execution of IT tests, that is, tests can say that they ran 0 tests and pass!!
 public abstract class BaseIntegrationTest extends BaseUnitTest {
 }

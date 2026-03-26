@@ -1,6 +1,5 @@
 package ADG.Games.Keezen.IntegrationTests;
 
-import static ADG.Games.Keezen.IntegrationTests.PlayerStatusReal_IT.sessionId;
 import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerPlaysCard;
 import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerSwitchesPawns;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.assertPointsEqual;
@@ -17,7 +16,6 @@ import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.Point;
-import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -31,7 +29,7 @@ import org.openqa.selenium.WebDriver;
 public class MovingOnBoard_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
-  private List<String> playerIds;
+  static String sessionId;
   static PawnId pawnId00;
   static PawnId pawnId10;
   static PawnId pawnId20;

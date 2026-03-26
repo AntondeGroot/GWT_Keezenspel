@@ -20,7 +20,7 @@ import org.openqa.selenium.WebElement;
 
 // optimized
 @TestMethodOrder(OrderAnnotation.class)
-public class PlayerStatusReal_IT extends BaseIntegrationTest {
+class PlayerStatusReal_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
   static String player0Id;
@@ -45,7 +45,7 @@ public class PlayerStatusReal_IT extends BaseIntegrationTest {
    * is done. This however is a static method, requiring the webdriver to be static as well.
    */
   @AfterAll
-  public static void tearDownAll() {
+  static void tearDownAll() {
     if (driver != null) {
       driver.quit();
     }
@@ -53,7 +53,7 @@ public class PlayerStatusReal_IT extends BaseIntegrationTest {
 
   @Test
   @Order(1)
-  public void player0IsPlayingWhenStartingGame() {
+  void player0IsPlayingWhenStartingGame() {
     // GIVEN a started game
     waitUntilCardsAreLoaded(driver);
 
@@ -66,7 +66,7 @@ public class PlayerStatusReal_IT extends BaseIntegrationTest {
 
   @Test
   @Order(2)
-  public void player1IsPlayingWhenPlayer0Forfeits() throws InterruptedException {
+  void player1IsPlayingWhenPlayer0Forfeits() throws InterruptedException {
     // GIVEN player 0's view is loaded
     setPlayerIdPlaying(driver, player0Id);
     waitUntilCardsAreLoaded(driver);

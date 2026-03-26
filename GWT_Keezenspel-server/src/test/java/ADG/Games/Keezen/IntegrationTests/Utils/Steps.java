@@ -29,7 +29,7 @@ public class Steps {
     clickCardByValue(driver, cardValue);
     clickPawn(driver, pawnId);
 
-    TestUtils.wait(100);
+//    TestUtils.wait(100);
     clickPlayCardButton(driver);
     waitUntilPawnStopsMoving(driver, pawnId);
   }
@@ -41,7 +41,7 @@ public class Steps {
     clickCardByValue(driver, sessionId, cardValue);
     clickPawn(driver, pawnId);
 
-    TestUtils.wait(100);
+//    TestUtils.wait(100);
     clickPlayCardButton(driver);
     waitUntilPawnStopsMoving(driver, pawnId);
   }
@@ -79,26 +79,5 @@ public class Steps {
     assertTrue("Other pawn was not selected", pawnIsSelected(driver, otherPawnId));
     clickPlayCardButton(driver);
     waitUntilPawnStopsMoving(driver, ownPawnId);
-  }
-
-  public static void whenPlayerWins(WebDriver driver, String playerId) {
-    int[][] winningMoves = {
-      {1, 4, 7}, // Pawn 0
-      {1, 4, 6}, // Pawn 1
-      {1, 4, 5}, // Pawn 2
-      {1, 4, 3, 1} // Pawn 3
-    };
-
-    for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
-      for (int step : winningMoves[pawnNr]) {
-        // Ensure it's this player's turn before playing (handles real deck round transitions)
-        String currentTurn = ApiUtil.getPlayerIdTurn("123");
-        while (currentTurn != null && !currentTurn.equals(playerId)) {
-          ApiUtil.forfeitPlayerViaApi("123", currentTurn);
-          currentTurn = ApiUtil.getPlayerIdTurn("123");
-        }
-        playerPlaysCard(driver, playerId, new PawnId(playerId, pawnNr), step);
-      }
-    }
   }
 }
