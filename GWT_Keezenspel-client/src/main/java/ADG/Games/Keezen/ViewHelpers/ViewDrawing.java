@@ -101,19 +101,21 @@ public class ViewDrawing {
                 if (className.endsWith("Overlay")) {
                   String pawnId = className.substring(0, className.length() - "Overlay".length());
                   // compare with selected pawns
-                  boolean isSelected = false;
-                  if (pawnAndCardSelection.getPawn1() != null
-                      && pawnAndCardSelection.getPawn1().getPawnId().equals(pawnId)) {
-                    isSelected = true;
-                  } else if (pawnAndCardSelection.getPawn2() != null
-                      && pawnAndCardSelection.getPawn2().getPawnId().equals(pawnId)) {
-                    isSelected = true;
-                  }
+                  boolean isPawn1 = pawnAndCardSelection.getPawn1() != null
+                      && pawnAndCardSelection.getPawn1().getPawnId().equals(pawnId);
+                  boolean isPawn2 = pawnAndCardSelection.getPawn2() != null
+                      && pawnAndCardSelection.getPawn2().getPawnId().equals(pawnId);
 
-                  element
-                      .getStyle()
-                      .setVisibility(
-                          isSelected ? Style.Visibility.VISIBLE : Style.Visibility.HIDDEN);
+                  if (isPawn1) {
+                    element.getStyle().setVisibility(Style.Visibility.VISIBLE);
+                    element.getStyle().clearProperty("filter"); // red (default)
+                  } else if (isPawn2) {
+                    element.getStyle().setVisibility(Style.Visibility.VISIBLE);
+                    element.getStyle().setProperty("filter", "hue-rotate(120deg)"); // green
+                  } else {
+                    element.getStyle().setVisibility(Style.Visibility.HIDDEN);
+                    element.getStyle().clearProperty("filter");
+                  }
                 }
               }
               GWT.log("Pawn and card selection is after validation: " + pawnAndCardSelection);
