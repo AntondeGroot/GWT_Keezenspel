@@ -1,6 +1,5 @@
 package ADG.Games.Keezen.IntegrationTests;
 
-import static ADG.Games.Keezen.IntegrationTests.PlayerStatusReal_IT.sessionId;
 import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerPlaysCard;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
@@ -27,6 +26,7 @@ import org.openqa.selenium.WebElement;
 public class PlayerStatusMock_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
+  static String sessionId;
   static String player0Id;
   static String player1Id;
   static String player2Id;

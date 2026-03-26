@@ -6,18 +6,19 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilPawnStopsMoving;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.Player.PawnId;
 import ADG.Games.Keezen.utils.BaseIntegrationTest;
-import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
 import org.openqa.selenium.WebDriver;
 
 // optimized
-public class Winner_IT extends BaseIntegrationTest {
+class Winner_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
   static String sessionId;
@@ -36,14 +37,14 @@ public class Winner_IT extends BaseIntegrationTest {
   }
 
   @AfterAll
-  public static void tearDownAll() {
+  static void tearDownAll() {
     if (driver != null) {
       driver.quit();
     }
   }
 
   @Test
-  public void letPlayer2Win_ThenPlayer0_ThenPlayer1() throws InterruptedException {
+  void letPlayer2Win_ThenPlayer0_ThenPlayer1() {
     // GIVEN player 0 forfeits
     waitUntilCardsAreLoaded(driver);
     playerForfeits(driver, player0Id);
@@ -78,7 +79,7 @@ public class Winner_IT extends BaseIntegrationTest {
     ApiUtil.setPawnPosition(sessionId, player1Id, 3, player0Id, 15);
     playerForfeits(driver, player0Id);
     playerPlaysCard(driver, sessionId, player1Id, new PawnId(player1Id, 3), 1);
-    TestUtils.wait(500);
+    waitUntilPawnStopsMoving(driver, new PawnId(player1Id, 3));
     assertPlayerHasMedal(driver, player1Id, 3);
   }
 }

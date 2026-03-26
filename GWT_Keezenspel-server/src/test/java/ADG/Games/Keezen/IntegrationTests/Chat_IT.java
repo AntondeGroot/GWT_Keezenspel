@@ -2,41 +2,41 @@ package ADG.Games.Keezen.IntegrationTests;
 
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilVisible;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import ADG.Games.Keezen.IntegrationTests.Utils.ChatServerMock;
-import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+
+// optimized before 18s -> 9 s -> 1s
+@TestMethodOrder(OrderAnnotation.class)
 class Chat_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
 
-  @BeforeEach
-  public void setUp() {
-    driver = getDriver();
-    setPlayerIdPlaying(driver, ApiUtil.getPlayerid("123", 0));
-  }
-
-  @AfterEach
-  public void tearDown() {
-    ChatServerMock.stop();
-    if (driver != null) {
-      driver.quit();
-    }
+  @BeforeAll
+  static void setUp() {
+    String sessionId = ApiUtil.createStandardGame();
+    driver = getDriver(sessionId);
+    setPlayerIdPlaying(driver, ApiUtil.getPlayerid(sessionId,0));
+    waitUntilCardsAreLoaded(driver);
   }
 
   @AfterAll
-  public static void tearDownAll() {
+  static void tearDown() {
     ChatServerMock.stop();
     if (driver != null) {
       driver.quit();
@@ -44,17 +44,19 @@ class Chat_IT extends BaseIntegrationTest {
   }
 
   @Test
+  @Order(3)
   public void chatSendButtonIsVisible() {
     ChatServerMock.start();
-    TestUtils.wait(1500);
+    waitUntilVisible(driver, "chatSendButton");
     WebElement sendButton = driver.findElement(By.className("chatSendButton"));
     assertTrue(sendButton.isDisplayed(), "Chat send button should be visible when chat server is available");
   }
 
   @Test
+  @Order(4)
   public void chatSendButtonIsJustAboveFooter() {
     ChatServerMock.start();
-    TestUtils.wait(1500);
+    waitUntilVisible(driver, "chatSendButton");
     WebElement sendButton = driver.findElement(By.className("chatSendButton"));
     WebElement footer = driver.findElement(By.tagName("footer"));
 
@@ -70,9 +72,9 @@ class Chat_IT extends BaseIntegrationTest {
   }
 
   @Test
+  @Order(1)
   public void chatInputIsNotVisibleWhenChatServerIsDown() {
     // No ChatServerMock started — polls will fail
-    TestUtils.wait(1500);
     WebElement sendButton = driver.findElement(By.className("chatSendButton"));
     WebElement inputField = driver.findElement(By.className("chatInputField"));
     assertFalse(sendButton.isDisplayed(), "Chat send button should not be visible when chat server is unavailable");
@@ -80,19 +82,13 @@ class Chat_IT extends BaseIntegrationTest {
   }
 
   @Test
+  @Order(2)
   public void chatInputBecomesVisibleWhenChatServerComesBack() {
-    // First confirm both are hidden with no server
-    TestUtils.wait(1500);
-    WebElement sendButton = driver.findElement(By.className("chatSendButton"));
-    WebElement inputField = driver.findElement(By.className("chatInputField"));
-    assertFalse(sendButton.isDisplayed(), "Chat send button should not be visible before chat server starts");
-    assertFalse(inputField.isDisplayed(), "Chat input field should not be visible before chat server starts");
-
     // Now bring the chat server up
     ChatServerMock.start();
-    TestUtils.wait(1500);
-    sendButton = driver.findElement(By.className("chatSendButton"));
-    inputField = driver.findElement(By.className("chatInputField"));
+    waitUntilVisible(driver, "chatSendButton");
+    WebElement sendButton = driver.findElement(By.className("chatSendButton"));
+    WebElement inputField = driver.findElement(By.className("chatInputField"));
     assertTrue(sendButton.isDisplayed(), "Chat send button should become visible once chat server is available");
     assertTrue(inputField.isDisplayed(), "Chat input field should become visible once chat server is available");
   }

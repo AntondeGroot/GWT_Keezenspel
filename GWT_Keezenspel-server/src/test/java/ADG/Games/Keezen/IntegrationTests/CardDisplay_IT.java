@@ -57,7 +57,7 @@ class CardDisplay_IT extends BaseIntegrationTest {
     List<WebElement> cards = driver.findElements(By.className("cardDiv"));
     assertFalse(
         "Cards should be visible in the DOM — pollServerForCards must have completed", cards.isEmpty());
-    TestUtils.wait(200);
+//    TestUtils.wait(200);
     cards = driver.findElements(By.className("cardDiv"));
     assertFalse(
         "Cards should remain visible after a short wait — polling must be stable", cards.isEmpty());

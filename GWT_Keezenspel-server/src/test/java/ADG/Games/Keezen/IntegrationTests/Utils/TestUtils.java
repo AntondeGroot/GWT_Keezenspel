@@ -95,7 +95,7 @@ public class TestUtils {
       driver.manage().addCookie(playerCookie);
     }catch (Exception ignored){};
     driver.navigate().refresh();
-    wait(200);
+//    wait(200);
   }
 
   /***
@@ -154,7 +154,7 @@ public class TestUtils {
     // useful when you select a Jack
     JavascriptExecutor js = (JavascriptExecutor) driver;
     js.executeScript("window.scrollTo(0, 0);"); // Scroll to top
-    TestUtils.wait(200);
+//    TestUtils.wait(200);
   }
 
   public static Point clickPawn(WebDriver driver, PawnId pawnId) {
@@ -226,7 +226,7 @@ public class TestUtils {
     assertTrue("forfeitButton is not visible: ", forfeitButton.isDisplayed());
     forfeitButton.click();
 
-    wait(200);
+//    wait(200);
 
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
     try {
@@ -258,6 +258,16 @@ public class TestUtils {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
+  }
+
+  public static void waitUntilVisible(WebDriver driver, String className) {
+    new WebDriverWait(driver, Duration.ofSeconds(3))
+        .until(d -> d.findElement(By.className(className)).isDisplayed());
+  }
+
+  public static void waitUntilHidden(WebDriver driver, String className) {
+    new WebDriverWait(driver, Duration.ofSeconds(3))
+        .until(d -> !d.findElement(By.className(className)).isDisplayed());
   }
 
   public static void assertPointsNotEqual(String msg, Point p1, Point p2) {
