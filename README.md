@@ -28,7 +28,7 @@ This keeps local development and tests working without any prefix, while nginx o
 - Unit testing
 - Selenium automated browser testing
 
-The SpringBootApplication server is automatically restarted before each Selenium test.
+The SpringBootApplication server is automatically all tests and shut down afterwards.
 
 When a test fails a screenshot is taken.
 
