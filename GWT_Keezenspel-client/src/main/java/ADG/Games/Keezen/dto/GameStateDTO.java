@@ -27,4 +27,7 @@ public class GameStateDTO extends JavaScriptObject {
 
   /** Version number of this game state. */
   public final native double getVersion() /*-{ return this.version; }-*/;
+
+  /** The move response from the last move played, for animating opponent moves. */
+  public final native MoveResponseDTO getLastMoveResponse() /*-{ return this.lastMoveResponse; }-*/;
 }

@@ -52,6 +52,7 @@ public class CardsApiDelegateImpl implements CardsApiDelegate {
 
     if (gameState.hasStarted() && gameState.getPlayerIdTurn().equals(playerId)) {
       gameState.processOnForfeit(playerId);
+      session.setLastMoveResponse(null);
       return ResponseEntity.status(HttpStatus.OK).body(null);
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

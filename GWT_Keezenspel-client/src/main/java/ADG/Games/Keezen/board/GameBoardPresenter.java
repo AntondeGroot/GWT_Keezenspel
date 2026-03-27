@@ -261,7 +261,11 @@ public class GameBoardPresenter {
         }
       }
     } else if (!PawnAnimation.isAnimating()) {
-      view.animatePawnsToPositions(gameState.getPawns());
+      if (gameState.getLastMoveResponse() != null) {
+        view.animatePawns(gameState.getLastMoveResponse());
+      } else {
+        view.animatePawnsToPositions(gameState.getPawns());
+      }
     }
     updatePlayerProfileUI(gameState.getPlayers());
 

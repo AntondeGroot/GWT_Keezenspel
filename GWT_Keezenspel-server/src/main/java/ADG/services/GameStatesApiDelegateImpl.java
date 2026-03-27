@@ -31,6 +31,7 @@ public class GameStatesApiDelegateImpl implements GamestatesApiDelegate {
     gameStateResponse.setPlayers(gameState.getPlayers());
     gameStateResponse.setWinners(gameState.getWinners());
     gameStateResponse.setVersion(gameState.getVersion());
+    gameStateResponse.setLastMoveResponse(session.getLastMoveResponse());
 
     return ResponseEntity.ok(gameStateResponse);
   }
