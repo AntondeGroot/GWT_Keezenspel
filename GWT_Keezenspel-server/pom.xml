@@ -113,6 +113,17 @@
   <build>
     <finalName>GWT_Keezenspel</finalName>
 
+    <!-- Include webapp/assets/ (audio, etc.) as static resources under /assets/ -->
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>src/main/webapp</directory>
+        <targetPath>public</targetPath>
+      </resource>
+    </resources>
+
     <plugins>
       <!-- Spring Boot packaging -->
       <plugin>
