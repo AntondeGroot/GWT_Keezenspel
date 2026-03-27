@@ -127,6 +127,36 @@ class WinnerLogicTest {
   }
 
   @Test
+  void whenPlayer1WinsInTwoPlayerGame_Player1GetsFirstMedal_NotPlayer0() {
+    // Re-setup with 2 players: player "0" (red) and player "1" (blue)
+    createGame_With_NPlayers(gameState, 2);
+
+    // GIVEN player "0" forfeits this round so player "1" has the turn
+    gameState.processOnForfeit("0");
+
+    // GIVEN player "1" has 3 pawns on their finish and pawn 3 one step away in player "0"'s section
+    placePawnOnBoard(gameState, new PawnId("1", 0), new PositionKey("1", 17));
+    placePawnOnBoard(gameState, new PawnId("1", 1), new PositionKey("1", 18));
+    placePawnOnBoard(gameState, new PawnId("1", 2), new PositionKey("1", 19));
+    Pawn pawn1_3 = placePawnOnBoard(gameState, new PawnId("1", 3), new PositionKey("0", 15));
+    Card ace = givePlayerAce(cardsDeck, 1);
+
+    // WHEN player "1" plays the Ace to move their last pawn into the finish
+    MoveRequest moveRequest = new MoveRequest();
+    createMoveRequest(moveRequest, pawn1_3, ace);
+    gameState.processOnMove(moveRequest, new MoveResponse());
+
+    // THEN player "1" wins with place 1, and player "0" does NOT receive a medal
+    assertTrue(gameState.getWinners().contains("1"), "Player 1 (blue) should be in the winners list");
+    assertEquals(1,
+        gameState.getPlayers().stream().filter(p -> p.getId().equals("1")).findFirst().get().getPlace(),
+        "Player 1 (blue) should have place 1 — the first medal");
+    assertEquals(-1,
+        gameState.getPlayers().stream().filter(p -> p.getId().equals("0")).findFirst().get().getPlace(),
+        "Player 0 (red) should NOT have a medal — place should remain -1");
+  }
+
+  @Test
   void testPlayer2Wins_Player0Wins_ThenPlayer1Wins() {
     // GIVEN
     place4PawnsOnFinish(gameState, "2");

@@ -24,6 +24,16 @@ public class ApiUtil {
     return sessionId;
   }
 
+  public static String createTwoPlayerGame() {
+    String sessionId = apiHelper.createNewGame(getRandomRoomName(), 2);
+    for (int i = 0; i < 2; i++) {
+      Player player = new Player("player" + i, "player" + i);
+      apiHelper.addPlayerToGame(sessionId, player);
+    }
+    apiHelper.startGame(sessionId);
+    return sessionId;
+  }
+
   public static List<String> getPlayerIds(String sessionId) {
     List<Map<String, Object>> result = apiHelper.getAllPlayersInGame(sessionId);
     return result.stream().map(map -> (String) map.get("id")).toList();

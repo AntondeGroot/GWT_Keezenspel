@@ -11,7 +11,6 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAr
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilPawnStopsMoving;
 import static org.junit.Assert.assertTrue;
 
-import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.Player.PawnId;
 import org.openqa.selenium.WebDriver;
 
@@ -28,8 +27,6 @@ public class Steps {
     waitUntilCardsAreLoaded(driver);
     clickCardByValue(driver, cardValue);
     clickPawn(driver, pawnId);
-
-//    TestUtils.wait(100);
     clickPlayCardButton(driver);
     waitUntilPawnStopsMoving(driver, pawnId);
   }
@@ -40,8 +37,6 @@ public class Steps {
     waitUntilCardsAreLoaded(driver);
     clickCardByValue(driver, sessionId, cardValue);
     clickPawn(driver, pawnId);
-
-//    TestUtils.wait(100);
     clickPlayCardButton(driver);
     waitUntilPawnStopsMoving(driver, pawnId);
   }
