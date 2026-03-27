@@ -417,6 +417,8 @@ components:
           description: this way the client can ask the verser if they need to update anything
           type: integer
           format: int64
+        lastMoveResponse:
+          $ref: '#/components/schemas/MoveResponse'
 
     NewGameRequest:
       type: object

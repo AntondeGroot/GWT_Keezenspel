@@ -7,143 +7,97 @@ import ADG.Games.Keezen.dto.PawnDTO;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.user.client.Timer;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
 public class PawnAnimation {
 
-  //  private boolean isFirstSequence = true;
-  //  private double totalDelay;
-  //  private Map<String, DivElement> pawnElements;
+  private static int runningAnimations = 0;
 
-  //  public PawnAnimation(Map<String, DivElement> pawnElements) {
-  //    this.pawnElements = pawnElements;
-  //  }
+  public static boolean isAnimating() {
+    return runningAnimations > 0;
+  }
 
   public static void animateSequence(
       Map<String, DivElement> pawnElements, MoveResponseDTO moveResponse) {
-    // first
 
     PawnDTO pawn1 = moveResponse.getPawn1();
     PawnDTO pawn2 = moveResponse.getPawn2();
     PawnDTO pawnKilledByPawn1 = moveResponse.getPawnKilledByPawn1();
     PawnDTO pawnKilledByPawn2 = moveResponse.getPawnKilledByPawn2();
 
-    double delayPawnKilledByPawn1 = 0;
-    double delayPawnKilledByPawn2 = 0;
-    double pixelsPerMs = 100;
+    double delayKilledByPawn1 = 0;
+    double delayKilledByPawn2 = 0;
 
     if (pawn1 != null) {
       PawnClient pawn1Client = new PawnClient(pawn1);
-      AnimatePawnPoints animatePawnPointsPawn1 =
-          new AnimatePawnPoints(pawn1Client, moveResponse.getMovePawn1());
-      double distancePawn1 = animatePawnPointsPawn1.getTotalPathLength();
-      pixelsPerMs = calculateSpeed(distancePawn1);
-      delayPawnKilledByPawn1 = distancePawn1 / pixelsPerMs;
-      DivElement pawnElement = pawnElements.get(pawn1Client.getPawnId());
-      GWT.log("move pawn 1 distance: " + distancePawn1);
-      GWT.log("move pawn 1 speed: " + pixelsPerMs);
-      LinkedList<Point> points = animatePawnPointsPawn1.getPoints();
+      AnimatePawnPoints animPoints = new AnimatePawnPoints(pawn1Client, moveResponse.getMovePawn1());
+      double distance = animPoints.getTotalPathLength();
+      double speed = calculateSpeed(distance);
+      delayKilledByPawn1 = distance / speed;
+      DivElement element = pawnElements.get(pawn1Client.getPawnId());
+      LinkedList<Point> points = animPoints.getPoints();
       Point current = points.pop();
-
-      animateStep(pawnElement, current, points, pixelsPerMs, 0);
+      runningAnimations++;
+      animateStep(element, current, points, speed);
     }
+
     if (pawn2 != null) {
       PawnClient pawn2Client = new PawnClient(pawn2);
-      AnimatePawnPoints animatePawnPointsPawn2 =
-          new AnimatePawnPoints(pawn2Client, moveResponse.getMovePawn2());
-      double distancePawn2 = animatePawnPointsPawn2.getTotalPathLength();
-      pixelsPerMs = calculateSpeed(distancePawn2);
-      delayPawnKilledByPawn2 = distancePawn2 / pixelsPerMs;
-      DivElement pawnElement = pawnElements.get(pawn2Client.getPawnId());
-      LinkedList<Point> points = animatePawnPointsPawn2.getPoints();
+      AnimatePawnPoints animPoints = new AnimatePawnPoints(pawn2Client, moveResponse.getMovePawn2());
+      double distance = animPoints.getTotalPathLength();
+      double speed = calculateSpeed(distance);
+      delayKilledByPawn2 = distance / speed;
+      DivElement element = pawnElements.get(pawn2Client.getPawnId());
+      LinkedList<Point> points = animPoints.getPoints();
       Point current = points.pop();
-      animateStep(pawnElement, current, points, pixelsPerMs, 0);
+      runningAnimations++;
+      animateStep(element, current, points, speed);
     }
+
     if (pawnKilledByPawn1 != null) {
-      PawnClient pawnKilled1Client = new PawnClient(pawnKilledByPawn1);
-      AnimatePawnPoints animatePawnPointsPawnKilledByPawn1 =
-          new AnimatePawnPoints(pawnKilled1Client, moveResponse.getMovePawnKilledByPawn1());
-      double distancePawnKilledByPawn1 = animatePawnPointsPawnKilledByPawn1.getTotalPathLength();
-      pixelsPerMs = calculateSpeed(distancePawnKilledByPawn1);
-      DivElement pawnElement = pawnElements.get(pawnKilled1Client.getPawnId());
-      LinkedList<Point> points = animatePawnPointsPawnKilledByPawn1.getPoints();
+      PawnClient killedClient = new PawnClient(pawnKilledByPawn1);
+      AnimatePawnPoints animPoints = new AnimatePawnPoints(killedClient, moveResponse.getMovePawnKilledByPawn1());
+      double speed = calculateSpeed(animPoints.getTotalPathLength());
+      DivElement element = pawnElements.get(killedClient.getPawnId());
+      LinkedList<Point> points = animPoints.getPoints();
       Point current = points.pop();
-      animateStep(pawnElement, current, points, pixelsPerMs, delayPawnKilledByPawn1);
+      runningAnimations++;
+      int delay = (int) delayKilledByPawn1;
+      new Timer() {
+        @Override public void run() { animateStep(element, current, points, speed); }
+      }.schedule(delay);
     }
+
     if (pawnKilledByPawn2 != null) {
-      PawnClient pawnKilled2Client = new PawnClient(pawnKilledByPawn2);
-      AnimatePawnPoints animatePawnPointsPawnKilledByPawn2 =
-          new AnimatePawnPoints(pawnKilled2Client, moveResponse.getMovePawnKilledByPawn2());
-      double distancePawnKilledByPawn2 = animatePawnPointsPawnKilledByPawn2.getTotalPathLength();
-      pixelsPerMs = calculateSpeed(distancePawnKilledByPawn2);
-      DivElement pawnElement = pawnElements.get(pawnKilled2Client.getPawnId());
-      LinkedList<Point> points = animatePawnPointsPawnKilledByPawn2.getPoints();
+      PawnClient killedClient = new PawnClient(pawnKilledByPawn2);
+      AnimatePawnPoints animPoints = new AnimatePawnPoints(killedClient, moveResponse.getMovePawnKilledByPawn2());
+      double speed = calculateSpeed(animPoints.getTotalPathLength());
+      DivElement element = pawnElements.get(killedClient.getPawnId());
+      LinkedList<Point> points = animPoints.getPoints();
       Point current = points.pop();
-      animateStep(pawnElement, current, points, pixelsPerMs, delayPawnKilledByPawn2);
+      runningAnimations++;
+      int delay = (int) delayKilledByPawn2;
+      new Timer() {
+        @Override public void run() { animateStep(element, current, points, speed); }
+      }.schedule(delay);
     }
-
-    // * get the list of all pawns that should be animated first
-    // * get one pawn
-    // * determine the total length that pawn has to travel
-    // * determine the speed it will need to travel?
-    // * get the DivElement for that Pawn
-    // * animate the pawn
-  }
-
-  public void animateSequence(List<AnimatePawnPoints> sequence) {
-    // * get the list of all pawns that should be animated first
-    // * get one pawn
-    // * determine the total length that pawn has to travel
-    // * determine the speed it will need to travel?
-    // * get the DivElement for that Pawn
-    // * animate the pawn
-    //    if (isFirstSequence) {
-    //      totalDelay = 0;
-    //    }
-    //    for (AnimatePawnPoints p : sequence) {
-    //      GWT.log("Animating pawn path: " + p);
-    //
-    //      PawnClient pawn = p.getPawn();
-    //      LinkedList<Point> points = p.getPoints();
-    //      double distance = p.getTotalPathLength();
-    //
-    //      double pixelsPerMs = calculateSpeed(distance);
-    //
-    //      DivElement pawnElement = pawnElements.get(pawn.getPawnId());
-    //
-    //      animateStep(pawnElement, points.get(0), points, pixelsPerMs);
-    //
-    //      totalDelay = max(totalDelay, distance / pixelsPerMs);
-    //    }
-    //    isFirstSequence = !isFirstSequence;
   }
 
   private static double calculateSpeed(double distance) {
     double pixelsPerMs = 0.1;
-    if (distance > 200) {
-      pixelsPerMs = 0.12;
-    }
-    ;
-    if (distance > 400) {
-      pixelsPerMs = 0.16;
-    }
-    ;
-    pixelsPerMs = pixelsPerMs * AnimationSpeed.getSpeed();
-
-    return pixelsPerMs;
+    if (distance > 200) pixelsPerMs = 0.12;
+    if (distance > 400) pixelsPerMs = 0.16;
+    return pixelsPerMs * AnimationSpeed.getSpeed();
   }
 
   private static void animateStep(
-      DivElement pawn,
-      Point current,
-      Queue<Point> remaining,
-      double speedPixelsPerMs,
-      double totalDelay) {
+      DivElement pawn, Point current, Queue<Point> remaining, double speedPixelsPerMs) {
 
     if (remaining.isEmpty()) {
+      runningAnimations--;
       return;
     }
 
@@ -151,27 +105,21 @@ public class PawnAnimation {
     double dx = next.getX() - current.getX();
     double dy = next.getY() - current.getY();
     double distancePixels = Math.sqrt(dx * dx + dy * dy);
+    double duration = distancePixels / speedPixelsPerMs;
 
-    double duration = (distancePixels / speedPixelsPerMs);
-    GWT.log("current: " + current);
-    GWT.log("next: " + next);
-    GWT.log("duration = " + duration);
-    GWT.log("distancePixels = " + distancePixels);
-    GWT.log("totalDelay = " + totalDelay);
+    GWT.log("animateStep: " + current + " -> " + next + " duration=" + duration + "ms");
 
-    // Apply CSS transition
-    pawn.getStyle().setProperty("transition", "all " + duration + "ms linear");
-    pawn.getStyle().setProperty("animationDelay", totalDelay + "ms");
-    pawn.getOffsetWidth(); // force reflow
+    pawn.getStyle().setProperty(
+        "transition", "left " + duration + "ms linear, top " + duration + "ms linear");
+    pawn.getOffsetWidth(); // force reflow so transition applies
 
     pawn.getStyle().setLeft(next.getX() - 20, Style.Unit.PX);
     pawn.getStyle().setTop(next.getY() - 20 - 15, Style.Unit.PX);
 
-    // Chain to next move
-    new com.google.gwt.user.client.Timer() {
+    new Timer() {
       @Override
       public void run() {
-        animateStep(pawn, next, remaining, speedPixelsPerMs, duration);
+        animateStep(pawn, next, remaining, speedPixelsPerMs);
       }
     }.schedule((int) duration);
   }

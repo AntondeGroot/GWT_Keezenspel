@@ -12,9 +12,11 @@ public class GameStateClient {
   private ArrayList<PawnClient> pawns = new ArrayList<>();
   private String playerIdTurn;
   private ArrayList<PlayerClient> players = new ArrayList<>();
+  private MoveResponseDTO lastMoveResponse;
 
   public GameStateClient(GameStateDTO gameStateDTO) {
     playerIdTurn = gameStateDTO.getCurrentPlayerId();
+    lastMoveResponse = gameStateDTO.getLastMoveResponse();
 
     // convert players
     ArrayList<PlayerClient> tempPlayers = new ArrayList<>();
@@ -43,5 +45,9 @@ public class GameStateClient {
 
   public ArrayList<PlayerClient> getPlayers() {
     return this.players;
+  }
+
+  public MoveResponseDTO getLastMoveResponse() {
+    return lastMoveResponse;
   }
 }
