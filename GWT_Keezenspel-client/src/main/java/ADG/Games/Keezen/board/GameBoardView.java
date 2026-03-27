@@ -523,7 +523,7 @@ public class GameBoardView extends Composite {
       for (TileMapping mapping : Board.getTiles()) {
         if (mapping.getTileId().equals(pawn.getCurrentTileId())) {
           Point point = mapping.getPosition();
-          pawnElement.getStyle().setProperty("transition", "all 600ms ease-in-out");
+          pawnElement.getStyle().setProperty("transition", "left 600ms ease-in-out, top 600ms ease-in-out");
           pawnElement.getOffsetWidth(); // force reflow so transition applies
           pawnElement.getStyle().setLeft(point.getX() - desiredWidth / 2, Style.Unit.PX);
           pawnElement.getStyle().setTop(point.getY() - desiredHeight / 2 - 15, Style.Unit.PX);
