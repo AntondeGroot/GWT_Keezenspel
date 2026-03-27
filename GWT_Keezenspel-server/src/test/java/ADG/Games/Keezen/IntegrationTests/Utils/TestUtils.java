@@ -1,7 +1,6 @@
 package ADG.Games.Keezen.IntegrationTests.Utils;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -39,6 +38,7 @@ public class TestUtils {
     options.addArguments("--no-sandbox");
     options.addArguments("--disable-dev-shm-usage");
     options.addArguments("--window-size=1920,1080");
+    options.addArguments("--mute-audio");
 
     // this line is here to fix a CI error
     options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.nanoTime());
@@ -57,6 +57,7 @@ public class TestUtils {
     options.addArguments("--no-sandbox");
     options.addArguments("--disable-dev-shm-usage");
     options.addArguments("--window-size=1920,1080");
+    options.addArguments("--mute-audio");
 
     // this line is here to fix a CI error
     options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.nanoTime());
@@ -95,7 +96,6 @@ public class TestUtils {
       driver.manage().addCookie(playerCookie);
     }catch (Exception ignored){};
     driver.navigate().refresh();
-//    wait(200);
   }
 
   /***
@@ -154,7 +154,6 @@ public class TestUtils {
     // useful when you select a Jack
     JavascriptExecutor js = (JavascriptExecutor) driver;
     js.executeScript("window.scrollTo(0, 0);"); // Scroll to top
-//    TestUtils.wait(200);
   }
 
   public static Point clickPawn(WebDriver driver, PawnId pawnId) {
@@ -225,8 +224,6 @@ public class TestUtils {
         "⚠️ forfeitButton is not enabled: it was not the player's turn", forfeitButton.isEnabled());
     assertTrue("forfeitButton is not visible: ", forfeitButton.isDisplayed());
     forfeitButton.click();
-
-//    wait(200);
 
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
     try {
