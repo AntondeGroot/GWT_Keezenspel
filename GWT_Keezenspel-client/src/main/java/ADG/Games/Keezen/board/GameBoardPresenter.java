@@ -8,6 +8,7 @@ import ADG.Games.Keezen.PawnAndCardSelection;
 import ADG.Games.Keezen.PlayerList;
 import ADG.Games.Keezen.TileId;
 import ADG.Games.Keezen.animations.*;
+import ADG.Games.Keezen.audio.AudioPlayer;
 import ADG.Games.Keezen.dto.CardClient;
 import ADG.Games.Keezen.dto.CardDTO;
 import ADG.Games.Keezen.dto.GameStateClient;
@@ -45,6 +46,8 @@ public class GameBoardPresenter {
   private int chatMessageCount = 0;
   private boolean chatOffline = false;
   private String myPlayerName = "";
+  private String lastCurrentPlayerId = null;
+  private int lastMedalCount = 0;
   private final int BOARD_SIZE = 600; // todo: replace with CSS properties
 
   public GameBoardPresenter(GameBoardView gameBoardView, PollingService pollingService) {
@@ -93,6 +96,7 @@ public class GameBoardPresenter {
             new ClickHandler() {
               @Override
               public void onClick(ClickEvent event) {
+                AudioPlayer.play(AudioPlayer.BUTTON_CLICK);
                 GWT.log("pawn 1: " + pawnAndCardSelection.getPawn1());
                 MoveRequestJsonBuilder builder =
                     new MoveRequestJsonBuilder()
@@ -112,9 +116,8 @@ public class GameBoardPresenter {
                     new ApiCallback<MoveResponseDTO>() {
                       @Override
                       public void onSuccess(MoveResponseDTO result) {
-                        // todo: improve animation
                         GWT.log("make move successful");
-                        view.animatePawns(result);
+                        animatePawnsWithAudio(result);
                       }
 
                       @Override
@@ -139,6 +142,7 @@ public class GameBoardPresenter {
             new ClickHandler() {
               @Override
               public void onClick(ClickEvent event) {
+                AudioPlayer.play(AudioPlayer.BUTTON_CLICK);
                 pawnAndCardSelection.reset();
                 apiClient.playerForfeits(
                     Cookie.getSessionID(),
@@ -247,11 +251,22 @@ public class GameBoardPresenter {
         });
   }
 
+  private void animatePawnsWithAudio(MoveResponseDTO moveResponse) {
+    if ("onBoard".equals(moveResponse.getMoveType())) {
+      AudioPlayer.play(AudioPlayer.PAWN_ON_BOARD, 0.1);
+    }
+    view.animatePawns(moveResponse);
+  }
+
   private void updateGameState(GameStateClient gameState) {
     GWT.log("Game State initialize board: ");
     if (!Board.isInitialized()) {
       GWT.log("Game State board not yet initialized.");
       initializeBoardState(gameState);
+      lastCurrentPlayerId = gameState.getCurrentPlayerId();
+      lastMedalCount = (int) gameState.getPlayers().stream()
+          .filter(p -> p.getPlace() > -1)
+          .count();
       AnimationSpeed.setSpeed(1);
       view.createPlayerList(gameState.getPlayers());
       for (PlayerClient p : gameState.getPlayers()) {
@@ -260,11 +275,25 @@ public class GameBoardPresenter {
           break;
         }
       }
-    } else if (!PawnAnimation.isAnimating()) {
-      if (gameState.getLastMoveResponse() != null) {
-        view.animatePawns(gameState.getLastMoveResponse());
-      } else {
-        view.animatePawnsToPositions(gameState.getPawns());
+    } else {
+      String currentPlayerId = gameState.getCurrentPlayerId();
+      if (!currentPlayerId.equals(lastCurrentPlayerId)) {
+        AudioPlayer.play(AudioPlayer.TURN_CHANGE);
+        lastCurrentPlayerId = currentPlayerId;
+      }
+      int medalCount = (int) gameState.getPlayers().stream()
+          .filter(p -> p.getPlace() > -1)
+          .count();
+      if (medalCount > lastMedalCount) {
+        AudioPlayer.play(AudioPlayer.MEDAL_AWARDED);
+        lastMedalCount = medalCount;
+      }
+      if (!PawnAnimation.isAnimating()) {
+        if (gameState.getLastMoveResponse() != null) {
+          animatePawnsWithAudio(gameState.getLastMoveResponse());
+        } else {
+          view.animatePawnsToPositions(gameState.getPawns());
+        }
       }
     }
     updatePlayerProfileUI(gameState.getPlayers());

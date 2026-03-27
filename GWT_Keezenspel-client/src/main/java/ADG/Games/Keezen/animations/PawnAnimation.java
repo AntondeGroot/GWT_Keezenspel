@@ -1,6 +1,7 @@
 package ADG.Games.Keezen.animations;
 
 import ADG.Games.Keezen.Point;
+import ADG.Games.Keezen.audio.AudioPlayer;
 import ADG.Games.Keezen.dto.MoveResponseDTO;
 import ADG.Games.Keezen.dto.PawnClient;
 import ADG.Games.Keezen.dto.PawnDTO;
@@ -67,7 +68,10 @@ public class PawnAnimation {
       runningAnimations++;
       int delay = (int) delayKilledByPawn1;
       new Timer() {
-        @Override public void run() { animateStep(element, current, points, speed); }
+        @Override public void run() {
+          AudioPlayer.play(AudioPlayer.PAWN_KILLED);
+          animateStep(element, current, points, speed);
+        }
       }.schedule(delay);
     }
 
@@ -81,7 +85,10 @@ public class PawnAnimation {
       runningAnimations++;
       int delay = (int) delayKilledByPawn2;
       new Timer() {
-        @Override public void run() { animateStep(element, current, points, speed); }
+        @Override public void run() {
+          AudioPlayer.play(AudioPlayer.PAWN_KILLED);
+          animateStep(element, current, points, speed);
+        }
       }.schedule(delay);
     }
   }
