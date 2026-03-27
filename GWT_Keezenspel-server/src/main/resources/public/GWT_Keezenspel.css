@@ -176,6 +176,16 @@ footer {
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
 }
 
+.sendButton:disabled {
+  background: linear-gradient(145deg, #555, #444);
+  border-color: #333;
+  color: #888;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+  text-shadow: none;
+}
+
 .forfeitButton {
   font-size: 15pt;
   font-family: 'Cinzel', Georgia, serif;
@@ -203,6 +213,16 @@ footer {
   background: linear-gradient(145deg, #ffc850, #ff9800);
   transform: translateY(1px);
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+.forfeitButton:disabled {
+  background: linear-gradient(145deg, #555, #444);
+  border-color: #333;
+  color: #888;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+  text-shadow: none;
 }
 
 /* ============================================================
@@ -347,6 +367,22 @@ footer {
 .cardDiv:hover {
   transform: translateY(-8px) scale(1.04);
   box-shadow: 6px 12px 24px rgba(0, 0, 0, 0.65), 0 0 10px rgba(244, 208, 63, 0.25);
+}
+
+.specialCard {
+  box-shadow: 4px 5px 14px rgba(0, 0, 0, 0.55), 1px 1px 4px rgba(0, 0, 0, 0.3), 0 0 7px 2px rgba(212, 175, 55, 0.85);
+  outline: 2px solid rgba(212, 175, 55, 0.9);
+}
+
+.cardHintLabel {
+  font-family: 'Lato', 'Helvetica Neue', sans-serif;
+  font-size: 16pt;
+  font-style: italic;
+  color: #c8b87a;
+  padding: 6px 8px 2px 8px;
+  max-width: 500px;
+  white-space: normal;
+  min-height: 1em;
 }
 
 /* ============================================================

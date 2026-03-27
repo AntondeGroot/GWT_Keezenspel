@@ -12,6 +12,7 @@
             <g:HTMLPanel ui:field="pawnBoard" width="700" height="600"/>
           </g:HTMLPanel>
           <g:FlowPanel ui:field="cardsContainer" styleName="cardsContainer"/>
+          <g:Label ui:field="cardHintLabel" styleName="cardHintLabel"/>
         </g:VerticalPanel>
         <g:Label styleName="errorLabel" ui:field="errorLabel"/>
         <g:VerticalPanel styleName="buttonContainer">

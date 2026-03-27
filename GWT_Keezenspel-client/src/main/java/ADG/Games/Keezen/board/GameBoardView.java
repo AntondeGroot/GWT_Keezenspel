@@ -57,6 +57,8 @@ public class GameBoardView extends Composite {
 
   @UiField FlowPanel cardsContainer;
 
+  @UiField Label cardHintLabel;
+
   @UiField HorizontalPanel pawnIntegerBoxes;
 
   @UiField TextBox stepsPawn1;
@@ -282,7 +284,9 @@ public class GameBoardView extends Composite {
 
       // Create the card element
       DivElement cardElement = Document.get().createDivElement();
-      cardElement.setClassName("cardDiv");
+      int v = card.getValue();
+      boolean isSpecial = v == 1 || v == 4 || v == 7 || v == 11 || v == 12 || v == 13;
+      cardElement.setClassName(isSpecial ? "cardDiv specialCard" : "cardDiv");
       cardElement.setId(card.toString());
       cardElement
           .getStyle()
@@ -297,13 +301,22 @@ public class GameBoardView extends Composite {
       cardElement.getStyle().setProperty("width", destWidth + "px");
       cardElement.getStyle().setProperty("height", destHeight + "px");
 
-      Event.sinkEvents(cardElement, Event.ONCLICK);
+      Event.sinkEvents(cardElement, Event.ONCLICK | Event.ONMOUSEOVER | Event.ONMOUSEOUT);
       Event.setEventListener(
           cardElement,
           new com.google.gwt.user.client.EventListener() {
             @Override
             public void onBrowserEvent(Event event) {
-              if (DOM.eventGetType(event) == Event.ONCLICK) {
+              int eventType = DOM.eventGetType(event);
+              if (eventType == Event.ONMOUSEOVER) {
+                updateCardHint(card);
+                return;
+              }
+              if (eventType == Event.ONMOUSEOUT) {
+                updateCardHint(selectedCard); // revert to selected card, or clear if none
+                return;
+              }
+              if (eventType == Event.ONCLICK) {
                 pawnAndCardSelection.setCard(card);
                 GWT.log("pawnAndCardSelection = " + pawnAndCardSelection);
 
@@ -377,6 +390,25 @@ public class GameBoardView extends Composite {
 
       cardsContainer.getElement().appendChild(cardElement);
     }
+    updateCardHint(selectedCard);
+  }
+
+  private void updateCardHint(CardClient card) {
+    if (card == null) {
+      cardHintLabel.setText("");
+      return;
+    }
+    String hint;
+    switch (card.getValue()) {
+      case 1:  hint = "Aas: zet een pion op het bord of beweeg 1 stap vooruit."; break;
+      case 4:  hint = "Vier: beweeg 4 stappen achteruit. Tip: je kunt dit gebruiken op je startveld om een heel bord af te snijden."; break;
+      case 7:  hint = "Zeven: maak 7 stappen in totaal met één of twee pionnen. Selecteer eerst de kaart en daarna één of twee pionnen."; break;
+      case 11: hint = "Boer: ruil jouw pion met een vijandige pion. Je kunt pas een geschikte vijand selecteren wanneer je deze kaart hebt geselecteerd."; break;
+      case 12: hint = "Vrouw: beweeg 12 stappen vooruit."; break;
+      case 13: hint = "Koning: zet een pion op het bord."; break;
+      default: hint = ""; break;
+    }
+    cardHintLabel.setText(hint);
   }
 
   public void drawCards(CardsDeck cardsDeck, PawnAndCardSelection pawnAndCardSelection) {
