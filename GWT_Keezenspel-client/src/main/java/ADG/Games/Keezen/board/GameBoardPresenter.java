@@ -26,6 +26,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
@@ -35,7 +37,6 @@ import java.util.HashMap;
 public class GameBoardPresenter {
 
   private boolean requestInProgress = false;
-  private Board boardModel;
   private final GameBoardView view;
   private final PollingService pollingService;
   private final PawnAndCardSelection pawnAndCardSelection;
@@ -76,20 +77,18 @@ public class GameBoardPresenter {
             new ClickHandler() {
               @Override
               public void onClick(ClickEvent event) {
-                String text = view.getChatInput().trim();
-                if (text.isEmpty()) return;
-                view.clearChatInput();
-                JSONObject msg = new JSONObject();
-                msg.put("sender", new JSONString(myPlayerName));
-                msg.put("message", new JSONString(ChatCipher.encrypt(text, Cookie.getSessionID())));
-                apiClient.sendChatMessage(Cookie.getSessionID(), msg, new ApiCallback<Void>() {
-                  @Override public void onSuccess(Void result) {}
-                  @Override public void onHttpError(int statusCode, String statusText) {}
-                  @Override public void onFailure(Throwable caught) {}
-                });
+                sendChatMessage();
               }
             },
             ClickEvent.getType());
+
+    view.chatInputField.addDomHandler(
+        event -> {
+          if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+            sendChatMessage();
+          }
+        },
+        KeyDownEvent.getType());
 
     view.getSendButton()
         .addDomHandler(
@@ -160,50 +159,68 @@ public class GameBoardPresenter {
 
     view.stepsPawn1.addChangeHandler(
         event -> {
-          // validate entry
           pawnAndCardSelection.setNrStepsPawn1ForSplit(view.stepsPawn1.getValue());
-          // split entry over the 2 text boxes
           view.stepsPawn1.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn1()));
           view.stepsPawn2.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn2()));
+          checkMove();
+        });
 
-          GWT.log("pawn 1: " + pawnAndCardSelection.getPawn1());
-          MoveRequestJsonBuilder builder =
-              new MoveRequestJsonBuilder()
-                  .withPlayerId(Cookie.getPlayerId())
-                  .withCardId(pawnAndCardSelection.getCard())
-                  .withPawn1(pawnAndCardSelection.getPawn1())
-                  .withPawn2(pawnAndCardSelection.getPawn2())
-                  .withStepsPawn1(pawnAndCardSelection.getNrStepsPawn1())
-                  .withStepsPawn2(pawnAndCardSelection.getNrStepsPawn2())
-                  .withTempMessageType("CHECK_MOVE");
+    view.stepsPawn2.addChangeHandler(
+        event -> {
+          pawnAndCardSelection.setNrStepsPawn2ForSplit(view.stepsPawn2.getValue());
+          view.stepsPawn1.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn1()));
+          view.stepsPawn2.setValue(valueOf(pawnAndCardSelection.getNrStepsPawn2()));
+          checkMove();
+        });
+  }
 
-          GWT.log("testmove anton: " + builder.build());
+  private void sendChatMessage() {
+    String text = view.getChatInput().trim();
+    if (text.isEmpty()) return;
+    view.clearChatInput();
+    JSONObject msg = new JSONObject();
+    msg.put("sender", new JSONString(myPlayerName));
+    msg.put("message", new JSONString(ChatCipher.encrypt(text, Cookie.getSessionID())));
+    apiClient.sendChatMessage(Cookie.getSessionID(), msg, new ApiCallback<Void>() {
+      @Override public void onSuccess(Void result) {}
+      @Override public void onHttpError(int statusCode, String statusText) {}
+      @Override public void onFailure(Throwable caught) {}
+    });
+  }
 
-          apiClient.checkMove(
-              Cookie.getSessionID(),
-              Cookie.getPlayerId(),
-              builder.build(),
-              new ApiCallback<TestMoveResponseDTO>() {
-                @Override
-                public void onSuccess(TestMoveResponseDTO result) {
-                  ArrayList<TileId> tiles = new ArrayList<>();
-                  GWT.log("testmove was successful presenter YYYYYY" + result.toString());
-                  for (int i = 0; i < result.getTiles().length(); i++) {
-                    tiles.add(
-                        new TileId(
-                            result.getTiles().get(i).getPlayerId(),
-                            result.getTiles().get(i).getTileNr()));
-                  }
-                  GWT.log("tiles = " + tiles);
-                  StepsAnimation.updateStepsAnimation(tiles);
-                }
+  private void checkMove() {
+    MoveRequestJsonBuilder builder =
+        new MoveRequestJsonBuilder()
+            .withPlayerId(Cookie.getPlayerId())
+            .withCardId(pawnAndCardSelection.getCard())
+            .withPawn1(pawnAndCardSelection.getPawn1())
+            .withPawn2(pawnAndCardSelection.getPawn2())
+            .withStepsPawn1(pawnAndCardSelection.getNrStepsPawn1())
+            .withStepsPawn2(pawnAndCardSelection.getNrStepsPawn2())
+            .withTempMessageType("CHECK_MOVE");
 
-                @Override
-                public void onHttpError(int statusCode, String statusText) {}
+    apiClient.checkMove(
+        Cookie.getSessionID(),
+        Cookie.getPlayerId(),
+        builder.build(),
+        new ApiCallback<TestMoveResponseDTO>() {
+          @Override
+          public void onSuccess(TestMoveResponseDTO result) {
+            ArrayList<TileId> tiles = new ArrayList<>();
+            for (int i = 0; i < result.getTiles().length(); i++) {
+              tiles.add(
+                  new TileId(
+                      result.getTiles().get(i).getPlayerId(),
+                      result.getTiles().get(i).getTileNr()));
+            }
+            StepsAnimation.updateStepsAnimation(tiles);
+          }
 
-                @Override
-                public void onFailure(Throwable caught) {}
-              });
+          @Override
+          public void onHttpError(int statusCode, String statusText) {}
+
+          @Override
+          public void onFailure(Throwable caught) {}
         });
   }
 
@@ -321,7 +338,7 @@ public class GameBoardPresenter {
         for (int i = 0; i < messages.size(); i++) {
           JSONObject m = messages.get(i).isObject();
           if (m == null) continue;
-          String timestamp = m.get("timestamp").isString().stringValue();
+          String timestamp = convertUTCToLocal(m.get("timestampUTC").isString().stringValue());
           String sender    = m.get("sender").isString().stringValue();
           String encrypted = m.get("message").isString().stringValue();
           sb.append(timestamp).append(" ").append(sender).append(": ")
@@ -427,4 +444,20 @@ public class GameBoardPresenter {
   private boolean currentPlayerIsPlaying(GameStateClient result) {
     return result.getCurrentPlayerId().equals(Cookie.getPlayerId());
   }
+
+  /** Converts a UTC "HH:mm" string to the browser's local timezone. */
+  private static String convertUTCToLocal(String utcTime) {
+    String[] parts = utcTime.split(":");
+    int utcHours   = Integer.parseInt(parts[0]);
+    int utcMinutes = Integer.parseInt(parts[1]);
+    // getTimezoneOffset() returns (UTC − local) in minutes
+    int total = utcHours * 60 + utcMinutes - getTimezoneOffset();
+    total = ((total % 1440) + 1440) % 1440;
+    int h = total / 60, m = total % 60;
+    return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
+  }
+
+  private static native int getTimezoneOffset() /*-{
+    return new Date().getTimezoneOffset();
+  }-*/;
 }

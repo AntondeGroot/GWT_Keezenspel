@@ -1,0 +1,237 @@
+/* ============================================================
+   Mobile UX overrides — loaded by mobile.html only.
+   The laptop layout (index.html) is completely unaffected.
+
+   All pixel values are in the 1100 px layout-viewport space.
+   The browser scales the whole page by (screen-width / 1100),
+   so e.g. 160 px CSS ≈ 57 px on a 393 px iPhone 15.
+   ============================================================ */
+
+/* ── 0. Brown background so the system nav bar area matches the footer ─ */
+html,
+body {
+  background: #2a1408 !important;
+}
+
+/* 100vw resolves to the device CSS-pixel width (~390px), not the 1100px
+   layout viewport, so override with a percentage relative to the body. */
+h1 {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  left: auto !important;
+  position: relative !important;
+}
+
+/* ── 1. Board toward the top with a small buffer ───────────────────────
+   The desktop centering formula uses 100vh, but with the fixed 1100 px
+   viewport the layout-viewport height becomes ≈ 2400 px on a phone,
+   making the auto-centre margin enormous. Override with a fixed gap.
+   Also force the game container to fill the full viewport width so the
+   board column expands into the space freed by the narrower player column. */
+.columnWrapper {
+  margin-top: 30px !important;
+}
+
+.gameContainer {
+  width: 1100px !important;
+}
+
+.column1 {
+  width: 900px !important;
+}
+
+/* ── 2. Round Play Card / Forfeit buttons ──────────────────────────── */
+.sendButton,
+.forfeitButton {
+  width: 160px !important;
+  height: 160px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  font-size: 18pt !important;
+  letter-spacing: 0 !important;
+  white-space: normal !important;
+  line-height: 1.35 !important;
+  /* flex centres multi-word text ("Play Card") inside the circle */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  margin: 8px auto !important;
+  /* remove square tap highlight / focus ring on touch */
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.sendButton:focus,
+.forfeitButton:focus {
+  outline: none !important;
+}
+
+/* Row order: forfeit left (1), Play Card right (2), pawn steps below (3).
+   Flex items are the <tr> elements inside .buttonContainer > tbody.
+   Without an explicit order on the pawn row it defaults to 0 and sorts first. */
+.buttonContainer > tbody > tr:first-child  { order: 2 !important; }
+.buttonContainer > tbody > tr:nth-child(2) { order: 1 !important; }
+.buttonContainer > tbody > tr:nth-child(3) { order: 3 !important; }
+
+/* Red forfeit button for mobile */
+.forfeitButton {
+  background: linear-gradient(145deg, #f07070, #d02020) !important;
+  border-color: #8b0000 !important;
+  color: #1a0000 !important;
+  text-shadow: none !important;
+}
+
+.forfeitButton:active {
+  background: linear-gradient(145deg, #b01010, #800000) !important;
+}
+
+/* Keep the grey disabled look even with the red overrides */
+.forfeitButton:disabled {
+  background: linear-gradient(145deg, #555, #444) !important;
+  border-color: #333 !important;
+  color: #888 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* ── 3. Pawn-step +/− buttons (injected by mobile-ux.js) ──────────── */
+.pawn-step-btn {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  font-size: 22pt;
+  font-weight: 600;
+  border: 2px solid #c9a227;
+  background: linear-gradient(145deg, #3a2000, #251400);
+  color: #f4d03f;
+  cursor: pointer;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5),
+              inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  line-height: 1;
+  vertical-align: middle;
+  /* prevent double-tap zoom on mobile */
+  touch-action: manipulation;
+}
+
+.pawn-step-btn:active {
+  background: linear-gradient(145deg, #251400, #1a0e00);
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+  transform: translateY(1px);
+}
+
+/* Dim the button when the paired input is disabled (pawn 2 by default) */
+.pawn-step-btn[data-disabled="true"] {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Pawn step inputs: wider and taller for legibility on small screens */
+.TextBoxForPawnSteps {
+  width: 48px !important;
+  height: 44px !important;
+  font-size: 14pt !important;
+  text-align: center !important;
+  padding: 4px !important;
+  touch-action: manipulation;
+}
+
+/* Vertically centre labels and inputs inside the pawnIntegerBoxes row.
+   GWT HorizontalPanel sets vertical-align:bottom as an inline style on
+   each <td>, so !important is required to override it. */
+#pawnIntegerBoxes > tbody > tr > td {
+  vertical-align: middle !important;
+}
+
+/* ── 4. Card hint text: larger so it's readable on a small screen ───── */
+.cardHintLabel {
+  font-size: 24pt !important;
+}
+
+/* ── 5. Narrower column2 so the game board gets more horizontal space ─ */
+.column2 {
+  width: 200px !important;
+}
+
+.playerListContainer {
+  width: 200px !important;
+}
+
+/* ── 7. Chat: wider panel fixed above the footer ──────────────────────
+   Keep all golden trim borders. The desktop rule uses position:fixed
+   bottom:32px — we keep bottom:32px but expand the width to span most
+   of the screen, centred. */
+.chatContainer {
+  position: fixed !important;
+  bottom: 32px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  right: auto !important;
+  width: 1060px !important;
+  z-index: 55 !important;
+}
+
+.chatDisplayField {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.chatInputRow {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Taller text input; explicit large width pushes the send button to the
+   right edge (overrides the desktop width:210px; flex alone is unreliable
+   through GWT's table-based HorizontalPanel). */
+.chatInputField {
+  height: 56px !important;
+  font-size: 13pt !important;
+  padding: 12px 8px !important;
+  width: 870px !important;
+}
+
+/* Match the send button height to the taller input */
+.chatSendButton {
+  height: 56px !important;
+  padding: 0 16px !important;
+  font-size: 12pt !important;
+}
+
+/* ── 8. buttonContainer: side-by-side buttons, fixed above the chat ────
+   Chat is ~232px tall (160px textarea + 68px input row + 4px border)
+   with bottom:32px → its top edge is at ~264px from the viewport bottom.
+   Using bottom:310px gives ~46px of clear space above the chat.
+   GWT VerticalPanel renders as a <table>; we flex the <tbody> to lay
+   the Send/Forfeit buttons in a row while keeping pawnIntegerBoxes below.
+   Width is auto (shrink-wraps the buttons) and centred on screen. */
+.buttonContainer {
+  position: fixed !important;
+  bottom: 310px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  top: auto !important;
+  width: auto !important;
+  z-index: 60 !important;
+}
+
+/* Flex the GWT table rows so the two buttons sit side by side */
+.buttonContainer > tbody {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 60px !important;
+}
+
+.buttonContainer > tbody > tr {
+  display: block !important;
+}
+
+/* pawnIntegerBoxes row spans the full width on its own line, centred */
+.buttonContainer > tbody > tr:last-child {
+  flex: 0 0 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+}

@@ -1,48 +1,39 @@
 <!doctype html>
-<!-- The DOCTYPE declaration above will set the     -->
-<!-- browser's rendering engine into                -->
-<!-- "Standards Mode". Replacing this declaration   -->
-<!-- with a "Quirks Mode" doctype is not supported. -->
+<!-- Mobile layout: fixed 1100px viewport so the browser scales the whole
+     desktop layout down to fit the phone screen proportionally.
+     This ensures the title bar always spans the full width and the
+     game board never overflows or requires manual zoom. -->
 
 <html>
 
   <head>
     <meta charset=UTF-8>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Fixed viewport width = game board width + sidebar + breathing room.
+         NO initial-scale — the browser automatically calculates the correct
+         scale to fit 1100px into the phone's screen width (e.g. ~0.36 on
+         a 393px iPhone). Specifying initial-scale=1.0 would keep 1:1 zoom
+         and show only a 393px slice of the 1100px layout (zoomed in). -->
+    <meta name="viewport" content="width=1100">
+    <!-- Colours the browser chrome / system nav bar to match the footer -->
+    <meta name="theme-color" content="#4a2610">
     <script>
-      // Phones (CSS screen width < 768px) get the mobile-optimised layout
-      if (window.innerWidth < 768) {
-        window.location.replace('mobile.html' + window.location.search);
+      // Tablets and desktops (real CSS screen width >= 768px) use the desktop layout
+      if (window.screen.width >= 768) {
+        window.location.replace('index.html' + window.location.search);
       }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-
-    <!--                                                               -->
-    <!-- Consider inlining CSS to reduce the number of requested files -->
-    <!--                                                               -->
     <link type="text/css" rel="stylesheet" href="GWT_Keezenspel.css">
+    <link type="text/css" rel="stylesheet" href="mobile.css">
 
-    <!--                                           -->
-    <!-- Any title is fine                         -->
-    <!--                                           -->
     <title>Keezenspel</title>
-    
-    <!--                                           -->
-    <!-- This script loads your compiled module.   -->
-    <!-- If you add any GWT meta tags, they must   -->
-    <!-- be added before this line.                -->
-    <!--                                           -->
+
     <script src="app/app.nocache.js"></script>
     <script src="mobile-ux.js"></script>
   </head>
 
-  <!--                                           -->
-  <!-- The body can have arbitrary html, or      -->
-  <!-- you can leave the body empty if you want  -->
-  <!-- to create a completely dynamic UI.        -->
-  <!--                                           -->
   <body>
 
     <!-- RECOMMENDED if your web app will not function without JavaScript enabled -->

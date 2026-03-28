@@ -173,12 +173,8 @@ public class ViewDrawing {
     GWT.log("creates player grid");
     // todo: maybe check player whether they belong in column 1 or 2, so don't expand both when a
     // winner has been declared
-    List<Integer> column1 = Arrays.asList(0, 1, 2, 3);
-    List<Integer> column2 = Arrays.asList(4, 5, 6, 7);
-    int colCount = 2;
-    // for a maximum of 8 players, there are either 4 rows and 2 columns
-    // or there are between 1 and 4 rows
-    int rowCount = Math.min(players.size(), 4);
+    int colCount = 1;
+    int rowCount = players.size();
     Grid grid = new Grid(rowCount, colCount);
 
     List<PlayerClient> winners =
@@ -218,9 +214,7 @@ public class ViewDrawing {
       hp.add(canvasMedal.asWidget());
       hp.add(profilePic);
       hp.add(playerNameLabel);
-      int row = playerId % 4;
-      int col = playerId > 3 ? 1 : 0;
-      grid.setWidget(row, col, hp);
+      grid.setWidget(playerId, 0, hp);
 
       playerId++;
     }
