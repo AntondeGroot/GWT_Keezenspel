@@ -22,7 +22,7 @@
             <g:Label styleName="TextBoxLabel pawn1Label">Pawn 1</g:Label>
             <g:TextBox ui:field="stepsPawn1" styleName="TextBoxForPawnSteps TextBoxForPawnSteps1"/>
             <g:Label styleName="TextBoxLabel pawn2Label">Pawn 2</g:Label>
-            <g:TextBox ui:field="stepsPawn2" styleName="TextBoxForPawnSteps TextBoxForPawnSteps2" enabled="false"/>
+            <g:TextBox ui:field="stepsPawn2" styleName="TextBoxForPawnSteps TextBoxForPawnSteps2"/>
           </g:HorizontalPanel>
         </g:VerticalPanel>
       </g:HorizontalPanel>
