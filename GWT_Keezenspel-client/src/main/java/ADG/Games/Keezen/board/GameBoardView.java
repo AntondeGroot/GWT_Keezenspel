@@ -402,7 +402,7 @@ public class GameBoardView extends Composite {
     switch (card.getValue()) {
       case 1:  hint = "Aas: zet een pion op het bord of beweeg 1 stap vooruit."; break;
       case 4:  hint = "Vier: beweeg 4 stappen achteruit. Tip: je kunt dit gebruiken op je startveld om een heel bord af te snijden."; break;
-      case 7:  hint = "Zeven: maak 7 stappen in totaal met één of twee pionnen. Selecteer eerst de kaart en daarna één of twee pionnen."; break;
+      case 7:  hint = "Zeven: maak 7 stappen in totaal met één of twee pionnen. Selecteer eerst de kaart en daarna pas een tweede pion. NB: pion 1 beweegt altijd als eerste."; break;
       case 11: hint = "Boer: ruil jouw pion met een vijandige pion. Je kunt pas een geschikte vijand selecteren wanneer je deze kaart hebt geselecteerd."; break;
       case 12: hint = "Vrouw: beweeg 12 stappen vooruit."; break;
       case 13: hint = "Koning: zet een pion op het bord."; break;
