@@ -17,7 +17,6 @@ import ADG.util.PlayerStatus;
 import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
-import com.adg.openapi.model.MoveType;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PawnId;
 import com.adg.openapi.model.Player;
@@ -683,6 +682,8 @@ public class GameState {
         winners.add(playerId);
         cardsDeck.forfeitCardsForPlayer(playerId);
         player.setIsPlaying(false);
+        player.setIsActive(false);
+        version.incrementAndGet();
       }
     }
   }

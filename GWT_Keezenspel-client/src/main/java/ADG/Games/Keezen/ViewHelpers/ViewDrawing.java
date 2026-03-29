@@ -201,17 +201,13 @@ public class ViewDrawing {
       if (player.isPlaying()) {
         hp.asWidget().setStyleName("playerPlaying");
       }
-
-      // todo: the following text is not implemented
-      // winners can be in either column 1 or 2: only add a medal to the winner,
-      // but add an empty canvas to the other players in that column so that they are aligned
-      // todo: medals are now not implemented
+      // add an empty medal element
       Canvas canvasMedal = Canvas.createIfSupported();
       canvasMedal.getElement().setId(player.getName() + "Medal");
       canvasMedal.setWidth("0px");
       canvasMedal.setHeight("0px");
-
       hp.add(canvasMedal.asWidget());
+
       hp.add(profilePic);
       hp.add(playerNameLabel);
       grid.setWidget(playerId, 0, hp);
