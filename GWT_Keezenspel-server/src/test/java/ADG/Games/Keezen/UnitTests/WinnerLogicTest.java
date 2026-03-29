@@ -48,6 +48,9 @@ class WinnerLogicTest {
 
     // THEN
     assertTrue(winners.contains("0"));
+    assertFalse(Boolean.TRUE.equals(
+        gameState.getPlayers().stream().filter(p -> p.getId().equals("0")).findFirst().get().getIsActive()),
+        "Player 0 should no longer be active after winning");
   }
 
   @Test
@@ -68,6 +71,9 @@ class WinnerLogicTest {
     assertTrue(gameState.getWinners().contains("0"));
     assertEquals(0, cardsDeck.getCardsForPlayer("0").size());
     assertEquals("1", gameState.getPlayerIdTurn());
+    assertFalse(Boolean.TRUE.equals(
+        gameState.getPlayers().stream().filter(p -> p.getId().equals("0")).findFirst().get().getIsActive()),
+        "Player 0 should no longer be active after winning");
   }
 
   @Test
@@ -104,12 +110,16 @@ class WinnerLogicTest {
     createMoveRequest(req1, pawn1_3, ace1);
     gameState.processOnMove(req1, new MoveResponse());
 
-    // THEN it's player 0's turn and no winner is shown as playing
+    // THEN it's player 0's turn and no winner is shown as playing or active
     assertTrue(gameState.getWinners().contains("1"));
     assertEquals("0", gameState.getPlayerIdTurn());
     assertFalse(gameState.getWinners().stream().anyMatch(winnerId ->
         gameState.getPlayers().stream()
             .anyMatch(p -> p.getId().equals(winnerId) && Boolean.TRUE.equals(p.getIsPlaying()))));
+    assertFalse(gameState.getWinners().stream().anyMatch(winnerId ->
+        gameState.getPlayers().stream()
+            .anyMatch(p -> p.getId().equals(winnerId) && Boolean.TRUE.equals(p.getIsActive()))),
+        "No winner should still be active");
   }
 
   @Test
@@ -124,6 +134,12 @@ class WinnerLogicTest {
 
     // THEN
     assertEquals(stringsToList(new String[] {"2", "1"}), winners);
+    assertFalse(Boolean.TRUE.equals(
+        gameState.getPlayers().stream().filter(p -> p.getId().equals("2")).findFirst().get().getIsActive()),
+        "Player 2 should no longer be active after winning");
+    assertFalse(Boolean.TRUE.equals(
+        gameState.getPlayers().stream().filter(p -> p.getId().equals("1")).findFirst().get().getIsActive()),
+        "Player 1 should no longer be active after winning");
   }
 
   @Test
@@ -154,6 +170,39 @@ class WinnerLogicTest {
     assertEquals(-1,
         gameState.getPlayers().stream().filter(p -> p.getId().equals("0")).findFirst().get().getPlace(),
         "Player 0 (red) should NOT have a medal — place should remain -1");
+    assertFalse(Boolean.TRUE.equals(
+        gameState.getPlayers().stream().filter(p -> p.getId().equals("1")).findFirst().get().getIsActive()),
+        "Player 1 (blue) should no longer be active after winning");
+  }
+
+  @Test
+  void whenPlayer0WinsInTwoPlayerGame_Player0GetsFirstMedal_NotPlayer1() {
+    // Re-setup with 2 players: player "0" (red) and player "1" (blue)
+    createGame_With_NPlayers(gameState, 2);
+
+    // GIVEN player "0" has 3 pawns on their finish and pawn 3 one step away in player "1"'s section
+    placePawnOnBoard(gameState, new PawnId("0", 0), new PositionKey("0", 17));
+    placePawnOnBoard(gameState, new PawnId("0", 1), new PositionKey("0", 18));
+    placePawnOnBoard(gameState, new PawnId("0", 2), new PositionKey("0", 19));
+    Pawn pawn0_3 = placePawnOnBoard(gameState, new PawnId("0", 3), new PositionKey("1", 15));
+    Card ace = givePlayerAce(cardsDeck, 0);
+
+    // WHEN player "0" plays the Ace to move their last pawn into the finish
+    MoveRequest moveRequest = new MoveRequest();
+    createMoveRequest(moveRequest, pawn0_3, ace);
+    gameState.processOnMove(moveRequest, new MoveResponse());
+
+    // THEN player "0" wins with place 1, and player "1" does NOT receive a medal
+    assertTrue(gameState.getWinners().contains("0"), "Player 0 (red) should be in the winners list");
+    assertEquals(1,
+        gameState.getPlayers().stream().filter(p -> p.getId().equals("0")).findFirst().get().getPlace(),
+        "Player 0 (red) should have place 1 — the first medal");
+    assertEquals(-1,
+        gameState.getPlayers().stream().filter(p -> p.getId().equals("1")).findFirst().get().getPlace(),
+        "Player 1 (blue) should NOT have a medal — place should remain -1");
+    assertFalse(Boolean.TRUE.equals(
+        gameState.getPlayers().stream().filter(p -> p.getId().equals("0")).findFirst().get().getIsActive()),
+        "Player 0 (red) should no longer be active after winning");
   }
 
   @Test
@@ -170,5 +219,14 @@ class WinnerLogicTest {
 
     // THEN
     assertEquals(stringsToList(new String[] {"2", "0", "1"}), winners);
+    assertFalse(Boolean.TRUE.equals(
+        gameState.getPlayers().stream().filter(p -> p.getId().equals("2")).findFirst().get().getIsActive()),
+        "Player 2 should no longer be active after winning");
+    assertFalse(Boolean.TRUE.equals(
+        gameState.getPlayers().stream().filter(p -> p.getId().equals("0")).findFirst().get().getIsActive()),
+        "Player 0 should no longer be active after winning");
+    assertFalse(Boolean.TRUE.equals(
+        gameState.getPlayers().stream().filter(p -> p.getId().equals("1")).findFirst().get().getIsActive()),
+        "Player 1 should no longer be active after winning");
   }
 }
