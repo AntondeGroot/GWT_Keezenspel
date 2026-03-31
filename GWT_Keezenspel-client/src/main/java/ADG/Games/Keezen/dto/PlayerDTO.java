@@ -20,9 +20,6 @@ public class PlayerDTO extends JavaScriptObject {
   /** Optional profile picture URL. */
   public final native String getProfilePic() /*-{ return this.profilePic; }-*/;
 
-  /** Optional color representing the player on the board. */
-  public final native String getColor() /*-{ return this.color; }-*/;
-
   /** Whether the player is currently active in the game. */
   public final native boolean isActive() /*-{ return !!this.isActive; }-*/;
 

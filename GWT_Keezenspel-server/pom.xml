@@ -173,28 +173,6 @@
         </executions>
       </plugin>
 
-      <!-- Generate colored pawn images at build time -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>3.1.0</version>
-        <executions>
-          <execution>
-            <id>generate-pawn-images</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>java</goal>
-            </goals>
-            <configuration>
-              <mainClass>ADG.Games.Keezen.PawnImageGenerator</mainClass>
-              <arguments>
-                <argument>${project.build.outputDirectory}/public</argument>
-              </arguments>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
       <!-- Java compilation -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

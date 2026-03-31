@@ -1,8 +1,9 @@
 package ADG.Games.Keezen.ViewHelpers;
 
-import static ADG.Games.Keezen.Player.PlayerColors.*;
+import static ADG.Games.Keezen.player.PlayerColors.*;
 
 import ADG.Games.Keezen.PawnAndCardSelection;
+import ADG.Games.Keezen.Player.PawnHighlightColors;
 import ADG.Games.Keezen.TileId;
 import ADG.Games.Keezen.dto.PawnClient;
 import ADG.Games.Keezen.dto.PlayerClient;
@@ -15,7 +16,6 @@ import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Unit;
@@ -23,56 +23,35 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.EventListener;
 import com.google.gwt.user.client.ui.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ViewDrawing {
 
+  private static final String pawnSvgTemplate = PawnResources.INSTANCE.pawnSvg().getText();
+
   public static DivElement createPawn(PawnClient pawn, PawnAndCardSelection pawnAndCardSelection) {
-    // Create new <div> Element
     GWT.log("A pawn was created");
     DivElement pawnElement = Document.get().createDivElement();
     pawnElement.setClassName("pawnDiv");
-    String pawnId = null;
-
     pawnElement.setId(pawn.getPawnId());
-    String uuid = UUID.get();
-    pawnElement.setAttribute(
-        "data-uuid",
-        uuid); // for debugging to see when the pawns are replaced, which happens after refreshing
-               // the page
+    pawnElement.setAttribute("data-uuid", UUID.get());
 
-    // Create new <div> Element
     DivElement pawnImage = Document.get().createDivElement();
     pawnImage.addClassName("pawnImage");
-
-    // set image
-    pawnImage.getStyle().setProperty("backgroundImage", "url(" + pawn.getUri() + ")");
-
-    // set overlay for when you want to select the pawn
-    ImageElement overlayImage = Document.get().createImageElement();
-    overlayImage.setSrc("/pawn_outline.png");
-    overlayImage.setClassName(pawn.getPawnId() + "Overlay");
-    overlayImage.getStyle().setPosition(Style.Position.ABSOLUTE);
-    overlayImage.getStyle().setTop(0, Style.Unit.PX);
-    overlayImage.getStyle().setLeft(0, Style.Unit.PX);
-    overlayImage.getStyle().setWidth(100, Style.Unit.PCT);
-    overlayImage.getStyle().setHeight(100, Style.Unit.PCT);
-    overlayImage.getStyle().setVisibility(Style.Visibility.HIDDEN);
-
-    // set position
     pawnImage.getStyle().setPosition(Style.Position.ABSOLUTE);
-    pawnImage.appendChild(overlayImage);
+    pawnImage.getStyle().setHeight(50, Style.Unit.PX);
+    pawnImage.getStyle().setWidth(50, Style.Unit.PX);
 
-    // set width
-    pawnImage.getStyle().setHeight(40, Style.Unit.PX);
-    pawnImage.getStyle().setWidth(40, Style.Unit.PX);
+    // Compute main color (sent as hex by server) and a darker shade for collar/base
+    String mainColor = pawn.getUri();
+    int[] darkRgb = darkenColor(hexToRgb(mainColor));
+    String darkColor = rgbToHex(darkRgb);
 
-    // combine
-    pawnImage.appendChild(overlayImage); // add overlay inside pawnImage
-    pawnElement.appendChild(pawnImage); // add pawnImage to outer container
-    pawnElement.getStyle().setZIndex(10); // put it on top of any canvas elements
+    injectSvgAndSetColors(pawnImage, pawnSvgTemplate, mainColor, darkColor);
+
+    pawnElement.appendChild(pawnImage);
+    pawnElement.getStyle().setZIndex(10);
 
     Event.sinkEvents(pawnElement, Event.ONCLICK);
     Event.setEventListener(
@@ -81,52 +60,96 @@ public class ViewDrawing {
           @Override
           public void onBrowserEvent(Event event) {
             if (DOM.eventGetType(event) == Event.ONCLICK) {
-              // select the pawnId when you click on the div
-              // we do not want to add the pawn itself as it will contain an outdated
-              // currentposition
-              // let pawnandcardselection keep track of where pawns are based on polling the server.
               pawnAndCardSelection.addPawnId(pawn.getPawnId());
               GWT.log("Pawn and card selection is: " + pawnAndCardSelection);
 
-              // each time you click on a pawn, you need to check all other pawns
-              // whether they should be selected or not.
-              // there is logic in pawnAndCardSelection so it might have unselected a pawn
-              // in the model.
-              NodeList<Element> overlayImages = Document.get().getElementsByTagName("img");
-              for (int i = 0; i < overlayImages.getLength(); i++) {
-                Element element = overlayImages.getItem(i);
-                String className = element.getClassName(); // e.g., "PawnId{0,0}Overlay"
+              String pawn1Id = pawnAndCardSelection.getPawn1() != null
+                  ? pawnAndCardSelection.getPawn1().getPawnId() : null;
+              String pawn2Id = pawnAndCardSelection.getPawn2() != null
+                  ? pawnAndCardSelection.getPawn2().getPawnId() : null;
+              String pawn1Color = pawnAndCardSelection.getPawn1() != null
+                  ? pawnAndCardSelection.getPawn1().getUri() : null;
+              String pawn2Color = pawnAndCardSelection.getPawn2() != null
+                  ? pawnAndCardSelection.getPawn2().getUri() : null;
+              updateAllPawnHighlights(pawn1Id, pawn2Id, pawn1Color, pawn2Color);
 
-                // Extract pawnId by removing "Overlay" suffix
-                if (className.endsWith("Overlay")) {
-                  String pawnId = className.substring(0, className.length() - "Overlay".length());
-                  // compare with selected pawns
-                  boolean isPawn1 = pawnAndCardSelection.getPawn1() != null
-                      && pawnAndCardSelection.getPawn1().getPawnId().equals(pawnId);
-                  boolean isPawn2 = pawnAndCardSelection.getPawn2() != null
-                      && pawnAndCardSelection.getPawn2().getPawnId().equals(pawnId);
-
-                  if (isPawn1) {
-                    element.getStyle().setVisibility(Style.Visibility.VISIBLE);
-                    element.getStyle().clearProperty("filter"); // red (default)
-                  } else if (isPawn2) {
-                    element.getStyle().setVisibility(Style.Visibility.VISIBLE);
-                    element.getStyle().setProperty("filter", "hue-rotate(120deg)"); // green
-                  } else {
-                    element.getStyle().setVisibility(Style.Visibility.HIDDEN);
-                    element.getStyle().clearProperty("filter");
-                  }
-                }
-              }
               GWT.log("Pawn and card selection is after validation: " + pawnAndCardSelection);
-              // after you have clicked on a pawn you will test whether it can move
-              //          Move.testMove(pawnAndCardSelection.createTestMoveMessage());
             }
           }
         });
     GWT.log("a pawn was created");
     return pawnElement;
   }
+
+  private static native void injectSvgAndSetColors(
+      Element container, String svgText, String mainColor, String darkColor) /*-{
+    container.innerHTML = svgText;
+    var svg = container.querySelector('svg');
+    if (!svg) return;
+    svg.setAttribute('width', '50');
+    svg.setAttribute('height', '50');
+    var highlights = svg.querySelectorAll('.highlight');
+    for (var i = 0; i < highlights.length; i++) {
+      highlights[i].style.opacity = '0';
+    }
+    var head = svg.querySelector('#headFill');
+    var body = svg.querySelector('#bodyFill');
+    var collar = svg.querySelector('#collarFill');
+    var base = svg.querySelector('#baseFill');
+    if (head) head.style.fill = mainColor;
+    if (body) body.style.fill = mainColor;
+    if (collar) collar.style.fill = darkColor;
+    if (base) base.style.fill = darkColor;
+  }-*/;
+
+  private static void updateAllPawnHighlights(
+      String pawn1Id, String pawn2Id, String pawn1Color, String pawn2Color) {
+    String pawn1HighlightColor = PawnHighlightColors.forPawn1(pawn1Color);
+    String pawn2HighlightColor = PawnHighlightColors.forPawn2(pawn2Color);
+    renderPawnHighlights(pawn1Id, pawn2Id, pawn1HighlightColor, pawn2HighlightColor);
+    updateStepBoxColors(pawn1HighlightColor, pawn2HighlightColor);
+  }
+
+  private static native void renderPawnHighlights(
+      String pawn1Id, String pawn2Id, String pawn1HighlightColor, String pawn2HighlightColor) /*-{
+    var pawnDivs = $doc.querySelectorAll('.pawnDiv');
+    for (var i = 0; i < pawnDivs.length; i++) {
+      var pawnDiv = pawnDivs[i];
+      var pawnId = pawnDiv.id;
+      var isPawn1 = pawn1Id && pawnId === pawn1Id;
+      var isPawn2 = pawn2Id && pawnId === pawn2Id;
+      var visible = isPawn1 || isPawn2;
+      var svg = pawnDiv.querySelector('svg');
+      if (!svg) continue;
+      var highlights = svg.querySelectorAll('.highlight');
+      for (var j = 0; j < highlights.length; j++) {
+        var color = isPawn2 ? pawn2HighlightColor : pawn1HighlightColor;
+
+        highlights[j].style.opacity = visible ? '1' : '0';
+
+        if (visible) {
+          highlights[j].style.fill = 'none';
+          highlights[j].style.stroke = color;
+          highlights[j].style.strokeWidth = '64';
+          highlights[j].style.strokeLinejoin = 'round';
+        } else {
+          highlights[j].style.stroke = 'none';
+        }
+      }
+    }
+  }-*/;
+
+  private static native void updateStepBoxColors(
+      String pawn1HighlightColor, String pawn2HighlightColor) /*-{
+    var labels1 = $doc.querySelectorAll('.pawn1Label');
+    for (var a = 0; a < labels1.length; a++) labels1[a].style.color = pawn1HighlightColor;
+    var boxes1 = $doc.querySelectorAll('.TextBoxForPawnSteps1');
+    for (var b = 0; b < boxes1.length; b++) boxes1[b].style.borderColor = pawn1HighlightColor;
+    var labels2 = $doc.querySelectorAll('.pawn2Label');
+    for (var c = 0; c < labels2.length; c++) labels2[c].style.color = pawn2HighlightColor;
+    var boxes2 = $doc.querySelectorAll('.TextBoxForPawnSteps2');
+    for (var d = 0; d < boxes2.length; d++) boxes2[d].style.borderColor = pawn2HighlightColor;
+  }-*/;
 
   public static DivElement createCircle(
       TileId tileId, double x, double y, double radius, String color) {

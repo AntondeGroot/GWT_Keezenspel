@@ -8,7 +8,7 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getPawnLocation;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.pawnIsSelected;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilPawnStopsMoving;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
@@ -32,8 +32,6 @@ public class Pawn_IT extends BaseIntegrationTest {
 
   static WebDriver driver;
   static String sessionId;
-  String HIDDEN = "hidden";
-  String VISIBLE = "visible";
   static String player0Id;
   static String player1Id;
   static String player2Id;
@@ -75,8 +73,7 @@ public class Pawn_IT extends BaseIntegrationTest {
     pawn1.click();
 
     // THEN
-    WebElement pawn1Outline = driver.findElement(By.className(pawnId + "Overlay"));
-    assertEquals(VISIBLE, pawn1Outline.getCssValue("visibility"));
+    assertTrue(pawnIsSelected(driver, pawnId));
   }
 
   @Test
@@ -93,11 +90,8 @@ public class Pawn_IT extends BaseIntegrationTest {
     pawn2.click();
 
     // THEN
-    WebElement pawn1Outline = driver.findElement(By.className(pawnId1 + "Overlay"));
-    assertEquals(HIDDEN, pawn1Outline.getCssValue("visibility"));
-
-    WebElement pawn2Outline = driver.findElement(By.className(pawnId2 + "Overlay"));
-    assertEquals(VISIBLE, pawn2Outline.getCssValue("visibility"));
+    assertFalse(pawnIsSelected(driver, pawnId1));
+    assertTrue(pawnIsSelected(driver, pawnId2));
   }
 
   @Test
@@ -111,8 +105,7 @@ public class Pawn_IT extends BaseIntegrationTest {
     pawnOtherPlayer.click();
 
     // THEN
-    WebElement pawnOtherPlayerOutline = driver.findElement(By.className(pawnId + "Overlay"));
-    assertEquals(HIDDEN, pawnOtherPlayerOutline.getCssValue("visibility"));
+    assertFalse(pawnIsSelected(driver, pawnId));
   }
 
   @Test

@@ -1,7 +1,6 @@
 package ADG.Games.Keezen;
 
 import static ADG.util.BoardLogic.isPawnOnFinish;
-import static ADG.util.PlayerColors.getPlayerColor;
 import static ADG.util.PlayerStatus.hasFinished;
 import static ADG.util.PlayerStatus.setActive;
 import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
@@ -113,8 +112,6 @@ public class GameState {
                   new PawnId(player.getId(), pawnNr),
                   currentPosition,
                   nestPosition);
-          p.setUri("pawn" + playerInt + ".png");
-
           pawns.add(p);
         }
         playerInt++;
@@ -138,7 +135,6 @@ public class GameState {
       player.setIsActive(true);
       player.setPlace(-1);
       player.isPlaying(false);
-      player.setColor(getPlayerColor(playerInt));
       player.setPlayerInt(playerInt);
       players.add(player);
       version.incrementAndGet();

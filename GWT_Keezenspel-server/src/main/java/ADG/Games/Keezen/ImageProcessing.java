@@ -1,6 +1,5 @@
 package ADG.Games.Keezen;
 
-import ADG.Games.Keezen.Player.PlayerColors;
 import ADG.Log;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -10,13 +9,32 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 public class ImageProcessing {
+
+  private static final String[] PLAYER_COLORS = {
+    "#A52A2A", "#0000A5", "#008000", "#A5A500",
+    "#6A5ACD", "#FF8C00", "#008B8B", "#8B008B"
+  };
+
+  private static int[] getRGBColor(int colorId) {
+    String hex = PLAYER_COLORS[colorId].substring(1);
+    int r = Integer.parseInt(hex.substring(0, 2), 16);
+    int g = Integer.parseInt(hex.substring(2, 4), 16);
+    int b = Integer.parseInt(hex.substring(4, 6), 16);
+    double lightenFactor = 0.5;
+    return new int[] {
+      (int) (r + (255 - r) * lightenFactor),
+      (int) (g + (255 - g) * lightenFactor),
+      (int) (b + (255 - b) * lightenFactor)
+    };
+  }
+
   public static void create(int colorId) {
     create(colorId, System.getProperty("user.dir") + "/public");
   }
 
   public static void create(int colorId, String outputDirPath) {
     String resourcePath = "/public/pawn.png";
-    int[] rgb = PlayerColors.getRGBColor(colorId);
+    int[] rgb = getRGBColor(colorId);
 
     File outputDir = new File(outputDirPath);
     outputDir.mkdirs();
