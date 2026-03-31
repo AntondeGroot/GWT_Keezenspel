@@ -157,10 +157,8 @@ public class TestUtils {
   }
 
   public static Point clickPawn(WebDriver driver, PawnId pawnId) {
-    WebElement pawnOverlay = driver.findElement(By.className(pawnId + "Overlay"));
     WebElement pawnElement = driver.findElement(By.id(pawnId.toString()));
 
-    // Check if the overlay is not visible
     if (!pawnIsSelected(driver, pawnId)) {
       pawnElement.click();
     } else {
@@ -175,11 +173,40 @@ public class TestUtils {
     return new Point(Double.parseDouble(x), Double.parseDouble(y));
   }
 
+  /** Returns the inline borderColor CSS value of .TextBoxForPawnSteps{pawnNr} as "rgb(r, g, b)". */
+  public static String getStepBoxBorderColor(WebDriver driver, int pawnNr) {
+    JavascriptExecutor js = (JavascriptExecutor) driver;
+    return (String) js.executeScript(
+        "return document.querySelector('.TextBoxForPawnSteps" + pawnNr + "').style.borderColor");
+  }
+
+  /** Returns the inline color CSS value of .pawn{pawnNr}Label as "rgb(r, g, b)". */
+  public static String getPawnLabelColor(WebDriver driver, int pawnNr) {
+    JavascriptExecutor js = (JavascriptExecutor) driver;
+    return (String) js.executeScript(
+        "return document.querySelector('.pawn" + pawnNr + "Label').style.color");
+  }
+
+  /** Converts a hex color like "#1e90ff" to the browser rgb() string "rgb(30, 144, 255)". */
+  public static String hexToRgbCss(String hex) {
+    int r = Integer.parseInt(hex.substring(1, 3), 16);
+    int g = Integer.parseInt(hex.substring(3, 5), 16);
+    int b = Integer.parseInt(hex.substring(5, 7), 16);
+    return "rgb(" + r + ", " + g + ", " + b + ")";
+  }
+
   public static boolean pawnIsSelected(WebDriver driver, PawnId pawnId) {
-    WebElement updatedElement = driver.findElement(By.className(pawnId.toString() + "Overlay"));
-    String output = updatedElement.getCssValue("visibility");
-    Log.info("pawnIsSelected: " + output + " for element " + updatedElement);
-    return Objects.equals(output, "visible");
+    JavascriptExecutor js = (JavascriptExecutor) driver;
+    String opacity = (String) js.executeScript(
+        "var pawn = document.getElementById(arguments[0]);" +
+        "if (!pawn) return 'none';" +
+        "var highlight = pawn.querySelector('.highlight');" +
+        "if (!highlight) return 'none';" +
+        "return highlight.style.opacity;",
+        pawnId.toString()
+    );
+    Log.info("pawnIsSelected: opacity=" + opacity + " for pawn " + pawnId);
+    return "1".equals(opacity);
   }
 
   public static void clickPlayCardButton(WebDriver driver) {

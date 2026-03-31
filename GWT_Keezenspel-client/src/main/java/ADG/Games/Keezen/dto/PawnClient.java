@@ -1,5 +1,6 @@
 package ADG.Games.Keezen.dto;
 
+import ADG.Games.Keezen.player.PlayerColors;
 import ADG.Games.Keezen.TileId;
 
 public class PawnClient {
@@ -16,6 +17,19 @@ public class PawnClient {
 
   private final String uri;
 
+  public PawnClient(PawnDTO pawnDTO, int playerInt) {
+    this.playerId = pawnDTO.getPlayerId();
+    this.pawnId = pawnDTO.getPlayerId() + "_" + pawnDTO.getPawnId().getPawnNr();
+    this.pawnNr = pawnDTO.getPawnId().getPawnNr();
+    this.currentTileId =
+        new TileId(
+            pawnDTO.getCurrentTileId().getPlayerId(), pawnDTO.getCurrentTileId().getTileNr());
+    this.nestTileId =
+        new TileId(pawnDTO.getNestTileId().getPlayerId(), pawnDTO.getNestTileId().getTileNr());
+    this.uri = PlayerColors.getHexColor(playerInt);
+  }
+
+  /** Constructor for animation use only — color is not needed. */
   public PawnClient(PawnDTO pawnDTO) {
     this.playerId = pawnDTO.getPlayerId();
     this.pawnId = pawnDTO.getPlayerId() + "_" + pawnDTO.getPawnId().getPawnNr();
@@ -25,7 +39,7 @@ public class PawnClient {
             pawnDTO.getCurrentTileId().getPlayerId(), pawnDTO.getCurrentTileId().getTileNr());
     this.nestTileId =
         new TileId(pawnDTO.getNestTileId().getPlayerId(), pawnDTO.getNestTileId().getTileNr());
-    this.uri = pawnDTO.getUri();
+    this.uri = null;
   }
 
   public PawnClient(String playerId, int pawnNr, TileId currentTileId) {

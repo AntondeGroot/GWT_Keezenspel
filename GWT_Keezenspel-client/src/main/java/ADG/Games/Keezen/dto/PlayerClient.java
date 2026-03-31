@@ -1,5 +1,6 @@
 package ADG.Games.Keezen.dto;
 
+import ADG.Games.Keezen.player.PlayerColors;
 import java.util.Objects;
 
 public class PlayerClient {
@@ -21,7 +22,7 @@ public class PlayerClient {
     this.id = playerDTO.getId();
     this.name = playerDTO.getName();
     this.profilePictureUrl = playerDTO.getProfilePic();
-    this.color = playerDTO.getColor();
+    this.color = PlayerColors.getHexColor(playerDTO.getPlayerInt());
     this.isActive = playerDTO.isActive();
     this.isPlaying = playerDTO.isPlaying();
     this.place = playerDTO.getPlace();

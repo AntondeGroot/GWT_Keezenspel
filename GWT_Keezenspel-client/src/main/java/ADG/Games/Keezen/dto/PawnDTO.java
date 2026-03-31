@@ -23,6 +23,4 @@ public class PawnDTO extends JavaScriptObject {
   /** The starting ("nest") tile for this pawn. */
   public final native PositionKeyDTO getNestTileId() /*-{ return this.nestTileId; }-*/;
 
-  /** Optional URI (e.g., pawn image or asset reference). */
-  public final native String getUri() /*-{ return this.uri; }-*/;
 }
