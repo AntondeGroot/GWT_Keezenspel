@@ -123,7 +123,6 @@ public class PawnAndCardSelection {
         firstPawnIsOnNestWhenYouPlayKing();
         break;
       default:
-        validateAllPawnsAreOnBoardOrFinish();
         break;
     }
   }
@@ -137,10 +136,6 @@ public class PawnAndCardSelection {
             "Pawn 2 is not on normal board, you cannot switch with it, pawn is deselected.");
       }
     }
-  }
-
-  private void validateAllPawnsAreOnBoardOrFinish() {
-    // this is only for validating your own pawns, we do not care about this
   }
 
   private void firstPawnIsOnNestWhenYouPlayKing() {
@@ -422,12 +417,6 @@ public class PawnAndCardSelection {
     nrStepsPawn2 = steps;
   }
 
-  //  public MoveMessage createTestMoveMessage() {
-  //    MoveMessage moveMessage = createMessage();
-  //    moveMessage.setMessageType(MessageType.CHECK_MOVE);
-  //    return moveMessage;
-  //  }
-
   public MoveMessage createMoveMessage() {
     if (pawn1 != null) {
       GWT.log(
@@ -442,18 +431,7 @@ public class PawnAndCardSelection {
   }
 
   private MoveMessage createMessage() {
-    MoveMessage moveMessage = new MoveMessage();
-    //        moveMessage.setPlayerId(playerId);
-    //        moveMessage.setPawnId1(getPawnId1());
-    //        moveMessage.setPawnId2(getPawnId2());
-    //        moveMessage.setCard(card);
-    //        moveMessage.setMoveType(moveType);
-    //        moveMessage.setStepsPawn1(nrStepsPawn1);
-    //        if(moveType == SPLIT){ // comparing Enums with == is null safe
-    //            moveMessage.setStepsPawn2(nrStepsPawn2);
-    //        }
-
-    return moveMessage;
+    return new MoveMessage();
   }
 
   private void setSplitBoxesVisibility(Visibility visibility) {
