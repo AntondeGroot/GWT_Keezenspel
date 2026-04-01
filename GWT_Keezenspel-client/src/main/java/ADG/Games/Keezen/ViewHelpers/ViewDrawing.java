@@ -7,6 +7,7 @@ import ADG.Games.Keezen.Player.PawnHighlightColors;
 import ADG.Games.Keezen.TileId;
 import ADG.Games.Keezen.dto.PawnClient;
 import ADG.Games.Keezen.dto.PlayerClient;
+import ADG.Games.Keezen.util.PawnLayout;
 import ADG.Games.Keezen.util.UUID;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -40,8 +41,8 @@ public class ViewDrawing {
     DivElement pawnImage = Document.get().createDivElement();
     pawnImage.addClassName("pawnImage");
     pawnImage.getStyle().setPosition(Style.Position.ABSOLUTE);
-    pawnImage.getStyle().setHeight(50, Style.Unit.PX);
-    pawnImage.getStyle().setWidth(50, Style.Unit.PX);
+    pawnImage.getStyle().setHeight(PawnLayout.HEIGHT, Style.Unit.PX);
+    pawnImage.getStyle().setWidth(PawnLayout.WIDTH, Style.Unit.PX);
 
     // Compute main color (sent as hex by server) and a darker shade for collar/base
     String mainColor = pawn.getUri();
@@ -51,7 +52,6 @@ public class ViewDrawing {
     injectSvgAndSetColors(pawnImage, pawnSvgTemplate, mainColor, darkColor);
 
     pawnElement.appendChild(pawnImage);
-    pawnElement.getStyle().setZIndex(10);
 
     Event.sinkEvents(pawnElement, Event.ONCLICK);
     Event.setEventListener(

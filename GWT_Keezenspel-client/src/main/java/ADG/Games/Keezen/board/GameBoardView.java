@@ -18,6 +18,7 @@ import ADG.Games.Keezen.dto.TestMoveResponseDTO;
 import ADG.Games.Keezen.services.ApiClient;
 import ADG.Games.Keezen.services.ApiClient.ApiCallback;
 import ADG.Games.Keezen.util.Cookie;
+import ADG.Games.Keezen.util.PawnLayout;
 import ADG.Games.Keezen.util.MoveRequestJsonBuilder;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
@@ -170,8 +171,6 @@ public class GameBoardView extends Composite {
   }
 
   public void createPawns(List<PawnClient> pawns, PawnAndCardSelection pawnAndCardSelection) {
-    double desiredWidth = 40;
-    double desiredHeight = 40;
     Point point = new Point(0, 0);
     GWT.log("createPawns : " + pawns.size() + " pawns to be drawn");
     for (PawnClient pawn : pawns) {
@@ -193,8 +192,7 @@ public class GameBoardView extends Composite {
           System.out.println("");
         }
       }
-      pawnElement.getStyle().setLeft(point.getX() - desiredWidth / 2, Style.Unit.PX);
-      pawnElement.getStyle().setTop(point.getY() - desiredHeight / 2 - 15, Style.Unit.PX);
+      PawnLayout.applyPosition(pawnElement, point);
     }
   }
 
@@ -515,8 +513,6 @@ public class GameBoardView extends Composite {
   }
 
   public void animatePawnsToPositions(List<PawnClient> pawns) {
-    double desiredWidth = 40;
-    double desiredHeight = 40;
     for (PawnClient pawn : pawns) {
       DivElement pawnElement = pawnElements.get(pawn.getPawnId());
       if (pawnElement == null) continue;
@@ -525,8 +521,7 @@ public class GameBoardView extends Composite {
           Point point = mapping.getPosition();
           pawnElement.getStyle().setProperty("transition", "left 600ms ease-in-out, top 600ms ease-in-out");
           pawnElement.getOffsetWidth(); // force reflow so transition applies
-          pawnElement.getStyle().setLeft(point.getX() - desiredWidth / 2, Style.Unit.PX);
-          pawnElement.getStyle().setTop(point.getY() - desiredHeight / 2 - 15, Style.Unit.PX);
+          PawnLayout.applyPosition(pawnElement, point);
           break;
         }
       }
