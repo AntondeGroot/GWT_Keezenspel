@@ -9,6 +9,8 @@
   --header-height: 84px;  /* h1: font + padding (18px+14px) + borders (4px+6px) */
   --footer-height: 32px;  /* footer: height 26px + border-top 6px              */
   --wrapper-height: 800px;
+  --canvas-height: 600px;
+  --card-height: calc(100px * 1150 / 5 * 13 / 1920); /* destWidth * spriteH/spriteW ≈ 155.7px */
 }
 
 html {
@@ -239,7 +241,7 @@ footer {
   background: linear-gradient(145deg, #3a2000, #251400);
   padding: 12px;
   position: absolute;
-  top: 600px;
+  bottom: calc(var(--wrapper-height) - var(--canvas-height) - var(--card-height));
   left: 600px;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
