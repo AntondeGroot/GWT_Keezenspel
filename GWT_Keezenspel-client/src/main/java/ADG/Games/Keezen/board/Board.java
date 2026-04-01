@@ -167,7 +167,6 @@ public class Board {
 
   public static void setPawns(ArrayList<PawnClient> pawns) {
     if (Board.pawns.isEmpty()) {
-      //      pawns.sort(new PawnComparator());
       pawns.sort(new PawnComparator());
       Board.pawns = pawns;
     }
