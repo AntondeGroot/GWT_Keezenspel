@@ -1,6 +1,11 @@
 package ADG.Games.Keezen.board;
 
-import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.*;
+import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.clearPawnHighlights;
+import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.clearPawnHighlightsExceptPawn1;
+import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.createCircle;
+import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.createPawn;
+import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.createPlayerGrid;
+import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.updatePlayerProfileUI;
 import static ADG.Games.Keezen.util.PlayerUtil.getPlayerById;
 
 import ADG.Games.Keezen.CardsDeck;
@@ -170,7 +175,7 @@ public class GameBoardView extends Composite {
     forfeitButton.setEnabled(enabled);
   }
 
-  public void createPawns(List<PawnClient> pawns, PawnAndCardSelection pawnAndCardSelection) {
+  public void createPawns(List<PawnClient> pawns, PawnAndCardSelection pawnAndCardSelection, Runnable onPawnSelected) {
     Point point = new Point(0, 0);
     GWT.log("createPawns : " + pawns.size() + " pawns to be drawn");
     for (PawnClient pawn : pawns) {
@@ -181,7 +186,7 @@ public class GameBoardView extends Composite {
       GWT.log("pawnId: " + pawnId);
       DivElement pawnElement = pawnElements.get(pawn.getPawnId());
       if (pawnElement == null) {
-        pawnElement = createPawn(pawn, pawnAndCardSelection);
+        pawnElement = createPawn(pawn, pawnAndCardSelection, onPawnSelected);
         pawnElements.put(pawn.getPawnId(), pawnElement);
         pawnBoard.getElement().appendChild(pawnElement);
       }
@@ -317,6 +322,14 @@ public class GameBoardView extends Composite {
               if (eventType == Event.ONCLICK) {
                 pawnAndCardSelection.setCard(card);
                 GWT.log("pawnAndCardSelection = " + pawnAndCardSelection);
+
+                if (pawnAndCardSelection.getCard() == null) {
+                  StepsAnimation.resetStepsAnimation();
+                  String pawn1Color = pawnAndCardSelection.getPawn1() != null ? pawnAndCardSelection.getPawn1().getUri() : null;
+                  clearPawnHighlightsExceptPawn1(pawnAndCardSelection.getPawnId1(), pawn1Color);
+                  drawPlayerCardsInHand(cards, pawnAndCardSelection, spriteImage);
+                  return;
+                }
 
                 MoveRequestJsonBuilder builder =
                     new MoveRequestJsonBuilder()

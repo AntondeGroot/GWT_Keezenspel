@@ -3,7 +3,6 @@ package ADG.testing;
 import ADG.Games.Keezen.GameRegistry;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
-import ADG.Games.Keezen.ImageProcessing;
 import com.adg.openapi.model.Player;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Profile;
@@ -16,10 +15,6 @@ public class TestGameInitializer_RealCards {
   @PostConstruct
   public void setupTestGame() {
     int nrPlayers = 3;
-
-    for (int i = 0; i < nrPlayers; i++) {
-      ImageProcessing.create(i);
-    }
 
     String sessionId = GameRegistry.createNewGame("123");
     GameSession session = GameRegistry.getGame(sessionId);

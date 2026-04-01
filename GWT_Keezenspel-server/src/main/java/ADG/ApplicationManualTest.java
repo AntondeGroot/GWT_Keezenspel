@@ -3,7 +3,6 @@ package ADG;
 import ADG.Games.Keezen.GameRegistry;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
-import ADG.Games.Keezen.ImageProcessing;
 import com.adg.openapi.model.Player;
 import java.io.File;
 import java.util.Objects;
@@ -24,9 +23,6 @@ public class ApplicationManualTest extends SpringBootServletInitializer {
     int NrPlayers = 3;
 
     SpringApplication.run(ApplicationManualTest.class, args);
-    for (int i = 0; i < NrPlayers; i++) {
-      ImageProcessing.create(i);
-    }
     String sessionId = GameRegistry.createTestGame("123");
     GameSession session = GameRegistry.getGame(sessionId);
     GameState gameState = session.getGameState();

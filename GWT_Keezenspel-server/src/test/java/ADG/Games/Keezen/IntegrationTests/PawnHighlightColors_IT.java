@@ -6,6 +6,7 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getStepBoxBorder
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.hexToRgbCss;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.pawnIsSelected;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -140,4 +141,27 @@ public class PawnHighlightColors_IT extends BaseIntegrationTest {
     assertEquals(expectedPawn2Rgb, getStepBoxBorderColor(driver, 2), "TextBoxForPawnSteps2 border");
     assertEquals(expectedPawn2Rgb, getPawnLabelColor(driver, 2),      "pawn2Label color");
   }
+
+  // ── deselecting card does not remove pawn highlight ───────────────────────
+
+  @Test
+  @Order(5)
+  void deselectCard_doesNotRemovePawnHighlight() {
+    // GIVEN: player 0's pawn on the board, with a non-special card
+    ApiUtil.setPawnPosition(sessionId, player0Id, 0, player0Id, 1);
+    ApiUtil.setCardForPlayer(sessionId, player0Id, 5);
+    setPlayerIdPlaying(driver, player0Id);
+    waitUntilCardsAreLoaded(driver);
+
+    PawnId pawnId = new PawnId(player0Id, 0);
+    driver.findElement(By.id(pawnId.toString())).click(); // select pawn
+    driver.findElement(By.id("card_0_5")).click();        // select card
+
+    // WHEN: deselect card by clicking it again
+    driver.findElement(By.id("card_0_5")).click();
+
+    // THEN: pawn highlight must still be visible
+    assertTrue(pawnIsSelected(driver, pawnId), "Pawn highlight must remain after card is deselected");
+  }
+
 }
