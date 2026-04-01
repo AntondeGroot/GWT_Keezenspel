@@ -8,7 +8,8 @@
 :root {
   --header-height: 84px;  /* h1: font + padding (18px+14px) + borders (4px+6px) */
   --footer-height: 32px;  /* footer: height 26px + border-top 6px              */
-  --wrapper-height: 800px;
+  --hint-height: 112px;
+  --wrapper-height: calc(var(--canvas-height) + var(--card-height) + var(--hint-height));
   --canvas-height: 600px;
   --card-height: calc(100px * 1150 / 5 * 13 / 1920); /* destWidth * spriteH/spriteW ≈ 155.7px */
 }
@@ -107,9 +108,11 @@ footer {
 }
 
 .column1 > tbody > tr > td {
-  height: calc(100vh - 90px);
+  height: calc(100vh - var(--header-height) - var(--footer-height)); /* fallback */
+  height: calc(100dvh - var(--header-height) - var(--footer-height)); /* Safari: dvh excludes browser chrome */
   text-align: center;
   vertical-align: middle;
+  overflow: hidden;
 }
 
 .column2 {
@@ -140,7 +143,8 @@ footer {
   width: 600px;
   height: var(--wrapper-height);
   display: inline-block;
-  margin-top: max(0px, calc((100vh - var(--header-height) - var(--footer-height) - var(--wrapper-height)) / 2));
+  margin-top: max(0px, calc((100vh - var(--header-height) - var(--footer-height) - var(--wrapper-height)) / 2)); /* fallback */
+  margin-top: max(0px, calc((100dvh - var(--header-height) - var(--footer-height) - var(--wrapper-height)) / 2)); /* Safari */
 }
 
 .canvasWrapper canvas {
@@ -424,9 +428,9 @@ footer {
   font-style: italic;
   color: #c8b87a;
   padding: 6px 8px 2px 8px;
-  max-width: 700px;
-  white-space: normal;
-  min-height: 1em;
+  max-width: 900px;
+  white-space: pre-wrap;
+  height: var(--hint-height);
 }
 
 /* ============================================================
