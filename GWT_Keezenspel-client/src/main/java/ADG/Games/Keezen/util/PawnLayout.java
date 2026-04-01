@@ -23,6 +23,7 @@ public class PawnLayout {
   public static void applyPosition(Element element, Point point) {
     element.getStyle().setLeft(getLeft(point), Style.Unit.PX);
     element.getStyle().setTop(getTop(point), Style.Unit.PX);
+    element.getStyle().setZIndex((int) point.getY());
   }
 
   /** Returns [left, top, width, height] — suitable for canvas drawImage calls. */

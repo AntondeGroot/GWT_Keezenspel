@@ -52,7 +52,6 @@ public class ViewDrawing {
     injectSvgAndSetColors(pawnImage, pawnSvgTemplate, mainColor, darkColor);
 
     pawnElement.appendChild(pawnImage);
-    pawnElement.getStyle().setZIndex(10);
 
     Event.sinkEvents(pawnElement, Event.ONCLICK);
     Event.setEventListener(
