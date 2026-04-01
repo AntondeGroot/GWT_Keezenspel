@@ -56,7 +56,12 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
 
     GameState gameState = gameSession.getGameState();
 
-    if (!Objects.equals(playerId, gameState.getPlayerIdTurn())) {
+    if (moveRequest.getTempMessageType() == MAKE_MOVE
+        && !Objects.equals(playerId, gameState.getPlayerIdTurn())) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    if (moveRequest.getCardId() == null || moveRequest.getPawn1Id() == null) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 

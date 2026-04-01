@@ -284,6 +284,16 @@ public class PawnAndCardSelection {
     return drawCards;
   }
 
+  public void resetSuccesfulMove(){
+    pawn2 = null;
+    card = null;
+    drawCards = true;
+    moveType = null;
+    nrStepsPawn1 = 0;
+    nrStepsPawn2 = 0;
+    setSplitBoxesVisibility(Visibility.HIDDEN);
+  }
+
   public void reset() {
     // do not reset playerId
     pawn1 = null;

@@ -1,5 +1,7 @@
 package ADG.Games.Keezen.board;
 
+import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.clearPawnHighlights;
+import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.clearPawnHighlightsExceptPawn1;
 import static ADG.Games.Keezen.ViewHelpers.ViewDrawing.updatePlayerProfileUI;
 import static java.lang.String.valueOf;
 
@@ -116,6 +118,10 @@ public class GameBoardPresenter {
                       @Override
                       public void onSuccess(MoveResponseDTO result) {
                         GWT.log("make move successful");
+                        pawnAndCardSelection.resetSuccesfulMove();
+                        StepsAnimation.resetStepsAnimation();
+                        String pawn1Color = pawnAndCardSelection.getPawn1() != null ? pawnAndCardSelection.getPawn1().getUri() : null;
+                        clearPawnHighlightsExceptPawn1(pawnAndCardSelection.getPawnId1(), pawn1Color);
                         animatePawnsWithAudio(result);
                       }
 
@@ -189,6 +195,9 @@ public class GameBoardPresenter {
   }
 
   private void checkMove() {
+    if (pawnAndCardSelection.getCard() == null) {
+      return;
+    }
     MoveRequestJsonBuilder builder =
         new MoveRequestJsonBuilder()
             .withPlayerId(Cookie.getPlayerId())
@@ -305,6 +314,12 @@ public class GameBoardPresenter {
         AudioPlayer.play(AudioPlayer.MEDAL_AWARDED);
         lastMedalCount = medalCount;
       }
+      if (gameState.getLastMoveResponse() != null) {
+        pawnAndCardSelection.resetSuccesfulMove();
+        StepsAnimation.resetStepsAnimation();
+        String pawn1Color = pawnAndCardSelection.getPawn1() != null ? pawnAndCardSelection.getPawn1().getUri() : null;
+        clearPawnHighlightsExceptPawn1(pawnAndCardSelection.getPawnId1(), pawn1Color);
+      }
       if (!PawnAnimation.isAnimating()) {
         if (gameState.getLastMoveResponse() != null) {
           animatePawnsWithAudio(gameState.getLastMoveResponse());
@@ -321,6 +336,10 @@ public class GameBoardPresenter {
     pawnAndCardSelection.updatePawns(gameState.getPawns());
 
     view.enableButtons(currentPlayerIsPlaying(gameState));
+
+    if (pawnAndCardSelection.getCard() != null) {
+      checkMove();
+    }
   }
 
   private void pollServerForChat() {
@@ -363,7 +382,7 @@ public class GameBoardPresenter {
     board.createBoard(result.getPlayers(), BOARD_SIZE);
     GWT.log("draw board");
     view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
-    view.createPawns(result.getPawns(), pawnAndCardSelection);
+    view.createPawns(result.getPawns(), pawnAndCardSelection, this::checkMove);
   }
 
   private void pollServerForCards() {

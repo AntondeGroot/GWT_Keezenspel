@@ -102,6 +102,21 @@ class PawnAndCardSelectionTest {
   }
 
   @Test
+  public void deselectCard_doesNotDeselectPawn() {
+    // GIVEN
+    pawnAndCardSelection.setPlayerId("1");
+    pawnAndCardSelection.addPawn(ownPawnOnBoard);
+    pawnAndCardSelection.setCard(nonJackCard);
+
+    // WHEN - deselect card by clicking it again
+    pawnAndCardSelection.setCard(nonJackCard);
+
+    // THEN - card is gone, pawn1 stays
+    assertNull(pawnAndCardSelection.getCard());
+    assertEquals(ownPawnOnBoard, pawnAndCardSelection.getPawn1());
+  }
+
+  @Test
   public void testReset() {
     pawnAndCardSelection.setPlayerId("1");
     pawnAndCardSelection.addPawn(ownPawnOnBoard);

@@ -31,7 +31,7 @@ public class ViewDrawing {
 
   private static final String pawnSvgTemplate = PawnResources.INSTANCE.pawnSvg().getText();
 
-  public static DivElement createPawn(PawnClient pawn, PawnAndCardSelection pawnAndCardSelection) {
+  public static DivElement createPawn(PawnClient pawn, PawnAndCardSelection pawnAndCardSelection, Runnable onSelectionChanged) {
     GWT.log("A pawn was created");
     DivElement pawnElement = Document.get().createDivElement();
     pawnElement.setClassName("pawnDiv");
@@ -72,6 +72,9 @@ public class ViewDrawing {
               String pawn2Color = pawnAndCardSelection.getPawn2() != null
                   ? pawnAndCardSelection.getPawn2().getUri() : null;
               updateAllPawnHighlights(pawn1Id, pawn2Id, pawn1Color, pawn2Color);
+              if (onSelectionChanged != null) {
+                onSelectionChanged.run();
+              }
 
               GWT.log("Pawn and card selection is after validation: " + pawnAndCardSelection);
             }
@@ -116,12 +119,15 @@ public class ViewDrawing {
     for (var i = 0; i < pawnDivs.length; i++) {
       var pawnDiv = pawnDivs[i];
       var pawnId = pawnDiv.id;
+
       var isPawn1 = pawn1Id && pawnId === pawn1Id;
       var isPawn2 = pawn2Id && pawnId === pawn2Id;
       var visible = isPawn1 || isPawn2;
       var svg = pawnDiv.querySelector('svg');
       if (!svg) continue;
+
       var highlights = svg.querySelectorAll('.highlight');
+
       for (var j = 0; j < highlights.length; j++) {
         var color = isPawn2 ? pawn2HighlightColor : pawn1HighlightColor;
 
@@ -138,6 +144,17 @@ public class ViewDrawing {
       }
     }
   }-*/;
+
+  public static void clearPawnHighlights() {
+    renderPawnHighlights(null, null, null, null);
+    updateStepBoxColors(null, null);
+  }
+
+  public static void clearPawnHighlightsExceptPawn1(String pawn1Id, String pawn1Color) {
+    String pawn1HighlightColor = PawnHighlightColors.forPawn1(pawn1Color);
+    renderPawnHighlights(pawn1Id, null, pawn1HighlightColor, null);
+    updateStepBoxColors(null, null);
+  }
 
   private static native void updateStepBoxColors(
       String pawn1HighlightColor, String pawn2HighlightColor) /*-{
