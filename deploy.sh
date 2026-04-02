@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-echo "🔨 Building..."
-mvn clean package
+echo "🔨 Building and running all tests..."
+mvn clean verify
 
 echo "📦 Uploading..."
 scp -i ~/.ssh/pi_deploy_key GWT_Keezenspel-server/target/GWT_Keezenspel-exec.jar my-pi:/home/ubuntu/keezen.jar
