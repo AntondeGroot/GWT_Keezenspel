@@ -54,6 +54,10 @@ public class ApiClient {
     post("/games/" + sessionId + "/players", playerJson, r -> null, callback);
   }
 
+  public void leaveGame(String sessionId, String playerId, ApiCallback<Void> callback) {
+    delete("/games/" + sessionId + "/players/" + playerId, r -> null, callback);
+  }
+
   // === MOVES ===
   public void makeMove(
       String sessionId,

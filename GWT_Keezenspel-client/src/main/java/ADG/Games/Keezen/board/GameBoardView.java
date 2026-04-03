@@ -51,6 +51,8 @@ public class GameBoardView extends Composite {
 
   @UiField Button forfeitButton;
 
+  @UiField Button leaveGameButton;
+
   @UiField Label errorLabel;
 
   @UiField VerticalPanel playerListContainer2;
@@ -120,6 +122,10 @@ public class GameBoardView extends Composite {
 
   public Button getForfeitButton() {
     return forfeitButton;
+  }
+
+  public Button getLeaveGameButton() {
+    return leaveGameButton;
   }
 
   public VerticalPanel getPlayerListContainer() {

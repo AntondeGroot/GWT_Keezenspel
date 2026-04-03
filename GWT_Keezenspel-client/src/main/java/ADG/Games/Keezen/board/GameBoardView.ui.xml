@@ -20,6 +20,7 @@
             <g:Button ui:field="sendButton" styleName="sendButton">Play Card</g:Button>
           </g:HTMLPanel>
           <g:Button ui:field="forfeitButton" styleName="forfeitButton">Forfeit</g:Button>
+          <g:Button ui:field="leaveGameButton" styleName="leaveGameButton">Leave game</g:Button>
           <g:HorizontalPanel ui:field="pawnIntegerBoxes" styleName="pawnIntegerBoxes">
             <g:Label styleName="TextBoxLabel pawn1Label">Pawn 1</g:Label>
             <g:TextBox ui:field="stepsPawn1" styleName="TextBoxForPawnSteps TextBoxForPawnSteps1"/>

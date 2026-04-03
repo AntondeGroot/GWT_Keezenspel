@@ -19,7 +19,6 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -32,17 +31,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class TestUtils {
 
   public static WebDriver getDriver() {
-    WebDriverManager.chromedriver().setup();
-    ChromeOptions options = new ChromeOptions();
-    options.addArguments("--headless=new");
-    options.addArguments("--no-sandbox");
-    options.addArguments("--disable-dev-shm-usage");
-    options.addArguments("--window-size=1920,1080");
-    options.addArguments("--mute-audio");
-
-    // this line is here to fix a CI error
-    options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.nanoTime());
-    WebDriver driver = new ChromeDriver(options);
+    WebDriver driver = new ChromeDriver(buildOptions());
     driver.get("http://localhost:4200/");
     driver.manage().addCookie(new Cookie("sessionid", "123"));
     driver.manage().addCookie(new Cookie("playerid", "player0"));
@@ -51,22 +40,24 @@ public class TestUtils {
   }
 
   public static WebDriver getDriver(String sessionId) {
-    WebDriverManager.chromedriver().setup();
+    WebDriver driver = new ChromeDriver(buildOptions());
+    driver.get("http://localhost:4200/");
+    driver.manage().addCookie(new Cookie("sessionid", sessionId));
+    driver.manage().addCookie(new Cookie("playerid", "player0"));
+    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+    return driver;
+  }
+
+  private static ChromeOptions buildOptions() {
     ChromeOptions options = new ChromeOptions();
     options.addArguments("--headless=new");
     options.addArguments("--no-sandbox");
     options.addArguments("--disable-dev-shm-usage");
     options.addArguments("--window-size=1920,1080");
     options.addArguments("--mute-audio");
-
-    // this line is here to fix a CI error
+    // unique profile dir prevents cross-instance conflicts in CI
     options.addArguments("--user-data-dir=/tmp/chrome-user-data-" + System.nanoTime());
-    WebDriver driver = new ChromeDriver(options);
-    driver.get("http://localhost:4200/");
-    driver.manage().addCookie(new Cookie("sessionid", sessionId));
-    driver.manage().addCookie(new Cookie("playerid", "player0"));
-    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
-    return driver;
+    return options;
   }
 
   public static void waitUntilCardsAreLoaded(WebDriver driver) {

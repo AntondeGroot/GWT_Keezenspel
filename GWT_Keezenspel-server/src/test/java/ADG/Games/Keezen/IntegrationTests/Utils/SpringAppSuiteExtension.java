@@ -1,5 +1,6 @@
 package ADG.Games.Keezen.IntegrationTests.Utils;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
@@ -19,6 +20,7 @@ public class SpringAppSuiteExtension implements BeforeAllCallback {
     private boolean started = false;
 
     private SpringAppResource() {
+      WebDriverManager.chromedriver().setup();
       SpringAppTestHelper.startRealApp(); // or startRealApp()
       started = true;
     }

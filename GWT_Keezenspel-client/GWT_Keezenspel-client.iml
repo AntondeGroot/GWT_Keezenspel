@@ -2,7 +2,11 @@
 <module version="4">
   <component name="FacetManager">
     <facet type="gwt" name="GWT">
-      <configuration />
+      <configuration>
+        <setting name="compilerParameters" value="-failOnError -sourceLevel 11" />
+        <setting name="gwtSdkUrl" value="file://$MAVEN_REPOSITORY$/org/gwtproject/gwt-dev/2.12.0/" />
+        <setting name="gwtSdkType" value="maven" />
+      </configuration>
     </facet>
   </component>
 </module>

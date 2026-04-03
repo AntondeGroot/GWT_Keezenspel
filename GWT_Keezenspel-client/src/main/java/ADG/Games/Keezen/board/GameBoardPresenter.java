@@ -171,6 +171,28 @@ public class GameBoardPresenter {
             },
             ClickEvent.getType());
 
+    view.getLeaveGameButton()
+        .addDomHandler(
+            new ClickHandler() {
+              @Override
+              public void onClick(ClickEvent event) {
+                if (com.google.gwt.user.client.Window.confirm(
+                    "Are you sure you want to leave the game?")) {
+                  apiClient.leaveGame(
+                      Cookie.getSessionID(),
+                      Cookie.getPlayerId(),
+                      new ApiCallback<Void>() {
+                        @Override
+                        public void onSuccess(Void result) {}
+
+                        @Override
+                        public void onFailure(Throwable caught) {}
+                      });
+                }
+              }
+            },
+            ClickEvent.getType());
+
     view.stepsPawn1.addChangeHandler(
         event -> {
           pawnAndCardSelection.setNrStepsPawn1ForSplit(view.stepsPawn1.getValue());

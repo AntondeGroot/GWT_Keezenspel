@@ -22,6 +22,16 @@ h1 {
   position: relative !important;
 }
 
+/* ── Leave Game button: move from title bar to top-left of the playing field.
+   On mobile the h1 is 84 px tall; the columnWrapper has a 30 px margin-top,
+   so top: 114 px places the button just inside the top edge of the board. */
+.leaveGameButton {
+  top: 114px !important;
+  left: 10px !important;
+  font-size: 14pt !important;
+  padding: 8px 16px !important;
+}
+
 /* ── 1. Board toward the top with a small buffer ───────────────────────
    The desktop centering formula uses 100vh, but with the fixed 1100 px
    viewport the layout-viewport height becomes ≈ 2400 px on a phone,

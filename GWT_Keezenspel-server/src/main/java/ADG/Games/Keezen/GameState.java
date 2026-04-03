@@ -36,6 +36,7 @@ public class GameState {
       new HashMap<>(); // to map a player UUID to an int for player Colors
   private final ArrayList<String> activePlayers = new ArrayList<>();
   private final ArrayList<String> winners = new ArrayList<>();
+  private final HashSet<String> leavers = new HashSet<>();
   private final int MAX_PLAYERS = 8;
   private final CardsDeckInterface cardsDeck;
   private int animationSpeed;
@@ -155,11 +156,42 @@ public class GameState {
   public void resetActivePlayers() {
     activePlayers.clear();
     for (Player player : players) {
-      if (!hasFinished(player)) {
+      if (!hasFinished(player) && !leavers.contains(player.getId())) {
         setActive(player);
         activePlayers.add(player.getId());
       }
     }
+  }
+
+  public boolean allPlayersHaveLeft() {
+    return !players.isEmpty() && players.stream().allMatch(p -> leavers.contains(p.getId()));
+  }
+
+  public void processLeaveGame(String playerId) {
+    cardsDeck.forfeitCardsForPlayer(playerId);
+    leavers.add(playerId);
+    for (Pawn pawn : pawns) {
+      if (playerId.equals(pawn.getPlayerId())) {
+        pawn.setCurrentTileId(pawn.getNestTileId());
+      }
+    }
+    Player player = findPlayerById(playerId);
+    if (player != null) {
+      PlayerStatus.setInactive(player);
+      player.setIsPlaying(false);
+    }
+    if (players.stream().noneMatch(Player::getIsActive)) {
+      resetActivePlayers();
+      cardsDeck.shuffleIfFirstRound();
+      cardsDeck.dealCards();
+      nextRoundPlayer();
+    } else {
+      activePlayers.remove(playerId);
+      if (playerId.equals(playerIdTurn)) {
+        nextActivePlayer();
+      }
+    }
+    version.incrementAndGet();
   }
 
   public void forfeitPlayer(String playerId) {

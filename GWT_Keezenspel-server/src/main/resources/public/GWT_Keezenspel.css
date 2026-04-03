@@ -262,6 +262,42 @@ footer {
 }
 
 /* ============================================================
+   Leave Game Button — fixed in the top-left of the title bar
+   ============================================================ */
+
+.leaveGameButton {
+  position: fixed;
+  top: 18px;
+  left: 16px;
+  z-index: 200;
+  font-size: 11pt;
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 1px;
+  border-radius: 6px;
+  background: linear-gradient(145deg, #8b2222, #6a1010);
+  border: 2px solid #400808;
+  color: #f4d03f;
+  padding: 6px 12px;
+  cursor: pointer;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all 0.18s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.leaveGameButton:hover {
+  background: linear-gradient(145deg, #a02828, #7a1818);
+  transform: translateY(-1px);
+  box-shadow: 3px 4px 12px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.leaveGameButton:active {
+  background: linear-gradient(145deg, #6a1010, #8b2222);
+  transform: translateY(1px);
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================================
    Button Container (absolute panel)
    ============================================================ */
 

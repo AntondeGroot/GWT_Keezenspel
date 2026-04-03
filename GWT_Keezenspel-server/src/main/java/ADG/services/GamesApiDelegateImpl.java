@@ -93,6 +93,20 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
   }
 
   @Override
+  public ResponseEntity<Void> leaveGame(String sessionId, String playerId) {
+    if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+    GameState gameState = gameSession.getGameState();
+    gameState.processLeaveGame(playerId);
+    gameSession.setLastMoveResponse(null);
+    if (gameState.allPlayersHaveLeft()) {
+      GameRegistry.removeGame(sessionId);
+    }
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
+
+  @Override
   public ResponseEntity<Void> stopGame(String sessionId) {
     if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
       return ResponseEntity.status(404).build();
