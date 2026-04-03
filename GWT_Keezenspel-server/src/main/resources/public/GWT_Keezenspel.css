@@ -479,9 +479,15 @@ footer {
   box-shadow: 6px 12px 24px rgba(0, 0, 0, 0.65), 0 0 10px rgba(244, 208, 63, 0.25);
 }
 
+@keyframes golden-pulse {
+  0%   { box-shadow: 4px 5px 14px rgba(0,0,0,0.55), 1px 1px 4px rgba(0,0,0,0.3), 0 0 4px 2px rgba(212,175,55,0.5); }
+  50%  { box-shadow: 4px 5px 14px rgba(0,0,0,0.55), 1px 1px 4px rgba(0,0,0,0.3), 0 0 9px 5px rgba(212,175,55,0.9); }
+  100% { box-shadow: 4px 5px 14px rgba(0,0,0,0.55), 1px 1px 4px rgba(0,0,0,0.3), 0 0 4px 2px rgba(212,175,55,0.5); }
+}
+
 .specialCard {
-  box-shadow: 4px 5px 14px rgba(0, 0, 0, 0.55), 1px 1px 4px rgba(0, 0, 0, 0.3), 0 0 7px 4px rgba(212, 175, 55, 0.85);
   outline: 2px solid rgba(212, 175, 55, 0.9);
+  animation: golden-pulse 1.6s ease-in-out infinite;
 }
 
 .cardHintLabel {
