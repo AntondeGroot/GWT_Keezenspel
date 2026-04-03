@@ -69,4 +69,8 @@ public class ApiUtil {
   public static void setPawnPosition(String sessionId, String playerId, int pawnNr, String sectionOwnerId, int tileNr) {
     apiHelper.setPawnPosition(sessionId, playerId, pawnNr, sectionOwnerId, tileNr);
   }
+
+  public static int leaveGame(String sessionId, String playerId) {
+    return apiHelper.leaveGame(sessionId, playerId);
+  }
 }

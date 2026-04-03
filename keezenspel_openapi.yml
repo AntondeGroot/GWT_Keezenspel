@@ -81,6 +81,21 @@ paths:
           description: Game was stopped
         404:
           description: Game could not be found in order to stop it
+  /games/{sessionId}/players/{playerId}:
+    delete:
+      summary: Remove a player from a game (player leaves voluntarily)
+      operationId: leaveGame
+      tags:
+        - players
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+        - $ref: '#/components/parameters/playerId'
+      responses:
+        204:
+          description: Player left the game; cards forfeited and player marked permanently inactive
+        404:
+          description: Game or player not found
+
   /games/{sessionId}/players:
     get:
       summary: Get all players in a game

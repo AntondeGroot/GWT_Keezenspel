@@ -109,6 +109,12 @@ public class ApiCallsHelper {
     restTemplate.delete(baseUrl + "/cards/" + sessionId + "/" + playerId);
   }
 
+  public int leaveGame(String sessionId, String playerId) {
+    String url = baseUrl + "/games/" + sessionId + "/players/" + playerId;
+    ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
+    return response.getStatusCode().value();
+  }
+
   public void setCardForPlayer(String playerId, int cardValue) {
     restTemplate.postForEntity(
         baseUrl + "/test/set-card/" + playerId + "/" + cardValue, null, Void.class);
