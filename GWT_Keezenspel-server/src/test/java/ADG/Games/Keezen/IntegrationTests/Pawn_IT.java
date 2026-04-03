@@ -23,9 +23,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.openqa.selenium.By;
-import org.openqa.selenium.By.ById;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 // optimized
 @TestMethodOrder(OrderAnnotation.class)
@@ -82,12 +80,10 @@ public class Pawn_IT extends BaseIntegrationTest {
     // GIVEN
     PawnId pawnId1 = new PawnId(player0Id, 1);
     PawnId pawnId2 = new PawnId(player0Id, 2);
-    WebElement pawn1 = driver.findElement(new ById(pawnId1.toString()));
-    pawn1.click();
+    clickById(driver, pawnId1.toString());
 
     // WHEN
-    WebElement pawn2 = driver.findElement(new ById(pawnId2.toString()));
-    pawn2.click();
+    clickById(driver, pawnId2.toString());
 
     // THEN
     assertFalse(pawnIsSelected(driver, pawnId1));
@@ -97,12 +93,9 @@ public class Pawn_IT extends BaseIntegrationTest {
   @Test
   @Order(3)
   public void clickOnOtherPawnOnBase_NotSelected() {
-    // GIVEN
+    // GIVEN / WHEN
     PawnId pawnId = new PawnId(player1Id, 1);
-    WebElement pawnOtherPlayer = driver.findElement(new ById(pawnId.toString()));
-
-    // WHEN
-    pawnOtherPlayer.click();
+    clickById(driver, pawnId.toString());
 
     // THEN
     assertFalse(pawnIsSelected(driver, pawnId));

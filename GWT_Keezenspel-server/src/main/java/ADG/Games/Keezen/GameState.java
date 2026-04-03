@@ -334,11 +334,11 @@ public class GameState {
     return true;
   }
 
-  public boolean cannotMoveToTileBecauseSamePlayer(Pawn selectedPawnId, PositionKey nextTileId) {
+  public boolean cannotMoveToTileBecauseSamePlayer(Pawn selectedPawn, PositionKey nextTileId) {
     Pawn pawn = getPawn(nextTileId);
     if (pawn != null) {
-      if (Objects.equals(pawn.getPlayerId(), selectedPawnId.getPlayerId())
-          && !pawn.getPawnId().equals(selectedPawnId)) {
+      if (Objects.equals(pawn.getPlayerId(), selectedPawn.getPlayerId())
+          && !pawn.getPawnId().equals(selectedPawn.getPawnId())) {
         return true;
       }
     }
