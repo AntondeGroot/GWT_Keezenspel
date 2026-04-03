@@ -45,6 +45,8 @@ public class GameBoardView extends Composite {
 
   private static final Binder uiBinder = GWT.create(Binder.class);
 
+  @UiField HTMLPanel sendButtonWrapper;
+
   @UiField Button sendButton;
 
   @UiField Button forfeitButton;
@@ -137,15 +139,9 @@ public class GameBoardView extends Composite {
     playerListContainer2.add(createPlayerGrid(players));
   }
 
-  public void animatePawns(MoveResponseDTO moveResponse) {
-    // pawns.sort(new PawnComparator()); // todo: will pawns be drawn incorrectly when on finish
-    // tile?
+  public void animatePawns(MoveResponseDTO moveResponse, Runnable onComplete) {
     GWT.log("view.animatepawns");
-    PawnAnimation.animateSequence(pawnElements, moveResponse);
-    //    PawnAnimation animation = new PawnAnimation(pawnElements);
-    //    animation.animateSequence(AnimationSequence.getFirst());
-    //    animation.animateSequence(AnimationSequence.getLast());
-    //    AnimationSequence.reset();
+    PawnAnimation.animateSequence(pawnElements, moveResponse, onComplete);
   }
 
   public void drawBoard(List<TileMapping> tiles, List<PlayerClient> players, double cellDistance) {
@@ -173,6 +169,20 @@ public class GameBoardView extends Composite {
   public void enableButtons(Boolean enabled) {
     sendButton.setEnabled(enabled);
     forfeitButton.setEnabled(enabled);
+  }
+
+  public void setSendButtonAnimating(boolean animating) {
+//    if (animating) {
+//      DivElement loader = Document.get().createDivElement();
+//      loader.setClassName("sendButtonLoader");
+//      loader.setId("sendButtonLoader");
+//      sendButtonWrapper.getElement().appendChild(loader);
+//    } else {
+//      Element loader = Document.get().getElementById("sendButtonLoader");
+//      if (loader != null) {
+//        loader.removeFromParent();
+//      }
+//    }
   }
 
   public void createPawns(List<PawnClient> pawns, PawnAndCardSelection pawnAndCardSelection, Runnable onPawnSelected) {

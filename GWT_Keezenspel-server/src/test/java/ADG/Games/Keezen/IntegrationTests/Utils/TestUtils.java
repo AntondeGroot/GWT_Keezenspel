@@ -150,6 +150,22 @@ public class TestUtils {
     return new Point(Double.parseDouble(x), Double.parseDouble(y));
   }
 
+  /**
+   * Clicks the element with the given id, retrying if the DOM is updated between lookup and click
+   * (StaleElementReferenceException). GWT's polling can re-render elements at any time, so a
+   * bare findElement().click() is not reliable under parallel test load.
+   */
+  public static void clickById(WebDriver driver, String id) {
+    new WebDriverWait(driver, Duration.ofSeconds(5)).until(d -> {
+      try {
+        d.findElement(By.id(id)).click();
+        return true;
+      } catch (StaleElementReferenceException e) {
+        return false;
+      }
+    });
+  }
+
   public static void scrollUp(WebDriver driver) {
     // useful when you select a Jack
     JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -246,11 +262,16 @@ public class TestUtils {
   }
 
   public static void clickForfeitButton(WebDriver driver) {
-    WebElement forfeitButton = driver.findElement(By.className("forfeitButton"));
-    assertTrue(
-        "⚠️ forfeitButton is not enabled: it was not the player's turn", forfeitButton.isEnabled());
-    assertTrue("forfeitButton is not visible: ", forfeitButton.isDisplayed());
-    forfeitButton.click();
+    new WebDriverWait(driver, Duration.ofSeconds(5)).until(d -> {
+      try {
+        WebElement btn = d.findElement(By.className("forfeitButton"));
+        if (!btn.isEnabled() || !btn.isDisplayed()) return false;
+        btn.click();
+        return true;
+      } catch (StaleElementReferenceException e) {
+        return false;
+      }
+    });
 
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
     try {
@@ -301,6 +322,18 @@ public class TestUtils {
     if (sameX && sameY) {
       fail(msg + " Points are equal within tolerance");
     }
+  }
+
+  /** Waits until an element with the given id is present in the DOM (not necessarily visible). */
+  public static void waitUntilPresent(WebDriver driver, String id) {
+    new WebDriverWait(driver, Duration.ofSeconds(5))
+        .until(d -> !d.findElements(By.id(id)).isEmpty());
+  }
+
+  /** Waits until no element with the given id exists in the DOM. */
+  public static void waitUntilAbsent(WebDriver driver, String id) {
+    new WebDriverWait(driver, Duration.ofSeconds(10))
+        .until(d -> d.findElements(By.id(id)).isEmpty());
   }
 
   public static void assertPointsEqual(String msg, Point p1, Point p2) {

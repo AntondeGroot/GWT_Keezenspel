@@ -35,6 +35,8 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class GameBoardPresenter {
 
@@ -52,6 +54,7 @@ public class GameBoardPresenter {
   private String lastCurrentPlayerId = null;
   private int lastMedalCount = 0;
   private final int BOARD_SIZE = 600; // todo: replace with CSS properties
+  private final Queue<MoveResponseDTO> pendingAnimations = new LinkedList<>();
 
   public GameBoardPresenter(GameBoardView gameBoardView, PollingService pollingService) {
     this.view = gameBoardView;
@@ -97,6 +100,9 @@ public class GameBoardPresenter {
             new ClickHandler() {
               @Override
               public void onClick(ClickEvent event) {
+                if (PawnAnimation.isAnimating()) {
+                  return;
+                }
                 AudioPlayer.play(AudioPlayer.BUTTON_CLICK);
                 GWT.log("pawn 1: " + pawnAndCardSelection.getPawn1());
                 MoveRequestJsonBuilder builder =
@@ -122,6 +128,7 @@ public class GameBoardPresenter {
                         StepsAnimation.resetStepsAnimation();
                         String pawn1Color = pawnAndCardSelection.getPawn1() != null ? pawnAndCardSelection.getPawn1().getUri() : null;
                         clearPawnHighlightsExceptPawn1(pawnAndCardSelection.getPawnId1(), pawn1Color);
+                        view.setSendButtonAnimating(true);
                         animatePawnsWithAudio(result);
                       }
 
@@ -149,6 +156,7 @@ public class GameBoardPresenter {
               public void onClick(ClickEvent event) {
                 AudioPlayer.play(AudioPlayer.BUTTON_CLICK);
                 pawnAndCardSelection.reset();
+                pendingAnimations.clear();
                 apiClient.playerForfeits(
                     Cookie.getSessionID(),
                     Cookie.getPlayerId(),
@@ -278,10 +286,24 @@ public class GameBoardPresenter {
   }
 
   private void animatePawnsWithAudio(MoveResponseDTO moveResponse) {
+    if (PawnAnimation.isAnimating()) {
+      pendingAnimations.add(moveResponse);
+    } else {
+      playAnimation(moveResponse);
+    }
+  }
+
+  private void playAnimation(MoveResponseDTO moveResponse) {
     if ("onBoard".equals(moveResponse.getMoveType())) {
       AudioPlayer.play(AudioPlayer.PAWN_ON_BOARD, 0.1);
     }
-    view.animatePawns(moveResponse);
+    view.animatePawns(moveResponse, () -> {
+      if (!pendingAnimations.isEmpty()) {
+        playAnimation(pendingAnimations.poll());
+      } else {
+        view.setSendButtonAnimating(false);
+      }
+    });
   }
 
   private void updateGameState(GameStateClient gameState) {
@@ -320,12 +342,17 @@ public class GameBoardPresenter {
         String pawn1Color = pawnAndCardSelection.getPawn1() != null ? pawnAndCardSelection.getPawn1().getUri() : null;
         clearPawnHighlightsExceptPawn1(pawnAndCardSelection.getPawnId1(), pawn1Color);
       }
-      if (!PawnAnimation.isAnimating()) {
-        if (gameState.getLastMoveResponse() != null) {
-          animatePawnsWithAudio(gameState.getLastMoveResponse());
-        } else {
-          view.animatePawnsToPositions(gameState.getPawns());
+      if (gameState.getLastMoveResponse() != null) {
+        MoveResponseDTO response = gameState.getLastMoveResponse();
+        String myId = Cookie.getPlayerId();
+        boolean isOwnMove = (response.getPawn1() != null && myId.equals(response.getPawn1().getPlayerId()))
+            || (response.getPawn2() != null && myId.equals(response.getPawn2().getPlayerId()));
+        if (!isOwnMove) {
+          animatePawnsWithAudio(response);
         }
+        // own moves are already animated via makeMove.onSuccess
+      } else if (!PawnAnimation.isAnimating()) {
+        view.animatePawnsToPositions(gameState.getPawns());
       }
     }
     updatePlayerProfileUI(gameState.getPlayers());
