@@ -3,6 +3,7 @@ package ADG.Games.Keezen.IntegrationTests;
 import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerForfeits;
 import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerPlaysCard;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.assertPointsNotEqual;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickById;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getPawnLocation;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.pawnIsSelected;
@@ -67,10 +68,9 @@ public class Pawn_IT extends BaseIntegrationTest {
   public void clickOnOwnPawn_Selected() {
     // GIVEN
     PawnId pawnId = new PawnId(player0Id, 0);
-    WebElement pawn1 = driver.findElement(By.id(pawnId.toString()));
 
     // WHEN
-    pawn1.click();
+    clickById(driver, pawnId.toString());
 
     // THEN
     assertTrue(pawnIsSelected(driver, pawnId));

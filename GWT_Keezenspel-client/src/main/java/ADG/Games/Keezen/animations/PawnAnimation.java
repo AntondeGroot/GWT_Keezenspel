@@ -25,6 +25,7 @@ public final class PawnAnimation {
   private static final double LONG_DISTANCE_THRESHOLD = 400;
 
   private static int runningAnimations = 0;
+  private static Runnable onAllAnimationsComplete;
 
   private PawnAnimation() {
   }
@@ -34,7 +35,9 @@ public final class PawnAnimation {
   }
 
   public static void animateSequence(
-      Map<String, DivElement> pawnElements, MoveResponseDTO moveResponse) {
+      Map<String, DivElement> pawnElements, MoveResponseDTO moveResponse, Runnable onComplete) {
+
+    onAllAnimationsComplete = onComplete;
 
     int delayForPawn1Kill = schedulePawnMove(
         pawnElements,
@@ -124,6 +127,15 @@ public final class PawnAnimation {
     return totalDurationMs;
   }
 
+  private static void onAnimationStepComplete() {
+    runningAnimations--;
+    if (runningAnimations == 0 && onAllAnimationsComplete != null) {
+      Runnable cb = onAllAnimationsComplete;
+      onAllAnimationsComplete = null;
+      cb.run();
+    }
+  }
+
   private static double calculateSpeed(double distance) {
     double pixelsPerMs = BASE_SPEED_PIXELS_PER_MS;
 
@@ -143,13 +155,13 @@ public final class PawnAnimation {
       double speedPixelsPerMs) {
 
     if (pawn == null || remaining == null || remaining.isEmpty()) {
-      runningAnimations--;
+      onAnimationStepComplete();
       return;
     }
 
     Point next = remaining.poll();
     if (next == null) {
-      runningAnimations--;
+      onAnimationStepComplete();
       return;
     }
 

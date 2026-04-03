@@ -196,6 +196,32 @@ footer {
   text-shadow: none;
 }
 
+.sendButtonWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.sendButtonLoader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border-top: 3px solid #FFF;
+  border-right: 3px solid transparent;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes rotation {
+  0%   { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
 .forfeitButton {
   font-size: 15pt;
   font-family: 'Cinzel', Georgia, serif;
