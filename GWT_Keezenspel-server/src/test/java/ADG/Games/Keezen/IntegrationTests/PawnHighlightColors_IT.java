@@ -1,5 +1,6 @@
 package ADG.Games.Keezen.IntegrationTests;
 
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.clickById;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getPawnLabelColor;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getStepBoxBorderColor;
@@ -8,6 +9,7 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.pawnIsSelected;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
@@ -142,10 +144,43 @@ public class PawnHighlightColors_IT extends BaseIntegrationTest {
     assertEquals(expectedPawn2Rgb, getPawnLabelColor(driver, 2),      "pawn2Label color");
   }
 
-  // ── deselecting card does not remove pawn highlight ───────────────────────
+  // ── switching from card 7 to an unrelated card clears pawn2 highlight ──────
 
   @Test
   @Order(5)
+  void switchingFromCard7ToAnotherCard_pawn2HighlightIsCleared_pawn1HighlightRemains() {
+    // The mock deck deals all 13 cards (suit 0) to every player. After setCardForPlayer(7)
+    // adds card_0_7 at position 0 (removing the Ace), card_0_3 is still present in the hand.
+    // So both card_0_7 and card_0_3 are visible in the DOM after a single page refresh —
+    // no second API call or refresh is needed to switch cards.
+    ApiUtil.setPawnPosition(sessionId, player2Id, 0, player2Id, 1);
+    ApiUtil.setPawnPosition(sessionId, player2Id, 1, player2Id, 2);
+    ApiUtil.setCardForPlayer(sessionId, player2Id, 7);
+    setPlayerIdPlaying(driver, player2Id); // refresh — card_0_7 and card_0_3 both in the DOM
+
+    PawnId pawnA = new PawnId(player2Id, 0);
+    PawnId pawnB = new PawnId(player2Id, 1);
+
+    // Select card 7, then both pawns
+    clickById(driver, "card_0_7");
+    clickById(driver, pawnA.toString()); // pawn1
+    clickById(driver, pawnB.toString()); // pawn2
+
+    assertTrue(pawnIsSelected(driver, pawnA), "pawn1 should be highlighted before card switch");
+    assertTrue(pawnIsSelected(driver, pawnB), "pawn2 should be highlighted before card switch");
+
+    // WHEN: switch directly to a different card (second card in the hand)
+    driver.findElements(By.className("cardDiv")).get(1).click();
+
+    // THEN: pawn1 highlight remains, pawn2 highlight is cleared
+    assertTrue(pawnIsSelected(driver, pawnA),  "pawn1 highlight must remain after card switch");
+    assertFalse(pawnIsSelected(driver, pawnB), "pawn2 highlight must be cleared after switching to a non-7 card");
+  }
+
+  // ── deselecting card does not remove pawn highlight ───────────────────────
+
+  @Test
+  @Order(6)
   void deselectCard_doesNotRemovePawnHighlight() {
     // GIVEN: player 0's pawn on the board, with a non-special card
     ApiUtil.setPawnPosition(sessionId, player0Id, 0, player0Id, 1);
