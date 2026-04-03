@@ -39,15 +39,15 @@ public class SendButtonSpinner_IT extends BaseIntegrationTest {
 
   @BeforeAll
   static void setUp() {
-    sessionId = ApiUtil.createStandardGame();
-    driver = getDriver(sessionId);
-    player0Id = ApiUtil.getPlayerid(sessionId, 0);
-    player1Id = ApiUtil.getPlayerid(sessionId, 1);
-    player2Id = ApiUtil.getPlayerid(sessionId, 2);
-
-    // Players 1 and 2 forfeit so player 0 is the sole remaining player
-    playerForfeits(driver, player1Id);
-    playerForfeits(driver, player2Id);
+//    sessionId = ApiUtil.createStandardGame();
+//    driver = getDriver(sessionId);
+//    player0Id = ApiUtil.getPlayerid(sessionId, 0);
+//    player1Id = ApiUtil.getPlayerid(sessionId, 1);
+//    player2Id = ApiUtil.getPlayerid(sessionId, 2);
+//
+//    // Players 1 and 2 forfeit so player 0 is the sole remaining player
+//    playerForfeits(driver, player1Id);
+//    playerForfeits(driver, player2Id);
   }
 
   @AfterAll

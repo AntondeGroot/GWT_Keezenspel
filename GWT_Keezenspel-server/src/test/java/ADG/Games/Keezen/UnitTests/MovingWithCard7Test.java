@@ -2,6 +2,7 @@ package ADG.Games.Keezen.UnitTests;
 
 import static ADG.Games.Keezen.UnitTests.GameStateUtil.*;
 import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
+import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
 import static com.adg.openapi.model.TempMessageType.CHECK_MOVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -146,6 +147,68 @@ public class MovingWithCard7Test {
     // THEN
     assertEquals(new PositionKey("0", 19), moveResponse.getMovePawn1().getLast());
     assertEquals(new PositionKey("0", 18), moveResponse.getMovePawn2().getLast());
+  }
+
+  @Test
+  void checkMove_sevenSplit_pawn2HasZeroSteps_shouldHighlightPawn1Destination() {
+    // When pawn2 moves 0 steps it stays in place. The validator must not treat the pawn
+    // at pawn2's current tile as a blocking own-pawn, because it IS pawn2 itself.
+    // Before the fix, cannotMoveToTileBecauseSamePlayer compared PawnId to Pawn (always
+    // unequal), so a 0-step move always returned CANNOT_MAKE_MOVE.
+
+    // GIVEN
+    Card card = givePlayerSeven(cardsDeck, 0);
+    Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("0", 1), new PositionKey("0", 3));
+    Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("0", 2), new PositionKey("0", 8));
+
+    // WHEN: pawn1 moves 7, pawn2 moves 0
+    createSplitMessage(moveMessage, pawn1, 7, pawn2, 0, card);
+    moveMessage.setTempMessageType(CHECK_MOVE);
+    gameState.processOnSplit(moveMessage, moveResponse);
+
+    // THEN: valid — pawn1 ends at tile 10, pawn2 stays at tile 8
+    assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+    assertEquals(new PositionKey("0", 10), moveResponse.getMovePawn1().getLast());
+    assertEquals(new PositionKey("0", 8),  moveResponse.getMovePawn2().getLast());
+  }
+
+  @Test
+  void checkMove_sevenSplit_pawn1HasZeroSteps_shouldHighlightPawn2Destination() {
+    // Mirror of the above: pawn1 gets 0 steps, pawn2 gets all 7.
+
+    // GIVEN
+    Card card = givePlayerSeven(cardsDeck, 0);
+    Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("0", 1), new PositionKey("0", 8));
+    Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("0", 2), new PositionKey("0", 3));
+
+    // WHEN: pawn1 moves 0, pawn2 moves 7
+    createSplitMessage(moveMessage, pawn1, 0, pawn2, 7, card);
+    moveMessage.setTempMessageType(CHECK_MOVE);
+    gameState.processOnSplit(moveMessage, moveResponse);
+
+    // THEN: valid — pawn1 stays at tile 8, pawn2 ends at tile 10
+    assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+    assertEquals(new PositionKey("0", 8),  moveResponse.getMovePawn1().getLast());
+    assertEquals(new PositionKey("0", 10), moveResponse.getMovePawn2().getLast());
+  }
+
+  @Test
+  void makeMove_sevenSplit_pawn2HasZeroSteps_pawnPositionsAreCorrect() {
+    // Confirm the actual MAKE_MOVE also works: pawn1 advances, pawn2 stays put.
+
+    // GIVEN
+    Card card = givePlayerSeven(cardsDeck, 0);
+    Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("0", 1), new PositionKey("0", 3));
+    Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("0", 2), new PositionKey("0", 8));
+
+    // WHEN: pawn1 moves 7, pawn2 moves 0
+    createSplitMessage(moveMessage, pawn1, 7, pawn2, 0, card);
+    gameState.processOnSplit(moveMessage, moveResponse);
+
+    // THEN: pawn1 is at tile 10, pawn2 is still at tile 8
+    assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+    assertEquals(new PositionKey("0", 10), gameState.getPawn(pawn1).getCurrentTileId());
+    assertEquals(new PositionKey("0", 8),  gameState.getPawn(pawn2).getCurrentTileId());
   }
 
   @Test

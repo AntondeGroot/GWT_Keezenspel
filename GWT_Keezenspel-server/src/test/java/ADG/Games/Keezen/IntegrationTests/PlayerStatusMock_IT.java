@@ -4,8 +4,8 @@ import static ADG.Games.Keezen.IntegrationTests.Utils.Steps.playerPlaysCard;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.playerForfeits;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitForPlayerClass;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
-import static org.junit.Assert.assertEquals;
 
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.utils.BaseIntegrationTest;
@@ -17,9 +17,7 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 // optimized before : 34 seconds after 7 seconds
 @TestMethodOrder(OrderAnnotation.class)
@@ -53,9 +51,7 @@ public class PlayerStatusMock_IT extends BaseIntegrationTest {
   @Order(1)
   public void player0IsPlayingWhenStartingGame() {
     setPlayerIdPlaying(driver, ApiUtil.getPlayerid(sessionId,0));
-    waitUntilCardsAreLoaded(driver);
-    WebElement player0 = driver.findElement(By.id(player0Id));
-    assertEquals("playerPlaying playerActive", player0.getAttribute("class"));
+    waitForPlayerClass(driver, player0Id, "playerPlaying playerActive");
   }
 
   @Test
@@ -66,11 +62,8 @@ public class PlayerStatusMock_IT extends BaseIntegrationTest {
 
     // THEN
     setPlayerIdPlaying(driver, player1Id);
-    waitUntilCardsAreLoaded(driver);
-    WebElement player1 = driver.findElement(By.id(player1Id));
-    assertEquals("playerPlaying playerActive", player1.getAttribute("class"));
-    WebElement player0 = driver.findElement(By.id(player0Id));
-    assertEquals("playerNotPlaying playerInactive", player0.getAttribute("class"));
+    waitForPlayerClass(driver, player1Id, "playerPlaying playerActive");
+    waitForPlayerClass(driver, player0Id, "playerNotPlaying playerInactive");
   }
 
   @Test
@@ -79,10 +72,8 @@ public class PlayerStatusMock_IT extends BaseIntegrationTest {
     // WHEN
     playerForfeits(driver, player1Id);
     setPlayerIdPlaying(driver, player2Id);
-    waitUntilCardsAreLoaded(driver);
     // THEN
-    WebElement player = driver.findElement(By.id(player2Id));
-    assertEquals("playerPlaying playerActive", player.getAttribute("class"));
+    waitForPlayerClass(driver, player2Id, "playerPlaying playerActive");
   }
 
   @Test
@@ -93,10 +84,8 @@ public class PlayerStatusMock_IT extends BaseIntegrationTest {
     // WHEN
     PawnId pawnId20 = new PawnId(player2Id, 0);
     playerPlaysCard(driver, sessionId, player2Id, pawnId20, 1);
-    waitUntilCardsAreLoaded(driver);
 
     // THEN
-    WebElement player0 = driver.findElement(By.id(player2Id));
-    assertEquals("playerPlaying playerActive", player0.getAttribute("class"));
+    waitForPlayerClass(driver, player2Id, "playerPlaying playerActive");
   }
 }

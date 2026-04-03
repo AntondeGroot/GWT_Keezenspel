@@ -2,7 +2,8 @@ package ADG.Games.Keezen.IntegrationTests;
 
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
-import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreGone;
+import static ADG.Games.Keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreVisible;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -10,7 +11,6 @@ import static org.junit.Assert.assertTrue;
 import ADG.Games.Keezen.ApiUtils.ApiUtil;
 import ADG.Games.Keezen.utils.BaseIntegrationTest;
 import ADG.Games.Keezen.IntegrationTests.Utils.Steps;
-import ADG.Games.Keezen.IntegrationTests.Utils.TestUtils;
 import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -50,14 +50,13 @@ class CardDisplay_IT extends BaseIntegrationTest {
   @Order(1)
   void playerCards_areLoadedWithinReasonableTime() {
     // GIVEN the game page loads
-    // WHEN waiting for cards to appear
-    waitUntilCardsAreLoaded(driver);
+    // WHEN waiting for cards to appear — throws on timeout (no silent swallow)
+    waitUntilCardsAreVisible(driver);
 
     // THEN at least one cardDiv is visible — confirming pollServerForCards completed successfully
     List<WebElement> cards = driver.findElements(By.className("cardDiv"));
     assertFalse(
         "Cards should be visible in the DOM — pollServerForCards must have completed", cards.isEmpty());
-//    TestUtils.wait(200);
     cards = driver.findElements(By.className("cardDiv"));
     assertFalse(
         "Cards should remain visible after a short wait — polling must be stable", cards.isEmpty());
@@ -86,6 +85,7 @@ class CardDisplay_IT extends BaseIntegrationTest {
 
     // WHEN player0 forfeits
     Steps.playerForfeits(driver, player0Id);
+    waitUntilCardsAreGone(driver);
 
     List<WebElement> cardsAfterForfeit = driver.findElements(By.className("cardDiv"));
     assertTrue(
@@ -98,7 +98,7 @@ class CardDisplay_IT extends BaseIntegrationTest {
     // GIVEN player0 is the current player and forfeits
     // WHEN switching to player1's view
     setPlayerIdPlaying(driver, player1Id);
-    waitUntilCardsAreLoaded(driver);
+    waitUntilCardsAreVisible(driver);
 
     // THEN player1 sees their own hand cards in the HTML
     List<WebElement> cards = driver.findElements(By.className("cardDiv"));

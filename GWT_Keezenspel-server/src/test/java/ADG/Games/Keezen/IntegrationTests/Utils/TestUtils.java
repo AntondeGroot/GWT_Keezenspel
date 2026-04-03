@@ -129,18 +129,14 @@ public class TestUtils {
     String playerId = driver.manage().getCookieNamed("playerid").getValue();
     ApiUtil.setCardForPlayer(playerId, cardValue);
     driver.navigate().refresh();
-    waitUntilCardsAreLoaded(driver);
-    // add test condition that the card must now exist
-    driver.findElement(By.id(new Card(0, cardValue).toString())).click();
+    clickById(driver, new Card(0, cardValue).toString());
   }
 
   public static void clickCardByValue(WebDriver driver, String sessionId, int cardValue) {
     String playerId = driver.manage().getCookieNamed("playerid").getValue();
     ApiUtil.setCardForPlayer(sessionId, playerId, cardValue);
     driver.navigate().refresh();
-    waitUntilCardsAreLoaded(driver);
-    // add test condition that the card must now exist
-    driver.findElement(By.id(new Card(0, cardValue).toString())).click();
+    clickById(driver, new Card(0, cardValue).toString());
   }
 
   public static Point getPawnLocation(WebDriver driver, PawnId pawnId) {
@@ -339,5 +335,27 @@ public class TestUtils {
   public static void assertPointsEqual(String msg, Point p1, Point p2) {
     assertEquals(msg, p1.getX(), p2.getX(), 2);
     assertEquals(msg, p1.getY(), p2.getY(), 2);
+  }
+
+  /**
+   * Waits up to 5 seconds for the element with the given id to have exactly the expected CSS class
+   * string. Use this instead of a bare findElement + getAttribute immediately after a GWT state
+   * change, because GWT's polling cycle may not have re-rendered the element yet.
+   */
+  public static void waitForPlayerClass(WebDriver driver, String playerId, String expectedClass) {
+    new WebDriverWait(driver, Duration.ofSeconds(5))
+        .until(d -> expectedClass.equals(d.findElement(By.id(playerId)).getAttribute("class")));
+  }
+
+  /** Waits up to 5 seconds for all .cardDiv elements to disappear from the DOM. */
+  public static void waitUntilCardsAreGone(WebDriver driver) {
+    new WebDriverWait(driver, Duration.ofSeconds(5))
+        .until(d -> d.findElements(By.className("cardDiv")).isEmpty());
+  }
+
+  /** Waits up to 5 seconds for at least one .cardDiv to be visible. Throws on timeout. */
+  public static void waitUntilCardsAreVisible(WebDriver driver) {
+    new WebDriverWait(driver, Duration.ofSeconds(5))
+        .until(d -> d.findElements(By.className("cardDiv")).stream().anyMatch(WebElement::isDisplayed));
   }
 }

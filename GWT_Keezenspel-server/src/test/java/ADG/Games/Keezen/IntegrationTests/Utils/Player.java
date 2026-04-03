@@ -15,11 +15,14 @@ public class Player {
   public static void assertPlayerHasMedal(WebDriver driver, String playerId, int finishingPlace) {
     String medalId = playerId+"Medal";
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(7));
+    String expectedClass = "Medal" + finishingPlace;
     try {
       wait.until(driver1 -> {
         List<WebElement> containers = driver1.findElements(By.className("playerListContainer"));
         if (containers.isEmpty()) return false;
-        return !containers.get(0).findElements(By.id(medalId)).isEmpty();
+        List<WebElement> medals = containers.get(0).findElements(By.id(medalId));
+        if (medals.isEmpty()) return false;
+        return expectedClass.equals(medals.get(0).getAttribute("class"));
       });
     } catch (TimeoutException e) {
       List<WebElement> containers = driver.findElements(By.className("playerListContainer"));
