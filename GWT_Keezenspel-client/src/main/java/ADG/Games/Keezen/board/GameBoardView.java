@@ -341,6 +341,13 @@ public class GameBoardView extends Composite {
                   return;
                 }
 
+                // Switching to a different card may have cleared pawn2 (e.g. switching away from
+                // a 7). Sync the visual highlight so pawn2 is no longer shown as selected.
+                if (pawnAndCardSelection.getPawn2() == null) {
+                  String pawn1Color = pawnAndCardSelection.getPawn1() != null ? pawnAndCardSelection.getPawn1().getUri() : null;
+                  clearPawnHighlightsExceptPawn1(pawnAndCardSelection.getPawnId1(), pawn1Color);
+                }
+
                 MoveRequestJsonBuilder builder =
                     new MoveRequestJsonBuilder()
                         .withPlayerId(Cookie.getPlayerId())
