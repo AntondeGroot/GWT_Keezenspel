@@ -42,6 +42,12 @@ public class TestResetController {
     gameSession.getCardsDeck().giveCardToPlayerForTesting(playerId, card);
   }
 
+  @PostMapping("/start-game/{sessionId}")
+  public void startGameWithoutShuffle(@PathVariable("sessionId") String sessionId) {
+    GameSession gameSession = GameRegistry.getGame(sessionId);
+    gameSession.getGameState().start(false);
+  }
+
   @PostMapping("/set-pawn/{sessionId}/{playerId}/{pawnNr}/{sectionOwnerId}/{tileNr}")
   public void setPawnPosition(
       @PathVariable("sessionId") String sessionId,

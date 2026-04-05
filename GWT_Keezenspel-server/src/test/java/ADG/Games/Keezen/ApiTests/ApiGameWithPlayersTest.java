@@ -63,48 +63,25 @@ class ApiGameWithPlayersTest extends BaseUnitTest {
   }
 
   @Test
-  void createGame_add3Players_player1isPlayingAndActiver_OtherPlayersActive() {
+  void createGame_add3Players_exactlyOnePlayerIsPlayingAndAllAreActive() {
     // GIVEN a game has started
     String roomName = getRandomRoomName();
-    Player player1 = getRandomPlayer();
-    Player player2 = getRandomPlayer();
-    Player player3 = getRandomPlayer();
     String sessionId = apiHelper.createNewGame(roomName, 3);
 
-    // WHEN you add 3 player
-    // you can't use player.uuid because that would have to be assigned belowe
-    apiHelper.addPlayerToGame(sessionId, player1);
-    apiHelper.addPlayerToGame(sessionId, player2);
-    apiHelper.addPlayerToGame(sessionId, player3);
-    apiHelper.startGame(sessionId);
+    // WHEN you add 3 players and start the game
+    apiHelper.addPlayerToGame(sessionId, getRandomPlayer());
+    apiHelper.addPlayerToGame(sessionId, getRandomPlayer());
+    apiHelper.addPlayerToGame(sessionId, getRandomPlayer());
+    apiHelper.startGameForTesting(sessionId);
 
-    // THEN they were added to the game
+    // THEN exactly one player is playing and all are active
     var players = apiHelper.getAllPlayersInGame(sessionId);
 
-    boolean foundPlayer =
-        players.stream()
-            .anyMatch(
-                p ->
-                    p.get("name").equals(player1.getName())
-                        && p.get("isActive").equals(true)
-                        && p.get("isPlaying").equals(true));
-    assertTrue(foundPlayer, "First player should be active and playing");
-    boolean foundPlayer2 =
-        players.stream()
-            .anyMatch(
-                p ->
-                    p.get("name").equals(player2.getName())
-                        && p.get("isActive").equals(true)
-                        && p.get("isPlaying").equals(false));
-    assertTrue(foundPlayer2, "Second player should only be active but not playing");
-    boolean foundPlayer3 =
-        players.stream()
-            .anyMatch(
-                p ->
-                    p.get("name").equals(player3.getName())
-                        && p.get("isActive").equals(true)
-                        && p.get("isPlaying").equals(false));
-    assertTrue(foundPlayer3, "Third player should be active but not playing");
+    long playingCount = players.stream().filter(p -> p.get("isPlaying").equals(true)).count();
+    long activeCount = players.stream().filter(p -> p.get("isActive").equals(true)).count();
+
+    assertEquals(1, playingCount, "Exactly one player should be playing");
+    assertEquals(3, activeCount, "All players should be active");
 
     // cleanup
     apiHelper.stopGame(sessionId);

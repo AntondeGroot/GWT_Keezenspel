@@ -28,7 +28,7 @@ class ApiPublicCardInfoTest extends BaseUnitTest {
     String id1 = apiHelper.addPlayerToGame(sessionId, player1);
     String id2 = apiHelper.addPlayerToGame(sessionId, player2);
     String id3 = apiHelper.addPlayerToGame(sessionId, player3);
-    apiHelper.startGame(sessionId);
+    apiHelper.startGameForTesting(sessionId);
 
     // WHEN fetching public card info
     Map<String, Object> cardInfo = apiHelper.getPubliclyAvailableCardInformation(sessionId);
@@ -53,7 +53,7 @@ class ApiPublicCardInfoTest extends BaseUnitTest {
     apiHelper.addPlayerToGame(sessionId, getRandomPlayer());
     apiHelper.addPlayerToGame(sessionId, getRandomPlayer());
     apiHelper.addPlayerToGame(sessionId, getRandomPlayer());
-    apiHelper.startGame(sessionId);
+    apiHelper.startGameForTesting(sessionId);
 
     // WHEN fetching public card info before any move
     Map<String, Object> cardInfo = apiHelper.getPubliclyAvailableCardInformation(sessionId);
@@ -71,19 +71,21 @@ class ApiPublicCardInfoTest extends BaseUnitTest {
   void playerForfeits_playedCardsContainsForfeitedCards() {
     // GIVEN a started game with 3 players
     String sessionId = apiHelper.createNewGame(getRandomRoomName(), 3);
-    Player player1 = getRandomPlayer();
-    String id1 = apiHelper.addPlayerToGame(sessionId, player1);
     apiHelper.addPlayerToGame(sessionId, getRandomPlayer());
     apiHelper.addPlayerToGame(sessionId, getRandomPlayer());
-    apiHelper.startGame(sessionId);
+    apiHelper.addPlayerToGame(sessionId, getRandomPlayer());
+    apiHelper.startGameForTesting(sessionId);
+
+    // Find the player whose turn it is (may differ due to shuffle on start)
+    String currentPlayerId = (String) apiHelper.getGameState(sessionId).get("currentPlayerId");
 
     int cardsBefore =
         ((Map<String, Integer>)
                 apiHelper.getPubliclyAvailableCardInformation(sessionId).get("nrOfCardsPerPlayer"))
-            .get(id1);
+            .get(currentPlayerId);
 
-    // WHEN the first player (whose turn it is) forfeits
-    apiHelper.playerForfeits(sessionId, id1);
+    // WHEN the current player (whose turn it is) forfeits
+    apiHelper.playerForfeits(sessionId, currentPlayerId);
 
     // THEN the forfeited cards appear in the played cards pile
     Map<String, Object> cardInfo = apiHelper.getPubliclyAvailableCardInformation(sessionId);
@@ -98,13 +100,14 @@ class ApiPublicCardInfoTest extends BaseUnitTest {
 
   @Test
   void playedCards_haveCorrectFormat() {
-    // GIVEN a started game where the first player forfeits
+    // GIVEN a started game where the current player forfeits
     String sessionId = apiHelper.createNewGame(getRandomRoomName(), 3);
-    String id1 = apiHelper.addPlayerToGame(sessionId, getRandomPlayer());
     apiHelper.addPlayerToGame(sessionId, getRandomPlayer());
     apiHelper.addPlayerToGame(sessionId, getRandomPlayer());
-    apiHelper.startGame(sessionId);
-    apiHelper.playerForfeits(sessionId, id1);
+    apiHelper.addPlayerToGame(sessionId, getRandomPlayer());
+    apiHelper.startGameForTesting(sessionId);
+    String currentPlayerId = (String) apiHelper.getGameState(sessionId).get("currentPlayerId");
+    apiHelper.playerForfeits(sessionId, currentPlayerId);
 
     // WHEN fetching played cards
     List<String> playedCards =

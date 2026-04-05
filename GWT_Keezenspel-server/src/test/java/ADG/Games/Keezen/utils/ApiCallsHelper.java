@@ -44,8 +44,8 @@ public class ApiCallsHelper {
     return response.getBody().get("sessionId").toString();
   }
 
-  public void startGame(String sessionId) {
-    restTemplate.postForEntity(baseUrl + "/games/" + sessionId + "/", null, Void.class);
+  public void startGameForTesting(String sessionId) {
+    restTemplate.postForEntity(baseUrl + "/test/start-game/" + sessionId, null, Void.class);
   }
 
   public void stopGame(String sessionId) {

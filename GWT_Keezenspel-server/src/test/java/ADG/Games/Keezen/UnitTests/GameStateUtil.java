@@ -180,6 +180,6 @@ public class GameStateUtil {
     for (int i = 0; i < nrPlayers; i++) {
       gameState.addPlayer(new Player(String.valueOf(i), String.valueOf(i)));
     }
-    gameState.start();
+    gameState.start(false);
   }
 }

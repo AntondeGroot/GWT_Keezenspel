@@ -30,7 +30,7 @@ class MissingTilesTest {
     gameState.addPlayer(new Player("player0", "0"));
     gameState.addPlayer(new Player("player1", "1"));
     gameState.addPlayer(new Player("player2", "2"));
-    gameState.start();
+    gameState.start(false);
   }
 
   @AfterEach

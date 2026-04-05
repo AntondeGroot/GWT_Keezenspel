@@ -19,7 +19,7 @@ public class ApiUtil {
       Player player = new Player("player" + i, "player" + i);
       apiHelper.addPlayerToGame(sessionId, player);
     }
-    apiHelper.startGame(sessionId);
+    apiHelper.startGameForTesting(sessionId);
 
     return sessionId;
   }
@@ -30,8 +30,12 @@ public class ApiUtil {
       Player player = new Player("player" + i, "player" + i);
       apiHelper.addPlayerToGame(sessionId, player);
     }
-    apiHelper.startGame(sessionId);
+    apiHelper.startGameForTesting(sessionId);
     return sessionId;
+  }
+
+  public static void startGameForTesting(String sessionId) {
+    apiHelper.startGameForTesting(sessionId);
   }
 
   public static List<String> getPlayerIds(String sessionId) {
@@ -50,6 +54,15 @@ public class ApiUtil {
   public static String getPlayerid(String sessionId, int indexOfPlayer) {
     List<Map<String, Object>> result = apiHelper.getAllPlayersInGame(sessionId);
     return result.get(indexOfPlayer).get("id").toString();
+  }
+
+  public static String getPlayerIdByPlayerInt(String sessionId, int playerInt) {
+    List<Map<String, Object>> result = apiHelper.getAllPlayersInGame(sessionId);
+    return result.stream()
+        .filter(p -> Integer.valueOf(playerInt).equals(p.get("playerInt")))
+        .map(p -> (String) p.get("id"))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("No player with playerInt=" + playerInt));
   }
 
   public static String getPlayerIdTurn(String sessionId) {

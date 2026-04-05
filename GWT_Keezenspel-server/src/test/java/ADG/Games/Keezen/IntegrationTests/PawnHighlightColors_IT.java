@@ -50,9 +50,9 @@ public class PawnHighlightColors_IT extends BaseIntegrationTest {
   static void setUp() {
     sessionId = ApiUtil.createStandardGame();
     driver = getDriver(sessionId);
-    player0Id = ApiUtil.getPlayerid(sessionId, 0);
-    player1Id = ApiUtil.getPlayerid(sessionId, 1);
-    player2Id = ApiUtil.getPlayerid(sessionId, 2);
+    player0Id = ApiUtil.getPlayerIdByPlayerInt(sessionId, 0);
+    player1Id = ApiUtil.getPlayerIdByPlayerInt(sessionId, 1);
+    player2Id = ApiUtil.getPlayerIdByPlayerInt(sessionId, 2);
     setPlayerIdPlaying(driver, player0Id);
   }
 
