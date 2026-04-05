@@ -102,6 +102,10 @@ public class ProcessOnMove {
         }
       } else {
         Log.info("GameState: OnMove: normal route is blocked by a start tile, move backwards");
+        if (gs.isExactMoveRequired()) {
+          response.setResult(CANNOT_MAKE_MOVE);
+          return;
+        }
         next = 15 - next % 15;
         moves.add(new PositionKey(playerIdOfTile, 15));
         if (next < 13) {
@@ -179,6 +183,10 @@ public class ProcessOnMove {
       } else {
         Log.info(
             "GameState: OnMove: pawn wants to go backwards but is blocked by a start tile, goes forwards");
+        if (gs.isExactMoveRequired()) {
+          response.setResult(CANNOT_MAKE_MOVE);
+          return;
+        }
         next = -next + 2;
       }
 
@@ -233,6 +241,10 @@ public class ProcessOnMove {
         return;
       }
       if (gs.isPawnLooselyClosedIn(pawn1, currentTileId)) {
+        if (gs.isExactMoveRequired()) {
+          response.setResult(CANNOT_MAKE_MOVE);
+          return;
+        }
         LinkedList<PositionKey> pingpongmoves =
             new LinkedList<>(gs.pingpongMove(pawn1, currentTileId, nrSteps));
         moves.clear();
@@ -247,6 +259,10 @@ public class ProcessOnMove {
       if (nrSteps > 0) {
         tileHighestTileNr = gs.checkHighestTileNrYouCanMoveTo(pawn1, currentTileId, nrSteps);
         if (tileHighestTileNr > targetTileId.getTileNr()) {
+          if (gs.isExactMoveRequired()) {
+            response.setResult(CANNOT_MAKE_MOVE);
+            return;
+          }
           Log.info("GameState: OnMove: pawn moves out of the finish");
           moves.add(new PositionKey(playerIdOfTile, tileHighestTileNr));
         }
@@ -283,6 +299,10 @@ public class ProcessOnMove {
 
       int tileHighestTileNr = gs.checkHighestTileNrYouCanMoveTo(pawn1, currentTileId, nrSteps);
       if (tileHighestTileNr > targetTileId.getTileNr()) {
+        if (gs.isExactMoveRequired()) {
+          response.setResult(CANNOT_MAKE_MOVE);
+          return;
+        }
         if (tileHighestTileNr > 15) {
           moves.add(new PositionKey(gs.nextPlayerId(playerIdOfTile), tileHighestTileNr));
           if (targetTileId.getTileNr() < 15) {
