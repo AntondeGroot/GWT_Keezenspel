@@ -40,6 +40,7 @@ public class GameState {
   private final int MAX_PLAYERS = 8;
   private final CardsDeckInterface cardsDeck;
   private int animationSpeed;
+  private boolean exactMoveRequired = false;
   private Boolean hasStarted = false;
   private final AtomicLong version =
       new AtomicLong(0); // to make it compatible with javascript as it doesn't do int64 well!
@@ -736,6 +737,14 @@ public class GameState {
 
   public int getAnimationSpeed() {
     return animationSpeed;
+  }
+
+  public void setExactMoveRequired(boolean exactMoveRequired) {
+    this.exactMoveRequired = exactMoveRequired;
+  }
+
+  public boolean isExactMoveRequired() {
+    return exactMoveRequired;
   }
 
   public boolean playerHasCard(String playerId, Card card) {
