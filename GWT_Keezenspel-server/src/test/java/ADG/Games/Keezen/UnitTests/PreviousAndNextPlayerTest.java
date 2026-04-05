@@ -38,7 +38,7 @@ public class PreviousAndNextPlayerTest {
     gameState.addPlayer(new Player(player1, "player 1"));
     gameState.addPlayer(new Player(player2, "player 2"));
     gameState.addPlayer(new Player(player3, "player 3"));
-    gameState.start();
+    gameState.start(false);
     moveMessage = new MoveRequest();
     moveResponse = new MoveResponse();
 

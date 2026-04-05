@@ -84,7 +84,7 @@ class ApiGamesEndpointTest extends BaseUnitTest {
     // WHEN you add 2 player
     apiHelper.addPlayerToGame(sessionId, player1);
     apiHelper.addPlayerToGame(sessionId, player2);
-    apiHelper.startGame(sessionId);
+    apiHelper.startGameForTesting(sessionId);
 
     // THEN expect 409 Conflict when you try to add a new player
     HttpClientErrorException ex =
@@ -118,7 +118,7 @@ class ApiGamesEndpointTest extends BaseUnitTest {
     apiHelper.addPlayerToGame(id, player3);
 
     // WHEN you start the game
-    apiHelper.startGame(id);
+    apiHelper.startGameForTesting(id);
 
     // THEN
     var allGames = apiHelper.getAllGames();

@@ -88,7 +88,23 @@ public class GameState {
   }
 
   public void start() {
+    start(true);
+  }
+
+  public void start(boolean shuffle) {
     hasStarted = true;
+
+    // Assign stable playerInts based on insertion order BEFORE shuffling,
+    // so player colors and HTML element IDs do not change between games.
+    int i = 0;
+    for (Player player : players) {
+      player.setPlayerInt(i);
+      i++;
+    }
+
+    if (shuffle) {
+      Collections.shuffle(players);
+    }
 
     playerIdTurn = players.getFirst().getId();
     playerIdStartingRound = playerIdTurn;
@@ -131,12 +147,10 @@ public class GameState {
   public void addPlayer(Player player) {
 
     if (!players.contains(player) && players.size() < MAX_PLAYERS) {
-      int playerInt = players.size();
 
       player.setIsActive(true);
       player.setPlace(-1);
       player.isPlaying(false);
-      player.setPlayerInt(playerInt);
       players.add(player);
       version.incrementAndGet();
     }
