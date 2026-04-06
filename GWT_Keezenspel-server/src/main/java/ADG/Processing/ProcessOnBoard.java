@@ -21,42 +21,70 @@ public class ProcessOnBoard {
     Pawn pawn1 = gs.getPawn(moveMessage.getPawn1Id());
     Card card = gs.getCard(moveMessage.getCardId(), moveMessage.getPlayerId());
     String playerId = moveMessage.getPlayerId();
+    response.setMoveType(ON_BOARD);
 
-    if (pawn1 == null || card == null) {
-      response.setResult(INVALID_SELECTION);
-      return;
-    }
-
-    if (!gs.playerHasCard(playerId, card)) {
-      response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
-      return;
-    }
-
-    if (!(isAce(card) || isKing(card))) {
-      response.setResult(CANNOT_MAKE_MOVE);
-      return;
-    }
+    if (!selectionIsValid(pawn1, card, response)) return;
+    if (!playerHasCard(gs, playerId, card, response)) return;
+    if (!cardIsAceOrKing(card, response)) return;
 
     PositionKey currentTileId = gs.getPawn(pawn1).getCurrentTileId();
     PositionKey targetTileId = new PositionKey(playerId, 0);
-    response.setMoveType(ON_BOARD);
 
-    if (!gs.canMoveToTile(pawn1, targetTileId)) {
-      response.setResult(CANNOT_MAKE_MOVE);
-      return;
+    if (!pawnIsOnNest(currentTileId, response)) return;
+    if (!targetTileIsFree(gs, pawn1, targetTileId, response)) return;
+
+    response.setPawn1(pawn1);
+    response.setMovePawn1(buildMovePath(currentTileId, targetTileId));
+    gs.processMove(pawn1, targetTileId, moveMessage, response);
+  }
+
+  private static boolean selectionIsValid(Pawn pawn1, Card card, MoveResponse response) {
+    if (pawn1 == null || card == null) {
+      response.setResult(INVALID_SELECTION);
+      return false;
     }
+    return true;
+  }
 
+  private static boolean playerHasCard(
+      GameState gs, String playerId, Card card, MoveResponse response) {
+    if (!gs.playerHasCard(playerId, card)) {
+      response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
+      return false;
+    }
+    return true;
+  }
+
+  private static boolean cardIsAceOrKing(Card card, MoveResponse response) {
+    if (!(isAce(card) || isKing(card))) {
+      response.setResult(CANNOT_MAKE_MOVE);
+      return false;
+    }
+    return true;
+  }
+
+  private static boolean pawnIsOnNest(PositionKey currentTileId, MoveResponse response) {
     if (currentTileId.getTileNr() >= 0) {
       response.setResult(CANNOT_MAKE_MOVE);
-      return;
+      return false;
     }
+    return true;
+  }
 
+  private static boolean targetTileIsFree(
+      GameState gs, Pawn pawn1, PositionKey targetTileId, MoveResponse response) {
+    if (!gs.canMoveToTile(pawn1, targetTileId)) {
+      response.setResult(CANNOT_MAKE_MOVE);
+      return false;
+    }
+    return true;
+  }
+
+  private static LinkedList<PositionKey> buildMovePath(
+      PositionKey currentTileId, PositionKey targetTileId) {
     LinkedList<PositionKey> move = new LinkedList<>();
     move.add(currentTileId);
     move.add(targetTileId);
-
-    response.setPawn1(pawn1);
-    response.setMovePawn1(move);
-    gs.processMove(pawn1, targetTileId, moveMessage, response);
+    return move;
   }
 }
