@@ -4,6 +4,7 @@ import java.util.UUID;
 import ADG.Games.Keezen.GameRegistry;
 import ADG.Games.Keezen.GameSession;
 import ADG.Games.Keezen.GameState;
+import ADG.Games.Keezen.KeezenGameOptions;
 import ADG.dto.GameCreatedResponse;
 import com.adg.openapi.api.GamesApiDelegate;
 import com.adg.openapi.model.GameInfo;
@@ -40,6 +41,8 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
 
     Integer maxPlayers = newGameRequest.getMaxPlayers();
     GameRegistry.createNewGame(sessionID, roomName, maxPlayers);
+    KeezenGameOptions.apply(
+        GameRegistry.getGame(sessionID).getGameState(), newGameRequest.getGameOptions());
 
     GameCreatedResponse response = new GameCreatedResponse(sessionID);
     return new ResponseEntity<>(response, HttpStatus.CREATED);
