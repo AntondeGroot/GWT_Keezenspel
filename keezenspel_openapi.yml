@@ -276,6 +276,26 @@ paths:
         404:
           description: Game not found
 
+  /game-options:
+    get:
+      summary: Get available game options
+      description: >
+        Returns the configurable options this game supports, including type,
+        description, and default value. Intended for lobby UIs to discover and
+        display options before a game is created.
+      operationId: getGameOptions
+      tags:
+        - games
+      responses:
+        '200':
+          description: List of configurable game options
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GameOption'
+
   /games/{sessionId}:
     get:
       summary: Get details of a specific game
@@ -435,6 +455,42 @@ components:
         lastMoveResponse:
           $ref: '#/components/schemas/MoveResponse'
 
+    GameOption:
+      type: object
+      required:
+        - key
+        - label
+        - description
+        - type
+        - defaultValue
+      properties:
+        key:
+          type: string
+          description: Identifier used when sending options in NewGameRequest
+        label:
+          type: string
+          description: Short human-readable name for display in a lobby UI
+        description:
+          type: string
+          description: Explanation of what the option does
+        type:
+          type: string
+          enum: [BOOLEAN, INTEGER, ENUM]
+        defaultValue:
+          type: string
+          description: Default value serialised as a string
+        choices:
+          type: array
+          items:
+            type: string
+          description: Allowed values — only relevant for ENUM type
+        minValue:
+          type: integer
+          description: Minimum value — only relevant for INTEGER type
+        maxValue:
+          type: integer
+          description: Maximum value — only relevant for INTEGER type
+
     NewGameRequest:
       type: object
       required:
@@ -451,6 +507,10 @@ components:
           max: 8
         playerId:
           type: string
+        gameOptions:
+          type: object
+          additionalProperties: {}
+          description: Optional key-value map of game settings (e.g. {"exactMoveRequired":true})
 
     MoveRequest:
       type: object
