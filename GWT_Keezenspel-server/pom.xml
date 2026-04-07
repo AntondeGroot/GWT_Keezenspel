@@ -137,7 +137,7 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>ADG.Application</mainClass>
+          <mainClass>adg.Application</mainClass>
           <skip>false</skip>
           <!-- Keep original JAR as the main artifact so the failsafe plugin
                can load application classes during integration tests.
