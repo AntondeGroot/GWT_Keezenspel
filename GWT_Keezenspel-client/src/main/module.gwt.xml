@@ -6,6 +6,6 @@
   <inherits name="com.google.gwt.json.JSON"/>
   <source path="" />
 
-  <entry-point class="ADG.App" />
+  <entry-point class="adg.App" />
 
 </module>

@@ -52,7 +52,7 @@
         <groupId>net.ltgt.gwt.maven</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
         <configuration>
-          <moduleName>ADG.App</moduleName>
+          <moduleName>adg.App</moduleName>
           <moduleShortName>app</moduleShortName>
           <workDir>${basedir}/target/gwt/workDir</workDir>
           <compilerArgs>
