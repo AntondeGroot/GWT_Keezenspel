@@ -4,6 +4,7 @@ import static com.adg.openapi.model.GameInfo.StatusEnum.IN_PROGRESS;
 import static com.adg.openapi.model.GameInfo.StatusEnum.WAITING;
 
 import com.adg.openapi.model.GameInfo;
+import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,12 +50,9 @@ public class GameRegistry {
   }
 
   // Get an existing game by ID
+  @Nullable
   public static GameSession getGame(String sessionId) {
-    GameSession session = games.get(sessionId);
-    if (session == null) {
-      return null;
-    }
-    return session;
+    return games.get(sessionId);
   }
 
   public static List<GameInfo> getAllGames() {
