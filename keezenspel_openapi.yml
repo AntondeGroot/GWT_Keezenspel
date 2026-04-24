@@ -54,7 +54,7 @@ paths:
         409:
           description: Game already exists with that name
 
-  /games/{sessionId}/:
+  /games/{sessionId}:
     post:
       summary: Start a game
       operationId: startGame
@@ -81,6 +81,19 @@ paths:
           description: Game was stopped
         404:
           description: Game could not be found in order to stop it
+    get:
+      summary: Get details of a specific game
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+      responses:
+        200:
+          description: Game details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameInfo'
+        404:
+          description: Game not found
   /games/{sessionId}/players/{playerId}:
     delete:
       summary: Remove a player from a game (player leaves voluntarily)
@@ -296,20 +309,6 @@ paths:
                 items:
                   $ref: '#/components/schemas/GameOption'
 
-  /games/{sessionId}:
-    get:
-      summary: Get details of a specific game
-      parameters:
-        - $ref: '#/components/parameters/sessionId'
-      responses:
-        200:
-          description: Game details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GameInfo'
-        404:
-          description: Game not found
 components:
   parameters:
     sessionId:

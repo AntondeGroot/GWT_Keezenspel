@@ -49,7 +49,7 @@ public class ApiCallsHelper {
   }
 
   public void stopGame(String sessionId) {
-    restTemplate.delete(baseUrl + "/games/" + sessionId + "/");
+    restTemplate.delete(baseUrl + "/games/" + sessionId);
   }
 
   // ---------- PLAYERS ----------
