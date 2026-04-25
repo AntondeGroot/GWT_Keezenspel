@@ -14,7 +14,7 @@ import com.google.gwt.user.client.Window;
 public class ApiClient {
 
   private static final String BASE_URL =
-      Window.Location.getProtocol() + "//" + Window.Location.getHost();
+      GWT.getHostPageBaseURL().replaceAll("/$", "");
   private static final String CHAT_BASE_URL = "";
 
   // === GAMES ===

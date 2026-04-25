@@ -449,7 +449,8 @@ public class GameBoardView extends Composite {
     ArrayList<CardClient> playedCards = (ArrayList<CardClient>) cardsDeck.getPlayedCards();
 
     // Create an image to represent the card deck
-    Image img = new Image("/card-deck.png");
+    Image img = new Image(GWT.getHostPageBaseURL() + "card-deck.png");
+    img.getElement().setId("card-deck-dynamic");
     GWT.log("drawcards method");
     // Add a LoadHandler to ensure the image is fully loaded before drawing
     img.addLoadHandler(
@@ -527,23 +528,13 @@ public class GameBoardView extends Composite {
   public void removeCardDeckImage() {
     // todo: can this be done any other way? how was it done for the pawns? There it didn't need a
     // loadHandler
-    // Get the parent element (e.g., RootPanel)
-    Element parentElement = RootPanel.get().getElement();
-
-    // Iterate through child elements to find the matching <img>
-    NodeList<Element> imgElements = parentElement.getElementsByTagName("img");
-    for (int i = 0; i < imgElements.getLength(); i++) {
-      Element imgElement = imgElements.getItem(i);
-
-      // Check if the <img> has the desired `src` attribute
-      if ("/card-deck.png".equals(imgElement.getAttribute("src"))) {
-        imgElement.removeFromParent(); // Remove the element from the DOM
-        GWT.log("Image removed successfully.");
-        return;
-      }
+    Element el = Document.get().getElementById("card-deck-dynamic");
+    if (el != null) {
+      el.removeFromParent();
+      GWT.log("Image removed successfully.");
+    } else {
+      GWT.log("Image not found in DOM.");
     }
-
-    GWT.log("Image not found in DOM.");
   }
 
   public void animatePawnsToPositions(List<PawnClient> pawns) {
