@@ -86,9 +86,26 @@
     });
   }
 
+  /* ── Hoist leaveGameButton to <body> ──────────────────────────────────
+     The button lives inside .buttonContainer, which has transform:translateX.
+     A CSS transform on an ancestor turns it into the containing block for
+     position:fixed descendants, so the button would be fixed relative to the
+     container instead of the viewport.  Moving it to <body> restores normal
+     fixed-to-viewport behaviour so the regular CSS (top:18px; left:16px)
+     places it in the title bar exactly as on desktop. */
+  function hoistLeaveGameButton() {
+    var btn = document.querySelector('.leaveGameButton');
+    if (!btn || btn.dataset.hoisted) return false;
+    btn.dataset.hoisted = 'true';
+    document.body.appendChild(btn);
+    return true;
+  }
+
   /* ── Poll until GWT has rendered the pawnIntegerBoxes element ──────── */
   var poll = setInterval(function () {
-    if (init()) clearInterval(poll);
+    var pawnsDone = init();
+    hoistLeaveGameButton();
+    if (pawnsDone) clearInterval(poll);
   }, 250);
 
 })();
