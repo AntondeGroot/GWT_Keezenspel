@@ -3,6 +3,7 @@ package adg.keezen.util;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import java.util.Collection;
+import java.util.Date;
 
 public class Cookie {
 
@@ -22,24 +23,32 @@ public class Cookie {
   public static void createPlayerIdCookie() {
     String fromUrl = Window.Location.getParameter(PLAYERID);
     if (fromUrl != null && !fromUrl.isEmpty()) {
-      Cookies.setCookie(PLAYERID, fromUrl);
+      Cookies.setCookie(PLAYERID, fromUrl, oneDayFromNow(), null, "/", isSecure());
       return;
     }
     Collection<String> cookieNames = Cookies.getCookieNames();
     if (!cookieNames.contains(PLAYERID)) {
-      Cookies.setCookie(PLAYERID, UUID.get());
+      Cookies.setCookie(PLAYERID, UUID.get(), oneDayFromNow(), null, "/", isSecure());
     }
   }
 
   public static void createSessionIdCookie() {
     String fromUrl = Window.Location.getParameter(SESSIONID);
     if (fromUrl != null && !fromUrl.isEmpty()) {
-      Cookies.setCookie(SESSIONID, fromUrl);
+      Cookies.setCookie(SESSIONID, fromUrl, oneDayFromNow(), null, "/", isSecure());
       return;
     }
     Collection<String> cookieNames = Cookies.getCookieNames();
     if (!cookieNames.contains(SESSIONID)) {
-      Cookies.setCookie(SESSIONID, "123");
+      Cookies.setCookie(SESSIONID, "123", oneDayFromNow(), null, "/", isSecure());
     }
+  }
+
+  private static Date oneDayFromNow() {
+    return new Date(System.currentTimeMillis() + 24L * 60 * 60 * 1000);
+  }
+
+  private static boolean isSecure() {
+    return Window.Location.getProtocol().startsWith("https");
   }
 }
