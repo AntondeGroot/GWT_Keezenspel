@@ -7,10 +7,15 @@
    so e.g. 160 px CSS ≈ 57 px on a 393 px iPhone 15.
    ============================================================ */
 
-/* ── 0. Brown background so the system nav bar area matches the footer ─ */
-html,
-body {
+/* ── 0. html stays brown (matches footer / system nav bar).
+   body gets the green felt so it fills the whole area between the title
+   bar and footer.  column1 and column2 are made transparent so the body
+   green shows through everywhere without gaps. */
+html {
   background: #2a1408 !important;
+}
+body {
+  background: radial-gradient(ellipse at center, #1d4d1d 0%, #0f2b0f 100%) !important;
 }
 
 /* 100vw resolves to the device CSS-pixel width (~390px), not the 1100px
@@ -22,22 +27,55 @@ h1 {
   position: relative !important;
 }
 
-/* ── 1. Board toward the top with a small buffer ───────────────────────
-   The desktop centering formula uses 100vh, but with the fixed 1100 px
-   viewport the layout-viewport height becomes ≈ 2400 px on a phone,
-   making the auto-centre margin enormous. Override with a fixed gap.
-   Also force the game container to fill the full viewport width so the
-   board column expands into the space freed by the narrower player column. */
-.columnWrapper {
-  margin-top: 30px !important;
+/* ── 1. Full-width board, columns stacked vertically ───────────────────
+   gameContainer is a GWT HorizontalPanel (<table>).  Turning its <tr>
+   into a flex column and its <td>s into blocks stacks column1 (board +
+   cards) above column2 (player list) without any Java changes. */
+.gameContainer {
+  display: block !important;
+  width: 1100px !important;
+}
+.gameContainer > tbody {
+  display: block !important;
+}
+.gameContainer > tbody > tr {
+  display: flex !important;
+  flex-direction: column !important;
+}
+.gameContainer > tbody > tr > td {
+  display: block !important;
 }
 
-.gameContainer {
-  width: 1100px !important;
+.columnWrapper {
+  margin-top: 30px !important;
+  width: auto !important;   /* expand beyond the desktop 600px to fit the zoomed board */
 }
 
 .column1 {
-  width: 900px !important;
+  width: 1100px !important;
+  border-right: none !important;
+  background: transparent !important;
+}
+
+/* Remove the fixed viewport height and overflow:hidden so the zoomed
+   board and cards are fully visible without clipping. */
+.column1 > tbody > tr > td {
+  height: auto !important;
+  overflow: visible !important;
+  vertical-align: top !important;
+}
+
+/* ── Scale the game board to fill the screen width ─────────────────────
+   zoom:1.5 scales the canvas + all overlay panels (tileBoard, pawnBoard)
+   together, keeping the internal 700×600 coordinate space intact.
+   Fixed-position descendants (buttonContainer) are unaffected by zoom. */
+.canvasWrapper {
+  zoom: 1.5 !important;
+}
+
+/* ── Cards bigger, but not as wide as the full board ───────────────── */
+.cardsContainer {
+  zoom: 1.3 !important;
 }
 
 /* ── 2. Round Play Card / Forfeit buttons ──────────────────────────── */
@@ -148,13 +186,19 @@ h1 {
   font-size: 24pt !important;
 }
 
-/* ── 5. Narrower column2 so the game board gets more horizontal space ─ */
+/* ── 5. Player list: fixed to the right side, overlaying the board ──── */
 .column2 {
-  width: 200px !important;
+  position: fixed !important;
+  right: 0 !important;
+  top: 950px !important;        /* h1(84) + margin(30) + board(900) + cards(~203) + buffer */
+  width: auto !important;
+  min-height: auto !important;
+  z-index: 50 !important;
+  background: transparent !important;
 }
 
 .playerListContainer {
-  width: 200px !important;
+  width: auto !important;
 }
 
 /* ── 7. Chat: wider panel fixed above the footer ──────────────────────
@@ -222,7 +266,8 @@ h1 {
   flex-wrap: wrap !important;
   justify-content: center !important;
   align-items: center !important;
-  gap: 60px !important;
+  column-gap: 60px !important;   /* horizontal space between Forfeit and Play Card */
+  row-gap: 10px !important;      /* vertical space between buttons row and steps row */
 }
 
 .buttonContainer > tbody > tr {
