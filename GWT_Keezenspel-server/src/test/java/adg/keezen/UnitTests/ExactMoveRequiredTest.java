@@ -139,6 +139,73 @@ class ExactMoveRequiredTest {
     assertEquals(new PositionKey("0", 3), gameState.getPawn(pawn1).getCurrentTileId());
   }
 
+  // ── Case 3b: entering finish from last section, first tile blocked ────────
+  // Without exactMoveRequired: pawn bounces off the blocked tile 16 and lands back on the
+  // last section.
+  // With exactMoveRequired: CANNOT_MAKE_MOVE.
+
+  @Test
+  void enteringFinish_FirstTileBlockedByOwnPawn_ExactEntry_CannotMove() {
+    // pawn "1" at (0,15) + 1 step → tries to enter finish at (1,16) but it is occupied
+    // → without setting: bounces back to (0,14)
+    // GIVEN
+    Card card = givePlayerCard(cardsDeck, 1, 1);
+    Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("1", 0), new PositionKey("0", 15));
+    Pawn blocker = placePawnOnBoard(gameState, new PawnId("1", 1), new PositionKey("1", 16));
+
+    // WHEN
+    createMoveRequest(moveMessage, pawn1, card);
+    gameState.processOnMove(moveMessage, moveResponse);
+
+    // THEN
+    assertEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
+    assertNull(moveResponse.getPawn1());
+    assertEquals(new PositionKey("0", 15), gameState.getPawn(pawn1).getCurrentTileId());
+  }
+
+  @Test
+  void enteringFinish_FirstTileBlockedByOwnPawn_OvershootEntry_CannotMove() {
+    // pawn "1" at (0,13) + 6 steps → would reach (1,19) but (1,16) is blocked
+    // → without setting: bounces back to (0,11)
+    // GIVEN
+    Card card = givePlayerCard(cardsDeck, 1, 6);
+    Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("1", 0), new PositionKey("0", 13));
+    Pawn blocker = placePawnOnBoard(gameState, new PawnId("1", 1), new PositionKey("1", 16));
+
+    // WHEN
+    createMoveRequest(moveMessage, pawn1, card);
+    gameState.processOnMove(moveMessage, moveResponse);
+
+    // THEN
+    assertEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
+    assertNull(moveResponse.getPawn1());
+    assertEquals(new PositionKey("0", 13), gameState.getPawn(pawn1).getCurrentTileId());
+  }
+
+  @Test
+  void enteringFinish_FirstTileBlockedByOwnPawn_OwnPawnOnSectionTile_CannotMove() {
+    // pawn "1" at (0,14) + 2 steps → would enter (1,16) but it is blocked.
+    // Another own pawn sits at (1,15) (player 1's main-board tile 15), which causes
+    // checkHighestTileNrYouCanMoveTo to stop at 14 instead of reaching tile 16.
+    // This makes highestReachable (14) == bounce target (14) → overshoot not detected
+    // → without setting: pawn bounces back to (0,14) (its own starting tile)
+    // → WITH setting: must be CANNOT_MAKE_MOVE
+    // GIVEN
+    Card card = givePlayerCard(cardsDeck, 1, 2);
+    Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("1", 0), new PositionKey("0", 14));
+    Pawn blocker = placePawnOnBoard(gameState, new PawnId("1", 1), new PositionKey("1", 16));
+    Pawn sectionPawn = placePawnOnBoard(gameState, new PawnId("1", 2), new PositionKey("1", 15));
+
+    // WHEN
+    createMoveRequest(moveMessage, pawn1, card);
+    gameState.processOnMove(moveMessage, moveResponse);
+
+    // THEN
+    assertEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
+    assertNull(moveResponse.getPawn1());
+    assertEquals(new PositionKey("0", 14), gameState.getPawn(pawn1).getCurrentTileId());
+  }
+
   // ── Case 3: entering finish from last section, overshoots and would bounce ─
   // Without exactMoveRequired: pawn bounces off tile 19 and lands somewhere lower.
   // With exactMoveRequired: CANNOT_MAKE_MOVE.
@@ -175,6 +242,51 @@ class ExactMoveRequiredTest {
     // THEN — 14 + 5 = 19, no bounce
     assertNotEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
     assertEquals(new PositionKey("1", 19), gameState.getPawn(pawn1).getCurrentTileId());
+  }
+
+  // ── Case 4b: pawn already on finish, loosely closed in, but forward move is clean ──
+  // When a pawn has an own pawn behind it (making it "loosely closed in"), a simple
+  // forward move that lands directly on a valid tile should still be allowed.
+  // With exactMoveRequired: the forward move is NOT a reversal and must NOT be blocked.
+
+  @Test
+  void alreadyOnFinish_LooselyClosedIn_CleanForwardMove_IsAllowed() {
+    // pawn at (1,18), own pawn at (1,17) → isPawnLooselyClosedIn = true
+    // +1 step → lands exactly at (1,19) with no direction reversal
+    // GIVEN
+    Card card = givePlayerCard(cardsDeck, 1, 1);
+    Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("1", 0), new PositionKey("1", 18));
+    Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("1", 1), new PositionKey("1", 17));
+
+    // WHEN
+    createMoveRequest(moveMessage, pawn1, card);
+    gameState.processOnMove(moveMessage, moveResponse);
+
+    // THEN — valid forward move, no ping-pong required
+    assertNotEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
+    assertEquals(new PositionKey("1", 19), gameState.getPawn(pawn1).getCurrentTileId());
+  }
+
+  @Test
+  void alreadyOnFinish_LooselyClosedIn_Split7_CleanForwardMove_IsAllowed() {
+    // Reproduces the user-reported bug: split 7 with one pawn going 18→19 (clean
+    // forward move) and the other pawn moving 6 steps on the board.  The first pawn
+    // has an own pawn at (1,17) behind it so isPawnLooselyClosedIn fires.  With
+    // exactMoveRequired this was incorrectly rejected.
+    // GIVEN
+    Card card = givePlayerSeven(cardsDeck, 1);
+    Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("1", 0), new PositionKey("1", 18));
+    Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("1", 1), new PositionKey("0", 4));
+    Pawn bystander = placePawnOnBoard(gameState, new PawnId("1", 2), new PositionKey("1", 17));
+
+    // WHEN: pawn1 moves 1 step (18→19), pawn2 moves 6 steps
+    createSplitMessage(moveMessage, pawn1, 1, pawn2, 6, card);
+    gameState.processOnSplit(moveMessage, moveResponse);
+
+    // THEN
+    assertNotEquals(CANNOT_MAKE_MOVE, moveResponse.getResult());
+    assertEquals(new PositionKey("1", 19), gameState.getPawn(pawn1).getCurrentTileId());
+    assertEquals(new PositionKey("0", 10), gameState.getPawn(pawn2).getCurrentTileId());
   }
 
   // ── Case 4: pawn already on finish, loosely closed in → ping-pong needed ──

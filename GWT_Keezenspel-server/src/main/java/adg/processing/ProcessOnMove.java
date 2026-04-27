@@ -269,6 +269,13 @@ public class ProcessOnMove {
     }
     if (gs.isPawnLooselyClosedIn(pawn1, currentTileId)) {
       if (gs.isExactMoveRequired()) {
+        if (nrSteps > 0) {
+          // A forward move may still land cleanly without any direction reversal.
+          // Delegate to the normal overshoot check: it rejects overshoots and
+          // allows exact landings, so exactMoveRequired is honoured correctly.
+          executeFinishMoveWithOvershootCheck();
+          return;
+        }
         response.setResult(CANNOT_MAKE_MOVE);
         return;
       }
@@ -323,7 +330,13 @@ public class ProcessOnMove {
     Log.info("GameState: OnMove: pawn is on last section and goes into finish");
     addForwardLandmarksIntoFinish();
     PositionKey targetTileId = gs.moveAndCheckEveryTile(pawn1, currentTileId, nrSteps);
-    int highestReachable = gs.checkHighestTileNrYouCanMoveTo(pawn1, currentTileId, nrSteps);
+    // Start the look-ahead from finish tile 15 (the entry point) with only the steps
+    // that reach into the finish lane. Using currentTileId directly would cause
+    // checkHighestTileNrYouCanMoveTo to check main-board tiles of the player's own
+    // section, which can incorrectly truncate the look-ahead if own pawns sit there.
+    int stepsIntoFinish = next - 15;
+    int highestReachable = gs.checkHighestTileNrYouCanMoveTo(
+        pawn1, new PositionKey(gs.nextPlayerId(playerIdOfTile), 15), stepsIntoFinish);
     if (highestReachable > targetTileId.getTileNr()) {
       if (!addEnteringFinishOvershootWaypoints(targetTileId, highestReachable)) return;
     }
