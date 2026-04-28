@@ -20,6 +20,7 @@ import adg.keezen.dto.GameStateDTO;
 import adg.keezen.dto.MoveResponseDTO;
 import adg.keezen.dto.PlayerClient;
 import adg.keezen.dto.TestMoveResponseDTO;
+import adg.keezen.i18n.AppConstants;
 import adg.keezen.services.ApiClient;
 import adg.keezen.services.ApiClient.ApiCallback;
 import adg.keezen.services.PollingService;
@@ -41,6 +42,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class GameBoardPresenter {
+
+  private static final AppConstants CONSTANTS = GWT.create(AppConstants.class);
 
   private boolean requestInProgress = false;
   private final GameBoardView view;
@@ -179,7 +182,7 @@ public class GameBoardPresenter {
               @Override
               public void onClick(ClickEvent event) {
                 if (com.google.gwt.user.client.Window.confirm(
-                    "Are you sure you want to leave the game?")) {
+                    CONSTANTS.confirmLeaveGame())) {
                   apiClient.leaveGame(
                       Cookie.getSessionID(),
                       Cookie.getPlayerId(),

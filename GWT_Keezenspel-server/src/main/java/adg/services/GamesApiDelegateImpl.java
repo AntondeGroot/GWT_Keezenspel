@@ -13,12 +13,16 @@ import com.adg.openapi.model.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GamesApiDelegateImpl implements GamesApiDelegate {
+
+  private static final Logger log = LoggerFactory.getLogger(GamesApiDelegateImpl.class);
 
   @Override
   public ResponseEntity<List<GameInfo>> getAllGames() {
@@ -44,6 +48,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
     KeezenGameOptions.apply(
         GameRegistry.getGame(sessionID).getGameState(), newGameRequest.getGameOptions());
 
+    log.info("Game created: sessionId={} room='{}' maxPlayers={}", sessionID, roomName, maxPlayers);
     GameCreatedResponse response = new GameCreatedResponse(sessionID);
     return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
@@ -77,6 +82,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
     }
 
     gameSession.getGameState().addPlayer(player);
+    log.info("Player joined: sessionId={} playerId={} name='{}'", sessionId, player.getId(), player.getName());
     return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("playerId", player.getId()));
   }
 
@@ -92,6 +98,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
     }
 
     gameState.start();
+    log.info("Game started: sessionId={} players={}", sessionId, gameState.getNrPlayers());
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
@@ -105,6 +112,9 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
     gameSession.setLastMoveResponse(null);
     if (gameState.allPlayersHaveLeft()) {
       GameRegistry.removeGame(sessionId);
+      log.info("Game removed (all players left): sessionId={}", sessionId);
+    } else {
+      log.info("Player left: sessionId={} playerId={}", sessionId, playerId);
     }
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
