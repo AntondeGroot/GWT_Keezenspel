@@ -689,8 +689,8 @@ footer {
 
 #lang-selector-root {
   position: fixed;
-  top: 14px;
-  right: 16px;
+  top: 20px;
+  right: 20px;
   z-index: 200;
 }
 
