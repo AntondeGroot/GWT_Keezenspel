@@ -17,14 +17,14 @@
         <g:Label styleName="errorLabel" ui:field="errorLabel"/>
         <g:VerticalPanel styleName="buttonContainer">
           <g:HTMLPanel ui:field="sendButtonWrapper" styleName="sendButtonWrapper">
-            <g:Button ui:field="sendButton" styleName="sendButton">Play Card</g:Button>
+            <g:Button ui:field="sendButton" styleName="sendButton"/>
           </g:HTMLPanel>
-          <g:Button ui:field="forfeitButton" styleName="forfeitButton">Forfeit</g:Button>
-          <g:Button ui:field="leaveGameButton" styleName="leaveGameButton">Leave game</g:Button>
+          <g:Button ui:field="forfeitButton" styleName="forfeitButton"/>
+          <g:Button ui:field="leaveGameButton" styleName="leaveGameButton"/>
           <g:HorizontalPanel ui:field="pawnIntegerBoxes" styleName="pawnIntegerBoxes">
-            <g:Label styleName="TextBoxLabel pawn1Label">Pawn 1</g:Label>
+            <g:Label ui:field="pawn1Label" styleName="TextBoxLabel pawn1Label"/>
             <g:TextBox ui:field="stepsPawn1" styleName="TextBoxForPawnSteps TextBoxForPawnSteps1"/>
-            <g:Label styleName="TextBoxLabel pawn2Label">Pawn 2</g:Label>
+            <g:Label ui:field="pawn2Label" styleName="TextBoxLabel pawn2Label"/>
             <g:TextBox ui:field="stepsPawn2" styleName="TextBoxForPawnSteps TextBoxForPawnSteps2"/>
           </g:HorizontalPanel>
         </g:VerticalPanel>
@@ -37,7 +37,7 @@
         <g:TextArea ui:field="chatDisplayField" styleName="chatDisplayField" visibleLines="8" readOnly="true"/>
         <g:HorizontalPanel ui:field="chatInputRow" styleName="chatInputRow">
           <g:TextBox ui:field="chatInputField" styleName="chatInputField"/>
-          <g:Button ui:field="chatSendButton" styleName="chatSendButton">Send</g:Button>
+          <g:Button ui:field="chatSendButton" styleName="chatSendButton"/>
         </g:HorizontalPanel>
       </g:VerticalPanel>
     </g:VerticalPanel>

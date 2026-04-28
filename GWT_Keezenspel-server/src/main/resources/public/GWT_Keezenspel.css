@@ -682,3 +682,44 @@ footer {
 .chatDisplayField::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #e0b830, #a07a18);
 }
+
+/* ============================================================
+   Language selector (top-right of the title bar)
+   ============================================================ */
+
+#lang-selector-root {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  z-index: 200;
+}
+
+.lang-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lang-selector-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.lang-listbox {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 10pt;
+  font-weight: 600;
+  background: linear-gradient(145deg, #3a2000, #251400);
+  color: #f4d03f;
+  border: 1px solid #c9a227;
+  border-radius: 4px;
+  padding: 3px 6px;
+  cursor: pointer;
+  box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.5);
+  outline: none;
+}
+
+.lang-listbox:hover {
+  background: linear-gradient(145deg, #4a2800, #341a00);
+  border-color: #e0b830;
+}

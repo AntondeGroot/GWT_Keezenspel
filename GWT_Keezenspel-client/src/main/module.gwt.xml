@@ -4,6 +4,11 @@
   <inherits name="com.google.gwt.user.theme.clean.Clean" />
   <inherits name="com.google.gwt.http.HTTP"/>
   <inherits name="com.google.gwt.json.JSON"/>
+  <inherits name="com.google.gwt.i18n.I18N"/>
+
+  <extend-property name="locale" values="en,nl,nb,de,fr"/>
+  <set-property-fallback name="locale" value="en"/>
+
   <source path="" />
 
   <entry-point class="adg.App" />

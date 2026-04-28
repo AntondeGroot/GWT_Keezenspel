@@ -8,6 +8,7 @@ import static adg.keezen.util.PlayerUtil.getPlayerById;
 
 import adg.keezen.CardsDeck;
 import adg.keezen.PawnAndCardSelection;
+import adg.keezen.i18n.AppConstants;
 import adg.keezen.Point;
 import adg.keezen.TileId;
 import adg.keezen.TileMapping;
@@ -36,6 +37,8 @@ import com.google.gwt.user.client.ui.*;
 import java.util.*;
 
 public class GameBoardView extends Composite {
+
+  private static final AppConstants CONSTANTS = GWT.create(AppConstants.class);
 
   private final Document document;
 
@@ -69,6 +72,10 @@ public class GameBoardView extends Composite {
 
   @UiField HorizontalPanel pawnIntegerBoxes;
 
+  @UiField Label pawn1Label;
+
+  @UiField Label pawn2Label;
+
   @UiField TextBox stepsPawn1;
 
   @UiField TextBox stepsPawn2;
@@ -94,6 +101,13 @@ public class GameBoardView extends Composite {
     stepsPawn1.setValue("7");
     stepsPawn2.setValue("0");
     pawnIntegerBoxes.getElement().setId("pawnIntegerBoxes");
+
+    sendButton.setText(CONSTANTS.playCard());
+    forfeitButton.setText(CONSTANTS.forfeit());
+    leaveGameButton.setText(CONSTANTS.leaveGame());
+    chatSendButton.setText(CONSTANTS.send());
+    pawn1Label.setText(CONSTANTS.pawn1());
+    pawn2Label.setText(CONSTANTS.pawn2());
   }
 
   public int getStepsPawn1() {
@@ -432,12 +446,12 @@ public class GameBoardView extends Composite {
     }
     String hint;
     switch (card.getValue()) {
-      case 1:  hint = "Aas: zet een pion op het bord of beweeg 1 stap vooruit."; break;
-      case 4:  hint = "Vier: beweeg 4 stappen achteruit. \nTip: je kunt dit gebruiken op je startveld om een heel bord af te snijden."; break;
-      case 7:  hint = "Zeven: maak in totaal 7 stappen met één of twee pionnen. \n- Selecteer eerst de kaart en kies daarna eventueel een tweede pion. Let op: pion 1 beweegt altijd als eerste."; break;
-      case 11: hint = "Boer: ruil jouw pion met een vijandige pion. \nJe kunt pas een geschikte vijand selecteren wanneer je deze kaart hebt geselecteerd."; break;
-      case 12: hint = "Vrouw: beweeg 12 stappen vooruit."; break;
-      case 13: hint = "Koning: zet een pion op het bord."; break;
+      case 1:  hint = CONSTANTS.hintAce();   break;
+      case 4:  hint = CONSTANTS.hintFour();  break;
+      case 7:  hint = CONSTANTS.hintSeven(); break;
+      case 11: hint = CONSTANTS.hintJack();  break;
+      case 12: hint = CONSTANTS.hintQueen(); break;
+      case 13: hint = CONSTANTS.hintKing();  break;
       default: hint = ""; break;
     }
     cardHintLabel.setText(hint);

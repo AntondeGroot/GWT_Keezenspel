@@ -26,6 +26,7 @@ echo "📝 Creating application override config..."
 $SSH "sudo tee /opt/keezen/application-override.yaml > /dev/null << 'EOF'
 # no context-path: Keezenspel serves at root, nginx handles routing
 EOF"
+$SSH "sudo chown ubuntu:ubuntu /opt/keezen/application-override.yaml"
 
 echo ""
 echo "✅ Pi setup complete."

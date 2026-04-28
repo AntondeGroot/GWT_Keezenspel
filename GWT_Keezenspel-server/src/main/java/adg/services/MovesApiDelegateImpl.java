@@ -15,12 +15,16 @@ import com.adg.openapi.model.MoveResponse;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.TestMoveResponse;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MovesApiDelegateImpl implements MovesApiDelegate {
+
+  private static final Logger log = LoggerFactory.getLogger(MovesApiDelegateImpl.class);
 
   @Override
   public ResponseEntity<TestMoveResponse> checkMove(
@@ -84,6 +88,8 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
 
     if (moveRequest.getTempMessageType() == MAKE_MOVE) {
       gameSession.setLastMoveResponse(response);
+      log.info("Move made: sessionId={} playerId={} card={} type={}",
+          sessionId, playerId, moveRequest.getCardId(), validation.getMoveType());
     }
 
     return new ResponseEntity<>(response, HttpStatus.OK);
