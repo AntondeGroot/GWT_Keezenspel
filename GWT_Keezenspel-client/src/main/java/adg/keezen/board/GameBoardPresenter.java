@@ -372,8 +372,7 @@ public class GameBoardPresenter {
       if (gameState.getLastMoveResponse() != null) {
         MoveResponseDTO response = gameState.getLastMoveResponse();
         String myId = Cookie.getPlayerId();
-        boolean isOwnMove = (response.getPawn1() != null && myId.equals(response.getPawn1().getPlayerId()))
-            || (response.getPawn2() != null && myId.equals(response.getPawn2().getPlayerId()));
+        boolean isOwnMove = response.getPawn1() != null && myId.equals(response.getPawn1().getPlayerId());
         if (!isOwnMove) {
           animatePawnsWithAudio(response);
         }
