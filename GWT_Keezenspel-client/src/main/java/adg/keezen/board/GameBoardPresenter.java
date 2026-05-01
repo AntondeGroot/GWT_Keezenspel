@@ -297,7 +297,8 @@ public class GameBoardPresenter {
                 GWT.log("ℹ️ Game state not modified — no update needed.");
                 break;
               case 404:
-                GWT.log("⚠️ Game session not found (404).");
+                GWT.log("⚠️ Game session not found — stopping polling.");
+                stop();
                 break;
               case 400:
                 GWT.log("🚫 Bad request: " + statusText);
