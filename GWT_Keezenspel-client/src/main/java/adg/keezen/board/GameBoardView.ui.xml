@@ -33,7 +33,7 @@
     <g:VerticalPanel styleName="column2">
       <g:VerticalPanel ui:field="playerListContainer2" styleName="playerListContainer"
         width="320px"/>
-      <g:VerticalPanel styleName="chatContainer">
+      <g:VerticalPanel ui:field="chatContainer" styleName="chatContainer">
         <g:TextArea ui:field="chatDisplayField" styleName="chatDisplayField" visibleLines="8" readOnly="true"/>
         <g:HorizontalPanel ui:field="chatInputRow" styleName="chatInputRow">
           <g:TextBox ui:field="chatInputField" styleName="chatInputField"/>

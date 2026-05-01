@@ -55,6 +55,7 @@ public class GameBoardPresenter {
   private long gameStateVersion = 0;
   private int chatMessageCount = 0;
   private boolean chatOffline = false;
+  private long chatOfflineSince = 0;
   private String myPlayerName = "";
   private String lastCurrentPlayerId = null;
   private int lastMedalCount = 0;
@@ -396,12 +397,21 @@ public class GameBoardPresenter {
   }
 
   private void pollServerForChat() {
+    if (chatOffline) {
+      long now = System.currentTimeMillis();
+      if (now - chatOfflineSince < 60_000) {
+        return;
+      }
+      chatOfflineSince = now; // reset so the next retry is 1 minute from now
+    }
     apiClient.getChatMessages(Cookie.getSessionID(), new ApiCallback<JSONArray>() {
       @Override
       public void onSuccess(JSONArray messages) {
+        chatOfflineSince = 0;
         if (chatOffline) {
           chatOffline = false;
-          view.setChatInputRowVisible(true);
+          view.setChatVisible(true);
+          return;
         }
         if (messages.size() == chatMessageCount) return;
         chatMessageCount = messages.size();
@@ -421,7 +431,8 @@ public class GameBoardPresenter {
       @Override public void onFailure(Throwable caught) {
         if (!chatOffline) {
           chatOffline = true;
-          view.setChatInputRowVisible(false);
+          chatOfflineSince = System.currentTimeMillis();
+          view.setChatVisible(false);
         }
       }
     });
