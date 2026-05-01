@@ -82,6 +82,8 @@ public class GameBoardView extends Composite {
 
   @UiField HorizontalPanel chatInputRow;
 
+  @UiField VerticalPanel chatContainer;
+
   @UiField TextArea chatDisplayField;
 
   @UiField TextBox chatInputField;
@@ -569,7 +571,9 @@ public class GameBoardView extends Composite {
 
   public Button getChatSendButton() { return chatSendButton; }
 
-  public void setChatInputRowVisible(boolean visible) { chatInputRow.setVisible(visible); }
+  public void setChatVisible(boolean visible) {
+    chatContainer.setVisible(visible);
+  }
 
   public String getChatInput() { return chatInputField.getText(); }
 

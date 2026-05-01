@@ -4,6 +4,7 @@ import static adg.keezen.IntegrationTests.Utils.TestUtils.getDriver;
 import static adg.keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
 import static adg.keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
 import static adg.keezen.IntegrationTests.Utils.TestUtils.waitUntilVisible;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -77,19 +78,25 @@ class Chat_IT extends BaseIntegrationTest {
     // No ChatServerMock started — polls will fail
     WebElement sendButton = driver.findElement(By.className("chatSendButton"));
     WebElement inputField = driver.findElement(By.className("chatInputField"));
+    WebElement displayField = driver.findElement(By.className("chatDisplayField"));
     assertFalse(sendButton.isDisplayed(), "Chat send button should not be visible when chat server is unavailable");
     assertFalse(inputField.isDisplayed(), "Chat input field should not be visible when chat server is unavailable");
+    assertFalse(displayField.isDisplayed(), "Chat input field should not be visible when chat server is unavailable");
   }
 
   @Test
   @Order(2)
   public void chatInputBecomesVisibleWhenChatServerComesBack() {
-    // Now bring the chat server up
     ChatServerMock.start();
+    // Refresh so the 1-minute offline timer resets; the first poll then detects the server immediately.
+    driver.navigate().refresh();
+    waitUntilCardsAreLoaded(driver);
     waitUntilVisible(driver, "chatSendButton");
     WebElement sendButton = driver.findElement(By.className("chatSendButton"));
     WebElement inputField = driver.findElement(By.className("chatInputField"));
+    WebElement displayField = driver.findElement(By.className("chatDisplayField"));
     assertTrue(sendButton.isDisplayed(), "Chat send button should become visible once chat server is available");
     assertTrue(inputField.isDisplayed(), "Chat input field should become visible once chat server is available");
+    assertTrue(displayField.isDisplayed(), "Chat input field should become visible once chat server is unavailable");
   }
 }
