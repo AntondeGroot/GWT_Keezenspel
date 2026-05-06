@@ -2,6 +2,9 @@ package adg.keezen.board;
 
 import static adg.keezen.viewhelpers.ViewDrawing.clearPawnHighlightsExceptPawn1;
 import static adg.keezen.viewhelpers.ViewDrawing.updatePlayerProfileUI;
+import static com.google.gwt.user.client.Window.Location.getHostName;
+import static com.google.gwt.user.client.Window.Location.getProtocol;
+import static com.google.gwt.user.client.Window.Location.replace;
 import static java.lang.String.valueOf;
 
 import adg.keezen.CardsDeck;
@@ -189,7 +192,10 @@ public class GameBoardPresenter {
                       Cookie.getPlayerId(),
                       new ApiCallback<Void>() {
                         @Override
-                        public void onSuccess(Void result) {}
+                        public void onSuccess(Void result) {
+                          String lobbyUrl = getProtocol() + "//" + getHostName();
+                          replace(lobbyUrl);
+                        }
 
                         @Override
                         public void onFailure(Throwable caught) {}
