@@ -186,8 +186,7 @@ public class ApiClient {
                 GWT.log("Anton HTTP status: " + status + ", body: '" + text + "'");
 
                 if (text == null || text.trim().isEmpty()) {
-                  // Allow 204 or empty 200 responses silently
-                  callback.onHttpError(status, "Empty body (OK or No Content)");
+                  callback.onSuccess(null);
                   return;
                 }
 
