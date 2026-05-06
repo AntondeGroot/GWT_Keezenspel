@@ -1,0 +1,8 @@
+{
+  "gameOption": {
+    "exactMoveRequired": {
+      "label": "Eksakt trekk krevd",
+      "description": "Når aktivert, må en brikke lande nøyaktig på sin destinasjon. Retningsomvendinger er ikke tillatt: å sprette av en blokkert startfelt eller overskyting av målbanen vil bli avvist som et ulovlig trekk."
+    }
+  }
+}

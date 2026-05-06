@@ -1,0 +1,8 @@
+{
+  "gameOption": {
+    "exactMoveRequired": {
+      "label": "Exacte zet vereist",
+      "description": "Als ingeschakeld, moet een pion exact op zijn bestemming landen. Richtingsomkeringen zijn niet toegestaan: terugkaatsen van een geblokkeerde starttegel of het voorbijschieten van de finish wordt afgewezen als een ongeldige zet."
+    }
+  }
+}

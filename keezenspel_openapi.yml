@@ -478,6 +478,12 @@ components:
         defaultValue:
           type: string
           description: Default value serialised as a string
+        labelKey:
+          type: string
+          description: i18n key for the label, looked up in the game server's /i18n/{lang}.json
+        descriptionKey:
+          type: string
+          description: i18n key for the description, looked up in the game server's /i18n/{lang}.json
         choices:
           type: array
           items:
