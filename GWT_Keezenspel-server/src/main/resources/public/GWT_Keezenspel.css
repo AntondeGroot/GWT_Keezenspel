@@ -705,15 +705,26 @@ footer {
   background: linear-gradient(145deg, #3a2000, #251400);
   border: 1px solid #c9a227;
   border-radius: 4px;
-  padding: 3px 10px;
+  padding: 5px 10px;
   cursor: pointer;
   box-shadow: 1px 2px 6px rgba(0,0,0,0.5);
   white-space: nowrap;
+  outline: none;
   transition: background 0.15s ease;
 }
 
 .rulesButton:hover {
-  background: linear-gradient(145deg, #4a2a00, #352000);
+  background: linear-gradient(145deg, #4a2800, #341a00);
+  border-color: #e0b830;
+}
+
+.rules-btn-icon {
+  height: 1em;
+  width: auto;
+  vertical-align: middle;
+  margin-right: 4px;
+  position: relative;
+  top: -1px;
 }
 
 /* ============================================================
@@ -829,26 +840,25 @@ footer {
   gap: 6px;
 }
 
-.lang-selector-icon {
-  font-size: 24px;
-  line-height: 1;
-}
 
 .lang-listbox {
   font-family: 'Cinzel', Georgia, serif;
   font-size: 13pt;
   font-weight: 600;
-  background: linear-gradient(145deg, #3a2000, #251400);
+  background-image: url('globe-language.svg'), linear-gradient(145deg, #3a2000, #251400);
+  background-repeat: no-repeat, no-repeat;
+  background-position: 8px center, 0 0;
+  background-size: 20px 20px, 100% 100%;
   color: #f4d03f;
   border: 1px solid #c9a227;
   border-radius: 4px;
-  padding: 5px 8px;
+  padding: 5px 8px 5px 36px;
   cursor: pointer;
   box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.5);
   outline: none;
 }
 
 .lang-listbox:hover {
-  background: linear-gradient(145deg, #4a2800, #341a00);
+  background-image: url('globe-language.svg'), linear-gradient(145deg, #4a2800, #341a00);
   border-color: #e0b830;
 }

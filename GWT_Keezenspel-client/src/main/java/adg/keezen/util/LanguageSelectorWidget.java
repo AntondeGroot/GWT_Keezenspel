@@ -2,7 +2,6 @@ package adg.keezen.util;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 
 public class LanguageSelectorWidget extends Composite {
@@ -15,9 +14,6 @@ public class LanguageSelectorWidget extends Composite {
     public LanguageSelectorWidget(boolean reloadOnChange) {
         FlowPanel container = new FlowPanel();
         container.setStyleName("lang-selector-container");
-
-        Label icon = new Label("🌐");
-        icon.setStyleName("lang-selector-icon");
 
         ListBox listBox = new ListBox();
         listBox.setStyleName("lang-listbox");
@@ -40,7 +36,6 @@ public class LanguageSelectorWidget extends Composite {
             }
         });
 
-        container.add(icon);
         container.add(listBox);
         initWidget(container);
     }

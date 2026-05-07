@@ -17,7 +17,8 @@ public class GameRulesWidget extends Composite {
     private FlowPanel overlay;
 
     public GameRulesWidget() {
-        Button button = new Button(CONSTANTS.rulesButton());
+        Button button = new Button();
+        button.setHTML("<img src='study-icon.svg' class='rules-btn-icon' alt=''> " + CONSTANTS.rulesButton());
         button.setStylePrimaryName("rulesButton");
         button.addClickHandler(e -> showModal());
         initWidget(button);
