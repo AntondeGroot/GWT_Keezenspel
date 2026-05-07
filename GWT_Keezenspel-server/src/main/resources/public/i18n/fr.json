@@ -1,0 +1,8 @@
+{
+  "gameOption": {
+    "exactMoveRequired": {
+      "label": "Coup exact requis",
+      "description": "Lorsqu'activé, un pion doit atterrir exactement sur sa destination. Les inversions de direction ne sont pas autorisées : rebondir sur une case de départ bloquée ou dépasser la voie d'arrivée sera rejeté comme coup illégal."
+    }
+  }
+}

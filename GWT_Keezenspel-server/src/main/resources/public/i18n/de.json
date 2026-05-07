@@ -1,0 +1,8 @@
+{
+  "gameOption": {
+    "exactMoveRequired": {
+      "label": "Exakter Zug erforderlich",
+      "description": "Wenn aktiviert, muss eine Figur genau auf ihrem Ziel landen. Richtungsumkehrungen sind nicht erlaubt: Zurückprallen an einem blockierten Startfeld oder Überschießen der Zielbahn wird als ungültiger Zug abgelehnt."
+    }
+  }
+}

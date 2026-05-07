@@ -28,6 +28,8 @@ public class KeezenGameOptions {
                 + "or overshooting the finish lane will be rejected as an illegal move.",
             TypeEnum.BOOLEAN,
             "true")
+            .labelKey("gameOption.exactMoveRequired.label")
+            .descriptionKey("gameOption.exactMoveRequired.description")
     );
   }
 

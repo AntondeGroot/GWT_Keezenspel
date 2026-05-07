@@ -1,0 +1,8 @@
+{
+  "gameOption": {
+    "exactMoveRequired": {
+      "label": "Exact move required",
+      "description": "When enabled, a pawn must land exactly on its destination. Direction reversals are not allowed: bouncing off a blocked start tile or overshooting the finish lane will be rejected as an illegal move."
+    }
+  }
+}
