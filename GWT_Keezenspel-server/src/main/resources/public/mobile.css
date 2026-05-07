@@ -13,9 +13,19 @@
    green shows through everywhere without gaps. */
 html {
   background: #2a1408 !important;
+  overflow-x: hidden !important;
 }
 body {
   background: radial-gradient(ellipse at center, #1d4d1d 0%, #0f2b0f 100%) !important;
+}
+
+/* The footer's box-shadow (blur 12px, no horizontal offset) bleeds 6px
+   beyond each side, making it appear 1112px wide on a 1100px viewport.
+   clip-path clips the sides exactly while the negative top value lets
+   the upward shadow remain visible. */
+footer {
+  clip-path: inset(-20px 0 0 0) !important;
+  width: 1100px;
 }
 
 /* 100vw resolves to the device CSS-pixel width (~390px), not the 1100px
@@ -211,7 +221,7 @@ h1 {
   left: 50% !important;
   transform: translateX(-50%) !important;
   right: auto !important;
-  width: 1060px !important;
+  width: 1000px !important;
   z-index: 55 !important;
 }
 
@@ -280,3 +290,20 @@ h1 {
   display: flex !important;
   justify-content: center !important;
 }
+/* ── Game Rules modal: 90% of the 1100px layout viewport ───────────────
+   90vw resolves to device screen width on mobile (~351px on a 390px phone),
+   so we use an explicit pixel width instead. */
+.rules-content {
+  width: 990px !important;
+  max-width: none !important;
+  max-height: 85vh !important;
+  padding: 32px 40px 0 40px !important;
+}
+
+/* ── Game Rules modal: scale up text for the 1100px layout viewport ─────
+   At ~0.35 scale factor, 13px CSS ≈ 4.6 visual pixels — unreadably small. */
+.rules-title        { font-size: 2.2em !important; }
+.rules-section-title { font-size: 1.6em !important; }
+.rules-row-text     { font-size: 26px !important; line-height: 1.5 !important; }
+.rules-close-hint   { font-size: 22px !important; }
+.rules-card-chip    { font-size: 28px !important; width: 54px !important; height: 72px !important; }

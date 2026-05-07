@@ -4,5 +4,21 @@
       "label": "Exacte zet vereist",
       "description": "Als ingeschakeld, moet een pion exact op zijn bestemming landen. Richtingsomkeringen zijn niet toegestaan: terugkaatsen van een geblokkeerde starttegel of het voorbijschieten van de finish wordt afgewezen als een ongeldige zet."
     }
+  },
+  "gameRules": {
+    "title": "Spelregels",
+    "clickToClose": "Klik ergens om te sluiten",
+    "gettingOnBoard": {
+      "title": "Op het bord komen",
+      "ace": "Aas: zet een pion op het bord, of beweeg een actieve pion 1 stap vooruit.",
+      "king": "Koning: zet een pion op het bord."
+    },
+    "specialCards": {
+      "title": "Speciale kaarten",
+      "four": "Vier: beweeg 4 stappen achteruit. Tip: gebruik dit op je startveld om een heel bord af te snijden.",
+      "seven": "Zeven: maak in totaal 7 stappen met één of twee pionnen. Pion 1 beweegt altijd als eerste.",
+      "jack": "Boer: ruil jouw pion met een vijandige pion. Selecteer eerst de kaart, kies dan een vijandige pion.",
+      "queen": "Vrouw: beweeg 12 stappen vooruit."
+    }
   }
 }

@@ -3,7 +3,9 @@ package adg;
 import adg.keezen.GameModule;
 import adg.keezen.i18n.AppConstants;
 import adg.keezen.util.Cookie;
+import adg.keezen.util.GameRulesWidget;
 import adg.keezen.util.LanguageSelectorWidget;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -24,7 +26,11 @@ public class App implements EntryPoint {
     Cookie.createLanguageCookie();
     if (Cookie.syncGwtLocale()) return;
 
-    RootPanel.get("lang-selector-root").add(new LanguageSelectorWidget(true));
+    FlowPanel topNav = new FlowPanel();
+    topNav.addStyleName("top-nav-panel");
+    topNav.add(new GameRulesWidget());
+    topNav.add(new LanguageSelectorWidget(true));
+    RootPanel.get("lang-selector-root").add(topNav);
 
     if (Canvas.createIfSupported() == null) {
       RootPanel.get().add(new Label(CONSTANTS.canvasNotSupported()));

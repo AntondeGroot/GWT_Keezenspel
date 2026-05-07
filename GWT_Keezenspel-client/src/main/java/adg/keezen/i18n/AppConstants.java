@@ -25,4 +25,11 @@ public interface AppConstants extends Constants {
     String hintJack();
     String hintQueen();
     String hintKing();
+
+    // Game rules modal
+    String rulesButton();
+    String rulesTitle();
+    String rulesGettingOnBoard();
+    String rulesSpecialCards();
+    String rulesClickToClose();
 }
