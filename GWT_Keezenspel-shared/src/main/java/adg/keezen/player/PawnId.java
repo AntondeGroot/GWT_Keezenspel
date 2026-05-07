@@ -14,6 +14,11 @@ public class PawnId implements IsSerializable {
 
   public PawnId() {}
 
+  public PawnId(PawnId other) {
+    this.playerId = other.playerId;
+    this.pawnNr = other.pawnNr;
+  }
+
   public String getPlayerId() {
     return playerId;
   }

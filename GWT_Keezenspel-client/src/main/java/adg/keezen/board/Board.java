@@ -23,17 +23,17 @@ public class Board {
 
   public static ArrayList<Point> getCardsDeckPointsForPlayer(String UUID) {
     if (!cardsDeckPointsPerPlayer.containsKey(UUID)) {
-      new ArrayList<>();
+      cardsDeckPointsPerPlayer.put(UUID, new ArrayList<>());
     }
 
     return cardsDeckPointsPerPlayer.get(UUID);
   }
 
-  public void createBoard(ArrayList<PlayerClient> players, double boardSize) {
+  public static void createBoard(ArrayList<PlayerClient> players, double boardSize) {
     // Clear the mappings list before creating a new board
     GWT.log("create board for players: " + players);
     tiles.clear();
-    Board.players = players;
+    Board.players = new ArrayList<>(players);
     int nrPlayers = players.size();
     cellDistance = CellDistance.getCellDistance(nrPlayers, boardSize);
     Point startPoint = CellDistance.getStartPoint(nrPlayers, boardSize);
@@ -167,8 +167,9 @@ public class Board {
 
   public static void setPawns(ArrayList<PawnClient> pawns) {
     if (Board.pawns.isEmpty()) {
-      pawns.sort(new PawnComparator());
-      Board.pawns = pawns;
+      ArrayList<PawnClient> copy = new ArrayList<>(pawns);
+      copy.sort(new PawnComparator());
+      Board.pawns = copy;
     }
   }
 
@@ -182,11 +183,11 @@ public class Board {
   }
 
   public static List<TileMapping> getTiles() {
-    return tiles;
+    return new ArrayList<>(tiles);
   }
 
   public static List<PawnClient> getPawns() {
-    return pawns;
+    return new ArrayList<>(pawns);
   }
 
   public static PawnClient getPawn(String pawnId) {

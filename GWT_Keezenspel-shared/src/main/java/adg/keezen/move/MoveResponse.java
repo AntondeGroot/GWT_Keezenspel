@@ -43,59 +43,59 @@ public class MoveResponse implements IsSerializable {
   }
 
   public PawnId getPawnId1() {
-    return pawnId1;
+    return pawnId1 == null ? null : new PawnId(pawnId1);
   }
 
   public void setPawnId1(PawnId pawnId1) {
-    this.pawnId1 = pawnId1;
+    this.pawnId1 = pawnId1 == null ? null : new PawnId(pawnId1);
   }
 
   public PawnId getPawnId2() {
-    return pawnId2;
+    return pawnId2 == null ? null : new PawnId(pawnId2);
   }
 
   public void setPawnId2(PawnId pawnId2) {
-    this.pawnId2 = pawnId2;
+    this.pawnId2 = pawnId2 == null ? null : new PawnId(pawnId2);
   }
 
   public PawnId getPawnIdKilled1() {
-    return pawnIdKilled1;
+    return pawnIdKilled1 == null ? null : new PawnId(pawnIdKilled1);
   }
 
   public PawnId getPawnIdKilled2() {
-    return pawnIdKilled2;
+    return pawnIdKilled2 == null ? null : new PawnId(pawnIdKilled2);
   }
 
   public void setPawnIdKilled1(PawnId pawnIdKilled) {
-    this.pawnIdKilled1 = pawnIdKilled;
+    this.pawnIdKilled1 = pawnIdKilled == null ? null : new PawnId(pawnIdKilled);
   }
 
   public void setPawnIdKilled2(PawnId pawnIdKilled) {
-    this.pawnIdKilled2 = pawnIdKilled;
+    this.pawnIdKilled2 = pawnIdKilled == null ? null : new PawnId(pawnIdKilled);
   }
 
   public LinkedList<TileId> getMovePawn1() {
-    return movePawn1;
+    return movePawn1 == null ? null : new LinkedList<>(movePawn1);
   }
 
   public void setMovePawn1(LinkedList<TileId> movePawn1) {
-    this.movePawn1 = movePawn1;
+    this.movePawn1 = movePawn1 == null ? null : new LinkedList<>(movePawn1);
   }
 
   public LinkedList<TileId> getMovePawn2() {
-    return movePawn2;
+    return movePawn2 == null ? null : new LinkedList<>(movePawn2);
   }
 
   public void setMovePawn2(LinkedList<TileId> movePawn2) {
-    this.movePawn2 = movePawn2;
+    this.movePawn2 = movePawn2 == null ? null : new LinkedList<>(movePawn2);
   }
 
   public LinkedList<TileId> getMoveKilledPawn1() {
-    return moveKilledPawn1;
+    return moveKilledPawn1 == null ? null : new LinkedList<>(moveKilledPawn1);
   }
 
   public LinkedList<TileId> getMoveKilledPawn2() {
-    return moveKilledPawn2;
+    return moveKilledPawn2 == null ? null : new LinkedList<>(moveKilledPawn2);
   }
 
   /**
@@ -103,12 +103,12 @@ public class MoveResponse implements IsSerializable {
    * communicate to the client that 2 pawns were killed then use SetMoveKilledPawn2 in OnSplit
    */
   public void setMoveKilledPawn1(LinkedList<TileId> moveKilledPawn) {
-    this.moveKilledPawn1 = moveKilledPawn;
+    this.moveKilledPawn1 = moveKilledPawn == null ? null : new LinkedList<>(moveKilledPawn);
   }
 
   /** Only use this when you use the OnSplit filling it in for the client */
   public void setMoveKilledPawn2(LinkedList<TileId> moveKilledPawn) {
-    this.moveKilledPawn2 = moveKilledPawn;
+    this.moveKilledPawn2 = moveKilledPawn == null ? null : new LinkedList<>(moveKilledPawn);
   }
 
   public MoveType getMoveType() {

@@ -46,8 +46,8 @@ public class PawnClient {
     this.playerId = playerId;
     this.pawnId = playerId + "_" + pawnNr;
     this.pawnNr = pawnNr;
-    this.currentTileId = currentTileId;
-    this.nestTileId = currentTileId;
+    this.currentTileId = new TileId(currentTileId);
+    this.nestTileId = new TileId(currentTileId);
     this.uri = null;
   }
 
@@ -76,15 +76,15 @@ public class PawnClient {
   }
 
   public TileId getCurrentTileId() {
-    return currentTileId;
+    return new TileId(currentTileId);
   }
 
   public void setCurrentTileId(TileId currentTileId) {
-    this.currentTileId = currentTileId;
+    this.currentTileId = new TileId(currentTileId);
   }
 
   public TileId getNestTileId() {
-    return nestTileId;
+    return new TileId(nestTileId);
   }
 
   public String getUri() {

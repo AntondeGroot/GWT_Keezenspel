@@ -56,7 +56,8 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
   @Override
   public ResponseEntity<List<Player>> getAllPlayersInGame(String sessionId) {
 
-    if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
+    GameSession gameSession = GameRegistry.getGame(sessionId);
+    if (gameSession == null) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
@@ -68,7 +69,8 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
   @Override
   public ResponseEntity<Object> addPlayerToGame(String sessionId, Player player) {
 
-    if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
+    GameSession gameSession = GameRegistry.getGame(sessionId);
+    if (gameSession == null) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
@@ -88,7 +90,8 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
 
   @Override
   public ResponseEntity<Void> startGame(String sessionId) {
-    if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
+    GameSession gameSession = GameRegistry.getGame(sessionId);
+    if (gameSession == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
@@ -104,7 +107,8 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
 
   @Override
   public ResponseEntity<Void> leaveGame(String sessionId, String playerId) {
-    if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
+    GameSession gameSession = GameRegistry.getGame(sessionId);
+    if (gameSession == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     GameState gameState = gameSession.getGameState();
@@ -121,7 +125,8 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
 
   @Override
   public ResponseEntity<Void> stopGame(String sessionId) {
-    if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
+    GameSession gameSession = GameRegistry.getGame(sessionId);
+    if (gameSession == null) {
       return ResponseEntity.status(404).build();
     }
     gameSession.getGameState().stop();
@@ -131,7 +136,8 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
 
   @Override
   public ResponseEntity<GameInfo> gamesSessionIdGet(String sessionId) {
-    if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
+    GameSession gameSession = GameRegistry.getGame(sessionId);
+    if (gameSession == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     GameState gameState = gameSession.getGameState();

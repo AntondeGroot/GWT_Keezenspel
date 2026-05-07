@@ -20,11 +20,11 @@ public class MoveMessage implements IsSerializable {
   public MoveMessage() {}
 
   public Card getCard() {
-    return card;
+    return card == null ? null : new Card(card);
   }
 
   public void setCard(Card card) {
-    this.card = card;
+    this.card = card == null ? null : new Card(card);
   }
 
   public String getPlayerId() {
@@ -36,19 +36,19 @@ public class MoveMessage implements IsSerializable {
   }
 
   public PawnId getPawnId1() {
-    return pawnId1;
+    return pawnId1 == null ? null : new PawnId(pawnId1);
   }
 
   public void setPawnId1(PawnId pawnId1) {
-    this.pawnId1 = pawnId1;
+    this.pawnId1 = pawnId1 == null ? null : new PawnId(pawnId1);
   }
 
   public PawnId getPawnId2() {
-    return pawnId2;
+    return pawnId2 == null ? null : new PawnId(pawnId2);
   }
 
   public void setPawnId2(PawnId pawnId2) {
-    this.pawnId2 = pawnId2;
+    this.pawnId2 = pawnId2 == null ? null : new PawnId(pawnId2);
   }
 
   public MoveType getMoveType() {
@@ -60,7 +60,7 @@ public class MoveMessage implements IsSerializable {
   }
 
   public Integer getStepsPawn1() {
-    return stepsPawn1 == null ? 0 : stepsPawn1;
+    return stepsPawn1 == null ? Integer.valueOf(0) : stepsPawn1;
   }
 
   public void setStepsPawn1(Integer stepsPawn1) {
@@ -68,7 +68,7 @@ public class MoveMessage implements IsSerializable {
   }
 
   public Integer getStepsPawn2() {
-    return stepsPawn2 == null ? 0 : stepsPawn2;
+    return stepsPawn2 == null ? Integer.valueOf(0) : stepsPawn2;
   }
 
   public void setStepsPawn2(Integer stepsPawn2) {

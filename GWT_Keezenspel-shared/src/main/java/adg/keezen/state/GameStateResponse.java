@@ -22,30 +22,30 @@ public class GameStateResponse implements IsSerializable {
   public GameStateResponse() {}
 
   public void setPlayerColors(HashMap<String, Integer> playerColors) {
-    this.playerColors = playerColors;
+    this.playerColors = playerColors == null ? null : new HashMap<>(playerColors);
   }
 
   public HashMap<String, Integer> getPlayerColors() {
-    return playerColors;
+    return playerColors == null ? null : new HashMap<>(playerColors);
   }
 
   public ArrayList<Pawn> getPawns() {
-    return pawns;
+    return pawns == null ? null : new ArrayList<>(pawns);
   }
 
   public void setPawns(ArrayList<Pawn> pawns) {
-    this.pawns = pawns;
+    this.pawns = pawns == null ? null : new ArrayList<>(pawns);
   }
 
   // todo: you could remove activePlayers and winners as that info is already contained within
   // Players
 
   public ArrayList<Player> getPlayers() {
-    return players;
+    return players == null ? null : new ArrayList<>(players);
   }
 
   public void setPlayers(ArrayList<Player> players) {
-    this.players = players;
+    this.players = players == null ? null : new ArrayList<>(players);
   }
 
   public String getPlayerIdTurn() {
@@ -65,19 +65,19 @@ public class GameStateResponse implements IsSerializable {
   }
 
   public ArrayList<String> getActivePlayers() {
-    return activePlayers;
+    return activePlayers == null ? null : new ArrayList<>(activePlayers);
   }
 
   public void setActivePlayers(ArrayList<String> activePlayers) {
-    this.activePlayers = activePlayers;
+    this.activePlayers = activePlayers == null ? null : new ArrayList<>(activePlayers);
   }
 
   public ArrayList<String> getWinners() {
-    return winners;
+    return winners == null ? null : new ArrayList<>(winners);
   }
 
   public void setWinners(ArrayList<String> winners) {
-    this.winners = winners;
+    this.winners = winners == null ? null : new ArrayList<>(winners);
   }
 
   @Override

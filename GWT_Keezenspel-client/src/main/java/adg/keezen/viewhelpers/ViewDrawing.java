@@ -217,9 +217,6 @@ public class ViewDrawing {
     int rowCount = players.size();
     Grid grid = new Grid(rowCount, colCount);
 
-    List<PlayerClient> winners =
-        players.stream().filter(player -> player.getPlace() > -1).collect(Collectors.toList());
-
     int playerId = 0;
     for (PlayerClient player : players) {
       int imagePixelSize = 50;

@@ -17,7 +17,7 @@ public class PlayerList {
       isUpToDate = true;
     } else {
       isUpToDate = false;
-      this.players = players;
+      this.players = new java.util.ArrayList<>(players);
     }
   }
 

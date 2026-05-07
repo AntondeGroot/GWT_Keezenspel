@@ -62,7 +62,7 @@ public class GameBoardPresenter {
   private String myPlayerName = "";
   private String lastCurrentPlayerId = null;
   private int lastMedalCount = 0;
-  private final int BOARD_SIZE = 600; // todo: replace with CSS properties
+  private static final int BOARD_SIZE = 600; // todo: replace with CSS properties
   private final Queue<MoveResponseDTO> pendingAnimations = new LinkedList<>();
 
   public GameBoardPresenter(GameBoardView gameBoardView, PollingService pollingService) {

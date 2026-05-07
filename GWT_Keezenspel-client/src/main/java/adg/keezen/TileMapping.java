@@ -8,7 +8,7 @@ public class TileMapping {
 
   public TileMapping(String playerId, int tileNr, Point position) {
     this.tileId = new TileId(playerId, tileNr);
-    this.position = position;
+    this.position = new Point(position);
   }
 
   public String getPlayerId() {
@@ -20,15 +20,15 @@ public class TileMapping {
   }
 
   public void setPosition(Point position) {
-    this.position = position;
+    this.position = new Point(position);
   }
 
   public Point getPosition() {
-    return position;
+    return new Point(position);
   }
 
   public TileId getTileId() {
-    return tileId;
+    return new TileId(tileId);
   }
 
   @Override
