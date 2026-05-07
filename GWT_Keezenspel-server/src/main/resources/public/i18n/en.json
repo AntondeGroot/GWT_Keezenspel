@@ -4,5 +4,21 @@
       "label": "Exact move required",
       "description": "When enabled, a pawn must land exactly on its destination. Direction reversals are not allowed: bouncing off a blocked start tile or overshooting the finish lane will be rejected as an illegal move."
     }
+  },
+  "gameRules": {
+    "title": "Game Rules",
+    "clickToClose": "Click anywhere to close",
+    "gettingOnBoard": {
+      "title": "Getting on the board",
+      "ace": "Ace: place a pawn on the board, or move an active pawn 1 step forward.",
+      "king": "King: place a pawn on the board."
+    },
+    "specialCards": {
+      "title": "Special Cards",
+      "four": "Four: move 4 steps backward. Tip: use this on your start tile to cut across the entire board.",
+      "seven": "Seven: make 7 steps total with one or two pawns. Pawn 1 always moves first.",
+      "jack": "Jack: swap your pawn with an enemy pawn. Select the card first, then choose an enemy pawn.",
+      "queen": "Queen: move 12 steps forward."
+    }
   }
 }
