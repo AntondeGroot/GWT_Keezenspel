@@ -37,10 +37,10 @@ public class GameState {
   private final ArrayList<String> activePlayers = new ArrayList<>();
   private final ArrayList<String> winners = new ArrayList<>();
   private final HashSet<String> leavers = new HashSet<>();
-  private final int MAX_PLAYERS = 8;
+  private static final int MAX_PLAYERS = 8;
   private final CardsDeckInterface cardsDeck;
-  private int animationSpeed;
-  private boolean exactMoveRequired = false;
+  private volatile int animationSpeed;
+  private volatile boolean exactMoveRequired = false;
   private Boolean hasStarted = false;
   private final AtomicLong version =
       new AtomicLong(0); // to make it compatible with javascript as it doesn't do int64 well!
@@ -361,7 +361,18 @@ public class GameState {
       boolean goToNextPlayer) {
 
     String playerId = moveMessage.getPlayerId();
-    Card card = getCard(moveMessage.getCardId(), moveMessage.getPlayerId());
+    Integer cardId = moveMessage.getCardId();
+    if (cardId == null) {
+      clearResponse(response);
+      response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
+      return;
+    }
+    Card card = getCard(cardId, playerId);
+    if (card == null) {
+      clearResponse(response);
+      response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
+      return;
+    }
 
     if (cannotMoveToTileBecauseSamePlayer(pawn0, targetTileId)) {
       clearResponse(response);

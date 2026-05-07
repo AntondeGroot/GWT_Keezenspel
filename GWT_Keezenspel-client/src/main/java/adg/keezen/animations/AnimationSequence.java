@@ -14,11 +14,11 @@ public class AnimationSequence {
   private static final List<AnimatePawnPoints> sequenceKilledByPawn2 = new ArrayList<>();
 
   public static List<AnimatePawnPoints> getFirst() {
-    return sequenceMovePawn1;
+    return new ArrayList<>(sequenceMovePawn1);
   }
 
   public static List<AnimatePawnPoints> getLast() {
-    return sequenceMovePawn2;
+    return new ArrayList<>(sequenceMovePawn2);
   }
 
   public static void reset() {

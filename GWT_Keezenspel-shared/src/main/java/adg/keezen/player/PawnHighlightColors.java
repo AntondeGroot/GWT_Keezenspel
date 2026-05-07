@@ -31,11 +31,11 @@ public class PawnHighlightColors {
     double max = Math.max(r, Math.max(g, b));
     double min = Math.min(r, Math.min(g, b));
     double delta = max - min;
-    if (delta == 0) return 0;
+    if (Double.compare(delta, 0.0) == 0) return 0;
     double hue;
-    if (max == r)      hue = 60 * (((g - b) / delta) % 6);
-    else if (max == g) hue = 60 * ((b - r) / delta + 2);
-    else               hue = 60 * ((r - g) / delta + 4);
+    if (Double.compare(max, r) == 0)      hue = 60 * (((g - b) / delta) % 6);
+    else if (Double.compare(max, g) == 0) hue = 60 * ((b - r) / delta + 2);
+    else                                  hue = 60 * ((r - g) / delta + 4);
     return hue < 0 ? hue + 360 : hue;
   }
 

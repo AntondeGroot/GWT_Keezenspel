@@ -47,11 +47,11 @@ public class GameStateClient {
   }
 
   public ArrayList<PawnClient> getPawns() {
-    return this.pawns;
+    return new ArrayList<>(this.pawns);
   }
 
   public ArrayList<PlayerClient> getPlayers() {
-    return this.players;
+    return new ArrayList<>(this.players);
   }
 
   public MoveResponseDTO getLastMoveResponse() {

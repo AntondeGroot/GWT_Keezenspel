@@ -12,27 +12,27 @@ public class CardsDeck {
   private HashMap<String, Integer> nrCardsPerPlayer = new HashMap<>();
 
   public HashMap<String, Integer> getNrCardsPerPlayer() {
-    return nrCardsPerPlayer;
+    return new HashMap<>(nrCardsPerPlayer);
   }
 
   public void setNrCardsPerPlayer(HashMap<String, Integer> nrCardsPerPlayer) {
-    this.nrCardsPerPlayer = nrCardsPerPlayer;
+    this.nrCardsPerPlayer = new HashMap<>(nrCardsPerPlayer);
   }
 
   public List<CardClient> getCards() {
-    return cards;
+    return new ArrayList<>(cards);
   }
 
   public List<CardClient> getPlayedCards() {
-    return playedCards;
+    return new ArrayList<>(playedCards);
   }
 
   public void setCards(List<CardClient> cards) {
-    this.cards = cards;
+    this.cards = new ArrayList<>(cards);
   }
 
   public void setPlayedCards(List<CardClient> playedCards) {
-    this.playedCards = playedCards;
+    this.playedCards = new ArrayList<>(playedCards);
   }
 
   //  public void processCardResponse(JsArray<CardClient> cardResponse) {

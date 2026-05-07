@@ -11,6 +11,12 @@ public class Card implements IsSerializable {
 
   public Card() {}
 
+  public Card(Card other) {
+    this.suit = other.suit;
+    this.cardValue = other.cardValue;
+    this.uniqueCardNumber = other.uniqueCardNumber;
+  }
+
   /**
    * @param suit , suit
    * @param cardValue , value between 1 and 13 (ace,2,...,king)

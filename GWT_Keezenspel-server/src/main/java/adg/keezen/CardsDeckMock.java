@@ -83,7 +83,8 @@ public class CardsDeckMock implements CardsDeckInterface, IsSerializable {
     }
 
     for (Player player : gameState.getPlayers()) {
-      if (player.getIsActive() && player.getPlace() < 0) {
+      Integer place = player.getPlace();
+      if (Boolean.TRUE.equals(player.getIsActive()) && place != null && place < 0) {
         for (Card card : allCardsFromAceToKing) {
           setPlayerCard(player.getId(), card);
         }
@@ -104,13 +105,14 @@ public class CardsDeckMock implements CardsDeckInterface, IsSerializable {
   }
 
   public ArrayList<Card> getPlayedCards() {
-    return playedCards;
+    return new ArrayList<>(playedCards);
   }
 
   private ArrayList<Card> all13Cards() {
     ArrayList<Card> all13Cards = new ArrayList<>();
+    Random random = new Random();
     for (int cardValue = 1; cardValue <= 13; cardValue++) {
-      all13Cards.add(new Card().suit(0).value(cardValue).uuid(new Random().nextInt()));
+      all13Cards.add(new Card().suit(0).value(cardValue).uuid(random.nextInt()));
     }
     return all13Cards;
   }

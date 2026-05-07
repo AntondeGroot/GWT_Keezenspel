@@ -1,0 +1,95 @@
+<FindBugsFilter>
+  <!-- Skip all OpenAPI-generated code -->
+  <Match>
+    <Package name="~com\.adg\.openapi.*"/>
+  </Match>
+  <!-- GWT UI widget getters must return the actual widget reference; defensive copying is not possible -->
+  <Match>
+    <Class name="adg.keezen.board.GameBoardView"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+  <!-- GWT presenter stores view widget by reference; that is the required MVP pattern -->
+  <Match>
+    <Class name="adg.keezen.board.GameBoardPresenter"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+  <!-- PawnClient has no copy constructor; it is shared by reference throughout animation code -->
+  <Match>
+    <Class name="adg.keezen.animations.AnimatePawnPoints"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+  <Match>
+    <Class name="adg.keezen.animations.AnimatePawnPoints"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+  <!-- GWT JSONObject has no copy constructor -->
+  <Match>
+    <Class name="adg.keezen.util.MoveRequestJsonBuilder"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+  <!-- MoveResponseDTO is a GWT overlay type (JavaScriptObject) and cannot be copied -->
+  <Match>
+    <Class name="adg.keezen.dto.GameStateClient"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+  <!-- PawnClient has no copy constructor; getPawn1/getPawn2 return the selection by reference intentionally -->
+  <Match>
+    <Class name="adg.keezen.PawnAndCardSelection"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+
+  <!-- CardsDeckInterface and GameState are complex domain objects with no copy constructor -->
+  <Match>
+    <Class name="adg.keezen.CardsDeck"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+  <Match>
+    <Class name="adg.keezen.CardsDeckMock"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+  <Match>
+    <Class name="adg.keezen.GameState"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+  <!-- GameState getters return live collections that callers mutate in-place; defensive copies break domain logic -->
+  <Match>
+    <Class name="adg.keezen.GameState"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+  <!-- PlayerHand.getHand() returns the live list so callers can add/remove cards directly -->
+  <Match>
+    <Class name="adg.keezen.PlayerHand"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+  <!-- GameSession holds live domain objects (GameState, CardsDeckInterface, OpenAPI MoveResponse) by design -->
+  <Match>
+    <Class name="adg.keezen.GameSession"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+  <Match>
+    <Class name="adg.keezen.GameSession"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+  <!-- Processing classes: null checks are enforced at the dispatch layer before these methods are called -->
+  <Match>
+    <Class name="adg.processing.ProcessOnBoard"/>
+    <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
+  </Match>
+  <Match>
+    <Class name="adg.processing.ProcessOnMove"/>
+    <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
+  </Match>
+  <Match>
+    <Class name="adg.processing.ProcessOnSplit"/>
+    <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
+  </Match>
+  <Match>
+    <Class name="adg.processing.ProcessOnSwitch"/>
+    <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
+  </Match>
+  <!-- card/pawn nulls are validated by PawnAndCardSelectionValidation before use -->
+  <Match>
+    <Class name="adg.services.MovesApiDelegateImpl"/>
+    <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
+  </Match>
+</FindBugsFilter>

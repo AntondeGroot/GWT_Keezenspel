@@ -113,7 +113,8 @@ public class CardsDeck implements CardsDeckInterface, IsSerializable {
     for (int j = 0; j < nrCards; j++) {
       for (Player player : gameState.getPlayers()) {
         // todo: winning players should not be active!
-        if (player.getIsActive() && player.getPlace() < 0) {
+        Integer place = player.getPlace();
+        if (Boolean.TRUE.equals(player.getIsActive()) && place != null && place < 0) {
           setPlayerCard(player.getId(), cardsDeque.pop());
         }
       }
@@ -138,6 +139,6 @@ public class CardsDeck implements CardsDeckInterface, IsSerializable {
   }
 
   public ArrayList<Card> getPlayedCards() {
-    return playedCards;
+    return new ArrayList<>(playedCards);
   }
 }

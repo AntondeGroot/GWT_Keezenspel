@@ -4,10 +4,11 @@ import com.adg.openapi.model.Player;
 
 public class PlayerStatus {
   public static boolean hasFinished(Player player) {
-    if (player.getPlace() == null) {
+    Integer place = player.getPlace();
+    if (place == null) {
       return false;
     }
-    return player.getPlace() > 0;
+    return place > 0;
   }
 
   public static void setActive(Player player) {

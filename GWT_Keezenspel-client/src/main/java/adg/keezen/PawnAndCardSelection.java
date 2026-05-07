@@ -45,7 +45,7 @@ public class PawnAndCardSelection {
   }
 
   public void updatePawns(List<PawnClient> pawns) {
-    this.pawns = pawns;
+    this.pawns = new ArrayList<>(pawns);
     checkIfSelectedPawnsAreUpToDate();
   }
 

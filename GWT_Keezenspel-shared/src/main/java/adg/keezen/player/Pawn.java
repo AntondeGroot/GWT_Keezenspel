@@ -15,25 +15,25 @@ public class Pawn implements IsSerializable {
 
   public Pawn(PawnId pawnId, TileId nestTileId) {
     this.playerId = pawnId.getPlayerId();
-    this.pawnId = pawnId;
+    this.pawnId = new PawnId(pawnId);
     this.nestTileId = new TileId(nestTileId);
-    this.currentTileId = nestTileId;
+    this.currentTileId = new TileId(nestTileId);
   }
 
   public Pawn(PawnId pawnId, TileId nestTileId, Integer colorInt) {
     this.playerId = pawnId.getPlayerId();
-    this.pawnId = pawnId;
+    this.pawnId = new PawnId(pawnId);
     this.nestTileId = new TileId(nestTileId);
-    this.currentTileId = nestTileId;
+    this.currentTileId = new TileId(nestTileId);
     this.colorInt = colorInt;
   }
 
   public PawnId getPawnId() {
-    return pawnId;
+    return pawnId == null ? null : new PawnId(pawnId);
   }
 
   public void setPawnId(PawnId pawnId) {
-    this.pawnId = pawnId;
+    this.pawnId = pawnId == null ? null : new PawnId(pawnId);
   }
 
   public String getPlayerId() {
@@ -53,17 +53,17 @@ public class Pawn implements IsSerializable {
   }
 
   public TileId getCurrentTileId() {
-    return currentTileId;
+    return currentTileId == null ? null : new TileId(currentTileId);
   }
 
   public void setCurrentTileId(TileId currentTileId) {
     if (currentTileId != null) {
-      this.currentTileId = currentTileId;
+      this.currentTileId = new TileId(currentTileId);
     }
   }
 
   public TileId getNestTileId() {
-    return nestTileId;
+    return nestTileId == null ? null : new TileId(nestTileId);
   }
 
   @Override

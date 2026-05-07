@@ -35,6 +35,9 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
       return ResponseEntity.status(result.getStatusCode()).build();
     }
     MoveResponse move = result.getBody();
+    if (move == null) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
     TestMoveResponse testMoveResponse = new TestMoveResponse();
     if (move.getMovePawn1() != null && !move.getMovePawn1().isEmpty()) {
       testMoveResponse.addTilesItem(move.getMovePawn1().getLast());
@@ -54,7 +57,8 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
 
   private ResponseEntity<MoveResponse> dispatchMove(
       String sessionId, String playerId, MoveRequest moveRequest) {
-    if (!(GameRegistry.getGame(sessionId) instanceof GameSession gameSession)) {
+    GameSession gameSession = GameRegistry.getGame(sessionId);
+    if (gameSession == null) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 

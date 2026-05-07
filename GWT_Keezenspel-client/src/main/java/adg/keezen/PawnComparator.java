@@ -1,9 +1,10 @@
 package adg.keezen;
 
 import adg.keezen.dto.PawnClient;
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class PawnComparator implements Comparator<PawnClient> {
+public class PawnComparator implements Comparator<PawnClient>, Serializable {
 
   // FOR SORTING THE PAWNS BASED ON THEIR Y POSITION SO THAT THEY ARE DRAWN CORRECTLY
   @Override

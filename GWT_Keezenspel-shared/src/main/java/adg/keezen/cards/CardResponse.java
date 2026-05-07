@@ -25,27 +25,27 @@ public class CardResponse implements IsSerializable {
   }
 
   public List<Card> getCards() {
-    return cards;
+    return cards == null ? null : new ArrayList<>(cards);
   }
 
   public void setCards(ArrayList<Card> cards) {
-    this.cards = cards;
+    this.cards = cards == null ? null : new ArrayList<>(cards);
   }
 
   public ArrayList<Card> getPlayedCards() {
-    return playedCards;
+    return playedCards == null ? null : new ArrayList<>(playedCards);
   }
 
   public void setPlayedCards(ArrayList<Card> playedCards) {
-    this.playedCards = playedCards;
+    this.playedCards = playedCards == null ? null : new ArrayList<>(playedCards);
   }
 
   public HashMap<String, Integer> getNrOfCardsPerPlayer() {
-    return nrOfCardsPerPlayer;
+    return nrOfCardsPerPlayer == null ? null : new HashMap<>(nrOfCardsPerPlayer);
   }
 
   public void setNrOfCardsPerPlayer(HashMap<String, Integer> nrOfCardsPerPlayer) {
-    this.nrOfCardsPerPlayer = nrOfCardsPerPlayer;
+    this.nrOfCardsPerPlayer = nrOfCardsPerPlayer == null ? null : new HashMap<>(nrOfCardsPerPlayer);
   }
 
   @Override
