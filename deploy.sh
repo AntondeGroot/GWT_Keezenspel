@@ -3,7 +3,7 @@ set -e
 
 stamp_css_version_for_cloudflare_cache_invalidation() {
   local v=$(date +%s)
-  local html_files=(
+  html_files=(
     GWT_Keezenspel-server/src/main/resources/public/index.html
     GWT_Keezenspel-server/src/main/resources/public/mobile.html
   )
