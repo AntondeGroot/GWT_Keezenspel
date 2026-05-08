@@ -145,6 +145,7 @@ public class GameBoardPresenter {
                       public void onHttpError(int statusCode, String statusText) {
                         GWT.log("make move HTTP error" + statusCode + ":" + statusText);
                         StepsAnimation.resetStepsAnimation();
+                        redirectToLobbyOnServerError(statusCode);
                       }
 
                       @Override
@@ -311,6 +312,7 @@ public class GameBoardPresenter {
                 break;
               default:
                 GWT.log("❌ HTTP Error " + statusCode + ": " + statusText);
+                redirectToLobbyOnServerError(statusCode);
                 break;
             }
           }
@@ -545,6 +547,13 @@ public class GameBoardPresenter {
     total = ((total % 1440) + 1440) % 1440;
     int h = total / 60, m = total % 60;
     return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
+  }
+
+  private void redirectToLobbyOnServerError(int statusCode) {
+    if (statusCode >= 500) {
+      stop();
+      replace(getProtocol() + "//" + getHostName());
+    }
   }
 
   private static native int getTimezoneOffset() /*-{
