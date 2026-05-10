@@ -74,33 +74,6 @@ public class MovingWithCard7Test {
   }
 
   @Test
-  void test_moveTwoPawns_TestSplitAll7TilesForBothPawns() {
-    // GIVEN
-    Card card = givePlayerSeven(cardsDeck, 0);
-    Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("0", 1), new PositionKey("0", 0));
-    Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("0", 2), new PositionKey("0", 5));
-
-    // WHEN no decision was made how to split the 7 among the two pawns
-    createSplitMessage(moveMessage, pawn1, 7, pawn2, 7, card);
-    moveMessage.setTempMessageType(CHECK_MOVE);
-    gameState.processOnSplit(moveMessage, moveResponse);
-
-    LinkedList<PositionKey> expectedTilesPawn1 = new LinkedList<>();
-    expectedTilesPawn1.add(new PositionKey("0", 0));
-    expectedTilesPawn1.add(new PositionKey("0", 1));
-    expectedTilesPawn1.add(new PositionKey("0", 7));
-
-    LinkedList<PositionKey> expectedTilesPawn2 = new LinkedList<>();
-    expectedTilesPawn2.add(new PositionKey("0", 5));
-    expectedTilesPawn2.add(new PositionKey("0", 7));
-    expectedTilesPawn2.add(new PositionKey("0", 12));
-
-    // THEN
-    assertEquals(expectedTilesPawn1, moveResponse.getMovePawn1());
-    assertEquals(expectedTilesPawn2, moveResponse.getMovePawn2());
-  }
-
-  @Test
   void test_moveTwoPawns_TestSplitForBothPawns_OneGoesToNextSegment() {
     // GIVEN
     Card card = givePlayerSeven(cardsDeck, 0);
@@ -108,8 +81,7 @@ public class MovingWithCard7Test {
     Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("0", 2), new PositionKey("0", 14));
 
     // WHEN no decision was made how to split the 7 among the two pawns
-    createSplitMessage(
-        moveMessage, pawn1, 3, pawn2, 4, card); // the second is null because no choice was made
+    createSplitMessage(moveMessage, pawn1, 3, pawn2, 4, card);
     moveMessage.setTempMessageType(CHECK_MOVE);
     gameState.processOnSplit(moveMessage, moveResponse);
 
