@@ -356,6 +356,8 @@ public class PawnAndCardSelection {
   private void handleSeven() {
     if (pawn1 != null && pawn2 != null) {
       setMoveType(SPLIT);
+      nrStepsPawn1 = 0;
+      nrStepsPawn2 = 7;
       // show boxes used to split a 7 over two pawns
       setSplitBoxesVisibility(Visibility.VISIBLE);
     } else {

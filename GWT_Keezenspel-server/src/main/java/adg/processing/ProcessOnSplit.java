@@ -5,7 +5,6 @@ import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
 import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
 import static com.adg.openapi.model.MoveResult.INVALID_SELECTION;
 import static com.adg.openapi.model.MoveResult.PLAYER_DOES_NOT_HAVE_CARD;
-import static com.adg.openapi.model.MoveType.MOVE;
 import static com.adg.openapi.model.MoveType.SPLIT;
 import static com.adg.openapi.model.TempMessageType.CHECK_MOVE;
 import static com.adg.openapi.model.TempMessageType.MAKE_MOVE;
@@ -101,7 +100,7 @@ public class ProcessOnSplit {
   }
 
   private boolean stepsAddUpToSeven() {
-    if ((nrStepsPawn1 + nrStepsPawn2 != 7) && moveMessage.getMoveType() == MOVE) {
+    if (nrStepsPawn1 + nrStepsPawn2 != 7) {
       response.setResult(INVALID_SELECTION);
       return false;
     }
