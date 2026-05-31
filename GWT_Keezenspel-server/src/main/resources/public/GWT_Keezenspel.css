@@ -129,6 +129,7 @@ footer {
   position: relative;
   width: 650px;
   height: 600px;
+  z-index: 1;
 }
 
 .canvasCards2 {
