@@ -25,6 +25,8 @@ body {
   overflow: hidden;
   background: radial-gradient(ellipse at center, #1a3a1a 0%, #0d1f0d 100%) !important;
   font-family: 'Lato', 'Helvetica Neue', sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 h1 {
@@ -630,6 +632,8 @@ footer {
   outline: none;
   transition: border-color 0.15s ease, background 0.15s ease;
   width: 210px;
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 .chatInputField:focus {
