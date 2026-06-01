@@ -100,8 +100,8 @@ public class GameBoardView extends Composite {
   public GameBoardView() {
     initWidget(uiBinder.createAndBindUi(this));
     document = Document.get();
-    stepsPawn1.setValue("7");
-    stepsPawn2.setValue("0");
+    stepsPawn1.setValue("0");
+    stepsPawn2.setValue("7");
     pawnIntegerBoxes.getElement().setId("pawnIntegerBoxes");
 
     sendButton.setText(CONSTANTS.playCard());
@@ -367,6 +367,11 @@ public class GameBoardView extends Composite {
                   String pawn1Color = pawnAndCardSelection.getPawn1() != null ? pawnAndCardSelection.getPawn1().getUri() : null;
                   clearPawnHighlightsExceptPawn1(pawnAndCardSelection.getPawnId1(), pawn1Color);
                 }
+
+                // Keep step boxes in sync with the model: setCard() may have reset the
+                // split steps (e.g. re-selecting a 7 card resets to 0/7 internally).
+                stepsPawn1.setValue(String.valueOf(pawnAndCardSelection.getNrStepsPawn1()));
+                stepsPawn2.setValue(String.valueOf(pawnAndCardSelection.getNrStepsPawn2()));
 
                 MoveRequestJsonBuilder builder =
                     new MoveRequestJsonBuilder()
