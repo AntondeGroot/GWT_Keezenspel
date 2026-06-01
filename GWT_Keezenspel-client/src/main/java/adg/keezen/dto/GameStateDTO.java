@@ -3,6 +3,7 @@ package adg.keezen.dto;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.json.client.JSONObject;
 
 /**
  * DTO representing a GameState object returned by the Keezen Game API. Compatible with GWT overlay
@@ -30,4 +31,13 @@ public class GameStateDTO extends JavaScriptObject {
 
   /** The move response from the last move played, for animating opponent moves. */
   public final native MoveResponseDTO getLastMoveResponse() /*-{ return this.lastMoveResponse; }-*/;
+
+  /** Played cards pile as "suit_value" strings. */
+  public final native JsArrayString getPlayedCards() /*-{ return this.playedCards; }-*/;
+
+  /** Number of cards per player, keyed by player ID. */
+  public final native JavaScriptObject getNrOfCardsPerPlayer() /*-{ return this.nrOfCardsPerPlayer; }-*/;
+
+  /** This player's private hand. */
+  public final native JsArray<CardDTO> getPlayerCards() /*-{ return this.playerCards; }-*/;
 }

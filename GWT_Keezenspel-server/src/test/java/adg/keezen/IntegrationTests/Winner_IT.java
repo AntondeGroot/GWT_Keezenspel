@@ -77,7 +77,6 @@ class Winner_IT extends BaseIntegrationTest {
     ApiUtil.setPawnPosition(sessionId, player1Id, 1, player1Id, 18);
     ApiUtil.setPawnPosition(sessionId, player1Id, 2, player1Id, 17);
     ApiUtil.setPawnPosition(sessionId, player1Id, 3, player0Id, 15);
-    playerForfeits(driver, player0Id);
     playerPlaysCard(driver, sessionId, player1Id, new PawnId(player1Id, 3), 1);
     waitUntilPawnStopsMoving(driver, new PawnId(player1Id, 3));
     assertPlayerHasMedal(driver, player1Id, 3);

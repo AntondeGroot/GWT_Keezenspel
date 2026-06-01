@@ -87,6 +87,16 @@
     <Class name="adg.processing.ProcessOnSwitch"/>
     <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
   </Match>
+  <!-- GameStatePush is a serialisation-only DTO; it holds live domain collections by reference intentionally -->
+  <Match>
+    <Class name="adg.services.GameStatePush"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+  <Match>
+    <Class name="adg.services.GameStatePush"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+
   <!-- card/pawn nulls are validated by PawnAndCardSelectionValidation before use -->
   <Match>
     <Class name="adg.services.MovesApiDelegateImpl"/>

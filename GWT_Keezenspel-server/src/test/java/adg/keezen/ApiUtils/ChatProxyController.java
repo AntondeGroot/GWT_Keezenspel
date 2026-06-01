@@ -1,11 +1,18 @@
 package adg.keezen.ApiUtils;
 
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.Executors;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * Proxies /chat/** requests to the chat server running on port 4100.
@@ -27,6 +35,42 @@ public class ChatProxyController {
 
   private static final String CHAT_SERVER_BASE_URL = "http://localhost:4100";
   private final HttpClient httpClient = HttpClient.newHttpClient();
+
+  @GetMapping(value = "/{sessionId}/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  public SseEmitter streamMessages(
+      @PathVariable("sessionId") String sessionId, HttpServletResponse response) {
+    response.setHeader("X-Accel-Buffering", "no");
+    SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+    Executors.newVirtualThreadPerTaskExecutor().execute(() -> proxyStream(sessionId, emitter));
+    return emitter;
+  }
+
+  private void proxyStream(String sessionId, SseEmitter emitter) {
+    String url = CHAT_SERVER_BASE_URL + "/chat/" + sessionId + "/stream";
+    try {
+      HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+      conn.setRequestProperty("Accept", "text/event-stream");
+      conn.setConnectTimeout(5_000);
+      conn.setReadTimeout(0);
+      conn.connect();
+
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+        StringBuilder data = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+          if (line.startsWith("data: ")) {
+            data.append(line.substring(6));
+          } else if (line.isBlank() && !data.isEmpty()) {
+            emitter.send(SseEmitter.event().data(data.toString(), MediaType.APPLICATION_JSON));
+            data.setLength(0);
+          }
+        }
+      }
+      emitter.complete();
+    } catch (Exception e) {
+      emitter.completeWithError(e);
+    }
+  }
 
   @GetMapping("/{sessionId}")
   public ResponseEntity<String> getChatMessages(@PathVariable("sessionId") String sessionId) {

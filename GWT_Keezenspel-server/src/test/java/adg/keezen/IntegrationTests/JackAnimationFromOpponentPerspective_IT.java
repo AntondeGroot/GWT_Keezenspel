@@ -31,7 +31,7 @@ import org.openqa.selenium.WebDriver;
  *   <li>It is player 0's turn.
  *   <li>The Selenium browser is viewing the game as player 1.
  *   <li>Player 0 plays the jack card via a direct API call (not through the browser UI).
- *   <li>The browser receives the state change via GWT's polling cycle and plays the animation.
+   *   <li>The browser receives the state change via SSE and plays the animation.
  *   <li>After both pawns stop moving, their screen positions must be swapped.
  * </ul>
  */
@@ -90,7 +90,7 @@ public class JackAnimationFromOpponentPerspective_IT extends BaseIntegrationTest
     );
     apiHelper.makeMove(sessionId, player0Id, switchRequest);
 
-    // Allow the GWT client's polling cycle (~1-2 s) to pick up the updated game state
+    // Allow the GWT client's SSE handler to pick up the updated game state
     // and begin the animation before we start waiting for it to stop.
     TestUtils.wait(2000);
 

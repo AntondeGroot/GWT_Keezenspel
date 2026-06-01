@@ -26,12 +26,11 @@ import adg.keezen.dto.TestMoveResponseDTO;
 import adg.keezen.i18n.AppConstants;
 import adg.keezen.services.ApiClient;
 import adg.keezen.services.ApiClient.ApiCallback;
-import adg.keezen.services.PollingService;
+import adg.keezen.services.SseService;
 import adg.keezen.util.ChatCipher;
 import adg.keezen.util.Cookie;
 import adg.keezen.util.MoveRequestJsonBuilder;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -48,41 +47,162 @@ public class GameBoardPresenter {
 
   private static final AppConstants CONSTANTS = GWT.create(AppConstants.class);
 
-  private boolean requestInProgress = false;
   private final GameBoardView view;
-  private final PollingService pollingService;
   private final PawnAndCardSelection pawnAndCardSelection;
   private final PlayerList playerList = new PlayerList();
   private final CardsDeck cardsDeck = new CardsDeck();
   private final ApiClient apiClient = new ApiClient();
+  private final SseService gameStateSse = new SseService();
+  private final SseService chatSse = new SseService();
   private long gameStateVersion = 0;
   private int chatMessageCount = 0;
   private boolean chatOffline = false;
-  private long chatOfflineSince = 0;
   private String myPlayerName = "";
   private String lastCurrentPlayerId = null;
   private int lastMedalCount = 0;
   private static final int BOARD_SIZE = 600; // todo: replace with CSS properties
   private final Queue<MoveResponseDTO> pendingAnimations = new LinkedList<>();
 
-  public GameBoardPresenter(GameBoardView gameBoardView, PollingService pollingService) {
+  public GameBoardPresenter(GameBoardView gameBoardView) {
     this.view = gameBoardView;
-    this.pollingService = pollingService;
     pawnAndCardSelection = new PawnAndCardSelection();
   }
 
   public void start() {
     bindEventHandlers();
-    startPollingServer();
+    connectToServer();
   }
 
-  private void startPollingServer() {
-    pollingService.startPolling(600, this::pollServerForUpdates);
+  private void connectToServer() {
+    // SSE opens immediately so it is ready before the first move is made.
+    connectGameStateSse();
+    connectChatSse();
+    // REST call bootstraps the initial render without waiting for a push.
+    apiClient.getGameState(
+        Cookie.getSessionID(),
+        null,
+        new ApiCallback<GameStateDTO>() {
+          @Override
+          public void onSuccess(GameStateDTO response) {
+            gameStateVersion = (long) response.getVersion();
+            updateGameState(new GameStateClient(response));
+            // Card data arrives via SSE; no REST poll needed.
+          }
+
+          @Override
+          public void onHttpError(int statusCode, String statusText) {
+            GWT.log("Initial game state HTTP error " + statusCode);
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            GWT.log("Initial game state error: " + caught.getMessage());
+          }
+        });
+  }
+
+  private void connectGameStateSse() {
+    String url = com.google.gwt.core.client.GWT.getHostPageBaseURL().replaceAll("/$", "")
+        + "/sse/gamestates/" + Cookie.getSessionID() + "/" + Cookie.getPlayerId();
+    gameStateSse.connect(url, "gamestate", new SseService.Callback() {
+      @Override
+      public void onMessage(String data) {
+        GameStateDTO response = com.google.gwt.core.client.JsonUtils.safeEval(data);
+        GWT.log("SSE game state: " + response.getVersion());
+        gameStateVersion = (long) response.getVersion();
+        updateGameState(new GameStateClient(response));
+        updateCardsFromPush(response);
+      }
+
+      @Override
+      public void onError() {
+        GWT.log("SSE game state connection error");
+      }
+    });
+  }
+
+  private void updateCardsFromPush(GameStateDTO push) {
+    pawnAndCardSelection.setPlayerId(Cookie.getPlayerId());
+
+    // Played cards pile
+    com.google.gwt.core.client.JsArrayString playedCardsJs = push.getPlayedCards();
+    if (playedCardsJs != null) {
+      ArrayList<CardClient> playedCards = new ArrayList<>();
+      for (int i = 0; i < playedCardsJs.length(); i++) {
+        String[] parts = playedCardsJs.get(i).split("_");
+        playedCards.add(new CardClient(Integer.parseInt(parts[0]), Integer.parseInt(parts[1])));
+      }
+      cardsDeck.setPlayedCards(playedCards);
+    }
+
+    // Card counts per player
+    com.google.gwt.core.client.JavaScriptObject nrCardsJs = push.getNrOfCardsPerPlayer();
+    if (nrCardsJs != null) {
+      JSONObject nrCardsJson = new JSONObject(nrCardsJs);
+      HashMap<String, Integer> nrCardsMap = new HashMap<>();
+      for (String key : nrCardsJson.keySet()) {
+        nrCardsMap.put(key, (int) nrCardsJson.get(key).isNumber().doubleValue());
+      }
+      cardsDeck.setNrCardsPerPlayer(nrCardsMap);
+    }
+
+    // Private hand
+    com.google.gwt.core.client.JsArray<CardDTO> handJs = push.getPlayerCards();
+    if (handJs != null) {
+      ArrayList<CardClient> hand = new ArrayList<>();
+      for (int i = 0; i < handJs.length(); i++) {
+        hand.add(new CardClient(handJs.get(i)));
+      }
+      cardsDeck.setCards(hand);
+    }
+
+    view.drawCards(cardsDeck, pawnAndCardSelection);
+    playerList.refresh();
+  }
+
+  private void connectChatSse() {
+    String url = com.google.gwt.core.client.GWT.getHostPageBaseURL().replaceAll("/$", "")
+        + "/chat/" + Cookie.getSessionID() + "/stream";
+    chatSse.connect(url, new SseService.Callback() {
+      @Override
+      public void onMessage(String data) {
+        if (chatOffline) {
+          chatOffline = false;
+          view.setChatVisible(true);
+        }
+        JSONArray messages =
+            com.google.gwt.json.client.JSONParser.parseStrict(data).isArray();
+        if (messages == null) return;
+        if (messages.size() == chatMessageCount) return;
+        chatMessageCount = messages.size();
+        String key = Cookie.getSessionID();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < messages.size(); i++) {
+          JSONObject m = messages.get(i).isObject();
+          if (m == null) continue;
+          String timestamp = convertUTCToLocal(m.get("timestampUTC").isString().stringValue());
+          String sender    = m.get("sender").isString().stringValue();
+          String encrypted = m.get("message").isString().stringValue();
+          sb.append(timestamp).append(" ").append(sender).append(": ")
+            .append(ChatCipher.decrypt(encrypted, key)).append("\n");
+        }
+        view.refreshChat(sb.toString());
+      }
+
+      @Override
+      public void onError() {
+        if (!chatOffline) {
+          chatOffline = true;
+          view.setChatVisible(false);
+        }
+      }
+    });
   }
 
   public void stop() {
     // todo: deregister all binders
-    pollingService.stopPolling();
+    gameStateSse.disconnect();
+    chatSse.disconnect();
   }
 
   private void bindEventHandlers() {
@@ -133,11 +253,17 @@ public class GameBoardPresenter {
                       @Override
                       public void onSuccess(MoveResponseDTO result) {
                         GWT.log("make move successful");
+                        adg.keezen.dto.CardClient playedCard = pawnAndCardSelection.getCard();
                         pawnAndCardSelection.resetSuccesfulMove();
                         StepsAnimation.resetStepsAnimation();
                         String pawn1Color = pawnAndCardSelection.getPawn1() != null ? pawnAndCardSelection.getPawn1().getUri() : null;
                         clearPawnHighlightsExceptPawn1(pawnAndCardSelection.getPawnId1(), pawn1Color);
                         view.setSendButtonAnimating(true);
+                        if (playedCard != null) {
+                          com.google.gwt.dom.client.Element el =
+                              com.google.gwt.dom.client.Document.get().getElementById(playedCard.toString());
+                          if (el != null) el.removeFromParent();
+                        }
                         animatePawnsWithAudio(result);
                       }
 
@@ -276,52 +402,6 @@ public class GameBoardPresenter {
         });
   }
 
-  private void pollServerForUpdates() {
-    pollServerForChat();
-
-    apiClient.getGameState(
-        Cookie.getSessionID(),
-        gameStateVersion,
-        new ApiClient.ApiCallback<GameStateDTO>() {
-          @Override
-          public void onSuccess(GameStateDTO response) {
-            GWT.log("Game State Response: " + response.getVersion());
-            // first save the gameStateVersion if something were to crash it won't ask for a state
-            // it doesn't need
-            gameStateVersion = (long) response.getVersion();
-
-            // convert DTO objects to 'real' objects
-            GameStateClient gameStateClient = new GameStateClient(response);
-
-            updateGameState(gameStateClient);
-            pollServerForCards();
-          }
-
-          @Override
-          public void onHttpError(int statusCode, String statusText) {
-            switch (statusCode) {
-              case 304:
-                GWT.log("ℹ️ Game state not modified — no update needed.");
-                break;
-              case 404:
-                GWT.log("⚠️ Game session not found — stopping polling.");
-                stop();
-                break;
-              case 400:
-                GWT.log("🚫 Bad request: " + statusText);
-                break;
-              default:
-                GWT.log("❌ HTTP Error " + statusCode + ": " + statusText);
-                redirectToLobbyOnServerError(statusCode);
-                break;
-            }
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {}
-        });
-  }
-
   private void animatePawnsWithAudio(MoveResponseDTO moveResponse) {
     if (PawnAnimation.isAnimating()) {
       pendingAnimations.add(moveResponse);
@@ -405,47 +485,6 @@ public class GameBoardPresenter {
     }
   }
 
-  private void pollServerForChat() {
-    if (chatOffline) {
-      long now = System.currentTimeMillis();
-      if (now - chatOfflineSince < 60_000) {
-        return;
-      }
-      chatOfflineSince = now; // reset so the next retry is 1 minute from now
-    }
-    apiClient.getChatMessages(Cookie.getSessionID(), new ApiCallback<JSONArray>() {
-      @Override
-      public void onSuccess(JSONArray messages) {
-        chatOfflineSince = 0;
-        if (chatOffline) {
-          chatOffline = false;
-          view.setChatVisible(true);
-          return;
-        }
-        if (messages.size() == chatMessageCount) return;
-        chatMessageCount = messages.size();
-        String key = Cookie.getSessionID();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < messages.size(); i++) {
-          JSONObject m = messages.get(i).isObject();
-          if (m == null) continue;
-          String timestamp = convertUTCToLocal(m.get("timestampUTC").isString().stringValue());
-          String sender    = m.get("sender").isString().stringValue();
-          String encrypted = m.get("message").isString().stringValue();
-          sb.append(timestamp).append(" ").append(sender).append(": ")
-            .append(ChatCipher.decrypt(encrypted, key)).append("\n");
-        }
-        view.refreshChat(sb.toString());
-      }
-      @Override public void onFailure(Throwable caught) {
-        if (!chatOffline) {
-          chatOffline = true;
-          chatOfflineSince = System.currentTimeMillis();
-          view.setChatVisible(false);
-        }
-      }
-    });
-  }
 
   private void initializeBoardState(GameStateClient result) {
     Board board = new Board();
@@ -456,81 +495,6 @@ public class GameBoardPresenter {
     GWT.log("draw board");
     view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
     view.createPawns(result.getPawns(), pawnAndCardSelection, this::checkMove);
-  }
-
-  private void pollServerForCards() {
-
-    if (requestInProgress) {
-      GWT.log("Skipped poll — still waiting for previous response.");
-      return;
-    }
-    GWT.log("polling server for cards");
-    requestInProgress = true;
-    pawnAndCardSelection.setPlayerId(Cookie.getPlayerId());
-
-    apiClient.getPubliclyAvailableCardInformation(
-        Cookie.getSessionID(),
-        new ApiClient.ApiCallback<JSONObject>() {
-          @Override
-          public void onSuccess(JSONObject publicCardInfo) {
-            // parse playedCards from List<String> where each entry is "suit_value"
-            ArrayList<CardClient> playedCards = new ArrayList<>();
-            JSONArray playedCardsJson =
-                publicCardInfo.get("playedCards").isArray();
-            if (playedCardsJson != null) {
-              for (int i = 0; i < playedCardsJson.size(); i++) {
-                String cardId = playedCardsJson.get(i).isString().stringValue();
-                String[] parts = cardId.split("_");
-                playedCards.add(
-                    new CardClient(Integer.parseInt(parts[0]), Integer.parseInt(parts[1])));
-              }
-            }
-            cardsDeck.setPlayedCards(playedCards);
-
-            // parse nrOfCardsPerPlayer
-            JSONObject nrCardsJson =
-                publicCardInfo.get("nrOfCardsPerPlayer").isObject();
-            HashMap<String, Integer> nrCardsMap = new HashMap<>();
-            if (nrCardsJson != null) {
-              for (String key : nrCardsJson.keySet()) {
-                nrCardsMap.put(
-                    key, (int) nrCardsJson.get(key).isNumber().doubleValue());
-              }
-            }
-            cardsDeck.setNrCardsPerPlayer(nrCardsMap);
-
-            // now fetch the player's own hand
-            apiClient.getPlayerCards(
-                Cookie.getSessionID(),
-                Cookie.getPlayerId(),
-                new ApiClient.ApiCallback<JsArray<CardDTO>>() {
-                  @Override
-                  public void onSuccess(JsArray<CardDTO> cards) {
-                    ArrayList<CardClient> clientCards = new ArrayList<>();
-                    for (int i = 0; i < cards.length(); i++) {
-                      clientCards.add(new CardClient(cards.get(i)));
-                    }
-                    GWT.log("Received " + cards.length() + " cards from API:");
-                    cardsDeck.setCards(clientCards);
-                    view.drawCards(cardsDeck, pawnAndCardSelection);
-                    playerList.refresh();
-                    requestInProgress = false;
-                  }
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    StepsAnimation.resetStepsAnimation();
-                    requestInProgress = false;
-                  }
-                });
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            StepsAnimation.resetStepsAnimation();
-            requestInProgress = false;
-          }
-        });
   }
 
   private boolean currentPlayerIsPlaying(GameStateClient result) {

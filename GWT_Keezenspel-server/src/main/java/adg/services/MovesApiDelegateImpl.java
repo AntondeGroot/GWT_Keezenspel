@@ -17,6 +17,7 @@ import com.adg.openapi.model.TestMoveResponse;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ import org.springframework.stereotype.Service;
 public class MovesApiDelegateImpl implements MovesApiDelegate {
 
   private static final Logger log = LoggerFactory.getLogger(MovesApiDelegateImpl.class);
+
+  @Autowired
+  private SseEmitterService sseEmitterService;
 
   @Override
   public ResponseEntity<TestMoveResponse> checkMove(
@@ -94,6 +98,7 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
       gameSession.setLastMoveResponse(response);
       log.info("Move made: sessionId={} playerId={} card={} type={}",
           sessionId, playerId, moveRequest.getCardId(), validation.getMoveType());
+      sseEmitterService.push(sessionId, gameSession);
     }
 
     return new ResponseEntity<>(response, HttpStatus.OK);
