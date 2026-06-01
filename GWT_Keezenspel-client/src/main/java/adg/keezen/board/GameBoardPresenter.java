@@ -494,7 +494,11 @@ public class GameBoardPresenter {
     board.createBoard(result.getPlayers(), BOARD_SIZE);
     GWT.log("draw board");
     view.drawBoard(Board.getTiles(), result.getPlayers(), Board.getCellDistance());
-    view.createPawns(result.getPawns(), pawnAndCardSelection, this::checkMove);
+    view.createPawns(result.getPawns(), pawnAndCardSelection, () -> {
+      view.stepsPawn1.setValue(String.valueOf(pawnAndCardSelection.getNrStepsPawn1()));
+      view.stepsPawn2.setValue(String.valueOf(pawnAndCardSelection.getNrStepsPawn2()));
+      checkMove();
+    });
   }
 
   private boolean currentPlayerIsPlaying(GameStateClient result) {

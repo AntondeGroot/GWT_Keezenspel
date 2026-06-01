@@ -237,7 +237,6 @@ public class PawnAndCardSelection {
     }
 
     card = p_card;
-    validateHowManyPawnsCanBeSelected(pawn2);
     validateSelectionBasedOnLocation();
     validateMoveType();
   }
