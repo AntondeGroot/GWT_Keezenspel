@@ -138,7 +138,7 @@ public class TestUtils {
 
   /**
    * Clicks the element with the given id, retrying if the DOM is updated between lookup and click
-   * (StaleElementReferenceException). GWT's polling can re-render elements at any time, so a
+   * (StaleElementReferenceException). GWT's SSE handler can re-render elements at any time, so a
    * bare findElement().click() is not reliable under parallel test load.
    */
   public static void clickById(WebDriver driver, String id) {
@@ -330,7 +330,7 @@ public class TestUtils {
   /**
    * Waits up to 5 seconds for the element with the given id to have exactly the expected CSS class
    * string. Use this instead of a bare findElement + getAttribute immediately after a GWT state
-   * change, because GWT's polling cycle may not have re-rendered the element yet.
+   * change, because GWT's SSE handler may not have re-rendered the element yet.
    */
   public static void waitForPlayerClass(WebDriver driver, String playerId, String expectedClass) {
     new WebDriverWait(driver, Duration.ofSeconds(5))

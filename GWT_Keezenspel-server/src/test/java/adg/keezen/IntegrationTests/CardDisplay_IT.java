@@ -59,7 +59,7 @@ class CardDisplay_IT extends BaseIntegrationTest {
         "Cards should be visible in the DOM — pollServerForCards must have completed", cards.isEmpty());
     cards = driver.findElements(By.className("cardDiv"));
     assertFalse(
-        "Cards should remain visible after a short wait — polling must be stable", cards.isEmpty());
+        "Cards should remain visible after a short wait — SSE must be stable", cards.isEmpty());
   }
 
   @Test

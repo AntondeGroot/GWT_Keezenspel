@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class CardsApiDelegateImpl implements CardsApiDelegate {
 
+  @org.springframework.beans.factory.annotation.Autowired
+  private SseEmitterService sseEmitterService;
+
   @Override
   public ResponseEntity<List<Card>> getPlayerCards(String gameId, String playerId) {
     // Input validation
@@ -53,6 +56,7 @@ public class CardsApiDelegateImpl implements CardsApiDelegate {
     if (gameState.hasStarted() && gameState.getPlayerIdTurn().equals(playerId)) {
       gameState.processOnForfeit(playerId);
       session.setLastMoveResponse(null);
+      sseEmitterService.push(sessionId, session);
       return ResponseEntity.status(HttpStatus.OK).body(null);
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
