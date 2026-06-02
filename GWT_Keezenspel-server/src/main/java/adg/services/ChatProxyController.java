@@ -1,9 +1,10 @@
-package adg.keezen.ApiUtils;
+package adg.services;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -23,11 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
- * Proxies /chat/** requests to the chat server running on port 4100.
- *
- * <p>In production, nginx routes /chat/ directly to the GameRoom service. In local/test
- * environments (no nginx), this controller forwards requests so Selenium tests can reach the
- * ChatServerMock via the same origin.
+ * Proxies /chat/** to the chat server running on port 4100 (GameRoom service).
+ * Active in all environments so the keezen app can reach the chat server
+ * without requiring a separate nginx rule for /chat/.
  */
 @RestController
 @RequestMapping("/chat")
@@ -54,7 +53,7 @@ public class ChatProxyController {
       conn.setReadTimeout(0);
       conn.connect();
 
-      try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
         StringBuilder data = new StringBuilder();
         String line;
         while ((line = reader.readLine()) != null) {
