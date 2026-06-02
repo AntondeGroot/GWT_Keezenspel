@@ -29,7 +29,16 @@ public class KeezenGameOptions {
             TypeEnum.BOOLEAN,
             "true")
             .labelKey("gameOption.exactMoveRequired.label")
-            .descriptionKey("gameOption.exactMoveRequired.description")
+            .descriptionKey("gameOption.exactMoveRequired.description"),
+        new GameOption(
+            "mustPlayIfPossible",
+            "Must play if possible",
+            "When enabled, you cannot forfeit your turn if any valid move is available. "
+                + "Pawns already in the finish are exempt — you are never required to move them.",
+            TypeEnum.BOOLEAN,
+            "true")
+            .labelKey("gameOption.mustPlayIfPossible.label")
+            .descriptionKey("gameOption.mustPlayIfPossible.description")
     );
   }
 
@@ -42,7 +51,8 @@ public class KeezenGameOptions {
 
   private static void applyOption(GameState gameState, String key, Object value) {
     switch (key) {
-      case "exactMoveRequired" -> gameState.setExactMoveRequired(toBoolean(value));
+      case "exactMoveRequired"    -> gameState.setExactMoveRequired(toBoolean(value));
+      case "mustPlayIfPossible"   -> gameState.setMustPlayIfPossible(toBoolean(value));
       default -> Log.info("KeezenGameOptions: unknown option key '" + key + "', ignoring");
     }
   }

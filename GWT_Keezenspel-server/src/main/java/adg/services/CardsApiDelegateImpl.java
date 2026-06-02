@@ -4,6 +4,7 @@ import adg.keezen.CardsDeckInterface;
 import adg.keezen.GameRegistry;
 import adg.keezen.GameSession;
 import adg.keezen.GameState;
+import adg.processing.MoveAvailabilityChecker;
 import com.adg.openapi.api.CardsApiDelegate;
 import com.adg.openapi.model.Card;
 import com.adg.openapi.model.CardResponse;
@@ -53,13 +54,24 @@ public class CardsApiDelegateImpl implements CardsApiDelegate {
 
     GameState gameState = session.getGameState();
 
-    if (gameState.hasStarted() && gameState.getPlayerIdTurn().equals(playerId)) {
-      gameState.processOnForfeit(playerId);
-      session.setLastMoveResponse(null);
-      sseEmitterService.push(sessionId, session);
-      return ResponseEntity.status(HttpStatus.OK).body(null);
+    if (!gameState.hasStarted() || !gameState.getPlayerIdTurn().equals(playerId)) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+
+    if (gameState.isMustPlayIfPossible()) {
+      List<Card> hand = session.getCardsDeck().getCardsForPlayer(playerId);
+      List<Card> safeHand = hand != null ? hand : List.of();
+      if (MoveAvailabilityChecker.hasAvailableMove(gameState, playerId, safeHand)
+          && !gameState.mustPlayTimeoutElapsed()) {
+        gameState.recordMustPlayBlocked();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+      }
+    }
+
+    gameState.processOnForfeit(playerId);
+    session.setLastMoveResponse(null);
+    sseEmitterService.push(sessionId, session);
+    return ResponseEntity.status(HttpStatus.OK).body(null);
   }
 
   @Override

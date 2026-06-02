@@ -2,6 +2,7 @@ package adg.services;
 
 import adg.keezen.GameSession;
 import adg.keezen.GameState;
+import adg.processing.MoveAvailabilityChecker;
 import com.adg.openapi.model.Card;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -70,7 +71,16 @@ public class SseEmitterService {
 
     // Private card data for this player only
     List<Card> hand = session.getCardsDeck().getCardsForPlayer(playerId);
-    push.setPlayerCards(hand != null ? hand : List.of());
+    List<Card> safeHand = hand != null ? hand : List.of();
+    push.setPlayerCards(safeHand);
+
+    boolean canForfeit = !gs.isMustPlayIfPossible()
+        || !MoveAvailabilityChecker.hasAvailableMove(gs, playerId, safeHand);
+    push.setCanForfeit(canForfeit);
+
+    if (playerId.equals(gs.getPlayerIdTurn()) && !canForfeit) {
+      gs.recordMustPlayBlocked();
+    }
 
     return push;
   }

@@ -27,6 +27,9 @@ public class GameStatePush {
   // Private card data (specific to the receiving player)
   private List<Card> playerCards;
 
+  // Whether this player is allowed to forfeit their turn right now
+  private boolean canForfeit = true;
+
   public String getCurrentPlayerId() { return currentPlayerId; }
   public void setCurrentPlayerId(String v) { currentPlayerId = v; }
 
@@ -53,4 +56,7 @@ public class GameStatePush {
 
   public List<Card> getPlayerCards() { return playerCards; }
   public void setPlayerCards(List<Card> v) { playerCards = v; }
+
+  public boolean isCanForfeit() { return canForfeit; }
+  public void setCanForfeit(boolean v) { canForfeit = v; }
 }

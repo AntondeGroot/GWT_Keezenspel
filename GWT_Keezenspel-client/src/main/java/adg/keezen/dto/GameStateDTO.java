@@ -40,4 +40,10 @@ public class GameStateDTO extends JavaScriptObject {
 
   /** This player's private hand. */
   public final native JsArray<CardDTO> getPlayerCards() /*-{ return this.playerCards; }-*/;
+
+  /**
+   * Whether this player may forfeit their turn.
+   * Defaults to true when the field is absent (e.g. initial REST response before first SSE push).
+   */
+  public final native boolean isCanForfeit() /*-{ return this.canForfeit !== false; }-*/;
 }

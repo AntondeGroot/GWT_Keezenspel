@@ -35,6 +35,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
@@ -62,6 +63,8 @@ public class GameBoardPresenter {
   private int lastMedalCount = 0;
   private static final int BOARD_SIZE = 600; // todo: replace with CSS properties
   private final Queue<MoveResponseDTO> pendingAnimations = new LinkedList<>();
+  private Timer mustPlayForfeitTimer;
+  private static final int MUST_PLAY_TIMEOUT_MS = 3 * 60 * 1000;
 
   public GameBoardPresenter(GameBoardView gameBoardView) {
     this.view = gameBoardView;
@@ -158,6 +161,26 @@ public class GameBoardPresenter {
 
     view.drawCards(cardsDeck, pawnAndCardSelection);
     playerList.refresh();
+
+    boolean isMyTurn = Cookie.getPlayerId().equals(push.getCurrentPlayerId());
+    if (!push.isCanForfeit() && isMyTurn) {
+      view.getForfeitButton().setEnabled(false);
+      if (mustPlayForfeitTimer == null) {
+        mustPlayForfeitTimer = new Timer() {
+          @Override
+          public void run() {
+            view.getForfeitButton().setEnabled(true);
+            mustPlayForfeitTimer = null;
+          }
+        };
+        mustPlayForfeitTimer.schedule(MUST_PLAY_TIMEOUT_MS);
+      }
+    } else {
+      if (mustPlayForfeitTimer != null) {
+        mustPlayForfeitTimer.cancel();
+        mustPlayForfeitTimer = null;
+      }
+    }
   }
 
   private void connectChatSse() {
