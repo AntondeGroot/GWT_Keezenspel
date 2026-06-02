@@ -37,10 +37,24 @@ h1 {
   position: relative !important;
 }
 
-/* ── 1. Full-width board, columns stacked vertically ───────────────────
-   gameContainer is a GWT HorizontalPanel (<table>).  Turning its <tr>
-   into a flex column and its <td>s into blocks stacks column1 (board +
-   cards) above column2 (player list) without any Java changes. */
+/* ── 1. Layout: canvas full-width; below it a JS-created 2-column grid ─────
+   display:contents on <tr>/<td> is broken in iOS Safari — those table rows
+   still generate boxes and create phantom gaps.  Instead, mobile-ux.js
+   (initMobileGrid) physically moves cardsContainer, cardHintLabel, and
+   playerListContainer into a real <div id="mobile-content-grid"> that it
+   appends inside the same td as the canvas.  CSS then targets that div.
+
+   Result:
+     ┌─────────────────────────────────────────────┐
+     │               canvasWrapper                  │  (full 1100px)
+     │               (+ 100px margin below)         │
+     ├──────────────────────────┬───────────────────┤
+     │   #mobile-left-col       │  playerList        │
+     │   cardsContainer         │  Container         │
+     │   cardHintLabel          │  (right col)       │
+     └──────────────────────────┴───────────────────┘                       */
+
+/* Outer structure: simple blocks, column1 full-width */
 .gameContainer {
   display: block !important;
   width: 1100px !important;
@@ -49,8 +63,7 @@ h1 {
   display: block !important;
 }
 .gameContainer > tbody > tr {
-  display: flex !important;
-  flex-direction: column !important;
+  display: block !important;
 }
 .gameContainer > tbody > tr > td {
   display: block !important;
@@ -58,7 +71,7 @@ h1 {
 
 .columnWrapper {
   margin-top: 30px !important;
-  width: auto !important;   /* expand beyond the desktop 600px to fit the zoomed board */
+  width: auto !important;
 }
 
 .column1 {
@@ -66,13 +79,61 @@ h1 {
   border-right: none !important;
   background: transparent !important;
 }
-
-/* Remove the fixed viewport height and overflow:hidden so the zoomed
-   board and cards are fully visible without clipping. */
 .column1 > tbody > tr > td {
   height: auto !important;
   overflow: visible !important;
   vertical-align: top !important;
+}
+
+/* column2 is emptied by JS (playerListContainer moved into the grid) */
+.column2 {
+  display: none !important;
+}
+
+/* Anonymous VP: make it 1100px so the canvas td can center within it */
+.columnWrapper > tbody > tr > td:first-child > table {
+  width: 1100px !important;
+}
+/* Center the canvas within its td */
+.columnWrapper > tbody > tr > td:first-child > table > tbody > tr:first-child > td {
+  text-align: center !important;
+}
+/* Make canvasWrapper inline-block so text-align:center applies to it */
+.canvasWrapper {
+  display: inline-block !important;
+  margin-bottom: 100px !important;
+}
+
+/* Hide now-empty anonymous VP rows 2 & 3 (cards/hint were moved by JS) */
+.columnWrapper > tbody > tr > td:first-child > table > tbody > tr:nth-child(n+2) {
+  display: none !important;
+}
+
+/* errorLabel: not used on mobile */
+.errorLabel {
+  display: none !important;
+}
+
+/* ── JS-created content grid ─────────────────────────────────────────────── */
+#mobile-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  column-gap: 16px;
+  width: 1100px;
+  padding-left: 24px;
+  text-align: left;   /* reset text-align:center inherited from ancestor td */
+}
+
+/* Player list: right column, scrollable so it never expands the left rows */
+.playerListContainer {
+  overflow-y: auto !important;
+  width: auto !important;
+}
+
+/* The GWT createPlayerGrid() sets an inline margin:50px on the table —
+   override it with something more compact for the narrow mobile column. */
+.playerListContainer table {
+  margin: 8px !important;
 }
 
 /* ── Scale the game board to fill the screen width ─────────────────────
@@ -194,74 +255,151 @@ h1 {
 /* ── 4. Card hint text: larger so it's readable on a small screen ───── */
 .cardHintLabel {
   font-size: 24pt !important;
+  height: 300px !important;
 }
 
-/* ── 5. Player list: fixed to the right side, overlaying the board ──── */
-.column2 {
-  position: fixed !important;
-  right: 0 !important;
-  top: 950px !important;        /* h1(84) + margin(30) + board(900) + cards(~203) + buffer */
-  width: auto !important;
-  min-height: auto !important;
-  z-index: 50 !important;
-  background: transparent !important;
-}
+/* ── 5. Player list: in the CSS Grid (section 1) ────────────────────── */
+/* column2 and playerListContainer grid placement is defined in section 1.  */
 
-.playerListContainer {
-  width: auto !important;
-}
-
-/* ── 7. Chat: wider panel fixed above the footer ──────────────────────
-   Keep all golden trim borders. The desktop rule uses position:fixed
-   bottom:32px — we keep bottom:32px but expand the width to span most
-   of the screen, centred. */
-.chatContainer {
-  position: fixed !important;
-  bottom: 32px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  right: auto !important;
-  width: 1000px !important;
-  z-index: 55 !important;
-}
-
-.chatDisplayField {
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-.chatInputRow {
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-/* Taller text input; explicit large width pushes the send button to the
-   right edge (overrides the desktop width:210px; flex alone is unreliable
-   through GWT's table-based HorizontalPanel). */
-.chatInputField {
-  height: 56px !important;
-  font-size: 13pt !important;
-  padding: 12px 8px !important;
-  width: 870px !important;
-}
-
-/* Match the send button height to the taller input */
+/* ── 7. Chat: GWT widgets permanently hidden on mobile ──────────────────
+   The mobile popup is a standalone div injected by mobile-ux.js, which
+   mirrors the GWT textarea content and routes send via the hidden widgets.
+   Hiding the originals avoids stacking-context and DOM-management fights. */
+.chatContainer,
+.chatDisplayField,
+.chatInputRow,
+.chatInputField,
 .chatSendButton {
-  height: 56px !important;
-  padding: 0 16px !important;
-  font-size: 12pt !important;
+  display: none !important;
 }
 
-/* ── 8. buttonContainer: side-by-side buttons, fixed above the chat ────
-   Chat is ~232px tall (160px textarea + 68px input row + 4px border)
-   with bottom:32px → its top edge is at ~264px from the viewport bottom.
-   Using bottom:310px gives ~46px of clear space above the chat.
+/* ── Standalone mobile chat popup ───────────────────────────────────────
+   Always a direct child of <body>, so z-index is in the root stacking
+   context and reliably beats the backdrop (200) and every other element. */
+#mobile-chat-popup {
+  display: none;        /* shown by JS via style.display = 'flex' */
+  flex-direction: column;
+  position: fixed;
+  bottom: 300px;
+  left: 50px;
+  right: 50px;
+  background: #1a0e00;
+  border: 2px solid #c9a227;
+  border-radius: 10px;
+  padding: 20px;
+  z-index: 201;
+  gap: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+}
+
+#mobile-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 20pt;
+  line-height: 1.5;
+  color: #e0e0e0;
+  min-height: 180px;
+  max-height: 360px;
+}
+
+#mobile-chat-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#mobile-chat-input {
+  flex: 1;
+  height: 68px;
+  font-size: 18pt;
+  padding: 8px 12px;
+  background: #251400;
+  border: 1px solid #c9a227;
+  color: #e0e0e0;
+  border-radius: 6px;
+}
+
+#mobile-chat-send {
+  width: 80px;
+  height: 68px;
+  font-size: 22pt;
+  background: #c9a227;
+  color: #111;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Semi-transparent backdrop — clicking it closes the popup */
+#mobile-chat-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.50);
+  z-index: 200;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Chat icon button (injected into the buttonContainer flex row) ──── */
+#mobile-chat-icon-btn {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#mobile-chat-icon-btn svg {
+  width: 90px;
+  height: 90px;
+  fill: #c9a227;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+  transition: fill 0.15s;
+}
+
+#mobile-chat-icon-btn:active svg {
+  fill: #fff8dc;
+}
+
+/* Unread-message badge */
+#mobile-chat-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #d02020;
+  color: #fff;
+  border-radius: 50%;
+  min-width: 46px;
+  height: 46px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  display: none;                /* shown by JS when count > 0 */
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Chat icon row sits leftmost in the button row (order 0 < forfeit 1 < send 2) */
+#mobile-chat-icon-tr { order: 0 !important; }
+
+/* ── 8. buttonContainer: now sits directly above the system nav bar ────
+   No chat panel below it any more, so bottom drops from 310 → 50 px.
    GWT VerticalPanel renders as a <table>; we flex the <tbody> to lay
-   the Send/Forfeit buttons in a row while keeping pawnIntegerBoxes below.
-   Width is auto (shrink-wraps the buttons) and centred on screen. */
+   the Send/Forfeit buttons in a row while keeping pawnIntegerBoxes below. */
 .buttonContainer {
   position: fixed !important;
-  bottom: 310px !important;
+  bottom: 50px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
   top: auto !important;
