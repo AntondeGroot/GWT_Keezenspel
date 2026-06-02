@@ -41,6 +41,9 @@ public class GameState {
   private final CardsDeckInterface cardsDeck;
   private volatile int animationSpeed;
   private volatile boolean exactMoveRequired = false;
+  private volatile boolean mustPlayIfPossible = false;
+  private volatile long mustPlayBlockedSinceMs = 0;
+  private static final long MUST_PLAY_TIMEOUT_MS = 3 * 60 * 1000L;
   private Boolean hasStarted = false;
   private final AtomicLong version =
       new AtomicLong(0); // to make it compatible with javascript as it doesn't do int64 well!
@@ -321,6 +324,7 @@ public class GameState {
   }
 
   private void setPlayingPlayer(String playerId) {
+    clearMustPlayBlocked();
     for (Player player : players) {
       player.setIsPlaying(player.getId().equals(playerId));
     }
@@ -814,5 +818,33 @@ public class GameState {
 
   public boolean isExactMoveRequired() {
     return exactMoveRequired;
+  }
+
+  public void setMustPlayIfPossible(boolean mustPlayIfPossible) {
+    this.mustPlayIfPossible = mustPlayIfPossible;
+  }
+
+  public boolean isMustPlayIfPossible() {
+    return mustPlayIfPossible;
+  }
+
+  public void recordMustPlayBlocked() {
+    if (mustPlayBlockedSinceMs == 0) {
+      mustPlayBlockedSinceMs = System.currentTimeMillis();
+    }
+  }
+
+  public void clearMustPlayBlocked() {
+    mustPlayBlockedSinceMs = 0;
+  }
+
+  public boolean mustPlayTimeoutElapsed() {
+    return mustPlayBlockedSinceMs > 0
+        && System.currentTimeMillis() - mustPlayBlockedSinceMs > MUST_PLAY_TIMEOUT_MS;
+  }
+
+  /** For testing: backdates the blocked-since timestamp so the timeout appears to have elapsed. */
+  public void setMustPlayBlockedSince(long ms) {
+    mustPlayBlockedSinceMs = ms;
   }
 }

@@ -26,21 +26,19 @@ public class ApiCallsHelper {
   }
 
   public String createNewGame(String roomName, int maxPlayers) {
-    // Create the request body
+    return createNewGameWithOptions(roomName, maxPlayers, Map.of());
+  }
+
+  public String createNewGameWithOptions(String roomName, int maxPlayers, Map<String, Object> options) {
     NewGameRequest request = new NewGameRequest();
     request.setRoomName(roomName);
     request.setMaxPlayers(maxPlayers);
-
-    // Build the HTTP entity with headers
+    options.forEach(request::putGameOptionsItem);
     String url = baseUrl + "/games";
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<NewGameRequest> entity = new HttpEntity<>(request, headers);
-
-    // Perform the POST request
     ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
-
-    // Return the response body as a Map (can be replaced by a custom class)
     return response.getBody().get("sessionId").toString();
   }
 
@@ -123,6 +121,16 @@ public class ApiCallsHelper {
   public void setCardForPlayer(String sessionId, String playerId, int cardValue) {
     restTemplate.postForEntity(
         baseUrl + "/test/set-card/" + sessionId + "/" + playerId + "/" + cardValue, null, Void.class);
+  }
+
+  public void setOnlyCardForPlayer(String sessionId, String playerId, int cardValue) {
+    restTemplate.postForEntity(
+        baseUrl + "/test/set-only-card/" + sessionId + "/" + playerId + "/" + cardValue, null, Void.class);
+  }
+
+  public void simulateMustPlayTimeout(String sessionId) {
+    restTemplate.postForEntity(
+        baseUrl + "/test/simulate-must-play-timeout/" + sessionId, null, Void.class);
   }
 
   public void setPawnPosition(String sessionId, String playerId, int pawnNr, String sectionOwnerId, int tileNr) {

@@ -42,6 +42,24 @@ public class TestResetController {
     gameSession.getCardsDeck().giveCardToPlayerForTesting(playerId, card);
   }
 
+  @PostMapping("/simulate-must-play-timeout/{sessionId}")
+  public void simulateMustPlayTimeout(@PathVariable("sessionId") String sessionId) {
+    GameSession gameSession = GameRegistry.getGame(sessionId);
+    gameSession.getGameState().setMustPlayBlockedSince(
+        System.currentTimeMillis() - 4 * 60 * 1000L);
+  }
+
+  @PostMapping("/set-only-card/{sessionId}/{playerId}/{cardValue}")
+  public void setOnlyCardForPlayer(
+      @PathVariable("sessionId") String sessionId,
+      @PathVariable("playerId") String playerId,
+      @PathVariable("cardValue") int cardValue) {
+    GameSession gameSession = GameRegistry.getGame(sessionId);
+    gameSession.getCardsDeck().forfeitCardsForPlayer(playerId);
+    Card card = new Card().value(cardValue).suit(0).uuid(cardValue);
+    gameSession.getCardsDeck().giveCardToPlayerForTesting(playerId, card);
+  }
+
   @PostMapping("/start-game/{sessionId}")
   public void startGameWithoutShuffle(@PathVariable("sessionId") String sessionId) {
     GameSession gameSession = GameRegistry.getGame(sessionId);

@@ -24,6 +24,17 @@ public class ApiUtil {
     return sessionId;
   }
 
+  public static String createGameWithMustPlay() {
+    String sessionId = apiHelper.createNewGameWithOptions(
+        getRandomRoomName(), 3, Map.of("mustPlayIfPossible", true));
+    for (int i = 0; i < 3; i++) {
+      Player player = new Player("player" + i, "player" + i);
+      apiHelper.addPlayerToGame(sessionId, player);
+    }
+    apiHelper.startGameForTesting(sessionId);
+    return sessionId;
+  }
+
   public static String createTwoPlayerGame() {
     String sessionId = apiHelper.createNewGame(getRandomRoomName(), 2);
     for (int i = 0; i < 2; i++) {
@@ -49,6 +60,14 @@ public class ApiUtil {
 
   public static void setCardForPlayer(String sessionId, String playerId, int cardValue) {
     apiHelper.setCardForPlayer(sessionId, playerId, cardValue);
+  }
+
+  public static void setOnlyCardForPlayer(String sessionId, String playerId, int cardValue) {
+    apiHelper.setOnlyCardForPlayer(sessionId, playerId, cardValue);
+  }
+
+  public static void simulateMustPlayTimeout(String sessionId) {
+    apiHelper.simulateMustPlayTimeout(sessionId);
   }
 
   public static String getPlayerid(String sessionId, int indexOfPlayer) {
