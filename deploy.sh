@@ -1,6 +1,17 @@
 #!/bin/bash
 set -e
 
+if [ -n "$1" ]; then
+  TARGET="$1"
+elif ssh -o ConnectTimeout=3 -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectionAttempts=1 my-pi true 2>/dev/null; then
+  TARGET=my-pi
+else
+  echo "⚠️  my-pi unreachable, falling back to my-pi-ext (Cloudflare Tunnel)..."
+  TARGET=my-pi-ext
+fi
+SSH="ssh -i ~/.ssh/pi_deploy_key $TARGET"
+SCP="scp -i ~/.ssh/pi_deploy_key"
+
 stamp_css_version_for_cloudflare_cache_invalidation() {
   local v=$(date +%s)
   html_files=(
@@ -26,13 +37,13 @@ echo "🔨 Building and running all tests..."
 mvn clean verify
 
 echo "📦 Uploading..."
-scp -i ~/.ssh/pi_deploy_key GWT_Keezenspel-server/target/GWT_Keezenspel-exec.jar my-pi:/home/ubuntu/keezen.jar
+$SCP GWT_Keezenspel-server/target/GWT_Keezenspel-exec.jar $TARGET:/home/ubuntu/keezen.jar
 
 echo "📁 Installing..."
-ssh -i ~/.ssh/pi_deploy_key my-pi "sudo mkdir -p /opt/keezen && sudo mv /home/ubuntu/keezen.jar /opt/keezen/keezen.jar"
+$SSH "sudo mkdir -p /opt/keezen && sudo mv /home/ubuntu/keezen.jar /opt/keezen/keezen.jar"
 
 echo "⚙️  Ensuring systemd service exists..."
-ssh -i ~/.ssh/pi_deploy_key my-pi "
+$SSH "
 if [ ! -f /etc/systemd/system/keezen.service ]; then
   sudo tee /etc/systemd/system/keezen.service > /dev/null << 'EOF'
 [Unit]
@@ -52,7 +63,7 @@ EOF
 fi"
 
 echo "⚙️  Ensuring application override config exists..."
-ssh -i ~/.ssh/pi_deploy_key my-pi "
+$SSH "
 if [ ! -f /opt/keezen/application-override.yaml ]; then
   sudo tee /opt/keezen/application-override.yaml > /dev/null << 'EOF'
 server:
@@ -62,6 +73,6 @@ EOF
 fi"
 
 echo "🔄 Restarting..."
-ssh -i ~/.ssh/pi_deploy_key my-pi "sudo systemctl restart keezen"
+$SSH "sudo systemctl restart keezen"
 
 echo "✅ Done."
