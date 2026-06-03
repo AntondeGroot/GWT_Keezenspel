@@ -66,6 +66,8 @@ public class GameBoardView extends Composite {
 
   @UiField HTMLPanel pawnBoard;
 
+  @UiField HTMLPanel cardBackBoard;
+
   @UiField FlowPanel cardsContainer;
 
   @UiField Label cardHintLabel;
@@ -231,66 +233,65 @@ public class GameBoardView extends Composite {
     }
   }
 
-  public void drawCardsIcons(HashMap<String, Integer> nrCardsPerPlayerUUID, Image spriteImage) {
-    GWT.log("drawCardsIcons");
+  /** Renders face-down card icons as HTML elements on the cardBackBoard overlay. */
+  public void drawCardsIcons(HashMap<String, Integer> nrCardsPerPlayerUUID) {
+    cardBackBoard.getElement().removeAllChildren();
+
     for (Map.Entry<String, Integer> entry : nrCardsPerPlayerUUID.entrySet()) {
       String uuid = entry.getKey();
-      if (uuid.equals(Cookie.getPlayerId())) {
-        // skip drawing card icons for the current player, their hand is already drawn showing the
-        // cards
-        // so you don't need to draw the back side to indicate how many cards they currently have
-        continue;
-      }
+      if (uuid.equals(Cookie.getPlayerId())) continue;
+
       ArrayList<Point> cardpoints = Board.getCardsDeckPointsForPlayer(uuid);
       Point startPoint = cardpoints.get(0);
-      Point endPoint = cardpoints.get(1);
-      double dx = (endPoint.getX() - startPoint.getX()) / 4;
-      double dy = (endPoint.getY() - startPoint.getY()) / 4;
-      GWT.log(
-          "drawCardsIcons \n"
-              + "PlayerUUID "
-              + uuid
-              + "\n"
-              + "Start "
-              + startPoint
-              + "\n"
-              + "End "
-              + endPoint
-              + "\n"
-              + "dx "
-              + dx
-              + "\n"
-              + "dy "
-              + dy);
+      Point endPoint   = cardpoints.get(1);
+      Integer nrCards  = entry.getValue();
+      if (nrCards <= 0) continue;
 
-      Integer nrCards = entry.getValue();
+      /* ── Fan geometry ──────────────────────────────────────────────── */
+      double rawMidX = (startPoint.getX() + endPoint.getX()) / 2;
+      double rawMidY = (startPoint.getY() + endPoint.getY()) / 2;
+      double radX   = rawMidX - 300;
+      double radY   = rawMidY - 300;
+      double radLen = Math.sqrt(radX * radX + radY * radY);
+      if (radLen < 1) continue;
+      double radNx = radX / radLen;
+      double radNy = radY / radLen;
+
+      /* Shift the fan midpoint outward so cards are clear of the tiles. */
+      double extraPush = 40;
+      double midX = rawMidX + radNx * extraPush;
+      double midY = rawMidY + radNy * extraPush;
+
+      /* Pivot further from the board so cards sit clear of the tiles.  */
+      double pivotDist = 120;
+      double pivotX    = midX + radNx * pivotDist;
+      double pivotY    = midY + radNy * pivotDist;
+
+      /* Full spread for max 5 cards (4 gaps).  Scale down as cards are played
+         so the fan shrinks proportionally and no gaps appear.              */
+      double fullSpreadW   = Math.sqrt(
+          Math.pow(endPoint.getX() - startPoint.getX(), 2) +
+          Math.pow(endPoint.getY() - startPoint.getY(), 2));
+      double scaledSpreadW = fullSpreadW * Math.max(0, nrCards - 1) / 4.0;
+      double halfFan   = Math.atan2(scaledSpreadW / 2, pivotDist);
+      double fanRadius = Math.sqrt(pivotDist * pivotDist + (scaledSpreadW / 2) * (scaledSpreadW / 2));
+      double baseDir   = Math.atan2(300 - pivotY, 300 - pivotX);
+
       for (int i = 0; i < nrCards; i++) {
-        // Define the source rectangle (from the sprite sheet): this image belongs to the backside
-        // image
-        double spriteWidth = 1920 / 13.0;
-        double spriteHeight = 1150 / 5.0;
-        double sourceX = spriteWidth * 2;
-        double sourceY = spriteHeight * 4;
+        double t         = (nrCards <= 1) ? 0.0 : (double) i / (nrCards - 1);
+        double cardAngle = baseDir - halfFan + t * 2 * halfFan;
+        double cx        = pivotX + fanRadius * Math.cos(cardAngle);
+        double cy        = pivotY + fanRadius * Math.sin(cardAngle);
+        double rotRad    = cardAngle + Math.PI / 2;
 
-        // Define the destination rectangle (on the canvas)
-        double imageWidth = 20;
-        double destWidth = imageWidth; // Card width on canvas
-        double destHeight = destWidth / spriteWidth * spriteHeight; // Maintain aspect ratio
-        double destX = startPoint.getX() - destWidth / 2 + dx * i; // Offset for each card
-        double destY = startPoint.getY() - destHeight / 2 + dy * i;
-
-        // Draw the card image on the canvas
-        getCanvasCardsContext()
-            .drawImage(
-                ImageElement.as(spriteImage.getElement()),
-                sourceX,
-                sourceY,
-                spriteWidth,
-                spriteHeight,
-                destX,
-                destY,
-                destWidth,
-                destHeight);
+        DivElement card = Document.get().createDivElement();
+        card.setClassName("cardBackIcon");
+        card.setInnerHTML("&#9733;");
+        card.getStyle().setLeft(cx, Style.Unit.PX);
+        card.getStyle().setTop(cy, Style.Unit.PX);
+        card.getStyle().setProperty("transform",
+            "translate(-50%, -50%) rotate(" + rotRad + "rad)");
+        cardBackBoard.getElement().appendChild(card);
       }
     }
   }
@@ -484,7 +485,7 @@ public class GameBoardView extends Composite {
 
             GWT.log("\n\ndrawing cards");
             drawPlayerCardsInHand(cards, pawnAndCardSelection, img);
-            drawCardsIcons(nrCardsPerPlayerUUID, img);
+            drawCardsIcons(nrCardsPerPlayerUUID);
             drawPlayedCards(playedCards, img);
           }
         });
