@@ -146,14 +146,42 @@ footer {
   width: 600px;
   height: var(--wrapper-height);
   display: inline-block;
-  margin-top: max(0px, calc((100vh - var(--header-height) - var(--footer-height) - var(--wrapper-height)) / 2)); /* fallback */
-  margin-top: max(0px, calc((100dvh - var(--header-height) - var(--footer-height) - var(--wrapper-height)) / 2)); /* Safari */
+  margin-top: max(30px, calc((100vh - var(--header-height) - var(--footer-height) - var(--wrapper-height)) / 2)); /* fallback */
+  margin-top: max(30px, calc((100dvh - var(--header-height) - var(--footer-height) - var(--wrapper-height)) / 2)); /* Safari: 30px = min gap from title bar */
 }
 
 .canvasWrapper canvas {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+/* Overlay panel for face-down card icons — same coordinate space as pawnBoard */
+.cardBackBoard {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.cardBackIcon {
+  position: absolute;
+  box-sizing: border-box;
+  width: 30px;
+  height: 47px;
+  background: #8b1a1a;
+  border: 2.5px solid white;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 22px;
+  font-family: serif;
+  font-weight: bold;
+  pointer-events: none;
+  transform-origin: center;
+  line-height: 1;
 }
 
 /* ============================================================

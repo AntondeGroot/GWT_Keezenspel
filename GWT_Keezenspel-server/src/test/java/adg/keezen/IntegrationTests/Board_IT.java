@@ -81,8 +81,8 @@ class Board_IT extends BaseIntegrationTest {
     System.out.println("Wrapper center  : " + wrapperCenter + " (expected: " + availableCenter + ", deviation: " + deviation + "px)");
 
     assertTrue(
-        deviation <= 50,
-        "Playing field center (" + wrapperCenter + "px) should be within 50px of the available"
+        deviation <= 65,
+        "Playing field center (" + wrapperCenter + "px) should be within 65px of the available"
             + " vertical center (" + availableCenter + "px), but deviation was " + deviation + "px");
   }
 }

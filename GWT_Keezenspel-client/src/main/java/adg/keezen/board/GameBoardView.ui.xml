@@ -10,6 +10,7 @@
             <canvas id="canvasCards2" width="700" height="600"/>
             <g:HTMLPanel ui:field="tileBoard" width="700" height="600"/>
             <g:HTMLPanel ui:field="pawnBoard" width="700" height="600"/>
+            <g:HTMLPanel ui:field="cardBackBoard" styleName="cardBackBoard" width="700" height="600"/>
           </g:HTMLPanel>
           <g:FlowPanel ui:field="cardsContainer" styleName="cardsContainer"/>
           <g:Label ui:field="cardHintLabel" styleName="cardHintLabel"/>
