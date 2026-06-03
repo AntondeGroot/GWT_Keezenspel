@@ -27,7 +27,10 @@ stamp_css_version_for_cloudflare_cache_invalidation() {
   trap restore_html EXIT
 
   for f in "${html_files[@]}"; do
-    sed -i.bak "s/\.css\"/.css?v=$v\"/g" "$f"
+    sed -i.bak \
+      -e "s/\.css\"/.css?v=$v\"/g" \
+      -e "s/mobile-ux\.js\"/mobile-ux.js?v=$v\"/g" \
+      "$f"
   done
 }
 
