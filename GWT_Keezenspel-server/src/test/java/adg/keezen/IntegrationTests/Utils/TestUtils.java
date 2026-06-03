@@ -47,6 +47,43 @@ public class TestUtils {
     return driver;
   }
 
+  /**
+   * Opens mobile.html with the given session / player cookies using Chrome
+   * mobile emulation.
+   *
+   * <p>mobile.html has {@code if (window.screen.width >= 768) location.replace('index.html')}.
+   * {@code --window-size} only sets the browser-window size — {@code window.screen.width}
+   * reflects the physical monitor resolution (≥ 1280 on any Mac), so the page
+   * would redirect to the desktop layout before cookies can be added.
+   *
+   * <p>Chrome mobile emulation overrides {@code window.screen.width} to the
+   * emulated device width (390 px), which is below 768, preventing the
+   * redirect.  The {@code <meta name="viewport" content="width=1100">} in
+   * mobile.html then sets {@code window.innerWidth = 1100} — the CSS coordinate
+   * space that testLayout checks bounds against.
+   */
+  public static WebDriver getMobileDriver(String sessionId, String playerId) {
+    ChromeOptions opts = buildOptions();
+
+    // Mobile emulation: screen.width = 390 < 768 → no redirect in mobile.html.
+    java.util.Map<String, Object> metrics = new java.util.HashMap<>();
+    metrics.put("width",       390);
+    metrics.put("height",      844);
+    metrics.put("pixelRatio",  3.0);
+    metrics.put("touch",       true);
+    java.util.Map<String, Object> emulation = new java.util.HashMap<>();
+    emulation.put("deviceMetrics", metrics);
+    opts.setExperimentalOption("mobileEmulation", emulation);
+
+    WebDriver driver = new ChromeDriver(opts);
+    driver.get("http://localhost:4200/mobile.html");
+    driver.manage().addCookie(new Cookie("sessionid", sessionId));
+    driver.manage().addCookie(new Cookie("playerid", playerId));
+    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+    driver.navigate().refresh();   // reload so the page reads the cookies
+    return driver;
+  }
+
   private static ChromeOptions buildOptions() {
     ChromeOptions options = new ChromeOptions();
     options.addArguments("--headless=new");

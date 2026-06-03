@@ -24,6 +24,15 @@ public class ApiUtil {
     return sessionId;
   }
 
+  public static String createNPlayerGame(int n) {
+    String sessionId = apiHelper.createNewGame(getRandomRoomName(), n);
+    for (int i = 0; i < n; i++) {
+      apiHelper.addPlayerToGame(sessionId, new Player("player" + i, "Player " + (i + 1)));
+    }
+    apiHelper.startGameForTesting(sessionId);
+    return sessionId;
+  }
+
   public static String createGameWithMustPlay() {
     String sessionId = apiHelper.createNewGameWithOptions(
         getRandomRoomName(), 3, Map.of("mustPlayIfPossible", true));

@@ -1,13 +1,16 @@
 /**
- * mobile-ux.js — loaded by mobile.html only.
+ * mobile-ux.js — loaded by mobile.html only (index.html also loads it,
+ * but every mobile-specific function guards against missing mobile.css).
  *
- * Adds +/− stepper buttons around the pawn-step text inputs so that
- * the split-card controls are usable with a finger without typing.
- *
- * The pawnIntegerBoxes table is built by GWT after the module loads,
- * so this script polls until the element appears, then enhances it.
- * Visibility is inherited automatically: when GWT hides/shows the
- * table the +/− buttons follow, because they live inside the same table.
+ * Responsibilities:
+ *   1. init()               — add +/− stepper buttons to the split-card inputs
+ *   2. initMobileButtonBar()— extract forfeit/send/pawnSteps from GWT's table
+ *                             into a plain flex div; create the chat circle
+ *   3. initMobileGrid()     — move cardsContainer, cardHintLabel, playerList
+ *                             into a CSS Grid div below the canvas
+ *   4. hoistLeaveGameButton()— move the leave button to <body> so its
+ *                             position:fixed works outside the transformed container
+ *   5. testLayout()         — global utility for layout smoke-tests (console / Selenium)
  */
 (function () {
   'use strict';
@@ -101,7 +104,9 @@
     return true;
   }
 
-  /* ── Chat icon: inject into the buttonContainer flex row ──────────── */
+  /* ── Mobile button bar ───────────────────────────────────────────────
+     Builds a clean <div> structure outside GWT's table so buttons can
+     be laid out with plain CSS flex — no nth-child order juggling.    */
 
   var CHAT_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 115.98 122.88">'
     + '<path d="M17.2,0h59.47c4.73,0,9.03,1.93,12.15,5.05c3.12,3.12,5.05,7.42,5.05,12.15v38.36'
@@ -122,24 +127,73 @@
     + 'V17.2c0-3.13-1.28-5.98-3.35-8.05C82.65,7.08,79.8,5.8,76.66,5.8L76.66,5.8z"/>'
     + '</svg>';
 
-  function initChatIcon() {
-    // Chat icon is mobile-only; mobile.html loads mobile.css, index.html does not.
+  function initMobileButtonBar() {
     if (!document.querySelector('link[href*="mobile.css"]')) return true;
-    var tbody = document.querySelector('.buttonContainer > tbody');
-    if (!tbody || tbody.dataset.chatEnhanced) return false;
-    tbody.dataset.chatEnhanced = 'true';
+    if (document.getElementById('mobile-button-bar')) return true;
 
-    /* ── Inject icon row as the leftmost item in the button flex row ── */
-    var tr = document.createElement('tr');
-    tr.id = 'mobile-chat-icon-tr';
-    var td = document.createElement('td');
-    var btn = document.createElement('button');
-    btn.id   = 'mobile-chat-icon-btn';
-    btn.type = 'button';
-    btn.innerHTML = CHAT_SVG + '<span id="mobile-chat-badge"></span>';
-    td.appendChild(btn);
-    tr.appendChild(td);
-    tbody.insertBefore(tr, tbody.firstChild);
+    /* Wait until init() has injected the pawn stepper buttons */
+    var pawnTable   = document.getElementById('pawnIntegerBoxes');
+    var sendWrapper = document.querySelector('.sendButtonWrapper');
+    var forfeitBtn  = document.querySelector('.forfeitButton');
+    if (!pawnTable || !pawnTable.dataset.mobileEnhanced) return false;
+    if (!sendWrapper || !forfeitBtn) return false;
+
+    /* ── Step row (pawn split controls, shown/hidden by GWT) ────────── */
+    var stepRow = document.createElement('div');
+    stepRow.id = 'mobile-step-row';
+    stepRow.appendChild(pawnTable);   /* move pawnIntegerBoxes here */
+
+    /* Mirror GWT's visibility toggling onto the step row.
+       GWT's setSplitBoxesVisibility() sets inline visibility:hidden/visible.
+       Empty string means GWT hasn't made it visible yet (CSS default is hidden)
+       so we also treat that as hidden to avoid phantom space. */
+    function syncStepRow() {
+      var vis  = pawnTable.style.visibility;
+      var disp = pawnTable.style.display;
+      var hidden = disp === 'none' || vis === 'hidden' || vis === '';
+      stepRow.style.display = hidden ? 'none' : '';
+    }
+    syncStepRow();
+    new MutationObserver(syncStepRow)
+        .observe(pawnTable, { attributes: true, attributeFilter: ['style'] });
+
+    /* ── Action row: [forfeit] [send] — chat icon lives in its own circle */
+    var actionRow = document.createElement('div');
+    actionRow.id = 'mobile-action-row';
+    actionRow.appendChild(forfeitBtn);    /* move forfeit button */
+    actionRow.appendChild(sendWrapper);   /* move send button wrapper */
+
+    /* ── Button bar (left column, cards area) ────────────────────────── */
+    var bar = document.createElement('div');
+    bar.id = 'mobile-button-bar';
+    bar.appendChild(stepRow);
+    bar.appendChild(actionRow);
+    document.body.appendChild(bar);
+
+    /* ── Chat circle (right column, player-list area) ────────────────── */
+    var chatBtn = document.createElement('button');
+    chatBtn.id   = 'mobile-chat-icon-btn';
+    chatBtn.type = 'button';
+    chatBtn.innerHTML = CHAT_SVG + '<span id="mobile-chat-badge"></span>';
+
+    var chatCircle = document.createElement('div');
+    chatCircle.id = 'mobile-chat-circle';
+    chatCircle.appendChild(chatBtn);
+    document.body.appendChild(chatCircle);
+
+    /* Align the circle's centre with the action row's centre (the actual
+       buttons), not the middle of the whole bar container.
+       getBoundingClientRect() forces synchronous layout so measurements
+       are accurate immediately after the elements are in the DOM.       */
+    var vh          = window.innerHeight;
+    var actionRect  = actionRow.getBoundingClientRect();
+    var circleH     = chatCircle.getBoundingClientRect().height;
+    var rowCenterFromBottom = vh - (actionRect.top + actionRect.height / 2);
+    chatCircle.style.bottom = Math.max(0, rowCenterFromBottom - circleH / 2) + 'px';
+
+    /* Hide the now-empty GWT buttonContainer */
+    var orig = document.querySelector('.buttonContainer');
+    if (orig) orig.style.display = 'none';
 
     /* ── Standalone popup — always a direct child of <body> ─────────────
        We do NOT reuse the GWT chatContainer because it lives inside
@@ -199,7 +253,7 @@
       backdrop.style.display = 'none';
     }
 
-    btn.addEventListener('click', openPopup);
+    chatBtn.addEventListener('click', openPopup);
     backdrop.addEventListener('click', closePopup);
 
     /* Send: write into the hidden GWT input and click the hidden send button */
@@ -276,16 +330,130 @@
        below the canvas because table-cell content flows vertically.      */
     anonVPTd.appendChild(grid);
 
+    /* ── Dynamic repositioning ──────────────────────────────────────
+       Do NOT call positionButtonContainer() here — the player list
+       is empty at this point (SSE push hasn't arrived yet), so
+       getBoundingClientRect() would return stale coordinates and the
+       bar would land in the wrong place.
+       Position is now set entirely in CSS (left: 384px) so no JS
+       measurement is needed here at all.                               */
+
     return true;
   }
 
   /* ── Poll until GWT has rendered the pawnIntegerBoxes element ──────── */
   var poll = setInterval(function () {
     var pawnsDone = init();
-    var chatDone  = initChatIcon();
+    var chatDone  = initMobileButtonBar();
     var gridDone  = initMobileGrid();
     hoistLeaveGameButton();
     if (pawnsDone && chatDone && gridDone) clearInterval(poll);
   }, 250);
 
 })();
+
+/**
+ * testLayout(ids)
+ *
+ * Checks two things for every DOM element in the given ID list:
+ *   1. The element is entirely within the visible viewport.
+ *   2. The element does not overlap any other element in the list.
+ *
+ * Logs a colour-coded summary to the browser console and returns an object
+ * with the full results so callers can assert programmatically.
+ *
+ * Usage (browser console):
+ *   testLayout(['canvasCards2', 'mobile-content-grid', 'mobile-chat-icon-btn'])
+ *
+ * @param  {string[]} ids  Array of element IDs to test.
+ * @returns {{ pass: boolean, violations: string[] }}
+ */
+window.testLayout = function testLayout(ids) {
+  var vw = window.innerWidth;
+  var vh = window.innerHeight;
+  var violations = [];
+  var rects = {};
+
+  /* ── 1. Resolve elements and get bounding rects ─────────────────────── */
+  var elements = ids.map(function (id) {
+    /* Resolve by ID or CSS selector:
+       'canvasCards2'       → getElementById('canvasCards2')
+       '#canvasCards2'      → getElementById('canvasCards2')
+       '.buttonContainer'   → querySelector('.buttonContainer')
+       'table.playerList'   → querySelector('table.playerList')   */
+    var el;
+    if (id.charAt(0) === '#') {
+      el = document.getElementById(id.slice(1));
+    } else if (id.charAt(0) === '.' || id.indexOf(' ') !== -1) {
+      el = document.querySelector(id);
+    } else {
+      el = document.getElementById(id) || document.querySelector(id);
+    }
+    if (!el) {
+      violations.push('MISSING  ' + id + ' — element not found in DOM');
+      return null;
+    }
+    rects[id] = el.getBoundingClientRect();
+    return { id: id, el: el, r: rects[id] };
+  }).filter(Boolean);
+
+  /* ── 2. Viewport containment ────────────────────────────────────────── */
+  elements.forEach(function (item) {
+    var r = item.r;
+    var offscreen = [];
+    if (r.left   <  0)  offscreen.push('left edge off-screen by '   + Math.round(-r.left)      + 'px');
+    if (r.top    <  0)  offscreen.push('top edge off-screen by '    + Math.round(-r.top)       + 'px');
+    if (r.right  > vw)  offscreen.push('right edge off-screen by '  + Math.round(r.right - vw) + 'px');
+    if (r.bottom > vh)  offscreen.push('bottom edge off-screen by ' + Math.round(r.bottom - vh)+ 'px');
+    if (offscreen.length) {
+      violations.push('OUT-OF-VIEW  #' + item.id + ' — ' + offscreen.join(', '));
+    }
+  });
+
+  /* ── 3. Overlap detection ───────────────────────────────────────────── */
+  for (var i = 0; i < elements.length; i++) {
+    for (var j = i + 1; j < elements.length; j++) {
+      var a = elements[i].r;
+      var b = elements[j].r;
+      var noOverlap = a.right <= b.left || b.right <= a.left ||
+                      a.bottom <= b.top || b.bottom <= a.top;
+      if (!noOverlap) {
+        var ox = Math.round(Math.min(a.right, b.right) - Math.max(a.left, b.left));
+        var oy = Math.round(Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+        violations.push(
+          'OVERLAP  #' + elements[i].id + ' ↔ #' + elements[j].id +
+          ' — ' + ox + '×' + oy + 'px overlap'
+        );
+      }
+    }
+  }
+
+  /* ── 4. Report ──────────────────────────────────────────────────────── */
+  var pass = violations.length === 0;
+  var label = 'testLayout (' + ids.length + ' elements, viewport ' + vw + '×' + vh + ')';
+
+  if (pass) {
+    console.log('%c✓ PASS  ' + label, 'color:#4caf50;font-weight:bold');
+  } else {
+    console.error('%c✗ FAIL  ' + label + ' — ' + violations.length + ' violation(s)',
+                  'color:#f44336;font-weight:bold');
+    violations.forEach(function (v) { console.warn('  ' + v); });
+  }
+
+  /* Bonus: log a rect summary table for visual inspection */
+  var tableData = elements.map(function (item) {
+    var r = item.r;
+    return {
+      id:     '#' + item.id,
+      top:    Math.round(r.top),
+      left:   Math.round(r.left),
+      width:  Math.round(r.width),
+      height: Math.round(r.height),
+      bottom: Math.round(r.bottom),
+      right:  Math.round(r.right)
+    };
+  });
+  if (tableData.length) console.table(tableData);
+
+  return { pass: pass, violations: violations };
+};

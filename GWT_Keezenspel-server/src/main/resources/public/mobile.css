@@ -119,6 +119,7 @@ h1 {
   display: grid;
   grid-template-columns: 1fr 340px;
   column-gap: 16px;
+  box-sizing: border-box;   /* padding is included in the 1100px width */
   width: 1100px;
   padding-left: 24px;
   text-align: left;   /* reset text-align:center inherited from ancestor td */
@@ -137,11 +138,12 @@ h1 {
 }
 
 /* ── Scale the game board to fill the screen width ─────────────────────
-   zoom:1.5 scales the canvas + all overlay panels (tileBoard, pawnBoard)
-   together, keeping the internal 700×600 coordinate space intact.
-   Fixed-position descendants (buttonContainer) are unaffected by zoom. */
+   zoom:1.45 instead of 1.5: the canvas element is 700 px wide while the
+   canvasWrapper is 650 px, so at zoom:1.5 the canvas right edge lands
+   12 px outside the 1100 px viewport.  At 1.45 the right edge is at
+   550 + 375×1.45 ≈ 1094 px — safely inside.  */
 .canvasWrapper {
-  zoom: 1.5 !important;
+  zoom: 1.45 !important;
 }
 
 /* ── Cards bigger, but not as wide as the full board ───────────────── */
@@ -175,12 +177,6 @@ h1 {
   outline: none !important;
 }
 
-/* Row order: forfeit left (1), Play Card right (2), pawn steps below (3).
-   Flex items are the <tr> elements inside .buttonContainer > tbody.
-   Without an explicit order on the pawn row it defaults to 0 and sorts first. */
-.buttonContainer > tbody > tr:first-child  { order: 2 !important; }
-.buttonContainer > tbody > tr:nth-child(2) { order: 1 !important; }
-.buttonContainer > tbody > tr:nth-child(3) { order: 3 !important; }
 
 /* Red forfeit button for mobile */
 .forfeitButton {
@@ -390,43 +386,77 @@ h1 {
   pointer-events: none;
 }
 
-/* Chat icon row sits leftmost in the button row (order 0 < forfeit 1 < send 2) */
-#mobile-chat-icon-tr { order: 0 !important; }
+/* ── 8. Button bar — JS-built div replaces GWT table manipulation ──────
+   initMobileButtonBar() extracts forfeit/send/pawnSteps from the GWT
+   table and places them in a clean <div id="mobile-button-bar">.
+   The original .buttonContainer is hidden by JS.                       */
+.buttonContainer { display: none !important; }
 
-/* ── 8. buttonContainer: now sits directly above the system nav bar ────
-   No chat panel below it any more, so bottom drops from 310 → 50 px.
-   GWT VerticalPanel renders as a <table>; we flex the <tbody> to lay
-   the Send/Forfeit buttons in a row while keeping pawnIntegerBoxes below. */
-.buttonContainer {
-  position: fixed !important;
-  bottom: 50px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  top: auto !important;
-  width: auto !important;
-  z-index: 60 !important;
+/* #mobile-button-bar is always centred in the player-free left column.
+   Derived from #mobile-content-grid geometry (no JS timing needed):
+     content-width = 1100 - 24px (padding) = 1076px
+     left-column   = 1076 - 340 (right col) - 16 (gap) = 720px
+     left-col-centre = 24 + 720/2 = 384px from viewport left
+   Right edge of bar (width≈584px): 384+292 = 676px < player-list left (760px). */
+#mobile-button-bar {
+  position: fixed;
+  bottom: 50px;
+  left: 384px;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  -webkit-tap-highlight-color: transparent;
+  /* Match the desktop buttonContainer brown panel */
+  border-radius: 16px;
+  border: 2px solid #c9a227;
+  background: linear-gradient(145deg, #3a2000, #251400);
+  padding: 12px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65),
+              inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* Flex the GWT table rows so the two buttons sit side by side */
-.buttonContainer > tbody {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: wrap !important;
-  justify-content: center !important;
-  align-items: center !important;
-  column-gap: 60px !important;   /* horizontal space between Forfeit and Play Card */
-  row-gap: 10px !important;      /* vertical space between buttons row and steps row */
+#mobile-step-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.buttonContainer > tbody > tr {
-  display: block !important;
+#mobile-action-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 60px;
 }
 
-/* pawnIntegerBoxes row spans the full width on its own line, centred */
-.buttonContainer > tbody > tr:last-child {
-  flex: 0 0 100% !important;
-  display: flex !important;
-  justify-content: center !important;
+/* ── Chat circle: centred in the right (player-list) column ─────────────
+   Right-column centre = padding (24) + left-col (720) + gap (16) + 340/2
+                       = 24 + 720 + 16 + 170 = 930px                    */
+#mobile-chat-circle {
+  position: fixed;
+  bottom: 50px;
+  left: 930px;
+  transform: translateX(-50%);
+  z-index: 60;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 2px solid #c9a227;
+  background: linear-gradient(145deg, #3a2000, #251400);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65),
+              inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Make the button fill the circle */
+#mobile-chat-icon-btn {
+  width: 100%;
+  height: 100%;
 }
 /* ── Game Rules modal: 90% of the 1100px layout viewport ───────────────
    90vw resolves to device screen width on mobile (~351px on a 390px phone),
