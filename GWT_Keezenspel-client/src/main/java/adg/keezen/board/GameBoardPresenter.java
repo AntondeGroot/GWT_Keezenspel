@@ -68,6 +68,10 @@ public class GameBoardPresenter {
   /** Previous card counts per player — used to detect when a card was played. */
   private final HashMap<String, Integer> prevNrCards = new HashMap<>();
 
+  /** Card snapshot captured at click time — used to animate on confirmed success only. */
+  private adg.keezen.dto.CardClient snapshotCard = null;
+  private int snapshotPileSize = 0;
+
   public GameBoardPresenter(GameBoardView gameBoardView) {
     this.view = gameBoardView;
     pawnAndCardSelection = new PawnAndCardSelection();
@@ -276,18 +280,17 @@ public class GameBoardPresenter {
                 }
                 AudioPlayer.play(AudioPlayer.BUTTON_CLICK);
 
-                // Snapshot the card and kick off its animation NOW — the element is
-                // guaranteed to be in the DOM at click time. Waiting until onSuccess
-                // risks the SSE arriving first and stripping the element from the DOM.
+                // Snapshot the card position now — the element is in the DOM at click time.
+                // Animation and removal are deferred to onSuccess so they only happen
+                // when the server confirms the move is valid.
                 final adg.keezen.dto.CardClient cardToPlay = pawnAndCardSelection.getCard();
                 if (cardToPlay != null) {
                   com.google.gwt.dom.client.Element cardEl =
                       com.google.gwt.dom.client.Document.get().getElementById(cardToPlay.toString());
                   if (cardEl != null) {
-                    int estimatedPileSize = cardsDeck.getPlayedCards().size() + 1;
-                    view.animateOwnPlayedCard(cardEl, estimatedPileSize,
-                        cardToPlay.getValue(), cardToPlay.getSuit());
-                    cardEl.removeFromParent();
+                    snapshotCard = cardToPlay;
+                    snapshotPileSize = cardsDeck.getPlayedCards().size() + 1;
+                    view.captureCardStartPos(cardEl);
                   }
                 }
 
@@ -310,6 +313,16 @@ public class GameBoardPresenter {
                       @Override
                       public void onSuccess(MoveResponseDTO result) {
                         GWT.log("make move successful");
+                        if (snapshotCard != null) {
+                          view.animateOwnPlayedCardFromSnapshot(snapshotPileSize,
+                              snapshotCard.getValue(), snapshotCard.getSuit());
+                          com.google.gwt.dom.client.Element cardEl =
+                              com.google.gwt.dom.client.Document.get().getElementById(snapshotCard.toString());
+                          if (cardEl != null) {
+                            cardEl.removeFromParent();
+                          }
+                          snapshotCard = null;
+                        }
                         pawnAndCardSelection.resetSuccesfulMove();
                         StepsAnimation.resetStepsAnimation();
                         String pawn1Color = pawnAndCardSelection.getPawn1() != null ? pawnAndCardSelection.getPawn1().getUri() : null;
@@ -321,6 +334,7 @@ public class GameBoardPresenter {
                       @Override
                       public void onHttpError(int statusCode, String statusText) {
                         GWT.log("make move HTTP error" + statusCode + ":" + statusText);
+                        snapshotCard = null;
                         StepsAnimation.resetStepsAnimation();
                         redirectToLobbyOnServerError(statusCode);
                       }
@@ -328,6 +342,7 @@ public class GameBoardPresenter {
                       @Override
                       public void onFailure(Throwable caught) {
                         GWT.log("make move Failure" + caught.getMessage());
+                        snapshotCard = null;
                         StepsAnimation.resetStepsAnimation();
                       }
                     });

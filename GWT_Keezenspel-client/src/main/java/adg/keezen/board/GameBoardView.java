@@ -245,6 +245,10 @@ public class GameBoardView extends Composite {
   /** True while the own-card fly animation is in flight; suppresses the static pile card. */
   private boolean ownCardAnimationInFlight = false;
 
+  /** Snapshot of the card's start position (board coordinates) captured at click time. */
+  private double snapshotStartX = 0;
+  private double snapshotStartY = 0;
+
   public void setPlayersWhoJustPlayed(String commaIds) {
     this.playersWhoJustPlayed = commaIds;
   }
@@ -327,6 +331,93 @@ public class GameBoardView extends Composite {
     }, 200);
 
     // Settle as a permanent pile card (cleaned up on next drawCards call).
+    setTimeout(function() {
+      clone.setAttribute('data-pile', 'true');
+      clone.style.zIndex    = '10';
+      clone.style.transition = 'none';
+    }, 750);
+  }-*/;
+
+  /**
+   * Captures the card's start position in board coordinates and stores it for later use by
+   * {@link #animateOwnPlayedCardFromSnapshot}. Must be called while the card element is in the DOM.
+   */
+  public void captureCardStartPos(com.google.gwt.dom.client.Element cardEl) {
+    if (cardEl == null) return;
+    com.google.gwt.dom.client.Element wrapper = canvasWrapper.getElement();
+    int wrapperWidth = wrapper.getClientWidth();
+    if (wrapperWidth == 0) return;
+    double scale = wrapperWidth / 650.0;
+    double left = cardEl.getAbsoluteLeft() - wrapper.getAbsoluteLeft();
+    double top  = cardEl.getAbsoluteTop()  - wrapper.getAbsoluteTop();
+    snapshotStartX = left / scale + (cardEl.getOffsetWidth()  / scale) / 2;
+    snapshotStartY = top  / scale + (cardEl.getOffsetHeight() / scale) / 2;
+  }
+
+  /**
+   * Animates a card flying to the pile using the position captured by {@link #captureCardStartPos}.
+   * Call this from {@code onSuccess} so animation only plays when the move is accepted.
+   */
+  public void animateOwnPlayedCardFromSnapshot(int pileSize, int cardValue, int cardSuit) {
+    ownCardAnimationInFlight = true;
+    new com.google.gwt.user.client.Timer() {
+      @Override public void run() { ownCardAnimationInFlight = false; }
+    }.schedule(800);
+    doAnimateOwnCardFromPos(snapshotStartX, snapshotStartY, cardBackBoard.getElement(),
+        pileSize, cardValue, cardSuit);
+  }
+
+  private static native void doAnimateOwnCardFromPos(
+      double startX, double startY,
+      com.google.gwt.dom.client.Element board,
+      int pileSize, int cardValue, int cardSuit) /*-{
+    var handW   = 100;
+    var spriteW = 1920 / 13;
+    var spriteH = 1150 / 5;
+    var handH   = handW / spriteW * spriteH;
+    var factor  = handW / spriteW;
+    var srcX    = spriteW * (cardValue - 1);
+    var srcY    = spriteH * cardSuit;
+    var bgPos   = (-srcX * factor) + 'px ' + (-srcY * factor) + 'px';
+    var bgSize  = (1920 * factor) + 'px ' + (1150 * factor) + 'px';
+
+    var angleDeg  = 45 + pileSize * 45;
+    var angleRad  = angleDeg * Math.PI / 180;
+    var destCX    = 315 + 10 * Math.cos(angleRad);
+    var destCY    = 300 + 10 * Math.sin(angleRad);
+    var pileScale = 60 / handW;
+
+    var clone = $doc.createElement('div');
+    clone.style.position           = 'absolute';
+    clone.style.width              = handW + 'px';
+    clone.style.height             = handH + 'px';
+    clone.style.left               = startX + 'px';
+    clone.style.top                = startY + 'px';
+    clone.style.backgroundImage    = "url('card-deck.png')";
+    clone.style.backgroundPosition = bgPos;
+    clone.style.backgroundSize     = bgSize;
+    clone.style.backgroundRepeat   = 'no-repeat';
+    clone.style.borderRadius       = '5px';
+    clone.style.boxShadow          = '2px 4px 12px rgba(0,0,0,0.6)';
+    clone.style.transform          = 'translate(-50%,-50%) scale(1)';
+    clone.style.zIndex             = '200';
+    clone.style.transition         = 'none';
+    board.appendChild(clone);
+
+    requestAnimationFrame(function() {
+      clone.style.transition = 'transform 0.18s ease-out, box-shadow 0.18s';
+      clone.style.transform  = 'translate(-50%,-50%) scale(1.2)';
+      clone.style.boxShadow  = '0 0 18px rgba(255,255,255,0.5)';
+    });
+
+    setTimeout(function() {
+      clone.style.transition = 'all 0.5s cubic-bezier(0.25,0.46,0.45,0.94)';
+      clone.style.left       = destCX + 'px';
+      clone.style.top        = destCY + 'px';
+      clone.style.transform  = 'translate(-50%,-50%) scale(' + pileScale + ')';
+      clone.style.boxShadow  = '1px 2px 5px rgba(0,0,0,0.5)';
+    }, 200);
+
     setTimeout(function() {
       clone.setAttribute('data-pile', 'true');
       clone.style.zIndex    = '10';
