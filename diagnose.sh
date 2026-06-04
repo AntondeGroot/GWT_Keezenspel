@@ -9,6 +9,10 @@ echo "=== last 50 log lines ==="
 $SSH "journalctl -u keezen -n 50 --no-pager" 2>&1 || true
 
 echo ""
+echo "=== errors in journal ==="
+$SSH "journalctl -u keezen --no-pager -r -o cat | grep -E -m 5 -A 3 -B 5 'Z[[:space:]]+(ERROR|WARN)[[:space:]]+[0-9]+' | tac | awk 'NR==1{n=1; printf \"--- error %d ---\n\", n} /^--\$/{n++; printf \"\n--- error %d ---\n\", n; next} /Z[[:space:]]+(ERROR|WARN)/{print \">>> \" \$0; next} {print}'" 2>&1 || true
+
+echo ""
 echo "=== jar file ==="
 $SSH "ls -lh /opt/keezen/keezen.jar" 2>&1 || true
 
