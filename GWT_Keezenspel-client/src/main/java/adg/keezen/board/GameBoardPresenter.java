@@ -520,16 +520,15 @@ public class GameBoardPresenter {
         lastMedalCount = medalCount;
       }
       if (gameState.getLastMoveResponse() != null) {
-        pawnAndCardSelection.resetSuccesfulMove();
-        StepsAnimation.resetStepsAnimation();
-        String pawn1Color = pawnAndCardSelection.getPawn1() != null ? pawnAndCardSelection.getPawn1().getUri() : null;
-        clearPawnHighlightsExceptPawn1(pawnAndCardSelection.getPawnId1(), pawn1Color);
-      }
-      if (gameState.getLastMoveResponse() != null) {
         MoveResponseDTO response = gameState.getLastMoveResponse();
         String myId = Cookie.getPlayerId();
         boolean isOwnMove = response.getPawn1() != null && myId.equals(response.getPawn1().getPlayerId());
-        if (!isOwnMove) {
+        StepsAnimation.resetStepsAnimation();
+        if (isOwnMove) {
+          pawnAndCardSelection.resetSuccesfulMove();
+          String pawn1Color = pawnAndCardSelection.getPawn1() != null ? pawnAndCardSelection.getPawn1().getUri() : null;
+          clearPawnHighlightsExceptPawn1(pawnAndCardSelection.getPawnId1(), pawn1Color);
+        } else {
           animatePawnsWithAudio(response);
         }
         // own moves are already animated via makeMove.onSuccess
