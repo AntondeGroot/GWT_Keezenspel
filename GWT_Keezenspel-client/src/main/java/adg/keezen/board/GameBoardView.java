@@ -24,7 +24,6 @@ import adg.keezen.services.ApiClient.ApiCallback;
 import adg.keezen.util.Cookie;
 import adg.keezen.util.PawnLayout;
 import adg.keezen.util.MoveRequestJsonBuilder;
-import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.*;
 import com.google.gwt.event.dom.client.LoadEvent;
@@ -148,10 +147,6 @@ public class GameBoardView extends Composite {
     return playerListContainer2;
   }
 
-  public Context2d getCanvasCardsContext() {
-    return ((CanvasElement) document.getElementById("canvasCards2")).getContext2d();
-  }
-
   public CanvasElement getCanvasCards() {
     return (CanvasElement) document.getElementById("canvasCards2");
   }
@@ -233,9 +228,307 @@ public class GameBoardView extends Composite {
     }
   }
 
+  /**
+   * Set by GameBoardPresenter before drawCards() when it detects that one or
+   * more opponents just played a card.  Comma-separated player IDs.
+   */
+  private String playersWhoJustPlayed;
+
+  /** Incremented on each drawCards() call; LoadHandlers that don't match are stale and skip. */
+  private int drawGeneration = 0;
+
+  /** Value/suit of the most recently played card (for pile flip animation). */
+  private int pendingPlayedCardValue = 0;
+  private int pendingPlayedCardSuit  = 0;
+  /** Total pile size (including the card being animated) for landing-position math. */
+  private int pendingPlayedPileSize  = 0;
+  /** True while the own-card fly animation is in flight; suppresses the static pile card. */
+  private boolean ownCardAnimationInFlight = false;
+
+  public void setPlayersWhoJustPlayed(String commaIds) {
+    this.playersWhoJustPlayed = commaIds;
+  }
+
+  /**
+   * Animate a face-up card from the current player flying toward the pile.
+   * The clone stays at the pile position as a DOM pile card until the next
+   * drawCards() call cleans it up.
+   */
+  public void animateOwnPlayedCard(com.google.gwt.dom.client.Element cardEl,
+                                   int pileSize, int cardValue, int cardSuit) {
+    if (cardEl == null) return;
+    ownCardAnimationInFlight = true;
+    new com.google.gwt.user.client.Timer() {
+      @Override public void run() { ownCardAnimationInFlight = false; }
+    }.schedule(800);
+    doAnimateOwnCard(cardEl, canvasWrapper.getElement(), cardBackBoard.getElement(),
+        pileSize, cardValue, cardSuit);
+  }
+
+  private static native void doAnimateOwnCard(
+      com.google.gwt.dom.client.Element cardEl,
+      com.google.gwt.dom.client.Element wrapper,
+      com.google.gwt.dom.client.Element board,
+      int pileSize, int cardValue, int cardSuit) /*-{
+    var cr = cardEl.getBoundingClientRect();
+    var wr = wrapper.getBoundingClientRect();
+    if (wr.width === 0) return;
+    var scale  = wr.width / 650;
+    var startX = (cr.left - wr.left) / scale + (cr.width  / scale) / 2;
+    var startY = (cr.top  - wr.top)  / scale + (cr.height / scale) / 2;
+
+    // Card starts at hand size (≈100px wide); pile cards are 60px wide.
+    var handW  = 100;
+    var spriteW = 1920 / 13;
+    var spriteH = 1150 / 5;
+    var handH   = handW / spriteW * spriteH;
+    var factor  = handW / spriteW;
+    var srcX    = spriteW * (cardValue - 1);
+    var srcY    = spriteH * cardSuit;
+    var bgPos   = (-srcX * factor) + 'px ' + (-srcY * factor) + 'px';
+    var bgSize  = (1920 * factor) + 'px ' + (1150 * factor) + 'px';
+
+    // Landing position — same formula as drawPlayedCardsDom.
+    var angleDeg  = 45 + pileSize * 45;
+    var angleRad  = angleDeg * Math.PI / 180;
+    var destCX    = 315 + 10 * Math.cos(angleRad);
+    var destCY    = 300 + 10 * Math.sin(angleRad);
+    var pileScale = 60 / handW;   // 0.6
+
+    var clone = $doc.createElement('div');
+    clone.style.position           = 'absolute';
+    clone.style.width              = handW + 'px';
+    clone.style.height             = handH + 'px';
+    clone.style.left               = startX + 'px';
+    clone.style.top                = startY + 'px';
+    clone.style.backgroundImage    = "url('card-deck.png')";
+    clone.style.backgroundPosition = bgPos;
+    clone.style.backgroundSize     = bgSize;
+    clone.style.backgroundRepeat   = 'no-repeat';
+    clone.style.borderRadius       = '5px';
+    clone.style.boxShadow          = '2px 4px 12px rgba(0,0,0,0.6)';
+    clone.style.transform          = 'translate(-50%,-50%) scale(1)';
+    clone.style.zIndex             = '200';
+    clone.style.transition         = 'none';
+    board.appendChild(clone);
+
+    requestAnimationFrame(function() {
+      clone.style.transition = 'transform 0.18s ease-out, box-shadow 0.18s';
+      clone.style.transform  = 'translate(-50%,-50%) scale(1.2)';
+      clone.style.boxShadow  = '0 0 18px rgba(255,255,255,0.5)';
+    });
+
+    setTimeout(function() {
+      clone.style.transition = 'all 0.5s cubic-bezier(0.25,0.46,0.45,0.94)';
+      clone.style.left       = destCX + 'px';
+      clone.style.top        = destCY + 'px';
+      clone.style.transform  = 'translate(-50%,-50%) scale(' + pileScale + ')';
+      clone.style.boxShadow  = '1px 2px 5px rgba(0,0,0,0.5)';
+    }, 200);
+
+    // Settle as a permanent pile card (cleaned up on next drawCards call).
+    setTimeout(function() {
+      clone.setAttribute('data-pile', 'true');
+      clone.style.zIndex    = '10';
+      clone.style.transition = 'none';
+    }, 750);
+  }-*/;
+
+  /** Returns a JSON snapshot of {playerId -> [{cx,cy,t}]} from current card elements. */
+  private static native String snapshotCardPositions(
+      com.google.gwt.dom.client.Element board) /*-{
+    var map = {};
+    var nodes = board.childNodes;
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      var pid = el.getAttribute && el.getAttribute('data-player-id');
+      if (!pid) continue;
+      if (!map[pid]) map[pid] = [];
+      map[pid].push({ cx: el.style.left, cy: el.style.top, t: el.style.transform });
+    }
+    return JSON.stringify(map);
+  }-*/;
+
+  /**
+   * Removes fan-card elements (data-player-id) and trims pile-card elements
+   * (data-pile) to a maximum of 8, oldest first.
+   */
+  private static native void cleanFanAndPileCards(
+      com.google.gwt.dom.client.Element board) /*-{
+    var toRemove = [];
+    var pileCards = [];
+    var ch = board.childNodes;
+    for (var i = 0; i < ch.length; i++) {
+      var el = ch[i];
+      if (!el.getAttribute) continue;
+      if (el.getAttribute('data-player-id')) {
+        toRemove.push(el);
+      } else if (el.getAttribute('data-pile')) {
+        pileCards.push(el);
+      }
+    }
+    for (var i = 0; i < toRemove.length; i++) board.removeChild(toRemove[i]);
+    if (pileCards.length > 8) {
+      var excess = pileCards.length - 8;
+      for (var i = 0; i < excess; i++) board.removeChild(pileCards[i]);
+    }
+  }-*/;
+
+  /**
+   * FLIP-animates opponent cards after a card was played.
+   * The clone flips from back to face mid-flight, then lands at the pile
+   * position and stays as a DOM pile card until the next drawCards() call.
+   */
+  private static native void applyCardAnimations(
+      com.google.gwt.dom.client.Element board,
+      String oldSnapshotJson,
+      String playedCommaIds,
+      int lastCardValue,
+      int lastCardSuit,
+      int pileSize) /*-{
+    if (!oldSnapshotJson || !playedCommaIds) return;
+    var snap;
+    try { snap = JSON.parse(oldSnapshotJson); } catch (e) { return; }
+
+    // Landing position for the new pile card (same formula as drawPlayedCards).
+    var angleDeg = 45 + pileSize * 45;
+    var angleRad = angleDeg * Math.PI / 180;
+    var destCX   = 315 + 10 * Math.cos(angleRad);
+    var destCY   = 300 + 10 * Math.sin(angleRad);
+
+    // Card-face sprite data for the revealed side.
+    var spriteW  = 1920 / 13;
+    var spriteH  = 1150 / 5;
+    var cloneW   = 60;
+    var cloneH   = cloneW / spriteW * spriteH;
+    var factor   = cloneW / spriteW;
+    var srcX     = spriteW * (lastCardValue - 1);
+    var srcY     = spriteH * lastCardSuit;
+    var faceBgPos  = (-srcX * factor) + 'px ' + (-srcY * factor) + 'px';
+    var faceBgSize = (1920 * factor) + 'px ' + (1150 * factor) + 'px';
+
+    var pids = playedCommaIds.split(',');
+    for (var pi = 0; pi < pids.length; pi++) {
+      var pid = pids[pi];
+      var oldPos = snap[pid];
+      if (!oldPos || oldPos.length === 0) continue;
+
+      var newCards = [];
+      var ch = board.childNodes;
+      for (var ci = 0; ci < ch.length; ci++) {
+        if (ch[ci].getAttribute && ch[ci].getAttribute('data-player-id') === pid) {
+          newCards.push(ch[ci]);
+        }
+      }
+      var oldN = oldPos.length;
+      var newN = newCards.length;
+      if (newN !== oldN - 1) continue;
+      var positionsValid = true;
+      for (var vi = 0; vi < oldN; vi++) {
+        if (!oldPos[vi].cx || !oldPos[vi].cy) { positionsValid = false; break; }
+      }
+      if (!positionsValid) continue;
+
+      var playedI = Math.floor((oldN - 1) / 2);
+      var playedP = oldPos[playedI];
+
+      // Midpoint between fan position and pile (where the flip happens).
+      var midCX = (parseFloat(playedP.cx) + destCX) / 2;
+      var midCY = (parseFloat(playedP.cy) + destCY) / 2;
+
+      // Clone starts as a face-down back card.
+      var clone = $doc.createElement('div');
+      clone.className = 'cardBackIcon animating-clone';
+      clone.innerHTML = '&#9733;';
+      clone.style.position   = 'absolute';
+      clone.style.left       = playedP.cx;
+      clone.style.top        = playedP.cy;
+      clone.style.transform  = playedP.t;
+      clone.style.zIndex     = '200';
+      clone.style.transition = 'none';
+      board.appendChild(clone);
+
+      // FLIP setup: save new positions, teleport fan cards back to old positions.
+      var remOld = [];
+      for (var j = 0; j < oldN; j++) {
+        if (j !== playedI) remOld.push(oldPos[j]);
+      }
+      var newPos = [];
+      for (var k = 0; k < newN; k++) {
+        newPos.push({ cx: newCards[k].style.left, cy: newCards[k].style.top, t: newCards[k].style.transform });
+        newCards[k].style.transition = 'none';
+        newCards[k].style.left      = remOld[k].cx;
+        newCards[k].style.top       = remOld[k].cy;
+        newCards[k].style.transform = remOld[k].t;
+      }
+
+      (function(clone, newCards, newPos, playedP, midCX, midCY, destCX, destCY,
+                faceBgPos, faceBgSize, cloneW, cloneH) {
+        requestAnimationFrame(function() {
+          // Release fan-card FLIP transition.
+          requestAnimationFrame(function() {
+            for (var k = 0; k < newCards.length; k++) {
+              newCards[k].style.transition = 'left 0.35s ease, top 0.35s ease, transform 0.35s ease';
+              newCards[k].style.left       = newPos[k].cx;
+              newCards[k].style.top        = newPos[k].cy;
+              newCards[k].style.transform  = newPos[k].t;
+            }
+          });
+
+          // Briefly enlarge the clone.
+          clone.style.transition = 'transform 0.15s ease-out';
+          clone.style.transform  = playedP.t + ' scale(1.3)';
+
+          // Phase 1: fly to midpoint, collapsing scaleX to 0 (first half of flip).
+          setTimeout(function() {
+            clone.style.transition = 'left 0.25s ease-in, top 0.25s ease-in, transform 0.2s ease-in';
+            clone.style.left      = midCX + 'px';
+            clone.style.top       = midCY + 'px';
+            clone.style.transform = 'translate(-50%,-50%) scaleX(0)';
+          }, 180);
+
+          // Phase 2: swap to card face, expand scaleX, continue to pile.
+          setTimeout(function() {
+            clone.className              = 'animating-clone';
+            clone.innerHTML              = '';
+            clone.style.width            = cloneW + 'px';
+            clone.style.height           = cloneH + 'px';
+            clone.style.background       = 'none';
+            clone.style.border           = 'none';
+            clone.style.backgroundImage  = "url('card-deck.png')";
+            clone.style.backgroundPosition = faceBgPos;
+            clone.style.backgroundSize   = faceBgSize;
+            clone.style.backgroundRepeat = 'no-repeat';
+            clone.style.borderRadius     = '5px';
+            clone.style.boxShadow        = '2px 4px 10px rgba(0,0,0,0.6)';
+            clone.style.transition = 'left 0.32s ease-out, top 0.32s ease-out, transform 0.25s ease-out';
+            clone.style.left      = destCX + 'px';
+            clone.style.top       = destCY + 'px';
+            clone.style.transform = 'translate(-50%,-50%) scale(1)';
+          }, 430);
+
+          // Settle as a permanent pile card.
+          setTimeout(function() {
+            clone.setAttribute('data-pile', 'true');
+            clone.style.zIndex    = '10';
+            clone.style.transition = 'none';
+          }, 820);
+        });
+      })(clone, newCards, newPos, playedP, midCX, midCY, destCX, destCY,
+         faceBgPos, faceBgSize, cloneW, cloneH);
+    }
+  }-*/;
+
   /** Renders face-down card icons as HTML elements on the cardBackBoard overlay. */
   public void drawCardsIcons(HashMap<String, Integer> nrCardsPerPlayerUUID) {
-    cardBackBoard.getElement().removeAllChildren();
+    // Snapshot old positions BEFORE clearing so the FLIP animation knows where
+    // each card started.  Also captures which player IDs are present.
+    String oldSnapshot = snapshotCardPositions(cardBackBoard.getElement());
+    String animatePlayers = this.playersWhoJustPlayed;
+    this.playersWhoJustPlayed = null;
+
+    // Remove fan cards and trim pile cards to max 8; leave flying clones alone.
+    cleanFanAndPileCards(cardBackBoard.getElement());
 
     for (Map.Entry<String, Integer> entry : nrCardsPerPlayerUUID.entrySet()) {
       String uuid = entry.getKey();
@@ -291,8 +584,14 @@ public class GameBoardView extends Composite {
         card.getStyle().setTop(cy, Style.Unit.PX);
         card.getStyle().setProperty("transform",
             "translate(-50%, -50%) rotate(" + rotRad + "rad)");
+        card.setAttribute("data-player-id", uuid);
+        card.setAttribute("data-card-index", String.valueOf(i));
         cardBackBoard.getElement().appendChild(card);
       }
+    }
+    if (animatePlayers != null && !animatePlayers.isEmpty()) {
+      applyCardAnimations(cardBackBoard.getElement(), oldSnapshot, animatePlayers,
+          pendingPlayedCardValue, pendingPlayedCardSuit, pendingPlayedPileSize);
     }
   }
 
@@ -470,6 +769,21 @@ public class GameBoardView extends Composite {
     HashMap<String, Integer> nrCardsPerPlayerUUID = cardsDeck.getNrCardsPerPlayer();
     ArrayList<CardClient> playedCards = (ArrayList<CardClient>) cardsDeck.getPlayedCards();
 
+    // Capture pile state for the flip animation (used inside drawCardsIcons).
+    this.pendingPlayedPileSize = playedCards.size();
+    if (!playedCards.isEmpty()) {
+      CardClient last = playedCards.get(playedCards.size() - 1);
+      this.pendingPlayedCardValue = last.getValue();
+      this.pendingPlayedCardSuit  = last.getSuit();
+    }
+
+    final int myGeneration = ++drawGeneration;
+    // Capture now (before loadHandler fires) whether any card animation is in flight,
+    // so drawPlayedCardsDom can skip the newest pile card while the clone is still flying.
+    final boolean skipLastPileCard =
+        ownCardAnimationInFlight
+        || (this.playersWhoJustPlayed != null && !this.playersWhoJustPlayed.isEmpty());
+
     // Create an image to represent the card deck
     Image img = new Image(GWT.getHostPageBaseURL() + "card-deck.png");
     img.getElement().setId("card-deck-dynamic");
@@ -479,14 +793,13 @@ public class GameBoardView extends Composite {
         new LoadHandler() {
           @Override
           public void onLoad(LoadEvent event) {
-            // Clear the canvas to prepare for drawing new cards
-            getCanvasCardsContext()
-                .clearRect(0, 0, getCanvasCards().getWidth(), getCanvasCards().getHeight());
+            // Drop stale handlers: a newer drawCards() call has already superseded this one.
+            if (myGeneration != drawGeneration) return;
 
             GWT.log("\n\ndrawing cards");
             drawPlayerCardsInHand(cards, pawnAndCardSelection, img);
             drawCardsIcons(nrCardsPerPlayerUUID);
-            drawPlayedCards(playedCards, img);
+            drawPlayedCardsDom(playedCards, skipLastPileCard);
           }
         });
 
@@ -496,53 +809,63 @@ public class GameBoardView extends Composite {
     RootPanel.get().add(img);
   }
 
-  private void drawPlayedCards(ArrayList<CardClient> playedCards, Image spriteImage) {
-    // Expose count for Selenium tests (canvas content is not DOM-inspectable)
+  private static native void removeStaticPileCards(
+      com.google.gwt.dom.client.Element board) /*-{
+    var ch = board.childNodes;
+    var toRemove = [];
+    for (var i = 0; i < ch.length; i++) {
+      if (ch[i].getAttribute && ch[i].getAttribute('data-pile-static')) {
+        toRemove.push(ch[i]);
+      }
+    }
+    for (var i = 0; i < toRemove.length; i++) board.removeChild(toRemove[i]);
+  }-*/;
+
+  private void drawPlayedCardsDom(ArrayList<CardClient> playedCards, boolean skipLast) {
+    // Keep count accessible for Selenium tests.
     getCanvasCards().setAttribute("data-played-count", String.valueOf(playedCards.size()));
 
-    // Loop through the cards to draw them
-    // the cards are drawn rotating with an angle of 45 degrees
-    // meaning that after 8 cards you will draw a card over a previous drawn card
-    // In order to not do any unnecessary drawing, we will skip the first N cards
-    // if more than 8 cards were drawn.
+    removeStaticPileCards(cardBackBoard.getElement());
+
+    double spriteWidth  = 1920 / 13.0;
+    double spriteHeight = 1150 / 5.0;
+    double destWidth    = 60.0;
+    double destHeight   = destWidth / spriteWidth * spriteHeight;
+    double factor       = destWidth / spriteWidth;
+
     int angleDegrees = 45;
-    int startDrawingFromCardIndex = 0;
-    if (playedCards.size() > 8) {
-      startDrawingFromCardIndex = playedCards.size() - 8;
-    }
+    // When an animation is in flight the newest card is shown by the animated clone —
+    // draw only the older cards so the static element doesn't pop in mid-animation.
+    int drawUpTo = skipLast ? playedCards.size() - 1 : playedCards.size();
+    int startFrom = drawUpTo > 8 ? drawUpTo - 8 : 0;
 
-    for (int i = 0; i < playedCards.size(); i++) {
-      angleDegrees = angleDegrees + 45;
-
-      if (i >= startDrawingFromCardIndex) {
+    for (int i = 0; i < drawUpTo; i++) {
+      angleDegrees += 45;
+      if (i >= startFrom) {
         CardClient card = playedCards.get(i);
-        double angleRadians = Math.toRadians(angleDegrees);
+        double angleRad = Math.toRadians(angleDegrees);
+        double destX    = 300 - destWidth / 4  + 10 * Math.cos(angleRad);
+        double destY    = 300 - destHeight / 2 + 10 * Math.sin(angleRad);
+        double srcX     = spriteWidth  * (card.getValue() - 1);
+        double srcY     = spriteHeight * card.getSuit();
 
-        // Define the source rectangle (from the sprite sheet)
-        double spriteWidth = 1920 / 13.0;
-        double spriteHeight = 1150 / 5.0;
-        double sourceX = spriteWidth * (card.getValue() - 1);
-        double sourceY = spriteHeight * card.getSuit();
-
-        // Define the destination rectangle (on the canvas)
-        double destWidth = 60.0; // Card width on canvas
-        double destHeight = destWidth / spriteWidth * spriteHeight; // Maintain aspect ratio
-        double destX =
-            300 - destWidth / 4 + 10 * Math.cos(angleRadians); // rotate for each card 45 degrees
-        double destY = 300 - destHeight / 2 + 10 * Math.sin(angleRadians);
-
-        // Draw the card image on the canvas
-        getCanvasCardsContext()
-            .drawImage(
-                ImageElement.as(spriteImage.getElement()),
-                sourceX,
-                sourceY,
-                spriteWidth,
-                spriteHeight,
-                destX,
-                destY,
-                destWidth,
-                destHeight);
+        DivElement el = Document.get().createDivElement();
+        el.setAttribute("data-pile-static", "true");
+        el.getStyle().setProperty("position",           "absolute");
+        el.getStyle().setProperty("width",              destWidth + "px");
+        el.getStyle().setProperty("height",             destHeight + "px");
+        el.getStyle().setLeft(destX, Style.Unit.PX);
+        el.getStyle().setTop(destY,  Style.Unit.PX);
+        el.getStyle().setProperty("backgroundImage",    "url('card-deck.png')");
+        el.getStyle().setProperty("backgroundPosition",
+            (-srcX * factor) + "px " + (-srcY * factor) + "px");
+        el.getStyle().setProperty("backgroundSize",
+            (1920 * factor) + "px " + (1150 * factor) + "px");
+        el.getStyle().setProperty("backgroundRepeat",   "no-repeat");
+        el.getStyle().setProperty("borderRadius",       "4px");
+        el.getStyle().setProperty("boxShadow",          "1px 2px 5px rgba(0,0,0,0.5)");
+        el.getStyle().setProperty("zIndex",             "2");
+        cardBackBoard.getElement().appendChild(el);
       }
     }
   }
@@ -594,8 +917,4 @@ public class GameBoardView extends Composite {
     }
   }
 
-  public void clearCanvasCards() {
-    getCanvasCardsContext()
-        .clearRect(0, 0, getCanvasCards().getWidth(), getCanvasCards().getHeight());
-  }
 }

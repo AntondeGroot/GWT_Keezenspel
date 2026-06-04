@@ -45,7 +45,7 @@ $SCP GWT_Keezenspel-server/target/GWT_Keezenspel-exec.jar $TARGET:/home/ubuntu/k
 echo "📁 Installing..."
 $SSH "sudo mkdir -p /opt/keezen && sudo mv /home/ubuntu/keezen.jar /opt/keezen/keezen.jar"
 
-echo "⚙️  Ensuring systemd service exists..."
+echo "⚙️ Ensuring systemd service exists..."
 $SSH "
 if [ ! -f /etc/systemd/system/keezen.service ]; then
   sudo tee /etc/systemd/system/keezen.service > /dev/null << 'EOF'
@@ -65,7 +65,7 @@ EOF
   sudo systemctl enable keezen
 fi"
 
-echo "⚙️  Ensuring application override config exists..."
+echo "⚙️ Ensuring application override config exists..."
 $SSH "
 if [ ! -f /opt/keezen/application-override.yaml ]; then
   sudo tee /opt/keezen/application-override.yaml > /dev/null << 'EOF'
