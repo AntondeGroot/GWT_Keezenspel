@@ -65,6 +65,8 @@ public class GameBoardPresenter {
   private final Queue<MoveResponseDTO> pendingAnimations = new LinkedList<>();
   private Timer mustPlayForfeitTimer;
   private static final int MUST_PLAY_TIMEOUT_MS = 3 * 60 * 1000;
+  /** Previous card counts per player — used to detect when a card was played. */
+  private final HashMap<String, Integer> prevNrCards = new HashMap<>();
 
   public GameBoardPresenter(GameBoardView gameBoardView) {
     this.view = gameBoardView;
@@ -146,6 +148,23 @@ public class GameBoardPresenter {
       for (String key : nrCardsJson.keySet()) {
         nrCardsMap.put(key, (int) nrCardsJson.get(key).isNumber().doubleValue());
       }
+
+      // Detect which players just played a card and tell the view so it
+      // can animate the face-down card flying to the pile before redrawing.
+      StringBuilder playedIds = new StringBuilder();
+      for (HashMap.Entry<String, Integer> e : nrCardsMap.entrySet()) {
+        String pid = e.getKey();
+        int oldN = prevNrCards.containsKey(pid) ? prevNrCards.get(pid) : e.getValue();
+        if (e.getValue() < oldN && !pid.equals(Cookie.getPlayerId())) {
+          if (playedIds.length() > 0) playedIds.append(',');
+          playedIds.append(pid);
+        }
+      }
+      if (playedIds.length() > 0) {
+        view.setPlayersWhoJustPlayed(playedIds.toString());
+      }
+      prevNrCards.clear();
+      prevNrCards.putAll(nrCardsMap);
       cardsDeck.setNrCardsPerPlayer(nrCardsMap);
     }
 
@@ -256,6 +275,22 @@ public class GameBoardPresenter {
                   return;
                 }
                 AudioPlayer.play(AudioPlayer.BUTTON_CLICK);
+
+                // Snapshot the card and kick off its animation NOW — the element is
+                // guaranteed to be in the DOM at click time. Waiting until onSuccess
+                // risks the SSE arriving first and stripping the element from the DOM.
+                final adg.keezen.dto.CardClient cardToPlay = pawnAndCardSelection.getCard();
+                if (cardToPlay != null) {
+                  com.google.gwt.dom.client.Element cardEl =
+                      com.google.gwt.dom.client.Document.get().getElementById(cardToPlay.toString());
+                  if (cardEl != null) {
+                    int estimatedPileSize = cardsDeck.getPlayedCards().size() + 1;
+                    view.animateOwnPlayedCard(cardEl, estimatedPileSize,
+                        cardToPlay.getValue(), cardToPlay.getSuit());
+                    cardEl.removeFromParent();
+                  }
+                }
+
                 GWT.log("pawn 1: " + pawnAndCardSelection.getPawn1());
                 MoveRequestJsonBuilder builder =
                     new MoveRequestJsonBuilder()
@@ -267,7 +302,6 @@ public class GameBoardPresenter {
                         .withStepsPawn2(pawnAndCardSelection.getNrStepsPawn2())
                         .withTempMessageType("MAKE_MOVE");
 
-                GWT.log("pawn 1: " + pawnAndCardSelection.getPawn1());
                 apiClient.makeMove(
                     Cookie.getSessionID(),
                     Cookie.getPlayerId(),
@@ -276,17 +310,11 @@ public class GameBoardPresenter {
                       @Override
                       public void onSuccess(MoveResponseDTO result) {
                         GWT.log("make move successful");
-                        adg.keezen.dto.CardClient playedCard = pawnAndCardSelection.getCard();
                         pawnAndCardSelection.resetSuccesfulMove();
                         StepsAnimation.resetStepsAnimation();
                         String pawn1Color = pawnAndCardSelection.getPawn1() != null ? pawnAndCardSelection.getPawn1().getUri() : null;
                         clearPawnHighlightsExceptPawn1(pawnAndCardSelection.getPawnId1(), pawn1Color);
                         view.setSendButtonAnimating(true);
-                        if (playedCard != null) {
-                          com.google.gwt.dom.client.Element el =
-                              com.google.gwt.dom.client.Document.get().getElementById(playedCard.toString());
-                          if (el != null) el.removeFromParent();
-                        }
                         animatePawnsWithAudio(result);
                       }
 
