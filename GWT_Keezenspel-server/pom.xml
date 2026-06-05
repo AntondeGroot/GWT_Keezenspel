@@ -303,6 +303,9 @@
           </outputFormats>
           <timestampedReports>false</timestampedReports>
           <mutationThreshold>60</mutationThreshold>
+          <avoidCallsTo>
+            <avoidCallsTo>adg.Log</avoidCallsTo>
+          </avoidCallsTo>
           <jvmArgs>
             <jvmArg>--add-opens=java.base/java.lang=ALL-UNNAMED</jvmArg>
             <jvmArg>--add-opens=java.base/java.util=ALL-UNNAMED</jvmArg>
