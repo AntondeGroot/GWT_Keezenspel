@@ -49,6 +49,9 @@ public class PawnAndCardSelectionValidation {
           isJack(card)) {
         return new SelectionValidation(VALID, MoveType.SWITCH);
       }
+
+      // two pawns selected but no valid split or switch
+      return new SelectionValidation(INVALID);
     }
 
     if (pawn1 == null) {
