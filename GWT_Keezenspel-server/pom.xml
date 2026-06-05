@@ -109,6 +109,21 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-launcher</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -256,6 +271,44 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- Mutation testing -->
+      <plugin>
+        <groupId>org.pitest</groupId>
+        <artifactId>pitest-maven</artifactId>
+        <version>1.17.3</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-junit5-plugin</artifactId>
+            <version>1.2.1</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <targetClasses>
+            <param>adg.keezen.*</param>
+            <param>adg.processing.*</param>
+            <param>adg.util.*</param>
+          </targetClasses>
+          <targetTests>
+            <param>adg.keezen.UnitTests.*</param>
+            <param>adg.keezen.logic.*</param>
+          </targetTests>
+          <mutators>
+            <mutator>DEFAULTS</mutator>
+          </mutators>
+          <outputFormats>
+            <outputFormat>HTML</outputFormat>
+          </outputFormats>
+          <timestampedReports>false</timestampedReports>
+          <mutationThreshold>60</mutationThreshold>
+          <jvmArgs>
+            <jvmArg>--add-opens=java.base/java.lang=ALL-UNNAMED</jvmArg>
+            <jvmArg>--add-opens=java.base/java.util=ALL-UNNAMED</jvmArg>
+            <jvmArg>--add-opens=java.base/java.io=ALL-UNNAMED</jvmArg>
+          </jvmArgs>
+        </configuration>
       </plugin>
 
       <!-- Add generated sources to the compile path -->

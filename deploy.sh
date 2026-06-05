@@ -39,6 +39,9 @@ stamp_css_version_for_cloudflare_cache_invalidation
 echo "🔨 Building and running all tests..."
 mvn clean verify
 
+echo "🧬 Running mutation tests..."
+mvn -pl GWT_Keezenspel-server pitest:mutationCoverage
+
 echo "📦 Uploading..."
 $SCP GWT_Keezenspel-server/target/GWT_Keezenspel-exec.jar $TARGET:/home/ubuntu/keezen.jar
 
