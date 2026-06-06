@@ -10,6 +10,7 @@ public class Cookie {
   private static final String PLAYERID  = "playerid";
   private static final String SESSIONID = "sessionid";
   private static final String LANGUAGE  = "language";
+  private static final String ROOMID    = "roomid";
 
   private static final long MILLIS_400_DAYS = 400L * 24L * 60L * 60L * 1000L;
 
@@ -21,6 +22,10 @@ public class Cookie {
   public static String getSessionID() {
     createSessionIdCookie();
     return Cookies.getCookie(SESSIONID);
+  }
+
+  public static String getRoomId() {
+    return Window.Location.getParameter(ROOMID);
   }
 
   public static void createPlayerIdCookie() {
@@ -87,6 +92,7 @@ public class Cookie {
         Window.Location.getPath(), locale,
         Window.Location.getParameter(SESSIONID), Cookies.getCookie(SESSIONID),
         Window.Location.getParameter(PLAYERID),  Cookies.getCookie(PLAYERID),
+        Window.Location.getParameter(ROOMID),
         Window.Location.getHash());
     Window.Location.replace(url);
   }
@@ -110,12 +116,14 @@ public class Cookie {
   static String buildRedirectUrl(String path, String locale,
                                   String urlSession, String cookieSession,
                                   String urlPlayer,  String cookiePlayer,
+                                  String urlRoom,
                                   String hash) {
     StringBuilder query = new StringBuilder("?locale=").append(locale);
     String session = pickValue(urlSession, cookieSession);
     if (session != null && !session.isEmpty()) query.append("&sessionid=").append(session);
     String player = pickValue(urlPlayer, cookiePlayer);
     if (player != null && !player.isEmpty()) query.append("&playerid=").append(player);
+    if (urlRoom != null && !urlRoom.isEmpty()) query.append("&roomid=").append(urlRoom);
     return path + query + hash;
   }
 
