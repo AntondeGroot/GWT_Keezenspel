@@ -83,7 +83,7 @@ class CookieTest {
                 "/mobile.html", "nl",
                 "new-session", "old-session",
                 "new-player",  "old-player",
-                "");
+                null, "");
         assertEquals("/mobile.html?locale=nl&sessionid=new-session&playerid=new-player", url);
     }
 
@@ -93,7 +93,7 @@ class CookieTest {
                 "/mobile.html", "nl",
                 null, "cookie-session",
                 null, "cookie-player",
-                "");
+                null, "");
         assertEquals("/mobile.html?locale=nl&sessionid=cookie-session&playerid=cookie-player", url);
     }
 
@@ -103,7 +103,7 @@ class CookieTest {
                 "/mobile.html", "en",
                 null, null,
                 null, null,
-                "");
+                null, "");
         assertEquals("/mobile.html?locale=en", url);
     }
 
@@ -113,7 +113,7 @@ class CookieTest {
                 "/keezen/mobile.html", "nl",
                 "sess", null,
                 "player", null,
-                "#room=123");
+                null, "#room=123");
         assertEquals("/keezen/mobile.html?locale=nl&sessionid=sess&playerid=player#room=123", url);
     }
 
@@ -123,7 +123,7 @@ class CookieTest {
                 "/mobile.html", "nl",
                 "url-session", "old-cookie-session",
                 "",            "cookie-player",
-                "");
+                null, "");
         assertEquals("/mobile.html?locale=nl&sessionid=url-session&playerid=cookie-player", url);
     }
 
@@ -135,7 +135,27 @@ class CookieTest {
                 "/mobile.html", "nl",
                 "game-B-session", "game-A-session",
                 "player-uuid",   "player-uuid",
-                "");
+                null, "");
         assertEquals("/mobile.html?locale=nl&sessionid=game-B-session&playerid=player-uuid", url);
+    }
+
+    @Test
+    void buildRedirectUrl_preservesRoomId_whenPresent() {
+        String url = Cookie.buildRedirectUrl(
+                "/keezen/mobile.html", "nl",
+                "sess", null,
+                "player", null,
+                "room-abc", "");
+        assertEquals("/keezen/mobile.html?locale=nl&sessionid=sess&playerid=player&roomid=room-abc", url);
+    }
+
+    @Test
+    void buildRedirectUrl_omitsRoomId_whenNull() {
+        String url = Cookie.buildRedirectUrl(
+                "/mobile.html", "nl",
+                "sess", null,
+                "player", null,
+                null, "");
+        assertEquals("/mobile.html?locale=nl&sessionid=sess&playerid=player", url);
     }
 }

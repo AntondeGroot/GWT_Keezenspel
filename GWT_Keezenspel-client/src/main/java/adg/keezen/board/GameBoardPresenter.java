@@ -386,12 +386,11 @@ public class GameBoardPresenter {
                       new ApiCallback<Void>() {
                         @Override
                         public void onSuccess(Void result) {
-                          String lobbyUrl = getProtocol() + "//" + getHostName();
-                          replace(lobbyUrl);
+                          replace(buildGameRoomUrl());
                         }
 
                         @Override
-                        public void onFailure(Throwable caught) {}
+                        public void onFailure(Throwable caught) { replace(buildGameRoomUrl()); }
                       });
                 }
               }
@@ -585,8 +584,17 @@ public class GameBoardPresenter {
   private void redirectToLobbyOnServerError(int statusCode) {
     if (statusCode >= 500) {
       stop();
-      replace(getProtocol() + "//" + getHostName());
+      replace(buildGameRoomUrl());
     }
+  }
+
+  private static String buildGameRoomUrl() {
+    String base = getProtocol() + "//" + getHostName();
+    String roomId = Cookie.getRoomId();
+    if (roomId != null && !roomId.isEmpty()) {
+      return base + "/?locale=" + Cookie.getLanguage().name() + "#room=" + roomId;
+    }
+    return base;
   }
 
   private static native int getTimezoneOffset() /*-{
