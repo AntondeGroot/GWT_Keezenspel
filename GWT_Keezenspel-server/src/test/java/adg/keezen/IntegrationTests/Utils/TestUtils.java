@@ -385,4 +385,10 @@ public class TestUtils {
     new WebDriverWait(driver, Duration.ofSeconds(5))
         .until(d -> d.findElements(By.className("cardDiv")).stream().anyMatch(WebElement::isDisplayed));
   }
+
+  /** Waits up to 5 seconds for the given pawn's highlight to be cleared (opacity != "1"). */
+  public static void waitUntilPawnIsDeselected(WebDriver driver, PawnId pawnId) {
+    new WebDriverWait(driver, Duration.ofSeconds(5))
+        .until(d -> !pawnIsSelected(d, pawnId));
+  }
 }
