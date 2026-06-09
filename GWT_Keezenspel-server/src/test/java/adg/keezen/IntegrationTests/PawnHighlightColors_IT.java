@@ -8,6 +8,7 @@ import static adg.keezen.IntegrationTests.Utils.TestUtils.hexToRgbCss;
 import static adg.keezen.IntegrationTests.Utils.TestUtils.pawnIsSelected;
 import static adg.keezen.IntegrationTests.Utils.TestUtils.setPlayerIdPlaying;
 import static adg.keezen.IntegrationTests.Utils.TestUtils.waitUntilCardsAreLoaded;
+import static adg.keezen.IntegrationTests.Utils.TestUtils.waitUntilPawnIsDeselected;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -173,6 +174,7 @@ public class PawnHighlightColors_IT extends BaseIntegrationTest {
     driver.findElements(By.className("cardDiv")).get(1).click();
 
     // THEN: pawn1 highlight remains, pawn2 highlight is cleared
+    waitUntilPawnIsDeselected(driver, pawnB); // GWT updates the DOM asynchronously after card switch
     assertTrue(pawnIsSelected(driver, pawnA),  "pawn1 highlight must remain after card switch");
     assertFalse(pawnIsSelected(driver, pawnB), "pawn2 highlight must be cleared after switching to a non-7 card");
   }
