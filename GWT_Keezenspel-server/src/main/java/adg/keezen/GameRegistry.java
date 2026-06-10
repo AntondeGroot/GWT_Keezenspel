@@ -8,6 +8,7 @@ import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameRegistry {
@@ -53,6 +54,10 @@ public class GameRegistry {
   @Nullable
   public static GameSession getGame(String sessionId) {
     return games.get(sessionId);
+  }
+
+  public static GameSession getGameOrThrow(String sessionId) {
+    return Objects.requireNonNull(games.get(sessionId), "No game with session: " + sessionId);
   }
 
   public static List<GameInfo> getAllGames() {

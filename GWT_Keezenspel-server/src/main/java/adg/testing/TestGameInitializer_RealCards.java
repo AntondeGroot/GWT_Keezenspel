@@ -17,7 +17,7 @@ public class TestGameInitializer_RealCards {
     int nrPlayers = 3;
 
     String sessionId = GameRegistry.createNewGame("123");
-    GameSession session = GameRegistry.getGame(sessionId);
+    GameSession session = GameRegistry.getGameOrThrow(sessionId);
     GameState gameState = session.getGameState();
 
     if (gameState.getPawns().isEmpty()) {

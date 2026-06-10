@@ -15,7 +15,7 @@ public class TestResetController {
 
   @PostMapping("/reset")
   public void resetGameState() {
-    GameSession gameSession = GameRegistry.getGame("123");
+    GameSession gameSession = GameRegistry.getGameOrThrow("123");
     gameSession.reset();
   }
 
@@ -23,7 +23,7 @@ public class TestResetController {
   public void setCardForPlayer(
       @PathVariable("playerId") String playerId,
       @PathVariable("cardValue") int cardValue) {
-    GameSession gameSession = GameRegistry.getGame("123");
+    GameSession gameSession = GameRegistry.getGameOrThrow("123");
     // Use cardValue as the UUID so the client can reliably round-trip it back in MoveRequest.
     // Works for both the real and mock card decks.
     Card card = new Card().value(cardValue).suit(0).uuid(cardValue);
@@ -35,7 +35,7 @@ public class TestResetController {
       @PathVariable("sessionId") String sessionId,
       @PathVariable("playerId") String playerId,
       @PathVariable("cardValue") int cardValue) {
-    GameSession gameSession = GameRegistry.getGame(sessionId);
+    GameSession gameSession = GameRegistry.getGameOrThrow(sessionId);
     // Use cardValue as the UUID so the client can reliably round-trip it back in MoveRequest.
     // Works for both the real and mock card decks.
     Card card = new Card().value(cardValue).suit(0).uuid(cardValue);
@@ -44,7 +44,7 @@ public class TestResetController {
 
   @PostMapping("/simulate-must-play-timeout/{sessionId}")
   public void simulateMustPlayTimeout(@PathVariable("sessionId") String sessionId) {
-    GameSession gameSession = GameRegistry.getGame(sessionId);
+    GameSession gameSession = GameRegistry.getGameOrThrow(sessionId);
     gameSession.getGameState().setMustPlayBlockedSince(
         System.currentTimeMillis() - 4 * 60 * 1000L);
   }
@@ -54,7 +54,7 @@ public class TestResetController {
       @PathVariable("sessionId") String sessionId,
       @PathVariable("playerId") String playerId,
       @PathVariable("cardValue") int cardValue) {
-    GameSession gameSession = GameRegistry.getGame(sessionId);
+    GameSession gameSession = GameRegistry.getGameOrThrow(sessionId);
     gameSession.getCardsDeck().forfeitCardsForPlayer(playerId);
     Card card = new Card().value(cardValue).suit(0).uuid(cardValue);
     gameSession.getCardsDeck().giveCardToPlayerForTesting(playerId, card);
@@ -62,7 +62,7 @@ public class TestResetController {
 
   @PostMapping("/start-game/{sessionId}")
   public void startGameWithoutShuffle(@PathVariable("sessionId") String sessionId) {
-    GameSession gameSession = GameRegistry.getGame(sessionId);
+    GameSession gameSession = GameRegistry.getGameOrThrow(sessionId);
     gameSession.getGameState().start(false);
   }
 
@@ -73,7 +73,7 @@ public class TestResetController {
       @PathVariable("pawnNr") int pawnNr,
       @PathVariable("sectionOwnerId") String sectionOwnerId,
       @PathVariable("tileNr") int tileNr) {
-    GameSession gameSession = GameRegistry.getGame(sessionId);
+    GameSession gameSession = GameRegistry.getGameOrThrow(sessionId);
     gameSession.getGameState().getPawns().stream()
         .filter(pawn -> pawn.getPlayerId().equals(playerId)
                      && pawn.getPawnId().getPawnNr() == pawnNr)

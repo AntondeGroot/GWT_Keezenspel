@@ -17,7 +17,7 @@ public class TestGameInitializer_MockedCards {
     int nrPlayers = 3;
 
     String sessionId = GameRegistry.createTestGame("123");
-    GameSession session = GameRegistry.getGame(sessionId);
+    GameSession session = GameRegistry.getGameOrThrow(sessionId);
     GameState gameState = session.getGameState();
 
     if (gameState.getPawns().isEmpty()) {

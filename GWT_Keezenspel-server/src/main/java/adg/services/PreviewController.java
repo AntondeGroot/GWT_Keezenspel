@@ -224,7 +224,7 @@ public class PreviewController {
 
     String sid = "preview-" + System.nanoTime();
     GameRegistry.createNewGame(sid, "Preview", n);
-    GameSession session = GameRegistry.getGame(sid);
+    GameSession session = GameRegistry.getGameOrThrow(sid);
     GameState gs = session.getGameState();
 
     for (int i = 0; i < n; i++) {
