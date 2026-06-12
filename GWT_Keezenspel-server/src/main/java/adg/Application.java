@@ -30,7 +30,7 @@ public class Application extends SpringBootServletInitializer {
     SpringApplication.run(Application.class, args);
 
     String sessionId = GameRegistry.createNewGame("123");
-    GameSession session = GameRegistry.getGame(sessionId);
+    GameSession session = GameRegistry.getGameOrThrow(sessionId);
     GameState gameState = session.getGameState();
     if (gameState.getPawns().isEmpty()) {
       for (int i = 0; i < NrPlayers; i++) {

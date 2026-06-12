@@ -24,7 +24,7 @@ public class ApplicationManualTest extends SpringBootServletInitializer {
 
     SpringApplication.run(ApplicationManualTest.class, args);
     String sessionId = GameRegistry.createTestGame("123");
-    GameSession session = GameRegistry.getGame(sessionId);
+    GameSession session = GameRegistry.getGameOrThrow(sessionId);
     GameState gameState = session.getGameState();
     if (gameState.getPawns().isEmpty()) {
       for (int i = 0; i < NrPlayers; i++) {

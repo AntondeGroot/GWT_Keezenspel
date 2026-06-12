@@ -50,7 +50,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
     Integer maxPlayers = newGameRequest.getMaxPlayers();
     GameRegistry.createNewGame(sessionID, roomName, maxPlayers);
     KeezenGameOptions.apply(
-        GameRegistry.getGame(sessionID).getGameState(), newGameRequest.getGameOptions());
+        GameRegistry.getGameOrThrow(sessionID).getGameState(), newGameRequest.getGameOptions());
 
     log.info("Game created: sessionId={} room='{}' maxPlayers={}", sessionID, roomName, maxPlayers);
     GameCreatedResponse response = new GameCreatedResponse(sessionID);
