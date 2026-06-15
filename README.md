@@ -1,5 +1,6 @@
 # GWT_Keezenspel
 
+<img src="readme-images/keezenspel_construction.svg" alt="Keezenspel construction" width="600">
 
 ## To start the application:
 1) in the server folder run the Application file, this is a springboot application.
