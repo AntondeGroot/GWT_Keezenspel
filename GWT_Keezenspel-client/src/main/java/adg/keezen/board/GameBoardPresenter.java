@@ -182,6 +182,10 @@ public class GameBoardPresenter {
       cardsDeck.setCards(hand);
     }
 
+    // Let the selection logic auto-select the right card from the player's hand
+    // when a pawn click makes the intended card unambiguous (Jack/Seven/King/Ace).
+    pawnAndCardSelection.setHand(cardsDeck.getCards());
+
     view.drawCards(cardsDeck, pawnAndCardSelection);
     playerList.refresh();
 

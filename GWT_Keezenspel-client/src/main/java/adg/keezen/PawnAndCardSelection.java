@@ -2,6 +2,7 @@ package adg.keezen;
 
 import static adg.keezen.move.MessageType.MAKE_MOVE;
 import static adg.keezen.move.MoveType.*;
+import static adg.keezen.util.BoardLogic.isPawnOnNest;
 import static adg.keezen.util.BoardLogic.pawnIsOnNormalBoard;
 import static adg.keezen.util.CardValueCheck.isJack;
 import static adg.keezen.util.CardValueCheck.isSeven;
@@ -29,6 +30,8 @@ public class PawnAndCardSelection {
   private int nrStepsPawn2 = 0;
   private boolean uiEnabled = true;
   private List<PawnClient> pawns = new ArrayList<>();
+  private List<CardClient> hand = new ArrayList<>();
+  private boolean cardWasAutoSelected = false;
 
   public void disableUIForTests() {
     this.uiEnabled = false;
@@ -47,6 +50,15 @@ public class PawnAndCardSelection {
   public void updatePawns(List<PawnClient> pawns) {
     this.pawns = new ArrayList<>(pawns);
     checkIfSelectedPawnsAreUpToDate();
+  }
+
+  /***
+   * Keep track of the player's current hand so a card can be auto-selected when the
+   * player's pawn selection makes the intended card unambiguous (see autoSelectCardFor).
+   * @param hand the cards currently held by the player
+   */
+  public void setHand(List<CardClient> hand) {
+    this.hand = (hand == null) ? new ArrayList<>() : new ArrayList<>(hand);
   }
 
   public void checkIfSelectedPawnsAreUpToDate() {
@@ -92,6 +104,7 @@ public class PawnAndCardSelection {
     validateHowManyPawnsCanBeSelected(pawn); // not accounting for if they are on nest/board/finish
     validateSelectionBasedOnLocation(); // validate if they are on nest/board/finish
     validateMoveType();
+    clearAutoCardIfIncomplete();
   }
 
   /***
@@ -106,6 +119,7 @@ public class PawnAndCardSelection {
     validateHowManyPawnsCanBeSelected(pawn); // not accounting for if they are on nest/board/finish
     validateSelectionBasedOnLocation(); // validate if they are on nest/board/finish
     validateMoveType();
+    clearAutoCardIfIncomplete();
   }
 
   private void validateSelectionBasedOnLocation() {
@@ -205,6 +219,22 @@ public class PawnAndCardSelection {
   }
 
   private void validateHowManyPawnsCanBeSelected(PawnClient pawn) {
+    // An auto-selected card is tied to the pawns that justified it. Re-derive it from
+    // scratch on every click so it never lingers after the selection that caused it changes.
+    if (cardWasAutoSelected) {
+      card = null;
+      cardWasAutoSelected = false;
+      // A brand-new pawn (not a re-click that deselects an already-selected pawn) starts a
+      // fresh inference, so drop the extra pawn the previous auto-card had pulled in.
+      if (!Objects.equals(pawn, pawn1) && !Objects.equals(pawn, pawn2)) {
+        pawn2 = null;
+      }
+    }
+
+    if (card == null) {
+      autoSelectCardFor(pawn);
+    }
+
     if (card == null) {
       handlePlayerCanSelect1Pawn(pawn);
       return;
@@ -223,8 +253,84 @@ public class PawnAndCardSelection {
     }
   }
 
+  /***
+   * When no card is selected yet, infer which card the player must intend from the pawn they
+   * are clicking and auto-select it from their hand (when they actually hold it):
+   *  - clicking an opponent's pawn while one of your own is selected -> Jack (switch)
+   *  - clicking a second pawn of your own                            -> Seven (split)
+   *  - clicking a pawn still in your nest                            -> King, or Ace if no King
+   * If the required card is not in hand the card stays null, so the selection is rejected just
+   * as before (e.g. you cannot select an opponent's pawn without a Jack).
+   */
+  private void autoSelectCardFor(PawnClient pawn) {
+    if (playerId == null || pawn == null) {
+      return;
+    }
+    boolean isOwnPawn = playerId.equals(pawn.getPlayerId());
+
+    // Selecting a second pawn (re-clicking pawn1 is a deselect, not a second selection).
+    if (pawn1 != null && !Objects.equals(pawn1, pawn)) {
+      if (isOwnPawn) {
+        autoSelectCardWithValue(7); // two of your own pawns -> Seven
+      } else {
+        autoSelectCardWithValue(11); // your pawn + opponent's pawn -> Jack
+      }
+      return;
+    }
+
+    // Selecting your first pawn straight out of the nest means coming on board. A King can only
+    // be used to come on board, so prefer it over an Ace, which has other uses.
+    if (pawn1 == null && isOwnPawn && isPawnOnNest(pawn)) {
+      if (!autoSelectCardWithValue(13)) {
+        autoSelectCardWithValue(1);
+      }
+    }
+  }
+
+  /** Selects the first card in hand with the given value; returns whether one was found. */
+  private boolean autoSelectCardWithValue(int value) {
+    for (CardClient handCard : hand) {
+      if (handCard.getValue() == value) {
+        card = handCard;
+        cardWasAutoSelected = true;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /***
+   * An auto-selected card only makes sense while the selection that triggered it is complete.
+   * If a needed pawn ends up deselected (e.g. an opponent pawn that turned out not to be on the
+   * normal board for a Jack), drop the auto-selected card again so nothing lingers.
+   */
+  private void clearAutoCardIfIncomplete() {
+    if (!cardWasAutoSelected || card == null) {
+      return;
+    }
+    boolean complete;
+    switch (card.getValue()) {
+      case 7:
+      case 11:
+        complete = pawn1 != null && pawn2 != null; // need two pawns
+        break;
+      default:
+        complete = pawn1 != null; // King / Ace need the pawn coming on board
+        break;
+    }
+    if (!complete) {
+      card = null;
+      cardWasAutoSelected = false;
+      moveType = null;
+      nrStepsPawn1 = 0;
+      nrStepsPawn2 = 0;
+    }
+  }
+
   public void setCard(CardClient p_card) {
     drawCards = true;
+    // a manual card pick is authoritative and is never treated as auto-selected
+    cardWasAutoSelected = false;
 
     // deselect when clicked twice
     if (card != null && card.equals(p_card)) {
@@ -286,6 +392,7 @@ public class PawnAndCardSelection {
   public void resetSuccesfulMove(){
     pawn2 = null;
     card = null;
+    cardWasAutoSelected = false;
     drawCards = true;
     moveType = null;
     nrStepsPawn1 = 0;
@@ -298,6 +405,7 @@ public class PawnAndCardSelection {
     pawn1 = null;
     pawn2 = null;
     card = null;
+    cardWasAutoSelected = false;
     drawCards = true;
     moveType = null;
     nrStepsPawn1 = 0;
