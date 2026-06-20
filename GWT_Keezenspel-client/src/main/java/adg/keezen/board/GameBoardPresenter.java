@@ -565,6 +565,9 @@ public class GameBoardPresenter {
     view.createPawns(result.getPawns(), pawnAndCardSelection, () -> {
       view.stepsPawn1.setValue(String.valueOf(pawnAndCardSelection.getNrStepsPawn1()));
       view.stepsPawn2.setValue(String.valueOf(pawnAndCardSelection.getNrStepsPawn2()));
+      // A pawn click may have auto-selected (or cleared) a card; repaint the hand so the
+      // red selection border matches the model.
+      view.refreshHandCardSelection(cardsDeck, pawnAndCardSelection);
       checkMove();
     });
   }
