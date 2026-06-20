@@ -855,6 +855,16 @@ public class GameBoardView extends Composite {
     cardHintLabel.setText(hint);
   }
 
+  /**
+   * Repaints only the player's hand so the selected-card border reflects the current
+   * selection. Used after a pawn click that auto-selects a card, where no server push
+   * (and therefore no drawCards()) occurs. Lighter than drawCards(): it skips the
+   * deck-image reload, pile redraw and animations.
+   */
+  public void refreshHandCardSelection(CardsDeck cardsDeck, PawnAndCardSelection pawnAndCardSelection) {
+    drawPlayerCardsInHand(cardsDeck.getCards(), pawnAndCardSelection, null);
+  }
+
   public void drawCards(CardsDeck cardsDeck, PawnAndCardSelection pawnAndCardSelection) {
     List<CardClient> cards = cardsDeck.getCards();
     HashMap<String, Integer> nrCardsPerPlayerUUID = cardsDeck.getNrCardsPerPlayer();
