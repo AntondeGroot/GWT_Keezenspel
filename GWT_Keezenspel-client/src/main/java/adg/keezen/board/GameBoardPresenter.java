@@ -64,6 +64,7 @@ public class GameBoardPresenter {
   private static final int BOARD_SIZE = 600; // todo: replace with CSS properties
   private final Queue<MoveResponseDTO> pendingAnimations = new LinkedList<>();
   private Timer mustPlayForfeitTimer;
+  private Timer resyncTimer;
   private static final int MUST_PLAY_TIMEOUT_MS = 3 * 60 * 1000;
   /** Previous card counts per player — used to detect when a card was played. */
   private final HashMap<String, Integer> prevNrCards = new HashMap<>();
@@ -87,6 +88,16 @@ public class GameBoardPresenter {
     connectGameStateSse();
     connectChatSse();
     // REST call bootstraps the initial render without waiting for a push.
+    fetchGameStateSnapshot();
+  }
+
+  /**
+   * One-shot REST fetch of the current game state. Used both to bootstrap the board on load and
+   * to resync after an SSE connection error (see scheduleResync) — so a flaky/slow connection
+   * recovers the correct board, turn and version without the player having to refresh the page.
+   * Card data still arrives via SSE.
+   */
+  private void fetchGameStateSnapshot() {
     apiClient.getGameState(
         Cookie.getSessionID(),
         null,
@@ -95,19 +106,37 @@ public class GameBoardPresenter {
           public void onSuccess(GameStateDTO response) {
             gameStateVersion = (long) response.getVersion();
             updateGameState(new GameStateClient(response));
-            // Card data arrives via SSE; no REST poll needed.
           }
 
           @Override
           public void onHttpError(int statusCode, String statusText) {
-            GWT.log("Initial game state HTTP error " + statusCode);
+            GWT.log("Game state HTTP error " + statusCode);
           }
 
           @Override
           public void onFailure(Throwable caught) {
-            GWT.log("Initial game state error: " + caught.getMessage());
+            GWT.log("Game state fetch error: " + caught.getMessage());
           }
         });
+  }
+
+  /**
+   * Coalesces bursts of SSE errors into a single delayed resync. The native EventSource also
+   * auto-reconnects, but this explicit fetch resyncs even while the stream is still flapping, so
+   * a stale board cannot cause a move to be silently rejected as "not your turn".
+   */
+  private void scheduleResync() {
+    if (resyncTimer != null) {
+      return; // a resync is already pending
+    }
+    resyncTimer = new Timer() {
+      @Override
+      public void run() {
+        resyncTimer = null;
+        fetchGameStateSnapshot();
+      }
+    };
+    resyncTimer.schedule(1000);
   }
 
   private void connectGameStateSse() {
@@ -126,6 +155,7 @@ public class GameBoardPresenter {
       @Override
       public void onError() {
         GWT.log("SSE game state connection error");
+        scheduleResync();
       }
     });
   }
@@ -253,6 +283,10 @@ public class GameBoardPresenter {
     // todo: deregister all binders
     gameStateSse.disconnect();
     chatSse.disconnect();
+    if (resyncTimer != null) {
+      resyncTimer.cancel();
+      resyncTimer = null;
+    }
   }
 
   private void bindEventHandlers() {

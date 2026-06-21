@@ -40,13 +40,20 @@ public class PawnAndCardSelectionValidation {
         return new SelectionValidation(VALID, MoveType.SPLIT);
       }
 
-      // validate switch
+      // validate switch — a Jack swaps your board pawn with another pawn on the board.
+      // pawn2 is protected only on its OWN start tile (tileNr 0 in pawn2's own section).
+      // Sitting on another player's start tile is also tileNr 0 but is a normal, switchable
+      // spot, so we must compare the tile owner rather than reject every tile 0 (matches
+      // ProcessOnSwitch.pawn2IsNotOnOwnStart).
+      boolean pawn2OnOwnStart =
+          getTileNr(pawn2) == 0
+          && pawn2.getCurrentTileId().getPlayerId().equals(pawn2.getPlayerId());
       if (getTileNr(pawn1) >= 0
           && getTileNr(pawn1) <= 15
-          && getTileNr(pawn2) > 0
+          && getTileNr(pawn2) >= 0
           && getTileNr(pawn2) <= 15
-          && // can not stand on his own start block
-          isJack(card)) {
+          && !pawn2OnOwnStart
+          && isJack(card)) {
         return new SelectionValidation(VALID, MoveType.SWITCH);
       }
 

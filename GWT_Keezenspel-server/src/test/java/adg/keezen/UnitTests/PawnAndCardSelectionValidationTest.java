@@ -23,6 +23,11 @@ class PawnAndCardSelectionValidationTest {
     return new Pawn(playerId, new PawnId(), new PositionKey(playerId, tileNr), new PositionKey(playerId, -1));
   }
 
+  /** A pawn owned by {@code playerId} but standing on {@code tileOwner}'s section tile. */
+  private static Pawn pawnOnTileOf(String playerId, String tileOwner, int tileNr) {
+    return new Pawn(playerId, new PawnId(), new PositionKey(tileOwner, tileNr), new PositionKey(playerId, -1));
+  }
+
   private static Card card(int value) {
     return new Card(0, value, 0);
   }
@@ -96,11 +101,22 @@ class PawnAndCardSelectionValidationTest {
   }
 
   @Test
-  void pawn2OnTileZero_jackCard_isInvalid() {
-    // tile 0 is the start block — pawn2 must be on tile > 0
+  void pawn2OnItsOwnStartTile_jackCard_isInvalid() {
+    // a pawn on its OWN start tile (tile 0 of its own section) is protected from switching
     Pawn p1 = pawnOnBoard("p1", 3);
-    Pawn p2 = pawnOnBoard("p2", 0);
+    Pawn p2 = pawnOnBoard("p2", 0); // tile owner == pawn owner == p2
     assertFalse(PawnAndCardSelectionValidation.validate(p1, p2, card(11)).isValid());
+  }
+
+  @Test
+  void pawn2OnAnotherPlayersStartTile_jackCard_isSwitch() {
+    // a pawn sitting on a DIFFERENT player's start tile (also tile 0) is not protected:
+    // e.g. red on blue's start point can be switched. Regression test.
+    Pawn p1 = pawnOnBoard("p1", 3);
+    Pawn p2 = pawnOnTileOf("p2", "p3", 0); // p2's pawn standing on p3's start tile
+    SelectionValidation result = PawnAndCardSelectionValidation.validate(p1, p2, card(11));
+    assertTrue(result.isValid());
+    assertEquals(MoveType.SWITCH, result.getMoveType());
   }
 
   @Test
