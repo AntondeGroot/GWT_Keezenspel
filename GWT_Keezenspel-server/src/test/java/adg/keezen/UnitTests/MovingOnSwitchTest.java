@@ -253,6 +253,24 @@ class MovingOnSwitchTest {
   }
 
   @Test
+  void canSwitchOpponentPawnSittingOnAnotherPlayersStart() {
+    // GIVEN green(0) has a pawn on the board, red(2) sits on blue's(1) start tile (1,0)
+    String green = "0";
+    Card card = givePlayerJack(cardsDeck, 0);
+    PositionKey greenTile = new PositionKey(green, 5);
+    PositionKey redOnBlueStart = new PositionKey("1", 0);
+    Pawn greenPawn = placePawnOnBoard(gameState, new PawnId(green, 0), greenTile);
+    Pawn redPawn = placePawnOnBoard(gameState, new PawnId("2", 0), redOnBlueStart);
+
+    // WHEN green plays a Jack to switch with the red pawn (not on its OWN start)
+    createSwitchMessage(moveMessage, greenPawn, redPawn, card);
+    gameState.processOnSwitch(moveMessage, moveResponse);
+
+    // THEN the switch is allowed
+    assertEquals(CAN_MAKE_MOVE, moveResponse.getResult());
+  }
+
+  @Test
   void cantSwitchWithOwnPawn() {
     // GIVEN
     String playerId = "0";
