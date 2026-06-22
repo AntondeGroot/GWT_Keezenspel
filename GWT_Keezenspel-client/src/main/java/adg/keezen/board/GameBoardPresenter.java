@@ -29,6 +29,7 @@ import adg.keezen.services.ApiClient.ApiCallback;
 import adg.keezen.services.SseService;
 import adg.keezen.util.ChatCipher;
 import adg.keezen.util.Cookie;
+import adg.keezen.util.MoveRejectedPopup;
 import adg.keezen.util.MoveRequestJsonBuilder;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -350,6 +351,15 @@ public class GameBoardPresenter {
                     new ApiCallback<MoveResponseDTO>() {
                       @Override
                       public void onSuccess(MoveResponseDTO result) {
+                        // The server returns 200 even when the move is illegal (result != CAN_MAKE_MOVE).
+                        // Explain why instead of silently doing nothing, and keep the selection so the
+                        // player can adjust it.
+                        if (!"CAN_MAKE_MOVE".equals(result.getResult())) {
+                          snapshotCard = null;
+                          StepsAnimation.resetStepsAnimation();
+                          MoveRejectedPopup.show(CONSTANTS.moveRejectedTitle(), rejectionMessage(result));
+                          return;
+                        }
                         GWT.log("make move successful");
                         if (snapshotCard != null) {
                           view.animateOwnPlayedCardFromSnapshot(snapshotPileSize,
@@ -374,7 +384,14 @@ public class GameBoardPresenter {
                         GWT.log("make move HTTP error" + statusCode + ":" + statusText);
                         snapshotCard = null;
                         StepsAnimation.resetStepsAnimation();
-                        redirectToLobbyOnServerError(statusCode);
+                        if (statusCode >= 500) {
+                          redirectToLobbyOnServerError(statusCode);
+                        } else {
+                          // 400 — typically not your turn (e.g. a double-submit on a slow connection),
+                          // or a selection the server rejected outright. Tell the player.
+                          MoveRejectedPopup.show(
+                              CONSTANTS.moveRejectedTitle(), CONSTANTS.moveRejectedNotYourTurn());
+                        }
                       }
 
                       @Override
@@ -620,6 +637,36 @@ public class GameBoardPresenter {
     total = ((total % 1440) + 1440) % 1440;
     int h = total / 60, m = total % 60;
     return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
+  }
+
+  /** Maps a server rejection reason to a localized, player-facing explanation. */
+  private String rejectionMessage(MoveResponseDTO result) {
+    String reason = result.getRejectionReason();
+    if (reason == null) {
+      return CONSTANTS.moveRejectedGeneric();
+    }
+    switch (reason) {
+      case "INVALID_SELECTION": return CONSTANTS.moveRejectedInvalidSelection();
+      case "DONT_HAVE_CARD": return CONSTANTS.moveRejectedDontHaveCard();
+      case "WRONG_CARD_FOR_MOVE": return CONSTANTS.moveRejectedWrongCardForMove();
+      case "PAWN_ON_NEST": return CONSTANTS.moveRejectedPawnOnNest();
+      case "PAWN_NOT_ON_NEST": return CONSTANTS.moveRejectedPawnNotOnNest();
+      case "PAWN_NOT_ON_BOARD": return CONSTANTS.moveRejectedPawnNotOnBoard();
+      case "NOT_YOUR_PAWN": return CONSTANTS.moveRejectedNotYourPawn();
+      case "DESTINATION_OCCUPIED_BY_OWN_PAWN": return CONSTANTS.moveRejectedDestinationOccupiedByOwnPawn();
+      case "DESTINATION_BLOCKED": return CONSTANTS.moveRejectedDestinationBlocked();
+      case "START_TILE_OCCUPIED": return CONSTANTS.moveRejectedStartTileOccupied();
+      case "CANNOT_PASS_START_TILE": return CONSTANTS.moveRejectedCannotPassStartTile();
+      case "CANNOT_SWITCH_OPPONENT_ON_OWN_START": return CONSTANTS.moveRejectedCannotSwitchOpponentOnOwnStart();
+      case "CANNOT_SWITCH_OWN_PAWNS": return CONSTANTS.moveRejectedCannotSwitchOwnPawns();
+      case "MUST_MOVE_EXACT_STEPS":
+        return CONSTANTS.moveRejectedMustMoveExactSteps()
+            .replace("%s", String.valueOf(result.getRejectionDetail()));
+      case "PAWN_CLOSED_IN_FINISH": return CONSTANTS.moveRejectedPawnClosedInFinish();
+      case "SPLIT_NEEDS_TWO_OWN_PAWNS": return CONSTANTS.moveRejectedSplitNeedsTwoOwnPawns();
+      case "SPLIT_STEPS_NOT_SEVEN": return CONSTANTS.moveRejectedSplitStepsNotSeven();
+      default: return CONSTANTS.moveRejectedGeneric();
+    }
   }
 
   private void redirectToLobbyOnServerError(int statusCode) {

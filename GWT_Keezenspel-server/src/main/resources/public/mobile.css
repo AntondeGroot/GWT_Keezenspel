@@ -475,3 +475,10 @@ h1 {
 .rules-row-text     { font-size: 26px !important; line-height: 1.5 !important; }
 .rules-close-hint   { font-size: 22px !important; }
 .rules-card-chip    { font-size: 28px !important; width: 54px !important; height: 72px !important; }
+
+/* Move-rejected popup: size the box and scale text up for the 1100px layout viewport so it
+   reads as a compact modal centred over the card deck. */
+.move-rejected-dialog     { width: 620px !important; max-width: none !important; padding: 32px 40px !important; }
+.move-rejected-title      { font-size: 2em !important; }
+.move-rejected-text       { font-size: 30px !important; line-height: 1.5 !important; }
+.move-rejected-close-hint { font-size: 24px !important; }

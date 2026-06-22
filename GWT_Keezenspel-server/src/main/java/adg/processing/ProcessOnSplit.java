@@ -11,6 +11,7 @@ import static com.adg.openapi.model.TempMessageType.MAKE_MOVE;
 
 import adg.keezen.GameState;
 import com.adg.openapi.model.Card;
+import com.adg.openapi.model.MoveRejectionReason;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
 import com.adg.openapi.model.Pawn;
@@ -78,6 +79,7 @@ public class ProcessOnSplit {
   private boolean selectionIsValid() {
     if (pawn1 == null || card == null || pawn2 == null) {
       response.setResult(INVALID_SELECTION);
+      response.setRejectionReason(MoveRejectionReason.INVALID_SELECTION);
       return false;
     }
     return true;
@@ -86,6 +88,7 @@ public class ProcessOnSplit {
   private boolean pawnsAreSamePlayer() {
     if (!pawn1.getPlayerId().equals(pawn2.getPlayerId())) {
       response.setResult(CANNOT_MAKE_MOVE);
+      response.setRejectionReason(MoveRejectionReason.SPLIT_NEEDS_TWO_OWN_PAWNS);
       return false;
     }
     return true;
@@ -94,6 +97,7 @@ public class ProcessOnSplit {
   private boolean cardIsSeven() {
     if (!isSeven(card)) {
       response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
+      response.setRejectionReason(MoveRejectionReason.WRONG_CARD_FOR_MOVE);
       return false;
     }
     return true;
@@ -102,6 +106,7 @@ public class ProcessOnSplit {
   private boolean stepsAddUpToSeven() {
     if (nrStepsPawn1 + nrStepsPawn2 != 7) {
       response.setResult(INVALID_SELECTION);
+      response.setRejectionReason(MoveRejectionReason.SPLIT_STEPS_NOT_SEVEN);
       return false;
     }
     return true;
@@ -134,6 +139,9 @@ public class ProcessOnSplit {
     ProcessOnMove.process(gs, moveMessagePawn1, moveResponsePawn1);
     if (moveResponsePawn1.getResult().equals(CANNOT_MAKE_MOVE)) {
       response.setResult(CANNOT_MAKE_MOVE);
+      // Surface the reason the first pawn's part of the split could not be made.
+      response.setRejectionReason(moveResponsePawn1.getRejectionReason());
+      response.setRejectionDetail(moveResponsePawn1.getRejectionDetail());
       return false;
     }
 
@@ -144,6 +152,9 @@ public class ProcessOnSplit {
 
     if (moveResponsePawn2.getResult().equals(CANNOT_MAKE_MOVE)) {
       response.setResult(CANNOT_MAKE_MOVE);
+      // Surface the reason the second pawn's part of the split could not be made.
+      response.setRejectionReason(moveResponsePawn2.getRejectionReason());
+      response.setRejectionDetail(moveResponsePawn2.getRejectionDetail());
       return false;
     }
 
@@ -179,6 +190,7 @@ public class ProcessOnSplit {
   private boolean executeSplitMoves() {
     if (moveMessage.getStepsPawn1() + moveMessage.getStepsPawn2() != 7) {
       response.setResult(INVALID_SELECTION);
+      response.setRejectionReason(MoveRejectionReason.SPLIT_STEPS_NOT_SEVEN);
       return false;
     }
     gs.duplicatePlayerCard(playerId, card);

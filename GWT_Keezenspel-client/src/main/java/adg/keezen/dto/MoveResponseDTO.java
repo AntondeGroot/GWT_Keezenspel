@@ -96,4 +96,14 @@ public final class MoveResponseDTO extends JavaScriptObject {
   public native void setResult(String result) /*-{
     this.result = result;
   }-*/;
+
+  // ----- Rejection detail (only meaningful when result is not CAN_MAKE_MOVE) -----
+  public native String getRejectionReason() /*-{
+    return this.rejectionReason;
+  }-*/;
+
+  /** Returns the numeric rejection detail (e.g. allowed steps), or -1 when absent. */
+  public native int getRejectionDetail() /*-{
+    return (this.rejectionDetail == null) ? -1 : this.rejectionDetail;
+  }-*/;
 }

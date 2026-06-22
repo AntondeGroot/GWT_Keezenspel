@@ -10,8 +10,10 @@ import static com.adg.openapi.model.MoveType.MOVE;
 import adg.keezen.GameState;
 import adg.Log;
 import com.adg.openapi.model.Card;
+import com.adg.openapi.model.MoveRejectionReason;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
+import com.adg.openapi.model.MoveResult;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PositionKey;
 import java.util.LinkedList;
@@ -54,6 +56,18 @@ public class ProcessOnMove {
     this.goToNextPlayer = goToNextPlayer;
   }
 
+  // ── Rejection helpers ─────────────────────────────────────────────────────
+
+  private void reject(MoveResult result, MoveRejectionReason reason) {
+    response.setResult(result);
+    response.setRejectionReason(reason);
+  }
+
+  private void reject(MoveResult result, MoveRejectionReason reason, int detail) {
+    reject(result, reason);
+    response.setRejectionDetail(detail);
+  }
+
   // ── Execution ─────────────────────────────────────────────────────────────
 
   private void execute() {
@@ -82,11 +96,11 @@ public class ProcessOnMove {
 
   private boolean selectionIsValid() {
     if (pawn1 == null || card == null) {
-      response.setResult(INVALID_SELECTION);
+      reject(INVALID_SELECTION, MoveRejectionReason.INVALID_SELECTION);
       return false;
     }
     if (pawn1.getCurrentTileId().getTileNr() < 0) {
-      response.setResult(CANNOT_MAKE_MOVE);
+      reject(CANNOT_MAKE_MOVE, MoveRejectionReason.PAWN_ON_NEST);
       return false;
     }
     return true;
@@ -94,7 +108,7 @@ public class ProcessOnMove {
 
   private boolean playerHasCard() {
     if (!gs.playerHasCard(playerId, card)) {
-      response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
+      reject(PLAYER_DOES_NOT_HAVE_CARD, MoveRejectionReason.DONT_HAVE_CARD);
       return false;
     }
     return true;
@@ -104,12 +118,12 @@ public class ProcessOnMove {
     if (isJack(card)) return true;
     if (moveMessage.getPawn1Id() != null
         && !Objects.equals(moveMessage.getPawn1Id().getPlayerId(), playerId)) {
-      response.setResult(CANNOT_MAKE_MOVE);
+      reject(CANNOT_MAKE_MOVE, MoveRejectionReason.NOT_YOUR_PAWN);
       return false;
     }
     if (moveMessage.getPawn2Id() != null
         && !Objects.equals(moveMessage.getPawn2Id().getPlayerId(), playerId)) {
-      response.setResult(CANNOT_MAKE_MOVE);
+      reject(CANNOT_MAKE_MOVE, MoveRejectionReason.NOT_YOUR_PAWN);
       return false;
     }
     return true;
@@ -170,7 +184,7 @@ public class ProcessOnMove {
   private boolean reverseBackInCurrentSection() {
     Log.info("GameState: OnMove: normal route is blocked by a start tile, move backwards");
     if (gs.isExactMoveRequired()) {
-      response.setResult(CANNOT_MAKE_MOVE);
+      reject(CANNOT_MAKE_MOVE, MoveRejectionReason.CANNOT_PASS_START_TILE);
       return false;
     }
     next = 15 - next % 15;
@@ -223,7 +237,7 @@ public class ProcessOnMove {
   private boolean reverseForwardFromStartTile() {
     Log.info("GameState: OnMove: pawn wants to go backwards but is blocked by a start tile, goes forwards");
     if (gs.isExactMoveRequired()) {
-      response.setResult(CANNOT_MAKE_MOVE);
+      reject(CANNOT_MAKE_MOVE, MoveRejectionReason.CANNOT_PASS_START_TILE);
       return false;
     }
     next = -next + 2;
@@ -239,7 +253,7 @@ public class ProcessOnMove {
     if (gs.canMoveToTile(pawn1, startTile)) {
       landOnTile(startTile);
     } else if (startTileIsBlockedByOwnPawn(startTile)) {
-      response.setResult(CANNOT_MAKE_MOVE);
+      reject(CANNOT_MAKE_MOVE, MoveRejectionReason.DESTINATION_OCCUPIED_BY_OWN_PAWN);
     } else {
       landBeyondBlockadedStartTile();
     }
@@ -255,7 +269,7 @@ public class ProcessOnMove {
     if (gs.canMoveToTile(pawn1, tile2)) {
       landOnTile(tile2);
     } else {
-      response.setResult(CANNOT_MAKE_MOVE);
+      reject(CANNOT_MAKE_MOVE, MoveRejectionReason.CANNOT_PASS_START_TILE);
     }
   }
 
@@ -264,7 +278,7 @@ public class ProcessOnMove {
   private void routeAlreadyOnFinish() {
     Log.info("GameState: OnMove: pawn is already on the finish");
     if (gs.isPawnTightlyClosedIn(pawn1, currentTileId)) {
-      response.setResult(CANNOT_MAKE_MOVE);
+      reject(CANNOT_MAKE_MOVE, MoveRejectionReason.PAWN_CLOSED_IN_FINISH);
       return;
     }
     if (gs.isPawnLooselyClosedIn(pawn1, currentTileId)) {
@@ -276,7 +290,7 @@ public class ProcessOnMove {
           executeFinishMoveWithOvershootCheck();
           return;
         }
-        response.setResult(CANNOT_MAKE_MOVE);
+        reject(CANNOT_MAKE_MOVE, MoveRejectionReason.PAWN_CLOSED_IN_FINISH);
         return;
       }
       executePingPongMove();
@@ -310,7 +324,8 @@ public class ProcessOnMove {
 
   private boolean addFinishBounceWaypoint(int highestReachable) {
     if (gs.isExactMoveRequired()) {
-      response.setResult(CANNOT_MAKE_MOVE);
+      reject(CANNOT_MAKE_MOVE, MoveRejectionReason.MUST_MOVE_EXACT_STEPS,
+          highestReachable - currentTileId.getTileNr());
       return false;
     }
     Log.info("GameState: OnMove: pawn moves out of the finish");
@@ -342,7 +357,7 @@ public class ProcessOnMove {
     }
     if (gs.cannotMoveToTileBecauseSamePlayer(pawn1, targetTileId)) {
       gs.clearResponse(response);
-      response.setResult(CANNOT_MAKE_MOVE);
+      reject(CANNOT_MAKE_MOVE, MoveRejectionReason.DESTINATION_OCCUPIED_BY_OWN_PAWN);
       return;
     }
     moves.add(targetTileId);
@@ -359,7 +374,8 @@ public class ProcessOnMove {
   private boolean addEnteringFinishOvershootWaypoints(
       PositionKey targetTileId, int highestReachable) {
     if (gs.isExactMoveRequired()) {
-      response.setResult(CANNOT_MAKE_MOVE);
+      reject(CANNOT_MAKE_MOVE, MoveRejectionReason.MUST_MOVE_EXACT_STEPS,
+          highestReachable - currentTileId.getTileNr());
       return false;
     }
     if (highestReachable > 15) {
@@ -381,7 +397,7 @@ public class ProcessOnMove {
       response.setMovePawn1(moves);
       gs.processMove(pawn1, nextTileId, moveMessage, response, goToNextPlayer);
     } else {
-      response.setResult(CANNOT_MAKE_MOVE);
+      reject(CANNOT_MAKE_MOVE, MoveRejectionReason.DESTINATION_BLOCKED);
     }
   }
 
