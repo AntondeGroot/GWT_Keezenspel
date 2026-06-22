@@ -40,19 +40,15 @@ public class PawnAndCardSelectionValidation {
         return new SelectionValidation(VALID, MoveType.SPLIT);
       }
 
-      // validate switch — a Jack swaps your board pawn with another pawn on the board.
-      // pawn2 is protected only on its OWN start tile (tileNr 0 in pawn2's own section).
-      // Sitting on another player's start tile is also tileNr 0 but is a normal, switchable
-      // spot, so we must compare the tile owner rather than reject every tile 0 (matches
-      // ProcessOnSwitch.pawn2IsNotOnOwnStart).
-      boolean pawn2OnOwnStart =
-          getTileNr(pawn2) == 0
-          && pawn2.getCurrentTileId().getPlayerId().equals(pawn2.getPlayerId());
+      // validate switch — a Jack swaps your board pawn with another on-board pawn. This is only
+      // a structural classification (jack + two pawns on the normal board); the rule that you
+      // cannot take an opponent off its OWN start tile lives in ProcessOnSwitch, which rejects it
+      // with a specific reason. Classifying it as SWITCH here (rather than rejecting with a bare
+      // 400) lets that reason reach the player.
       if (getTileNr(pawn1) >= 0
           && getTileNr(pawn1) <= 15
           && getTileNr(pawn2) >= 0
           && getTileNr(pawn2) <= 15
-          && !pawn2OnOwnStart
           && isJack(card)) {
         return new SelectionValidation(VALID, MoveType.SWITCH);
       }

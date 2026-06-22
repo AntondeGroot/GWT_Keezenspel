@@ -10,6 +10,7 @@ import static com.adg.openapi.model.MoveType.SWITCH;
 
 import adg.keezen.GameState;
 import com.adg.openapi.model.Card;
+import com.adg.openapi.model.MoveRejectionReason;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
 import com.adg.openapi.model.Pawn;
@@ -48,6 +49,7 @@ public class ProcessOnSwitch {
       Pawn pawn1, Pawn pawn2, Card card, MoveResponse response) {
     if (pawn1 == null || card == null || pawn2 == null) {
       response.setResult(INVALID_SELECTION);
+      response.setRejectionReason(MoveRejectionReason.INVALID_SELECTION);
       return false;
     }
     return true;
@@ -59,6 +61,7 @@ public class ProcessOnSwitch {
         moveMessage.getPawn1Id().getPlayerId(),
         moveMessage.getPawn2Id().getPlayerId())) {
       response.setResult(CANNOT_MAKE_MOVE);
+      response.setRejectionReason(MoveRejectionReason.CANNOT_SWITCH_OWN_PAWNS);
       return false;
     }
     return true;
@@ -70,6 +73,7 @@ public class ProcessOnSwitch {
     boolean ownsSecond = playerId.equals(moveMessage.getPawn2Id().getPlayerId());
     if (!ownsFirst && !ownsSecond) {
       response.setResult(CANNOT_MAKE_MOVE);
+      response.setRejectionReason(MoveRejectionReason.NOT_YOUR_PAWN);
       return false;
     }
     return true;
@@ -79,6 +83,7 @@ public class ProcessOnSwitch {
       GameState gs, String playerId, Card card, MoveResponse response) {
     if (!gs.playerHasCard(playerId, card)) {
       response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
+      response.setRejectionReason(MoveRejectionReason.DONT_HAVE_CARD);
       return false;
     }
     return true;
@@ -88,6 +93,7 @@ public class ProcessOnSwitch {
     if (isPawnOnNest(pawn1) || isPawnOnNest(pawn2)
         || isPawnOnFinish(pawn1) || isPawnOnFinish(pawn2)) {
       response.setResult(CANNOT_MAKE_MOVE);
+      response.setRejectionReason(MoveRejectionReason.PAWN_NOT_ON_BOARD);
       return false;
     }
     return true;
@@ -97,6 +103,7 @@ public class ProcessOnSwitch {
     PositionKey tile2 = pawn2.getCurrentTileId();
     if (tile2.getPlayerId().equals(pawn2.getPlayerId()) && tile2.getTileNr() == 0) {
       response.setResult(CANNOT_MAKE_MOVE);
+      response.setRejectionReason(MoveRejectionReason.CANNOT_SWITCH_OPPONENT_ON_OWN_START);
       return false;
     }
     return true;

@@ -574,6 +574,29 @@ components:
         - CANNOT_MAKE_MOVE
         - PLAYER_DOES_NOT_HAVE_CARD
         - INVALID_SELECTION
+    MoveRejectionReason:
+      description: |
+        Specific reason a move was rejected, so the client can explain to the player why
+        the move could not be made. NONE means no rejection (the move was valid).
+      enum:
+        - NONE
+        - INVALID_SELECTION
+        - DONT_HAVE_CARD
+        - WRONG_CARD_FOR_MOVE
+        - PAWN_ON_NEST
+        - PAWN_NOT_ON_NEST
+        - PAWN_NOT_ON_BOARD
+        - NOT_YOUR_PAWN
+        - DESTINATION_OCCUPIED_BY_OWN_PAWN
+        - DESTINATION_BLOCKED
+        - START_TILE_OCCUPIED
+        - CANNOT_PASS_START_TILE
+        - CANNOT_SWITCH_OPPONENT_ON_OWN_START
+        - CANNOT_SWITCH_OWN_PAWNS
+        - MUST_MOVE_EXACT_STEPS
+        - PAWN_CLOSED_IN_FINISH
+        - SPLIT_NEEDS_TWO_OWN_PAWNS
+        - SPLIT_STEPS_NOT_SEVEN
     MoveSet:
       type: array
       items:
@@ -613,6 +636,14 @@ components:
           $ref: '#/components/schemas/MoveType'
         result:
           $ref: '#/components/schemas/MoveResult'
+        # rejection detail (only meaningful when result is not CAN_MAKE_MOVE)
+        rejectionReason:
+          $ref: '#/components/schemas/MoveRejectionReason'
+        rejectionDetail:
+          description: |
+            Optional numeric detail for a rejection — e.g. for MUST_MOVE_EXACT_STEPS it is the
+            number of steps the pawn can actually move ("you can only move X steps").
+          type: integer
 
     CardResponse:
       type: object

@@ -101,11 +101,16 @@ class PawnAndCardSelectionValidationTest {
   }
 
   @Test
-  void pawn2OnItsOwnStartTile_jackCard_isInvalid() {
-    // a pawn on its OWN start tile (tile 0 of its own section) is protected from switching
+  void pawn2OnItsOwnStartTile_jackCard_isClassifiedAsSwitch() {
+    // The gate only classifies the selection structurally. A pawn on its OWN start tile is still
+    // a switch-shaped selection; the protection rule ("can't take an opponent off its own start")
+    // is enforced downstream in ProcessOnSwitch (see MovingOnSwitchTest.cantTakeOtherPawnFromStart),
+    // which rejects it with a specific reason rather than a bare 400.
     Pawn p1 = pawnOnBoard("p1", 3);
     Pawn p2 = pawnOnBoard("p2", 0); // tile owner == pawn owner == p2
-    assertFalse(PawnAndCardSelectionValidation.validate(p1, p2, card(11)).isValid());
+    SelectionValidation result = PawnAndCardSelectionValidation.validate(p1, p2, card(11));
+    assertTrue(result.isValid());
+    assertEquals(MoveType.SWITCH, result.getMoveType());
   }
 
   @Test

@@ -32,4 +32,27 @@ public interface AppConstants extends Constants {
     String rulesGettingOnBoard();
     String rulesSpecialCards();
     String rulesClickToClose();
+
+    // Move-rejected popup
+    String moveRejectedTitle();
+    String moveRejectedGeneric();
+    String moveRejectedNotYourTurn();
+    String moveRejectedInvalidSelection();
+    String moveRejectedDontHaveCard();
+    String moveRejectedWrongCardForMove();
+    String moveRejectedPawnOnNest();
+    String moveRejectedPawnNotOnNest();
+    String moveRejectedPawnNotOnBoard();
+    String moveRejectedNotYourPawn();
+    String moveRejectedDestinationOccupiedByOwnPawn();
+    String moveRejectedDestinationBlocked();
+    String moveRejectedStartTileOccupied();
+    String moveRejectedCannotPassStartTile();
+    String moveRejectedCannotSwitchOpponentOnOwnStart();
+    String moveRejectedCannotSwitchOwnPawns();
+    /** Contains a "%s" placeholder for the number of steps. */
+    String moveRejectedMustMoveExactSteps();
+    String moveRejectedPawnClosedInFinish();
+    String moveRejectedSplitNeedsTwoOwnPawns();
+    String moveRejectedSplitStepsNotSeven();
 }

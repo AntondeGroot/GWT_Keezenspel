@@ -867,6 +867,59 @@ footer {
   letter-spacing: 0.05em;
 }
 
+/* "Move not allowed" explanation popup — a compact, opaque modal centred over the board.
+   Rendered as a native <dialog> in the top layer (see MoveRejectedPopup) so it paints above the
+   zoom-scaled card deck. The backdrop is transparent: it's a centred box, not a full-screen cover. */
+.move-rejected-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  background-color: #140a00;
+  background-image: linear-gradient(160deg, #1f1000 0%, #0d0800 100%);
+  border: 2px solid #c9a227;
+  border-radius: 10px;
+  padding: 22px 26px;
+  max-width: 340px;
+  width: 80%;
+  color: #e8d5a0;
+  text-align: center;
+  box-shadow: 0 10px 44px rgba(0,0,0,0.9), 0 0 0 1px rgba(201,162,39,0.25);
+  cursor: pointer;
+  animation: rulesFadeIn 0.12s ease;
+}
+
+.move-rejected-dialog::backdrop {
+  background: transparent;
+}
+
+.move-rejected-title {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 1.3em;
+  font-weight: 700;
+  color: #f4d03f;
+  margin: 0 0 12px 0;
+  display: block;
+  letter-spacing: 0.04em;
+}
+
+.move-rejected-text {
+  color: #e8d5a0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.move-rejected-close-hint {
+  display: block;
+  color: #7a6a40;
+  font-size: 13px;
+  padding-top: 12px;
+  margin-top: 14px;
+  border-top: 1px solid rgba(201,162,39,0.25);
+  letter-spacing: 0.05em;
+}
+
 .lang-selector-container {
   display: flex;
   align-items: center;
