@@ -608,6 +608,13 @@ components:
       properties:
         tiles:
           $ref: '#/components/schemas/MoveSet'
+        # For a 7-split: the recommended step allocation that lands a pawn deepest in the finish.
+        # Only set when the selection is a valid 7-split and at least one allocation reaches the
+        # finish; otherwise omitted (client keeps its 0/7 default). Pawn order is never changed.
+        recommendedStepsPawn1:
+          type: integer
+        recommendedStepsPawn2:
+          type: integer
     MoveResponse:
       type: object
       description:

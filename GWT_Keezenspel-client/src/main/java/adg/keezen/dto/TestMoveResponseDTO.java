@@ -19,4 +19,16 @@ public class TestMoveResponseDTO extends JavaScriptObject {
   public final native JsArray<PositionKeyDTO> getTiles() /*-{
     return this.tiles || [];
   }-*/;
+
+  /**
+   * Recommended steps for pawn1 in a 7-split (the allocation that lands a pawn deepest in the
+   * finish), or -1 when the server made no recommendation. Pawn2's value is the complement.
+   */
+  public final native int getRecommendedStepsPawn1() /*-{
+    return (this.recommendedStepsPawn1 == null) ? -1 : this.recommendedStepsPawn1;
+  }-*/;
+
+  public final native int getRecommendedStepsPawn2() /*-{
+    return (this.recommendedStepsPawn2 == null) ? -1 : this.recommendedStepsPawn2;
+  }-*/;
 }

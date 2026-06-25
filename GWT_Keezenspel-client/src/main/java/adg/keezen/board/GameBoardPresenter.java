@@ -504,6 +504,22 @@ public class GameBoardPresenter {
         new ApiCallback<TestMoveResponseDTO>() {
           @Override
           public void onSuccess(TestMoveResponseDTO result) {
+            // When a 7-split was just set up, adopt the server's recommended allocation (the one
+            // that lands a pawn deepest in the finish) as the starting value, then re-check to
+            // highlight it. Applied only once per split selection; the player can still adjust.
+            if (pawnAndCardSelection.isSplitDefaultPending()) {
+              pawnAndCardSelection.clearSplitDefaultPending();
+              int s1 = result.getRecommendedStepsPawn1();
+              int s2 = result.getRecommendedStepsPawn2();
+              if (s1 >= 0 && s2 >= 0) {
+                pawnAndCardSelection.setNrStepsPawn1(s1);
+                pawnAndCardSelection.setNrStepsPawn2(s2);
+                view.stepsPawn1.setValue(valueOf(s1));
+                view.stepsPawn2.setValue(valueOf(s2));
+                checkMove(); // refresh the highlight for the recommended allocation
+                return;
+              }
+            }
             ArrayList<TileId> tiles = new ArrayList<>();
             for (int i = 0; i < result.getTiles().length(); i++) {
               tiles.add(

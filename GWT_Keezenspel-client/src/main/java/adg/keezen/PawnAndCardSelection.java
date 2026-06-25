@@ -32,6 +32,7 @@ public class PawnAndCardSelection {
   private List<PawnClient> pawns = new ArrayList<>();
   private List<CardClient> hand = new ArrayList<>();
   private boolean cardWasAutoSelected = false;
+  private boolean splitDefaultPending = false;
 
   public void disableUIForTests() {
     this.uiEnabled = false;
@@ -393,6 +394,7 @@ public class PawnAndCardSelection {
     pawn2 = null;
     card = null;
     cardWasAutoSelected = false;
+    splitDefaultPending = false;
     drawCards = true;
     moveType = null;
     nrStepsPawn1 = 0;
@@ -406,6 +408,7 @@ public class PawnAndCardSelection {
     pawn2 = null;
     card = null;
     cardWasAutoSelected = false;
+    splitDefaultPending = false;
     drawCards = true;
     moveType = null;
     nrStepsPawn1 = 0;
@@ -465,6 +468,9 @@ public class PawnAndCardSelection {
       setMoveType(SPLIT);
       nrStepsPawn1 = 0;
       nrStepsPawn2 = 7;
+      // The selection just became a 2-pawn split: ask the presenter to adopt the server's
+      // recommended allocation (deepest into the finish) as the starting value.
+      splitDefaultPending = true;
       // show boxes used to split a 7 over two pawns
       setSplitBoxesVisibility(Visibility.VISIBLE);
     } else {
@@ -472,6 +478,15 @@ public class PawnAndCardSelection {
       nrStepsPawn1 = 7;
       nrStepsPawn2 = 0;
     }
+  }
+
+  /** True right after a 7-split selection is formed, until the recommended default is applied. */
+  public boolean isSplitDefaultPending() {
+    return splitDefaultPending;
+  }
+
+  public void clearSplitDefaultPending() {
+    splitDefaultPending = false;
   }
 
   private void handleJack() {

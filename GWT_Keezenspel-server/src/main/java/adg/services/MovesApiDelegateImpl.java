@@ -6,6 +6,7 @@ import static com.adg.openapi.model.TempMessageType.MAKE_MOVE;
 import adg.keezen.GameRegistry;
 import adg.keezen.GameSession;
 import adg.keezen.GameState;
+import adg.processing.SevenSplitRecommender;
 import adg.util.PawnAndCardSelectionValidation;
 import adg.util.SelectionValidation;
 import com.adg.openapi.api.MovesApiDelegate;
@@ -48,6 +49,17 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
     }
     if (move.getMovePawn2() != null && !move.getMovePawn2().isEmpty()) {
       testMoveResponse.addTilesItem(move.getMovePawn2().getLast());
+    }
+
+    // For a 7-split, suggest the allocation that lands a pawn deepest in the finish (the obvious
+    // intent). Pawn order is preserved and only valid splits are suggested; null when N/A.
+    GameSession session = GameRegistry.getGame(sessionId);
+    if (session != null) {
+      int[] recommended = SevenSplitRecommender.recommend(session.getGameState(), moveRequest);
+      if (recommended != null) {
+        testMoveResponse.setRecommendedStepsPawn1(recommended[0]);
+        testMoveResponse.setRecommendedStepsPawn2(recommended[1]);
+      }
     }
     return ResponseEntity.ok(testMoveResponse);
   }
