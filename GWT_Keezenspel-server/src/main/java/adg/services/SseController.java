@@ -16,7 +16,7 @@ public class SseController {
 
   @Autowired private SseEmitterService sseEmitterService;
 
-  @GetMapping(value = "/sse/gamestates/{sessionId}/{playerId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  @GetMapping(value = "/gamestates/{sessionId}/{playerId}/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public SseEmitter subscribeToGameState(
       @PathVariable("sessionId") String sessionId,
       @PathVariable("playerId") String playerId,

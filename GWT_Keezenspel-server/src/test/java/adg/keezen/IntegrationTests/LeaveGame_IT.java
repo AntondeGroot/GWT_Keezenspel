@@ -125,7 +125,7 @@ public class LeaveGame_IT extends BaseIntegrationTest {
   @Test
   void leaveGame_pushesSSEUpdate_toRemainingPlayers() throws Exception {
     // GIVEN player 1 is subscribed to the SSE stream
-    String sseUrl = "http://localhost:4200/sse/gamestates/" + sessionId + "/" + player1Id;
+    String sseUrl = "http://localhost:4200/gamestates/" + sessionId + "/" + player1Id + "/stream";
     // Each SSE event ends with a blank line; the first event is the initial subscription push.
     // The second event should arrive after player 0 leaves.
     CompletableFuture<Boolean> secondEventReceived = new CompletableFuture<>();
