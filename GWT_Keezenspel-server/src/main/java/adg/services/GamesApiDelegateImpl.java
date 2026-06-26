@@ -5,14 +5,14 @@ import adg.keezen.GameRegistry;
 import adg.keezen.GameSession;
 import adg.keezen.GameState;
 import adg.keezen.KeezenGameOptions;
-import adg.dto.GameCreatedResponse;
 import com.adg.openapi.api.GamesApiDelegate;
+import com.adg.openapi.model.GameCreatedResponse;
 import com.adg.openapi.model.GameInfo;
 import com.adg.openapi.model.NewGameRequest;
 import com.adg.openapi.model.Player;
+import com.adg.openapi.model.PlayerAddedResponse;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
   }
 
   @Override
-  public ResponseEntity<Object> createNewGame(NewGameRequest newGameRequest) {
+  public ResponseEntity<GameCreatedResponse> createNewGame(NewGameRequest newGameRequest) {
     String roomName = newGameRequest.getRoomName();
 
     if (roomName == null || roomName.isBlank() || roomName.trim().length() < 3) {
@@ -71,7 +71,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
   }
 
   @Override
-  public ResponseEntity<Object> addPlayerToGame(String sessionId, Player player) {
+  public ResponseEntity<PlayerAddedResponse> addPlayerToGame(String sessionId, Player player) {
 
     GameSession gameSession = GameRegistry.getGame(sessionId);
     if (gameSession == null) {
@@ -89,7 +89,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
 
     gameSession.getGameState().addPlayer(player);
     log.info("Player joined: sessionId={} playerId={} name='{}'", sessionId, player.getId(), player.getName());
-    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("playerId", player.getId()));
+    return ResponseEntity.status(HttpStatus.CREATED).body(new PlayerAddedResponse(player.getId()));
   }
 
   @Override
@@ -140,7 +140,7 @@ public class GamesApiDelegateImpl implements GamesApiDelegate {
   }
 
   @Override
-  public ResponseEntity<GameInfo> gamesSessionIdGet(String sessionId) {
+  public ResponseEntity<GameInfo> getGame(String sessionId) {
     GameSession gameSession = GameRegistry.getGame(sessionId);
     if (gameSession == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
