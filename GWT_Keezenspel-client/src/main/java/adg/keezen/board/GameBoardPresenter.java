@@ -142,7 +142,7 @@ public class GameBoardPresenter {
 
   private void connectGameStateSse() {
     String url = com.google.gwt.core.client.GWT.getHostPageBaseURL().replaceAll("/$", "")
-        + "/sse/gamestates/" + Cookie.getSessionID() + "/" + Cookie.getPlayerId();
+        + "/gamestates/" + Cookie.getSessionID() + "/" + Cookie.getPlayerId() + "/stream";
     gameStateSse.connect(url, "gamestate", new SseService.Callback() {
       @Override
       public void onMessage(String data) {
