@@ -1,9 +1,11 @@
-# Reviewed exceptions to operation-4xx-response. These two GETs take no client
-# input that can be wrong and only ever return 200 (getAllGames lists all games;
-# getGameOptions returns a static option list), so there is no honest 4xx to
-# document. The rule stays ON globally — it surfaced real undocumented errors on
+# Reviewed exceptions to operation-4xx-response. These endpoints take no client
+# input that can be wrong and never return 4xx: getAllGames lists all games;
+# getGameOptions returns a static option list; the SSE stream always opens a 200
+# event-stream (it completes immediately for an unknown game rather than erroring).
+# The rule stays ON globally — it surfaced real undocumented errors on
 # getAllPlayersInGame (400) and getPlayerCards (400/404/500), which were fixed.
 keezenspel_openapi.yml:
   operation-4xx-response:
     - '#/paths/~1games/get/responses'
     - '#/paths/~1game-options/get/responses'
+    - '#/paths/~1gamestates~1{sessionId}~1{playerId}~1stream/get/responses'

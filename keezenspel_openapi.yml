@@ -316,6 +316,38 @@ paths:
         '404':
           description: Game not found
 
+  /gamestates/{sessionId}/{playerId}/stream:
+    get:
+      summary: Subscribe to realtime game-state updates (Server-Sent Events)
+      description: |
+        Opens a Server-Sent Events (`text/event-stream`) connection that pushes a
+        personalized game-state snapshot whenever the game changes. Each event is
+        named `gamestate` and its `data` is a `GameStatePush` JSON object.
+
+        This is a long-lived streaming endpoint — consume it with an `EventSource`
+        client, not a generated request/response client. OpenAPI cannot express SSE
+        framing, so the schema below describes the payload of a single `gamestate`
+        event, not the stream as a whole. If the game does not exist the stream opens
+        and completes immediately rather than returning an error.
+      operationId: streamGameState
+      # x-internal makes openapi-generator SKIP this operation: it is hand-implemented
+      # by adg.services.SseController (returns an SseEmitter, which the generator cannot
+      # model), and generating a controller for it would collide with that route. The
+      # operation stays here purely as the documented contract for the realtime stream.
+      x-internal: true
+      tags:
+        - realtime
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+        - $ref: '#/components/parameters/playerId'
+      responses:
+        '200':
+          description: An open SSE stream; each `gamestate` event carries a GameStatePush.
+          content:
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/GameStatePush'
+
   /game-options:
     get:
       summary: Get available game options
@@ -477,6 +509,57 @@ components:
           format: int64
         lastMoveResponse:
           $ref: '#/components/schemas/MoveResponse'
+
+    GameStatePush:
+      type: object
+      description: |
+        Personalized game-state snapshot pushed over the SSE stream. Extends the
+        public GameState fields with the receiving player's private card hand,
+        public card counts, and whether they may forfeit right now.
+      required:
+        - currentPlayerId
+        - pawns
+        - players
+        - winners
+        - version
+      properties:
+        currentPlayerId:
+          type: string
+        pawns:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pawn'
+        players:
+          type: array
+          items:
+            $ref: '#/components/schemas/Player'
+        winners:
+          type: array
+          items:
+            type: string
+        version:
+          type: integer
+          format: int64
+        lastMoveResponse:
+          $ref: '#/components/schemas/MoveResponse'
+        playedCards:
+          type: array
+          items:
+            type: string
+          description: Public — cards already played (for the played-cards stack)
+        nrOfCardsPerPlayer:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Public — number of cards each player has left, keyed by playerId
+        playerCards:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+          description: Private — the receiving player's own hand
+        canForfeit:
+          type: boolean
+          description: Whether this player is allowed to forfeit their turn right now
 
     GameOption:
       type: object
