@@ -90,6 +90,12 @@ public class ApiCallsHelper {
     return response.getBody();
   }
 
+  /** Returns the raw response so callers can assert the status (200 body / 204 empty / 404 throws). */
+  public ResponseEntity<Map> getLastMove(String sessionId) {
+    String url = baseUrl + "/moves/" + sessionId + "/last";
+    return restTemplate.exchange(url, HttpMethod.GET, null, Map.class);
+  }
+
   // ---------- CARDS ----------
   public Map<String, Object> getPubliclyAvailableCardInformation(String sessionId) {
     String url = baseUrl + "/cards/" + sessionId;

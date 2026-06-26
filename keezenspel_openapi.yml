@@ -156,14 +156,26 @@ paths:
           description: "Player could not be added"
         '409':
           description: Game already started, or a player with that id/name is already in the game
-#  /moves/{sessionId}:
-#    get:
-#      summary: get the latest moves you have to animate
-#      description: returns empty array if too much time has passed
-#      tags:
-#        - moves
-#      parameters:
-#        - $ref: '#/components/parameters/sessionId'
+  /moves/{sessionId}/last:
+    get:
+      summary: Get the last move made in the game
+      description: Used by the client to animate the most recent move.
+      operationId: getLastMove
+      tags:
+        - moves
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+      responses:
+        '200':
+          description: The last move that was made
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoveResponse'
+        '204':
+          description: No move has been made in this game yet. No response body.
+        '404':
+          description: Game not found. No response body.
   /moves/{sessionId}/{playerId}:
     post:
       summary: make a move for a player
