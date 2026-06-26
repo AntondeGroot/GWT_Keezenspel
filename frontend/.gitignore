@@ -29,6 +29,9 @@ yarn-error.log
 !.vscode/mcp.json
 .history/*
 
+# Generated API client (regenerated from ../keezenspel_openapi.yml; do not commit)
+/src/app/api
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/
