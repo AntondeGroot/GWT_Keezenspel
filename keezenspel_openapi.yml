@@ -181,17 +181,16 @@ paths:
               $ref: '#/components/schemas/MoveRequest'
       responses:
         '200':
-          description: Move is allowed
+          description: |
+            Move evaluated. The MoveResponse `result` field indicates whether the move
+            is legal (CAN_MAKE_MOVE) or rejected by the rules (see `rejectionReason`).
+            A rules-rejected move is still returned as 200, not as a 4xx.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MoveResponse'
         '400':
-          description: Move is not allowed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          description: Malformed request (game not found, not the player's turn, or missing card/pawn selection). No response body.
 
   /moves/{sessionId}/{playerId}/test:
     post:
@@ -210,13 +209,15 @@ paths:
               $ref: '#/components/schemas/MoveRequest'
       responses:
         '200':
-          description: Move is allowed
+          description: Move checked; returns the tiles to highlight (empty when no move is possible)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TestMoveResponse'
         '400':
-          description: Move is not allowed
+          description: Malformed request (game not found, or missing card/pawn selection). No response body.
+        '500':
+          description: Internal error while evaluating the move. No response body.
   /cards/{sessionId}:
     get:
       summary: Get all card info that is publicly available
@@ -696,16 +697,3 @@ components:
           type: object
           additionalProperties: #for a flexible key value mapping
             type: integer
-
-    ErrorResponse:
-      type: object
-      required:
-        - message
-        - code
-      properties:
-        message:
-          type: string
-          description: Human-readable error message
-        code:
-          type: integer
-          description: HTTP status code
