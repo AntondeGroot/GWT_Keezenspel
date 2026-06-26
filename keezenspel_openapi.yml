@@ -7,8 +7,8 @@ info:
     This API manages players, games, moves, and cards.
 
 servers:
-  - url: http://localhost:4200
-    description: Local development server
+  - url: /
+    description: Same origin as the deployed app (local dev runs at http://localhost:4200)
 
 paths:
   /games:
@@ -44,14 +44,15 @@ paths:
             schema:
               $ref: '#/components/schemas/NewGameRequest'
       responses:
-        201:
+        '201':
           description: Game created
           content:
             application/json:
               schema:
-                sessionId:
-                  type: string
-        409:
+                $ref: '#/components/schemas/GameCreatedResponse'
+        '400':
+          description: Invalid request (e.g. room name missing or shorter than 3 characters)
+        '409':
           description: Game already exists with that name
 
   /games/{sessionId}:
@@ -63,11 +64,11 @@ paths:
       parameters:
         - $ref: '#/components/parameters/sessionId'
       responses:
-        200:
+        '200':
           description: Game was started
-        404:
+        '404':
           description: Game could not be found
-        409:
+        '409':
           description: Game was already started
     delete:
       summary: Stop a game
@@ -77,22 +78,25 @@ paths:
       parameters:
         - $ref: '#/components/parameters/sessionId'
       responses:
-        204:
+        '204':
           description: Game was stopped
-        404:
+        '404':
           description: Game could not be found in order to stop it
     get:
       summary: Get details of a specific game
+      operationId: getGame
+      tags:
+        - games
       parameters:
         - $ref: '#/components/parameters/sessionId'
       responses:
-        200:
+        '200':
           description: Game details
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameInfo'
-        404:
+        '404':
           description: Game not found
   /games/{sessionId}/players/{playerId}:
     delete:
@@ -104,9 +108,9 @@ paths:
         - $ref: '#/components/parameters/sessionId'
         - $ref: '#/components/parameters/playerId'
       responses:
-        204:
+        '204':
           description: Player left the game; cards forfeited and player marked permanently inactive
-        404:
+        '404':
           description: Game or player not found
 
   /games/{sessionId}/players:
@@ -118,7 +122,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/sessionId'
       responses:
-        200:
+        '200':
           description: An array of all players in the session
           content:
             application/json:
@@ -126,6 +130,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Player'
+        '400':
+          description: Game not found
     post:
       summary: Add a player to a game
       operationId: addPlayerToGame
@@ -134,20 +140,22 @@ paths:
       parameters:
         - $ref: '#/components/parameters/sessionId'
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Player'
       responses:
-        201:
+        '201':
           description: "Player was added successfully"
           content:
             application/json:
               schema:
-                playerId:
-                  type: string
-        400:
+                $ref: '#/components/schemas/PlayerAddedResponse'
+        '400':
           description: "Player could not be added"
+        '409':
+          description: Game already started, or a player with that id/name is already in the game
 #  /moves/{sessionId}:
 #    get:
 #      summary: get the latest moves you have to animate
@@ -172,13 +180,13 @@ paths:
             schema:
               $ref: '#/components/schemas/MoveRequest'
       responses:
-        200:
+        '200':
           description: Move is allowed
           content:
-            appplication/json:
+            application/json:
               schema:
                 $ref: '#/components/schemas/MoveResponse'
-        400:
+        '400':
           description: Move is not allowed
           content:
             application/json:
@@ -201,13 +209,13 @@ paths:
             schema:
               $ref: '#/components/schemas/MoveRequest'
       responses:
-        200:
+        '200':
           description: Move is allowed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TestMoveResponse'
-        400:
+        '400':
           description: Move is not allowed
   /cards/{sessionId}:
     get:
@@ -221,13 +229,13 @@ paths:
       parameters:
         - $ref: '#/components/parameters/sessionId'
       responses:
-        200:
+        '200':
           description: get all cards info
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CardResponse'
-        404:
+        '404':
           description: not found
 
   /cards/{sessionId}/{playerId}:
@@ -240,7 +248,7 @@ paths:
       tags:
         - cards
       responses:
-        200:
+        '200':
           description: List of cards for the player
           content:
             application/json:
@@ -248,6 +256,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Card'
+        '400':
+          description: Missing sessionId or playerId
+        '404':
+          description: Game not found
+        '500':
+          description: Game has no card deck (unexpected server state)
 
     delete:
       summary: Player forfeits cards
@@ -258,9 +272,9 @@ paths:
       tags:
         - cards
       responses:
-        200:
+        '200':
           description: player forfeited successfully
-        400:
+        '400':
           description: player could not forfeit
   /gamestates/{sessionId}:
     get:
@@ -278,15 +292,15 @@ paths:
             type: integer
             format: int64
       responses:
-        200:
+        '200':
           description: Gamestate (new version)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameState'
-        304:
+        '304':
           description: Game state not modified (client is up-to-date)
-        404:
+        '404':
           description: Game not found
 
   /game-options:
@@ -324,11 +338,8 @@ components:
       schema:
         type: string
   schemas:
-    RequestType:
-      enum:
-        - CHECK_MOVE
-        - MAKE_MOVE
     MoveType:
+      type: string
       enum:
         - switch
         - onBoard
@@ -496,6 +507,24 @@ components:
           type: integer
           description: Maximum value — only relevant for INTEGER type
 
+    GameCreatedResponse:
+      type: object
+      required:
+        - sessionId
+      properties:
+        sessionId:
+          type: string
+          description: Identifier of the newly created game session
+
+    PlayerAddedResponse:
+      type: object
+      required:
+        - playerId
+      properties:
+        playerId:
+          type: string
+          description: Identifier of the player that was added to the game
+
     NewGameRequest:
       type: object
       required:
@@ -504,12 +533,12 @@ components:
       properties:
         roomName:
           type: string
-          min: 3
-          max: 50
+          minLength: 3
+          maxLength: 50
         maxPlayers:
           type: integer
-          min: 2
-          max: 8
+          minimum: 2
+          maximum: 8
         playerId:
           type: string
         gameOptions:
@@ -544,10 +573,12 @@ components:
           $ref: '#/components/schemas/TempMessageType'
     TempMessageType:
       description: only temporary, to give it test/make_move functionality in order to make the switch to openapi easier
+      type: string
       enum:
         - CHECK_MOVE
         - MAKE_MOVE
     Card:
+      type: object
       required:
         - suit
         - value
@@ -558,8 +589,8 @@ components:
             there is 1 suite per player
             with a maximum of 4 suites (0,1,2,3)
           type: integer
-          min: 0
-          max: 3
+          minimum: 0
+          maximum: 3
         value:
           description: the face value of the card 1 = ace, ... , 12 = king
           type: integer
@@ -569,6 +600,7 @@ components:
             this happens when you have more than 4 players.
           type: integer
     MoveResult:
+      type: string
       enum:
         - CAN_MAKE_MOVE
         - CANNOT_MAKE_MOVE
@@ -578,6 +610,7 @@ components:
       description: |
         Specific reason a move was rejected, so the client can explain to the player why
         the move could not be made. NONE means no rejection (the move was valid).
+      type: string
       enum:
         - NONE
         - INVALID_SELECTION

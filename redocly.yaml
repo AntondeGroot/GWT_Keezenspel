@@ -1,0 +1,26 @@
+# Redocly lint config — gates the OpenAPI contract in CI.
+#
+# `extends: recommended` turns on the `struct` rule, which validates schema
+# objects against the OpenAPI meta-schema. That is what catches the structural
+# malformations openapi-generator silently ignores at build time:
+#   - invalid schema keywords (e.g. `min`/`max` instead of minLength/minimum)
+#   - malformed inline response schemas (a bare property under `schema:`)
+# Spectral's default ruleset does NOT catch these, which is why we use Redocly.
+extends:
+  - recommended
+
+rules:
+  # This API has no authentication by design: identity is a self-asserted
+  # playerId carried in the URL path / a client cookie, with no server-side
+  # verification (no Spring Security on the classpath). Without turning this
+  # off, `security-defined` errors on every operation and fails the build.
+  # Revisit if real auth is ever added (declare a securityScheme + enforce it).
+  security-defined: off
+
+  # This hobby project declares no license (no LICENSE file); the API spec
+  # should not claim one it doesn't have. Drop this once a license is chosen.
+  info-license: off
+
+apis:
+  keezen@v1:
+    root: keezenspel_openapi.yml
