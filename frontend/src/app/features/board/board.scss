@@ -23,11 +23,13 @@
   border: 1px solid rgba(0, 0, 0, 0.4);
   border-radius: 50%;
 
-  // First pass: every tile is the neutral track colour. Per-player colours
-  // (start / nest / finish) come in the next step.
+  // Background colour is set per-tile inline by the component (#f2f2f2 for the
+  // neutral track, the owner's colour for start / nest / finish). This is just a
+  // fallback if none is bound.
   background-color: #f2f2f2;
-  // inset 3D disc — darker top-left, lighter bottom-right (shades of #f2f2f2).
+  // Colour-agnostic 3D disc: translucent dark top-left + light bottom-right, so
+  // the inset highlight/shadow works on any tile colour (no per-colour shades).
   box-shadow:
-    inset 3px 3px 4px #919191,
-    inset -4px -4px 4px #fefefe;
+    inset 3px 3px 4px rgba(0, 0, 0, 0.35),
+    inset -4px -4px 4px rgba(255, 255, 255, 0.5);
 }

@@ -1,7 +1,10 @@
 @if (tiles().length) {
   <div class="board" [style.--cell.px]="cell()">
     @for (t of tiles(); track t.playerId + ':' + t.tileNr) {
-      <div class="tile" [style.left.px]="t.x" [style.top.px]="t.y"></div>
+      <div class="tile"
+           [style.left.px]="t.x"
+           [style.top.px]="t.y"
+           [style.background-color]="t.color"></div>
     }
   </div>
 }
