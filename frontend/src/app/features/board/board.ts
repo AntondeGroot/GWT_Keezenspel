@@ -1,7 +1,6 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { GamestatesService, GameState } from '../../api';
-import { buildBoard } from './board-geometry';
-import { ActivatedRoute } from '@angular/router';
+import {buildBoard, pawnBox} from './board-geometry';
 import {resolveGameSession} from '../../session';
 
 @Component({
@@ -21,9 +20,6 @@ export class Board implements OnInit{
   private readonly sessionId = this.session.sessionId;
   private readonly viewerId = this.session.playerId
   private readonly gamestateService = inject(GamestatesService);
-  private readonly route = inject(ActivatedRoute);
-  private readonly params = this.route.snapshot.queryParamMap;
-
 
   protected readonly state = signal<GameState | undefined>(undefined);
 
@@ -47,5 +43,15 @@ export class Board implements OnInit{
       color: t.tileNr <= 0 || t.tileNr >= 16 ? colorOf(t.playerId) : '#f2f2f2',
     }));
   });
+  protected readonly pawns = computed(() => {
+    const g = this.geometry();
+    const s = this.state();
+    if(!g || !s?.pawns) return [];
+    return s.pawns.map((pawn) => {
+      const tile = pawn.currentTileId;
+      const pt = g.position(tile.playerId, tile.tileNr)
+      if(!pt) return null;
+      return pawnBox(pt)}).filter(x => x !== null);
+  })
   protected readonly cell  = computed(() => this.geometry()?.cellDistance ?? 0);
 }

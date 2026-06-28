@@ -105,3 +105,31 @@ const sessionId = urlParam('sessionid') ?? cookie('sessionid');
 `a ?? b` evaluates to `a` unless `a` is `null`/`undefined`, in which case it falls back to `b`. (This mirrors the GWT client's `Cookie.pickValue`.)
 
 ===END PAGE===
+
+---
+
+## Session 3 — Rendering lists: `@for`, `$index`, and self-closing tags
+
+===PAGE 1===
+Inside an Angular `@for`, how do you reference the current item's position in the list — what is the variable called?
+?
+`$index` — note the leading `$`, which marks all of `@for`'s built-in variables (the others are `$first`, `$last`, `$even`, `$odd`, `$count`). It starts at `0`.
+
+A common use is `track`, which is required and tells Angular how to identify each item across re-renders. Use `track $index` only when items have **no stable unique id**:
+```html
+@for (p of pawns(); track $index) { ... }
+```
+Prefer a real id when one exists (e.g. `track item.id`) — index-based tracking re-renders more than necessary if the list reorders.
+
+---
+
+When can an element be self-closed in an Angular template, and when not?
+?
+Only three kinds of elements may use `<… />`:
+- **void** elements (`<br/>`, `<img/>`, `<input/>`),
+- **custom** elements — a tag with a hyphen, including your components (`<app-board />`),
+- **foreign** elements (SVG / MathML).
+
+A normal element like `<div/>` is **not** allowed and fails the build with **NG5002: "Only void, custom and foreign elements can be self closed"**. Close it explicitly instead: `<div ...></div>`.
+
+===END PAGE===
