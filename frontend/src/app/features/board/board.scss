@@ -1,0 +1,33 @@
+// Board — ported from the GWT client's .tile look.
+// The board coordinate space is 600x600 (BOARD_SIZE); tiles are positioned by
+// their CENTRE (t.x, t.y) and centred on that point with translate(-50%, -50%).
+// --cell is set on .board from the component (the geometry's cellDistance).
+
+.board {
+  position: relative;
+  width: 600px;
+  height: 600px;
+  margin: 0 auto;
+}
+
+.tile {
+  position: absolute;
+  // left/top (bound from the component) are the tile centre; pull back by half.
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+
+  // diameter = cell - 3 (matches createCircle's 2 * (cell / 2) - 3)
+  width: calc(var(--cell, 35px) - 3px);
+  height: calc(var(--cell, 35px) - 3px);
+
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+
+  // First pass: every tile is the neutral track colour. Per-player colours
+  // (start / nest / finish) come in the next step.
+  background-color: #f2f2f2;
+  // inset 3D disc — darker top-left, lighter bottom-right (shades of #f2f2f2).
+  box-shadow:
+    inset 3px 3px 4px #919191,
+    inset -4px -4px 4px #fefefe;
+}
