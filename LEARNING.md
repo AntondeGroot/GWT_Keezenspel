@@ -69,3 +69,39 @@ Where do `GameState` and `GamestatesService` come from, and why aren't they in g
 They're generated from `keezenspel_openapi.yml` into `src/app/api/` by `npm run generate:api`. That folder is gitignored and regenerated on `postinstall`/`prebuild` — the OpenAPI spec is the source of truth, so the client is rebuilt rather than committed.
 
 ===END PAGE===
+
+---
+
+## Session 2 — Reading the session from URL params and cookies
+
+===PAGE 1===
+How do you read a query parameter from the current URL in plain TypeScript?
+?
+Use the browser's `URLSearchParams` on `window.location.search`:
+```typescript
+const value = new URLSearchParams(window.location.search).get('sessionid');
+```
+`window.location.search` is the `?a=1&b=2` part of the URL; `.get(name)` returns the value or `null` if it is absent.
+
+---
+
+How do you read a cookie value by name in plain TypeScript?
+?
+There is no built-in getter, so read `document.cookie` (a single `"a=1; b=2"` string) and pull the value out:
+```typescript
+const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+const value = match ? decodeURIComponent(match[1]) : null;
+```
+`decodeURIComponent` reverses the encoding the browser applies when the cookie was set.
+
+---
+
+When a value can come from either the URL or a cookie, which should win, and how do you express it?
+?
+The URL parameter wins, with the cookie as a fallback — the URL is the explicit hand-off for *this* visit, the cookie is what persists across refreshes. Express it with `??` (nullish coalescing):
+```typescript
+const sessionId = urlParam('sessionid') ?? cookie('sessionid');
+```
+`a ?? b` evaluates to `a` unless `a` is `null`/`undefined`, in which case it falls back to `b`. (This mirrors the GWT client's `Cookie.pickValue`.)
+
+===END PAGE===
