@@ -133,3 +133,36 @@ Only three kinds of elements may use `<… />`:
 A normal element like `<div/>` is **not** allowed and fails the build with **NG5002: "Only void, custom and foreign elements can be self closed"**. Close it explicitly instead: `<div ...></div>`.
 
 ===END PAGE===
+
+---
+
+## Session 4 — Class fields assigned later, and component cleanup
+
+===PAGE 1===
+A class field is assigned later (e.g. in `ngOnInit`), not at its declaration or in the constructor. How do you declare it so strict TypeScript accepts it, and what error appears if you don't?
+?
+Mark it **optional** with `?`:
+```typescript
+private eventSource?: EventSource;
+```
+The `?` makes the type `EventSource | undefined`, which satisfies strict mode (it's allowed to be unset). Without the `?` you get **TS2564: "Property … has no initializer and is not definitely assigned in the constructor."** Because it may be undefined, you then read it with optional chaining: `this.eventSource?.close()`.
+
+(Remember the distinction: class fields use `private`/`protected`/`public` (+ optional `readonly`) — never `const`/`let`, which are only for local variables inside a method.)
+
+---
+
+How do you run cleanup when an Angular component is destroyed, and why declare the interface instead of just writing the method?
+?
+Add an `ngOnDestroy()` method and declare `implements OnDestroy` (imported from `@angular/core`):
+```typescript
+export class Board implements OnInit, OnDestroy {
+  ngOnDestroy(): void {
+    this.eventSource?.close();
+  }
+}
+```
+Angular calls `ngOnDestroy` whenever the method exists, so it works without the interface — but `implements OnDestroy` makes TypeScript verify the method's name and signature, catching a typo like `ngOnDestory`. Typical use: closing an `EventSource`, unsubscribing, clearing timers.
+
+===END PAGE===
+
+===END PAGE===

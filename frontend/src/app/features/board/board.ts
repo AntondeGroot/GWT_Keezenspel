@@ -1,5 +1,5 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
-import { GamestatesService, GameState } from '../../api';
+import {Component, signal, computed, OnInit, OnDestroy} from '@angular/core';
+import { GameState } from '../../api';
 import {buildBoard, pawnBox} from './board-geometry';
 import {resolveGameSession} from '../../session';
 import { Pawn } from './pawn/pawn';
@@ -10,20 +10,24 @@ import { Pawn } from './pawn/pawn';
   templateUrl: './board.html',
   styleUrl: './board.scss',
 })
-export class Board implements OnInit{
+export class Board implements OnInit, OnDestroy{
+
   ngOnInit(): void {
     if(this.sessionId){
-      this.gamestateService.getGameStateForGame(this.sessionId)
-      .subscribe((s) => this.state.set(s));
+      this.eventSource = new EventSource(this.streamUrl);
+      this.eventSource.addEventListener('gamestate', (event: MessageEvent) => {this.state.set(JSON.parse(event.data))});
     }
   }
+
+  ngOnDestroy(): void {
+    this.eventSource?.close();
+  }
+
   private readonly session = resolveGameSession();
   private readonly sessionId = this.session.sessionId;
-  private readonly viewerId = this.session.playerId
-  private readonly gamestateService = inject(GamestatesService);
-
+  private readonly viewerId = this.session.playerId;
+  private readonly streamUrl = `/gamestates/${this.sessionId}/${this.viewerId}/stream`;
   protected readonly state = signal<GameState | undefined>(undefined);
-
   protected readonly geometry = computed(() => {
     const s = this.state();
     const viewer = this.viewerId;
@@ -59,4 +63,5 @@ export class Board implements OnInit{
       return {...pawnBox(pt), color:colorOfPawn, id: pawnId}}).filter(x => x !== null);
   })
   protected readonly cell  = computed(() => this.geometry()?.cellDistance ?? 0);
+  private eventSource?: EventSource;
 }
