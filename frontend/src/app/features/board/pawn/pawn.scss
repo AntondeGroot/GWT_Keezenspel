@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  // 657x873 viewBox in a 50x50 box → preserveAspectRatio (default) scales it to
+  // fit and centres it, same as the GWT pawn image.
+  overflow: visible;
+}
