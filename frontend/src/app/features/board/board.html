@@ -6,8 +6,8 @@
            [style.top.px]="t.y"
            [style.background-color]="t.color"></div>
     }
-    @for (p of pawns(); track $index){
-      <div class="pawn" [style.left.px]="p.left" [style.top.px]="p.top" [style.z-index]="p.zIndex"></div>
+    @for (p of pawns(); track p.id){
+      <div class="pawn" [style.left.px]="p.left" [style.top.px]="p.top" [style.z-index]="p.zIndex" [style.background-color]="p.color" [id]="p.id"></div>
     }
   </div>
 }

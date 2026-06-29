@@ -47,11 +47,15 @@ export class Board implements OnInit{
     const g = this.geometry();
     const s = this.state();
     if(!g || !s?.pawns) return [];
+    const colorOf = (playerId: string) =>
+      s.players!.find((p) => p.id === playerId)?.color || '#f2f2f2';
     return s.pawns.map((pawn) => {
       const tile = pawn.currentTileId;
       const pt = g.position(tile.playerId, tile.tileNr)
+      const colorOfPawn = colorOf(pawn.playerId);
+      const pawnId = `${pawn.pawnId.playerId}:${pawn.pawnId.pawnNr}`;
       if(!pt) return null;
-      return pawnBox(pt)}).filter(x => x !== null);
+      return {...pawnBox(pt), color:colorOfPawn, id: pawnId}}).filter(x => x !== null);
   })
   protected readonly cell  = computed(() => this.geometry()?.cellDistance ?? 0);
 }
