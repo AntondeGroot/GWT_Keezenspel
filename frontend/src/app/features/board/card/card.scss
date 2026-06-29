@@ -1,0 +1,20 @@
+// One card cell from card-deck.png. The full sheet is 13 cols x 5 rows (1920x1150);
+// at a 100px-wide card the cell is 100 x 155.73 and the whole sheet scales to
+// 1300 x 778.65. --card-col (value-1) and --card-row (suit) pick the cell.
+:host {
+  display: block;
+  width: 100px;
+  height: 155.73px;
+  background-image: url('/card-deck.png');
+  background-repeat: no-repeat;
+  background-size: 1300px 778.65px;
+  background-position:
+    calc(var(--card-col, 0) * -100px)
+    calc(var(--card-row, 0) * -155.73px);
+  border-radius: 5px;
+  box-shadow:
+    4px 5px 14px rgba(0, 0, 0, 0.55),
+    1px 1px 4px rgba(0, 0, 0, 0.3);
+  // movement (hand <-> pile) will animate smoothly once we drive position by state
+  transition: transform 0.3s ease;
+}

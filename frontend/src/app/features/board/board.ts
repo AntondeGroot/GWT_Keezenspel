@@ -1,12 +1,13 @@
-import {Component, signal, computed, OnInit, OnDestroy} from '@angular/core';
-import { GameState } from '../../api';
-import {buildBoard, pawnBox} from './board-geometry';
-import {resolveGameSession} from '../../session';
+import { Component, signal, computed, OnInit, OnDestroy } from '@angular/core';
+import { GameStatePush } from '../../api';
+import { buildBoard, pawnBox } from './board-geometry';
+import { resolveGameSession } from '../../session';
 import { Pawn } from './pawn/pawn';
+import { Card } from './card/card';
 
 @Component({
   selector: 'app-board',
-  imports: [Pawn],
+  imports: [Pawn, Card],
   templateUrl: './board.html',
   styleUrl: './board.scss',
 })
@@ -27,7 +28,7 @@ export class Board implements OnInit, OnDestroy{
   private readonly sessionId = this.session.sessionId;
   private readonly viewerId = this.session.playerId;
   private readonly streamUrl = `/gamestates/${this.sessionId}/${this.viewerId}/stream`;
-  protected readonly state = signal<GameState | undefined>(undefined);
+  protected readonly state = signal<GameStatePush | undefined>(undefined);
   protected readonly geometry = computed(() => {
     const s = this.state();
     const viewer = this.viewerId;
@@ -64,4 +65,6 @@ export class Board implements OnInit, OnDestroy{
   })
   protected readonly cell  = computed(() => this.geometry()?.cellDistance ?? 0);
   private eventSource?: EventSource;
+
+  protected readonly hand = computed(() => this.state()?.playerCards ?? []);
 }
