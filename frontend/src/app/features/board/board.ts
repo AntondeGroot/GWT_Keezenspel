@@ -4,6 +4,7 @@ import { buildBoard, pawnBox } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { Pawn } from './pawn/pawn';
 import { Card } from './card/card';
+import {highlightForPawn1, highlightForPawn2} from './pawn-highlight';
 
 @Component({
   selector: 'app-board',
@@ -67,4 +68,13 @@ export class Board implements OnInit, OnDestroy{
   private eventSource?: EventSource;
 
   protected readonly hand = computed(() => this.state()?.playerCards ?? []);
+
+  protected readonly selectedCardUuid = signal<number | undefined>(undefined);
+  protected readonly selectedPawnId = signal<string | undefined>(undefined);
+
+  protected selectCard(uuid: number): void { this.selectedCardUuid.set(uuid); }
+  protected selectPawn(id: string): void { this.selectedPawnId.set(id)};
+
+  protected readonly highlightForPawn1 = highlightForPawn1;
+  protected readonly highlightForPawn2 = highlightForPawn2;
 }
