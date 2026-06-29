@@ -2,10 +2,11 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { GamestatesService, GameState } from '../../api';
 import {buildBoard, pawnBox} from './board-geometry';
 import {resolveGameSession} from '../../session';
+import { Pawn } from './pawn/pawn';
 
 @Component({
   selector: 'app-board',
-  imports: [],
+  imports: [Pawn],
   templateUrl: './board.html',
   styleUrl: './board.scss',
 })

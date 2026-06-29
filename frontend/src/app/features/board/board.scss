@@ -34,14 +34,11 @@
     inset -4px -4px 4px rgba(255, 255, 255, 0.5);
 }
 
-// Placeholder pawn: a 50px box (matches pawnBox / PawnLayout) positioned by its
-// top-left. Real pawn.svg + per-player colour come next; this just proves the
-// positions are right.
+// A pawn (the <app-pawn> SVG): a 50px box positioned by its top-left, matching
+// pawnBox / PawnLayout. The SVG inside fills it and is recoloured via --pawn-color.
 .pawn {
   position: absolute;
   width: 50px;
   height: 50px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.55);
   box-sizing: border-box;
 }

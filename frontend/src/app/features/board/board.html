@@ -7,7 +7,11 @@
            [style.background-color]="t.color"></div>
     }
     @for (p of pawns(); track p.id){
-      <div class="pawn" [style.left.px]="p.left" [style.top.px]="p.top" [style.z-index]="p.zIndex" [style.background-color]="p.color" [id]="p.id"></div>
+      <app-pawn class="pawn"
+                [color]="p.color"
+                [style.left.px]="p.left"
+                [style.top.px]="p.top"
+                [style.z-index]="p.zIndex" />
     }
   </div>
 }
