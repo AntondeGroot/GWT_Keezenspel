@@ -12,8 +12,11 @@ import { Component, Input } from '@angular/core';
   styleUrl: './pawn.scss',
   host: {
     '[style.--pawn-color]': 'color',
+    '[style.--pawn-highlight]': 'highlight',
   },
 })
 export class Pawn {
   @Input() color = '#888888';
+  /** Selection-highlight stroke colour, or undefined when not selected. */
+  @Input() highlight?: string;
 }

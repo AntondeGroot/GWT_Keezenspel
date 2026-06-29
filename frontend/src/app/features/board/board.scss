@@ -41,6 +41,7 @@
   width: 50px;
   height: 50px;
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 // The player's hand: a row of cards pinned to the bottom-centre of the screen.
@@ -52,4 +53,21 @@
   display: flex;
   gap: 8px;
   z-index: 100;
+
+  // Cards are clickable; hover lifts slightly (matches the old .cardDiv:hover).
+  app-card {
+    cursor: pointer;
+  }
+  app-card:hover {
+    transform: translateY(-8px) scale(1.03);
+  }
+  // Selected card: lifted further with a gold ring + glow. (transform animates
+  // because app-card already has `transition: transform`.)
+  app-card.selected {
+    transform: translateY(-20px) scale(1.05);
+    box-shadow:
+      0 10px 20px rgba(0, 0, 0, 0.5),
+      0 0 0 3px #f4d03f,
+      0 0 12px rgba(244, 208, 63, 0.7);
+  }
 }
