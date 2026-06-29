@@ -13,5 +13,10 @@
                 [style.top.px]="p.top"
                 [style.z-index]="p.zIndex" />
     }
+    <div class="hand">
+      @for (c of hand(); track c.uuid) {
+        <app-card [suit]="c.suit" [value]="c.value" />
+      }
+    </div>
   </div>
 }
