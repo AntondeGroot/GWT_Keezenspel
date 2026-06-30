@@ -1,5 +1,5 @@
-import { Component, signal, computed, OnInit, OnDestroy } from '@angular/core';
-import { GameStatePush } from '../../api';
+import { Component, signal, inject, computed, OnInit, OnDestroy } from '@angular/core';
+import { GameStatePush, MovesService } from '../../api';
 import { buildBoard, pawnBox } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { Pawn } from './pawn/pawn';
@@ -24,7 +24,7 @@ export class Board implements OnInit, OnDestroy{
   ngOnDestroy(): void {
     this.eventSource?.close();
   }
-
+  private readonly movesService = inject(MovesService);
   private readonly session = resolveGameSession();
   private readonly sessionId = this.session.sessionId;
   private readonly viewerId = this.session.playerId;
@@ -72,9 +72,37 @@ export class Board implements OnInit, OnDestroy{
   protected readonly selectedCardUuid = signal<number | undefined>(undefined);
   protected readonly selectedPawnId = signal<string | undefined>(undefined);
 
-  protected selectCard(uuid: number): void { this.selectedCardUuid.set(uuid); }
-  protected selectPawn(id: string): void { this.selectedPawnId.set(id)};
+  protected selectCard(uuid: number): void {
+    this.selectedCardUuid.set(uuid);
+    this.tryMove();}
+  protected selectPawn(id: string): void {
+    this.selectedPawnId.set(id);
+    this.tryMove()};
 
   protected readonly highlightForPawn1 = highlightForPawn1;
   protected readonly highlightForPawn2 = highlightForPawn2;
+  private tryMove(): void {
+    const cardUuid = this.selectedCardUuid();
+    const pawnId = this.selectedPawnId();
+    if (cardUuid === undefined || pawnId === undefined) return;
+    
+    // check if the card and pawn still exist
+    const card = this.hand().find((c) => c.uuid === cardUuid);
+    const pawn = this.state()?.pawns?.find(
+      (p) => `${p.pawnId.playerId}:${p.pawnId.pawnNr}` === pawnId,
+    );
+    if (!card || !pawn || !this.sessionId || !this.viewerId) return;
+
+    const move = {
+      playerId: this.viewerId,
+      cardId: cardUuid,
+      pawn1Id: pawn.pawnId,
+      stepsPawn1: card.value,
+      tempMessageType: 'MAKE_MOVE' as const,
+    };
+
+    this.movesService.makeMove(this.sessionId, this.viewerId, move).subscribe();
+    this.selectedCardUuid.set(undefined);
+    this.selectedPawnId.set(undefined);
+  }
 }
