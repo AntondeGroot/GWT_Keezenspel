@@ -1,6 +1,6 @@
 import { Component, signal, inject, computed, OnInit, OnDestroy } from '@angular/core';
 import { GameStatePush, MovesService } from '../../api';
-import { buildBoard, pawnBox } from './board-geometry';
+import { buildBoard } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { Pawn } from './pawn/pawn';
 import { Card } from './card/card';
@@ -62,7 +62,7 @@ export class Board implements OnInit, OnDestroy{
       const colorOfPawn = colorOf(pawn.playerId);
       const pawnId = `${pawn.pawnId.playerId}:${pawn.pawnId.pawnNr}`;
       if(!pt) return null;
-      return {...pawnBox(pt), color:colorOfPawn, id: pawnId}}).filter(x => x !== null);
+      return {x: pt.x, y: pt.y, zIndex: Math.round(pt.y), color: colorOfPawn, id: pawnId}}).filter(x => x !== null);
   })
   protected readonly cell  = computed(() => this.geometry()?.cellDistance ?? 0);
   private eventSource?: EventSource;
