@@ -11,7 +11,9 @@
         <app-pawn class="pawn"
                   [color]="p.color"
                   (click)="selectPawn(p.id)"
-                  [highlight]="selectedPawnId() === p.id ? highlightForPawn1(p.color) : undefined"
+                  [highlight]="p.id === selectedPawnId() ? highlightForPawn1(p.color)
+                           : p.id === selectedPawn2Id() ? highlightForPawn2(p.color)
+                           : undefined"
                   [style.left.%]="p.x / 6"
                   [style.top.%]="p.y / 6"
                   [style.z-index]="p.zIndex" />

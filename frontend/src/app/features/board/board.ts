@@ -108,13 +108,30 @@ export class Board implements OnInit, OnDestroy{
 
   protected readonly selectedCardUuid = signal<number | undefined>(undefined);
   protected readonly selectedPawnId = signal<string | undefined>(undefined);
+  protected readonly selectedPawn2Id = signal<string | undefined>(undefined);
+
+  private findPawn(id: string) {
+    return this.state()?.pawns?.find(
+      (p) => `${p.pawnId.playerId}:${p.pawnId.pawnNr}` === id,
+    );
+  }
 
   protected selectCard(uuid: number): void {
     this.selectedCardUuid.set(uuid);
     this.tryMove();}
   protected selectPawn(id: string): void {
-    this.selectedPawnId.set(id);
-    this.tryMove()};
+    const card = this.hand().find((c) => c.uuid === this.selectedCardUuid());
+    const isJack = card?.value === 11;
+    // A Jack (switch) needs two pawns: keep the first, set the second on the
+    // next click on a different pawn. Any other card just (re)selects one pawn.
+    if (isJack && this.selectedPawnId() !== undefined && this.selectedPawnId() !== id) {
+      this.selectedPawn2Id.set(id);
+    } else {
+      this.selectedPawnId.set(id);
+      this.selectedPawn2Id.set(undefined);
+    }
+    this.tryMove();
+  }
 
   protected readonly highlightForPawn1 = highlightForPawn1;
   protected readonly highlightForPawn2 = highlightForPawn2;
@@ -122,18 +139,26 @@ export class Board implements OnInit, OnDestroy{
     const cardUuid = this.selectedCardUuid();
     const pawnId = this.selectedPawnId();
     if (cardUuid === undefined || pawnId === undefined) return;
-    
-    // check if the card and pawn still exist
+
     const card = this.hand().find((c) => c.uuid === cardUuid);
-    const pawn = this.state()?.pawns?.find(
-      (p) => `${p.pawnId.playerId}:${p.pawnId.pawnNr}` === pawnId,
-    );
-    if (!card || !pawn || !this.sessionId || !this.viewerId) return;
+    const pawn1 = this.findPawn(pawnId);
+    if (!card || !pawn1 || !this.sessionId || !this.viewerId) return;
+
+    // A Jack is a switch: wait for a second pawn, then send both. The server
+    // classifies it as SWITCH from (jack + two on-board pawns).
+    let pawn2;
+    if (card.value === 11) {
+      const pawn2Id = this.selectedPawn2Id();
+      if (pawn2Id === undefined) return; // still waiting for the second pawn
+      pawn2 = this.findPawn(pawn2Id);
+      if (!pawn2) return;
+    }
 
     const move = {
       playerId: this.viewerId,
       cardId: cardUuid,
-      pawn1Id: pawn.pawnId,
+      pawn1Id: pawn1.pawnId,
+      pawn2Id: pawn2?.pawnId, // undefined for non-switch moves
       stepsPawn1: card.value,
       tempMessageType: 'MAKE_MOVE' as const,
     };
@@ -149,5 +174,6 @@ export class Board implements OnInit, OnDestroy{
     });
     this.selectedCardUuid.set(undefined);
     this.selectedPawnId.set(undefined);
+    this.selectedPawn2Id.set(undefined);
   }
 }
