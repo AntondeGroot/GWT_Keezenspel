@@ -1,5 +1,5 @@
 import { Component, signal, inject, computed, OnInit, OnDestroy } from '@angular/core';
-import { GameStatePush, MovesService, Card as CardModel } from '../../api';
+import { GameStatePush, MovesService, CardsService, Card as CardModel, MoveRequest } from '../../api';
 import { buildBoard } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { Pawn } from './pawn/pawn';
@@ -25,6 +25,7 @@ export class Board implements OnInit, OnDestroy{
     this.eventSource?.close();
   }
   private readonly movesService = inject(MovesService);
+  private readonly cardsService = inject(CardsService);
   private readonly session = resolveGameSession();
   private readonly sessionId = this.session.sessionId;
   private readonly viewerId = this.session.playerId;
@@ -118,24 +119,31 @@ export class Board implements OnInit, OnDestroy{
 
   protected selectCard(uuid: number): void {
     this.selectedCardUuid.set(uuid);
-    this.tryMove();}
+  }
+
   protected selectPawn(id: string): void {
     const card = this.hand().find((c) => c.uuid === this.selectedCardUuid());
-    const isJack = card?.value === 11;
-    // A Jack (switch) needs two pawns: keep the first, set the second on the
-    // next click on a different pawn. Any other card just (re)selects one pawn.
-    if (isJack && this.selectedPawnId() !== undefined && this.selectedPawnId() !== id) {
+    // Jack (switch) needs two pawns: keep the first, set the second on the next
+    // click on a different pawn. Other cards just (re)select one pawn.
+    const needsTwo = card?.value === 11;
+    if (needsTwo && this.selectedPawnId() !== undefined && this.selectedPawnId() !== id) {
       this.selectedPawn2Id.set(id);
     } else {
       this.selectedPawnId.set(id);
       this.selectedPawn2Id.set(undefined);
     }
-    this.tryMove();
   }
 
   protected readonly highlightForPawn1 = highlightForPawn1;
   protected readonly highlightForPawn2 = highlightForPawn2;
-  private tryMove(): void {
+
+  // The "play card" button is enabled once a card and a pawn are selected.
+  protected readonly canPlay = computed(
+    () => this.selectedCardUuid() !== undefined && this.selectedPawnId() !== undefined,
+  );
+
+  // Submit the current selection (the green send / "play card" button).
+  protected playCard(): void {
     const cardUuid = this.selectedCardUuid();
     const pawnId = this.selectedPawnId();
     if (cardUuid === undefined || pawnId === undefined) return;
@@ -154,15 +162,18 @@ export class Board implements OnInit, OnDestroy{
       if (!pawn2) return;
     }
 
-    const move = {
+    this.send(card, {
       playerId: this.viewerId,
       cardId: cardUuid,
       pawn1Id: pawn1.pawnId,
       pawn2Id: pawn2?.pawnId, // undefined for non-switch moves
       stepsPawn1: card.value,
-      tempMessageType: 'MAKE_MOVE' as const,
-    };
+      tempMessageType: 'MAKE_MOVE',
+    });
+  }
 
+  private send(card: CardModel, move: MoveRequest): void {
+    if (!this.sessionId || !this.viewerId) return;
     this.movesService.makeMove(this.sessionId, this.viewerId, move).subscribe({
       // Only fly the card to the pile if the server actually accepted the move.
       next: (response) => {
@@ -172,6 +183,15 @@ export class Board implements OnInit, OnDestroy{
       },
       error: () => {}, // illegal / not your turn (400): card stays in the hand
     });
+    this.selectedCardUuid.set(undefined);
+    this.selectedPawnId.set(undefined);
+    this.selectedPawn2Id.set(undefined);
+  }
+
+  // Forfeit the turn (the amber forfeit button) — DELETE /cards/{session}/{player}.
+  protected forfeit(): void {
+    if (!this.sessionId || !this.viewerId) return;
+    this.cardsService.playerForfeits(this.sessionId, this.viewerId).subscribe({ error: () => {} });
     this.selectedCardUuid.set(undefined);
     this.selectedPawnId.set(undefined);
     this.selectedPawn2Id.set(undefined);

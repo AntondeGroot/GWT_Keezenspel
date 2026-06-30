@@ -37,5 +37,10 @@
           (click)="selectCard(c.uuid)" />
       }
     </div>
+
+    <div class="button-container">
+      <button class="send-button" [disabled]="!canPlay()" (click)="playCard()">Play card</button>
+      <button class="forfeit-button" (click)="forfeit()">Forfeit</button>
+    </div>
   </div>
 }

@@ -73,6 +73,79 @@
 // (board coordinate space). When a card's target changes from a hand slot to the
 // pile centre, the left/top/transform transition animates the flight — and because
 // it's the same element (tracked by uuid), it's the same card that flies.
+// Button container — ported from the GWT .buttonContainer/.sendButton/.forfeitButton.
+// A dark gold-bordered panel beside the board with the play (send) + forfeit buttons.
+.button-container {
+  position: absolute;
+  left: 100%; // just to the right of the board (GWT: left: 600px)
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 16px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 2px solid #c9a227;
+  background: linear-gradient(145deg, #3a2000, #251400);
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.send-button,
+.forfeit-button {
+  font: 600 15pt 'Cinzel', Georgia, serif;
+  letter-spacing: 1px;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow:
+    3px 3px 10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.4);
+  }
+  &:disabled {
+    background: linear-gradient(145deg, #555, #444);
+    border: 2px solid #333;
+    color: #888;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+    text-shadow: none;
+  }
+}
+
+.send-button {
+  background: linear-gradient(145deg, #a8f0a0, #60d458);
+  border: 2px solid #3a8c35;
+  color: #0e2b0b;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(145deg, #b8f8b0, #72e464);
+  }
+}
+
+.forfeit-button {
+  background: linear-gradient(145deg, #ffecc0, #ffc850);
+  border: 2px solid #b06010;
+  color: #4a2000;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(145deg, #fff0d0, #ffd870);
+  }
+}
+
 .card {
   position: absolute;
   width: 16.667%; // 100/600 of the board → scales with it (height from aspect-ratio)
