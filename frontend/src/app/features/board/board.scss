@@ -1,12 +1,14 @@
 // Board — ported from the GWT client's .tile look.
-// The board coordinate space is 600x600 (BOARD_SIZE); tiles are positioned by
-// their CENTRE (t.x, t.y) and centred on that point with translate(-50%, -50%).
-// --cell is set on .board from the component (the geometry's cellDistance).
+// The board is a 0..600 coordinate space expressed in PERCENT: the component
+// divides every coord by 6 (x/600*100), so positions/sizes are % of the board.
+// The board element itself targets 600px but shrinks to fit smaller windows, and
+// everything inside (tiles AND pawns) scales with it. --cell is the cell size as
+// a percent number (cellDistance / 6), so it also shrinks as players are added.
 
 .board {
   position: relative;
-  width: 600px;
-  height: 600px;
+  width: min(600px, 92vmin);
+  aspect-ratio: 1; // stays square as it shrinks
   margin: 0 auto;
 }
 
@@ -16,9 +18,9 @@
   transform: translate(-50%, -50%);
   box-sizing: border-box;
 
-  // diameter = cell - 3 (matches createCircle's 2 * (cell / 2) - 3)
-  width: calc(var(--cell, 35px) - 3px);
-  height: calc(var(--cell, 35px) - 3px);
+  // diameter = cell minus a small gap (~3px on a 600 board = 0.5%)
+  width: calc((var(--cell, 5.8) - 0.5) * 1%);
+  height: calc((var(--cell, 5.8) - 0.5) * 1%);
 
   border: 1px solid rgba(0, 0, 0, 0.4);
   border-radius: 50%;
@@ -34,12 +36,15 @@
     inset -4px -4px 4px rgba(255, 255, 255, 0.5);
 }
 
-// A pawn (the <app-pawn> SVG): a 50px box positioned by its top-left, matching
-// pawnBox / PawnLayout. The SVG inside fills it and is recoloured via --pawn-color.
+// A pawn (the <app-pawn> SVG). Size is tied to --cell (≈1.43 × cell, which is
+// 50px when cell≈35 at 3 players) so pawns shrink as the board/cells shrink.
+// left/top are the tile CENTRE; translate centres the pawn and lifts it so it
+// "stands" above the tile (the -80% = -50% centre - 30% of pawn height lift).
 .pawn {
   position: absolute;
-  width: 50px;
-  height: 50px;
+  width: calc(var(--cell, 5.8) * 1.43%);
+  height: calc(var(--cell, 5.8) * 1.43%);
+  transform: translate(-50%, -80%);
   box-sizing: border-box;
   cursor: pointer;
 }
