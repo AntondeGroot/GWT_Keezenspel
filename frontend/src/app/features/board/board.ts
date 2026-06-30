@@ -138,8 +138,15 @@ export class Board implements OnInit, OnDestroy{
       tempMessageType: 'MAKE_MOVE' as const,
     };
 
-    this.movesService.makeMove(this.sessionId, this.viewerId, move).subscribe();
-    this.pile.update((p) => [...p, card]); // send the played card to the pile (it flies there)
+    this.movesService.makeMove(this.sessionId, this.viewerId, move).subscribe({
+      // Only fly the card to the pile if the server actually accepted the move.
+      next: (response) => {
+        if (response.result === 'CAN_MAKE_MOVE') {
+          this.pile.update((p) => [...p, card]);
+        }
+      },
+      error: () => {}, // illegal / not your turn (400): card stays in the hand
+    });
     this.selectedCardUuid.set(undefined);
     this.selectedPawnId.set(undefined);
   }
