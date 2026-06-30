@@ -49,30 +49,34 @@
   cursor: pointer;
 }
 
-// The player's hand: a row of cards pinned to the bottom-centre of the screen.
-.hand {
-  position: fixed;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 8px;
-  z-index: 100;
+// Cards (hand + pile) live in one layer inside the board, positioned by left/top%
+// (board coordinate space). When a card's target changes from a hand slot to the
+// pile centre, the left/top/transform transition animates the flight — and because
+// it's the same element (tracked by uuid), it's the same card that flies.
+.card {
+  position: absolute;
+  // left/top are the card's CENTRE; --rot rotates, --card-scale shrinks pile cards
+  // (hand = 1, pile ≈ 0.6). The transition animates the fly: position + shrink.
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(var(--card-scale, 1));
+  // ease-out so the card decelerates into the pile (a "thrown" feel)
+  transition:
+    left 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+  z-index: 50;
+}
 
-  // Cards are clickable; hover lifts slightly (matches the old .cardDiv:hover).
-  app-card {
-    cursor: pointer;
-  }
-  app-card:hover {
-    transform: translateY(-8px) scale(1.03);
-  }
-  // Selected card: lifted further with a gold ring + glow. (transform animates
-  // because app-card already has `transition: transform`.)
-  app-card.selected {
-    transform: translateY(-20px) scale(1.05);
-    box-shadow:
-      0 10px 20px rgba(0, 0, 0, 0.5),
-      0 0 0 3px #f4d03f,
-      0 0 12px rgba(244, 208, 63, 0.7);
-  }
+.card:hover {
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) translateY(-8px) scale(1.03);
+}
+
+// Selected card: lifted with a gold ring + glow.
+.card.selected {
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) translateY(-20px) scale(1.05);
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.5),
+    0 0 0 3px #f4d03f,
+    0 0 12px rgba(244, 208, 63, 0.7);
+  z-index: 60;
 }

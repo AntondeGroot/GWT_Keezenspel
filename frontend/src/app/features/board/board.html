@@ -15,14 +15,17 @@
                 [style.top.%]="p.y / 6"
                 [style.z-index]="p.zIndex" />
     }
-    <div class="hand">
-      @for (c of hand(); track c.uuid) {
-        <app-card
-          [suit]="c.suit"
-          [value]="c.value"
-          [class.selected]="selectedCardUuid() === c.uuid"
-          (click)="selectCard(c.uuid)"/>
-      }
-    </div>
+    @for (c of cards(); track c.uuid) {
+      <app-card class="card"
+        [suit]="c.suit"
+        [value]="c.value"
+        [style.left.%]="c.x"
+        [style.top.%]="c.y"
+        [style.--rot.deg]="c.rot"
+        [style.--card-scale]="c.scale"
+        [style.z-index]="c.z"
+        [class.selected]="selectedCardUuid() === c.uuid"
+        (click)="selectCard(c.uuid)" />
+    }
   </div>
 }

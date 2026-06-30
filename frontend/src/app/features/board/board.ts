@@ -1,5 +1,5 @@
 import { Component, signal, inject, computed, OnInit, OnDestroy } from '@angular/core';
-import { GameStatePush, MovesService } from '../../api';
+import { GameStatePush, MovesService, Card as CardModel } from '../../api';
 import { buildBoard } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { Pawn } from './pawn/pawn';
@@ -69,6 +69,43 @@ export class Board implements OnInit, OnDestroy{
 
   protected readonly hand = computed(() => this.state()?.playerCards ?? []);
 
+  // Cards the viewer has played, kept client-side so the same element can fly to
+  // the pile (the server's playedCards is just strings, no uuid to track).
+  protected readonly pile = signal<CardModel[]>([]);
+
+  // One list of every card (hand + pile), each with a target position. Moving a
+  // card from a hand slot to the pile target makes the same element animate there.
+  protected readonly cards = computed(() => {
+    const pile = this.pile();
+    const pileUuids = new Set(pile.map((c) => c.uuid));
+    const handCards = this.hand().filter((c) => !pileUuids.has(c.uuid));
+    const n = handCards.length;
+
+    // Per-uuid target position: hand slot (fanned row below the board) or pile slot.
+    // z follows PLAY ORDER (pile index) so the newest card is on top, regardless of
+    // the DOM order (which is sorted by uuid for stable transitions).
+    const target = new Map<number, { x: number; y: number; rot: number; scale: number; z?: number }>();
+    handCards.forEach((c, i) =>
+      target.set(c.uuid, { x: 50 + (i - (n - 1) / 2) * 12, y: 106, rot: 0, scale: 1 }),
+    );
+    pile.forEach((c, i) => {
+      const angle = ((90 + i * 45) * Math.PI) / 180; // each card +45° around the circle
+      target.set(c.uuid, {
+        x: (315 + 10 * Math.cos(angle)) / 6, // GWT: pile centre 315, radius 10 → board %
+        y: (300 + 10 * Math.sin(angle)) / 6, // centre 300
+        rot: 0,
+        scale: 0.6, // pile cards ~60px vs 100px hand
+        z: 100 + i, // newest played card stacks on top
+      });
+    });
+
+    // Stable DOM order (by uuid) so playing a card never reorders the list — only
+    // its target changes, so the same element transitions cleanly every time.
+    return [...handCards, ...pile]
+      .sort((a, b) => a.uuid - b.uuid)
+      .map((c) => ({ uuid: c.uuid, suit: c.suit, value: c.value, ...target.get(c.uuid)! }));
+  });
+
   protected readonly selectedCardUuid = signal<number | undefined>(undefined);
   protected readonly selectedPawnId = signal<string | undefined>(undefined);
 
@@ -102,6 +139,7 @@ export class Board implements OnInit, OnDestroy{
     };
 
     this.movesService.makeMove(this.sessionId, this.viewerId, move).subscribe();
+    this.pile.update((p) => [...p, card]); // send the played card to the pile (it flies there)
     this.selectedCardUuid.set(undefined);
     this.selectedPawnId.set(undefined);
   }

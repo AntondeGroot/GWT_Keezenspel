@@ -15,6 +15,6 @@
   box-shadow:
     4px 5px 14px rgba(0, 0, 0, 0.55),
     1px 1px 4px rgba(0, 0, 0, 0.3);
-  // movement (hand <-> pile) will animate smoothly once we drive position by state
-  transition: transform 0.3s ease;
+  // No transition here — the parent .card rule animates left/top/transform together
+  // so a played card flies (position) and shrinks (scale) as one smooth motion.
 }
