@@ -86,7 +86,7 @@ export class Board implements OnInit, OnDestroy{
     // the DOM order (which is sorted by uuid for stable transitions).
     const target = new Map<number, { x: number; y: number; rot: number; scale: number; z?: number }>();
     handCards.forEach((c, i) =>
-      target.set(c.uuid, { x: 50 + (i - (n - 1) / 2) * 12, y: 106, rot: 0, scale: 1 }),
+      target.set(c.uuid, { x: 50 + (i - (n - 1) / 2) * 18, y: 116, rot: 0, scale: 1 }),
     );
     pile.forEach((c, i) => {
       const angle = ((90 + i * 45) * Math.PI) / 180; // each card +45° around the circle

@@ -3,14 +3,17 @@
 // 1300 x 778.65. --card-col (value-1) and --card-row (suit) pick the cell.
 :host {
   display: block;
-  width: 100px;
-  height: 155.73px;
+  // Width is set by the parent (.card in board.scss) as a fraction of the board,
+  // so the card scales with it; height follows from the sprite cell's aspect ratio.
+  aspect-ratio: 100 / 155.73;
   background-image: url('/card-deck.png');
   background-repeat: no-repeat;
-  background-size: 1300px 778.65px;
+  // 13 cols x 5 rows. Sizes/positions are PERCENT of the card so they scale with
+  // it. Percent background-position picks a cell via col/(cols-1) and row/(rows-1).
+  background-size: 1300% 500%;
   background-position:
-    calc(var(--card-col, 0) * -100px)
-    calc(var(--card-row, 0) * -155.73px);
+    calc(var(--card-col, 0) * 100% / 12)
+    calc(var(--card-row, 0) * 100% / 4);
   border-radius: 5px;
   box-shadow:
     4px 5px 14px rgba(0, 0, 0, 0.55),

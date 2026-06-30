@@ -5,11 +5,31 @@
 // everything inside (tiles AND pawns) scales with it. --cell is the cell size as
 // a percent number (cellDistance / 6), so it also shrinks as players are added.
 
-.board {
+// Stage = the board + a reserved strip below it for the hand. Targets 600px,
+// shrinks to fit. padding-bottom (relative to width) is the reserved hand area.
+.stage {
   position: relative;
   width: min(600px, 92vmin);
-  aspect-ratio: 1; // stays square as it shrinks
   margin: 0 auto;
+  padding-bottom: 30%; // reserved hand strip below the board
+}
+
+.board {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1; // stays square as it shrinks
+}
+
+// Cards layer: overlaid on exactly the board's box (so % positions line up with
+// the board), but the cards themselves are not children of .board. Hand cards
+// spill below into the stage's reserved area (overflow is visible).
+.card-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 1;
+  pointer-events: none; // clicks fall through to the board; cards re-enable below
 }
 
 .tile {
@@ -55,6 +75,8 @@
 // it's the same element (tracked by uuid), it's the same card that flies.
 .card {
   position: absolute;
+  width: 16.667%; // 100/600 of the board → scales with it (height from aspect-ratio)
+  pointer-events: auto; // the .card-layer disables events; cards opt back in
   // left/top are the card's CENTRE; --rot rotates, --card-scale shrinks pile cards
   // (hand = 1, pile ≈ 0.6). The transition animates the fly: position + shrink.
   transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(var(--card-scale, 1));

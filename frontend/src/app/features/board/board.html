@@ -1,31 +1,39 @@
 @if (tiles().length) {
-  <div class="board" [style.--cell]="cell() / 6">
-    @for (t of tiles(); track t.playerId + ':' + t.tileNr) {
-      <div class="tile"
-           [style.left.%]="t.x / 6"
-           [style.top.%]="t.y / 6"
-           [style.background-color]="t.color"></div>
-    }
-    @for (p of pawns(); track p.id){
-      <app-pawn class="pawn"
-                [color]="p.color"
-                (click)="selectPawn(p.id)"
-                [highlight]="selectedPawnId() === p.id ? highlightForPawn1(p.color) : undefined"
-                [style.left.%]="p.x / 6"
-                [style.top.%]="p.y / 6"
-                [style.z-index]="p.zIndex" />
-    }
-    @for (c of cards(); track c.uuid) {
-      <app-card class="card"
-        [suit]="c.suit"
-        [value]="c.value"
-        [style.left.%]="c.x"
-        [style.top.%]="c.y"
-        [style.--rot.deg]="c.rot"
-        [style.--card-scale]="c.scale"
-        [style.z-index]="c.z"
-        [class.selected]="selectedCardUuid() === c.uuid"
-        (click)="selectCard(c.uuid)" />
-    }
+  <div class="stage">
+    <div class="board" [style.--cell]="cell() / 6">
+      @for (t of tiles(); track t.playerId + ':' + t.tileNr) {
+        <div class="tile"
+             [style.left.%]="t.x / 6"
+             [style.top.%]="t.y / 6"
+             [style.background-color]="t.color"></div>
+      }
+      @for (p of pawns(); track p.id){
+        <app-pawn class="pawn"
+                  [color]="p.color"
+                  (click)="selectPawn(p.id)"
+                  [highlight]="selectedPawnId() === p.id ? highlightForPawn1(p.color) : undefined"
+                  [style.left.%]="p.x / 6"
+                  [style.top.%]="p.y / 6"
+                  [style.z-index]="p.zIndex" />
+      }
+    </div>
+
+    <!-- Cards live in their own layer (not inside .board), overlaid on the same
+         box so the pile lines up with the board centre. The hand sits below in
+         the reserved space (.stage padding). -->
+    <div class="card-layer">
+      @for (c of cards(); track c.uuid) {
+        <app-card class="card"
+          [suit]="c.suit"
+          [value]="c.value"
+          [style.left.%]="c.x"
+          [style.top.%]="c.y"
+          [style.--rot.deg]="c.rot"
+          [style.--card-scale]="c.scale"
+          [style.z-index]="c.z"
+          [class.selected]="selectedCardUuid() === c.uuid"
+          (click)="selectCard(c.uuid)" />
+      }
+    </div>
   </div>
 }
