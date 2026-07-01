@@ -1,0 +1,134 @@
+// Ported from the GWT .rulesButton + Game Rules modal styles.
+:host {
+  display: inline-flex;
+  align-items: center;
+}
+
+.rulesButton {
+  font: 600 13pt 'Cinzel', Georgia, serif;
+  color: #f4d03f;
+  background: linear-gradient(145deg, #3a2000, #251400);
+  border: 1px solid #c9a227;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  outline: none;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: linear-gradient(145deg, #4a2800, #341a00);
+    border-color: #e0b830;
+  }
+}
+
+.rules-btn-icon {
+  height: 1em;
+  width: auto;
+  vertical-align: middle;
+  margin-right: 4px;
+  position: relative;
+  top: -1px;
+}
+
+.rules-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  animation: rulesFadeIn 0.15s ease;
+}
+
+@keyframes rulesFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.rules-content {
+  background: linear-gradient(160deg, #1a0d00 0%, #0d0800 100%);
+  border: 2px solid #c9a227;
+  border-radius: 10px;
+  padding: 28px 32px 0 32px;
+  max-width: 540px;
+  width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(201, 162, 39, 0.2);
+  cursor: default;
+}
+
+.rules-title {
+  display: block;
+  font: 700 1.6em 'Cinzel', Georgia, serif;
+  color: #f4d03f;
+  margin: 0 0 20px 0;
+  letter-spacing: 0.05em;
+}
+
+.rules-section {
+  margin-bottom: 20px;
+}
+
+.rules-section-title {
+  display: block;
+  font: 700 1em 'Cinzel', Georgia, serif;
+  color: #c9a227;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 10px 0;
+}
+
+.rules-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.rules-card-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 60px;
+  border-radius: 5px;
+  background: #fff;
+  color: #111;
+  font: bold 22px 'Georgia', serif;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  flex-shrink: 0;
+}
+
+.rules-card-red {
+  color: #c0392b;
+}
+
+.rules-row-text {
+  color: #e8d5a0;
+  font-size: 16px;
+  line-height: 1.6;
+  padding-top: 2px;
+  white-space: pre-line; // honour the \n in the hint strings (GWT used <br>)
+}
+
+.rules-close-hint {
+  display: block;
+  text-align: center;
+  color: #7a6a40;
+  font-size: 14px;
+  padding: 14px 0;
+  margin-top: 8px;
+  border-top: 1px solid rgba(201, 162, 39, 0.25);
+  letter-spacing: 0.05em;
+}
