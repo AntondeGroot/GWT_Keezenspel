@@ -184,9 +184,12 @@ export class Board implements OnInit, OnDestroy{
       const prev = this.prevCounts;
       if (counts && prev) {
         for (const [pid, n] of Object.entries(counts)) {
-          if (pid !== this.viewerId && prev[pid] !== undefined && prev[pid] - n === 1) {
-            this.flyOpponentCard(pid, prev[pid], played);
-          }
+          if (pid === this.viewerId) continue;
+          const before = prev[pid];
+          if (before === undefined) continue;
+          const dropped = before - n;
+          if (dropped === 1) this.flyOpponentCard(pid, before, played); // played one card
+          else if (dropped > 1) this.flyOpponentForfeit(pid, before, dropped, played); // forfeit
         }
       }
       this.prevCounts = counts ? { ...counts } : undefined;
@@ -242,6 +245,28 @@ export class Board implements OnInit, OnDestroy{
   /** Animate the viewer's own just-played card from its (snapshotted) hand slot. */
   private flyOwnCard(card: CardModel, from: { x: number; y: number }): void {
     this.spawnFlyer({ x: from.x, y: from.y, rot: 0 }, 1, card.suit ?? 0, card.value ?? 1, card);
+  }
+
+  /** Forfeit: fly all of an opponent's cards from their fan to the pile, staggered. */
+  private flyOpponentForfeit(playerId: string, fanCount: number, dropped: number, played: string[]): void {
+    const segment = this.geometry()?.deckSegment(playerId);
+    if (!segment) return;
+    const fan = fanCardBacks(segment, fanCount);
+    const forfeited = played.slice(played.length - dropped); // the discarded cards (public)
+    forfeited.forEach((str, i) => {
+      const [suit, value] = str.split('_').map(Number);
+      const slot = fan[i] ?? fan.at(-1);
+      if (!slot) return;
+      setTimeout(
+        () =>
+          this.spawnFlyer({ x: slot.x / 6, y: slot.y / 6, rot: slot.rotDeg }, 0.3, suit, value, {
+            uuid: this.syntheticUuid--,
+            suit,
+            value,
+          } as CardModel),
+        i * 120, // small stagger between cards
+      );
+    });
   }
 
   private findPawn(id: string) {
@@ -410,9 +435,23 @@ export class Board implements OnInit, OnDestroy{
   // Forfeit the turn (the amber forfeit button) — DELETE /cards/{session}/{player}.
   protected forfeit(): void {
     if (!this.sessionId || !this.viewerId) return;
+    // Snapshot my hand-card positions BEFORE the server push clears them, then fly
+    // each to the pile, staggered (same as an opponent's forfeit).
+    const myCards = this.cards().filter((c) => !c.inPile);
     this.cardsService.playerForfeits(this.sessionId, this.viewerId).subscribe({ error: () => {} });
     this.selection.reset();
     this.previewTiles.set(new Set());
     this.touch();
+    myCards.forEach((c, i) =>
+      setTimeout(
+        () =>
+          this.spawnFlyer({ x: c.x, y: c.y, rot: 0 }, 1, c.suit, c.value, {
+            uuid: this.syntheticUuid--,
+            suit: c.suit,
+            value: c.value,
+          } as CardModel),
+        i * 120,
+      ),
+    );
   }
 }
