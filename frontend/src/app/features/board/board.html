@@ -19,6 +19,12 @@
                   [style.top.%]="p.y / 6"
                   [style.z-index]="p.zIndex" />
       }
+      @for (b of cardBacks(); track b.key) {
+        <div class="card-back"
+             [style.left.%]="b.x / 6"
+             [style.top.%]="b.y / 6"
+             [style.--rot.deg]="b.rot"></div>
+      }
     </div>
 
     <!-- Cards live in their own layer (not inside .board), overlaid on the same
@@ -37,6 +43,16 @@
           [class.selected]="selectedCardUuid() === c.uuid"
           [class.played]="c.inPile"
           (click)="selectCard(c.uuid)" />
+      }
+
+      @for (f of flyers(); track f.id) {
+        <app-card class="card flyer"
+          [suit]="f.suit"
+          [value]="f.value"
+          [style.left.%]="f.x"
+          [style.top.%]="f.y"
+          [style.--rot.deg]="f.rot"
+          [style.--card-scale]="f.scale" />
       }
     </div>
 

@@ -106,6 +106,30 @@
   filter: brightness(1.15) drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5));
 }
 
+// Face-down card back for another player's hand (ported from .cardBackIcon).
+// Sized as a fraction of the board so it scales; carries NO card value.
+.card-back {
+  position: absolute;
+  width: 5%; // 30/600 of the board
+  aspect-ratio: 30 / 47;
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  box-sizing: border-box;
+  background: linear-gradient(145deg, #a52222, #7a1414);
+  border: 2px solid #fff;
+  border-radius: 8%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+
+  // Classic inner frame — decorative only.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 14%;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 6%;
+  }
+}
+
 // Cards (hand + pile) live in one layer inside the board, positioned by left/top%
 // (board coordinate space). When a card's target changes from a hand slot to the
 // pile centre, the left/top/transform transition animates the flight — and because
@@ -250,6 +274,12 @@
   &:hover {
     transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(var(--card-scale, 1));
   }
+}
+
+// A card flying from an opponent's hand to the pile — inert, on top during flight.
+.card.flyer {
+  z-index: 150;
+  pointer-events: none;
 }
 
 // Selected card: lifted with a gold ring + glow.
