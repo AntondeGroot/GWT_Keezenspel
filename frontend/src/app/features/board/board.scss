@@ -119,6 +119,11 @@
   border-radius: 8%;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
   pointer-events: none;
+  // Smoothly fan out on a deal (and re-fan when a player plays).
+  transition:
+    left 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 
   // Classic inner frame — decorative only.
   &::after {

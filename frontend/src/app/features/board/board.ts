@@ -1,6 +1,6 @@
 import { Component, signal, inject, computed, effect, OnInit, OnDestroy } from '@angular/core';
 import { GameStatePush, MovesService, CardsService, Card as CardModel, MoveRequest } from '../../api';
-import { buildBoard, fanCardBacks } from './board-geometry';
+import { buildBoard, fanCardBacks, Pt } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { Pawn } from './pawn/pawn';
 import { Card } from './card/card';
@@ -21,7 +21,22 @@ export class Board implements OnInit, OnDestroy{
   ngOnInit(): void {
     if(this.sessionId){
       this.eventSource = new EventSource(this.streamUrl);
-      this.eventSource.addEventListener('gamestate', (event: MessageEvent) => {this.state.set(JSON.parse(event.data))});
+      this.eventSource.addEventListener('gamestate', (event: MessageEvent) => {
+        const next = JSON.parse(event.data) as GameStatePush;
+        // Detect a deal (cards that weren't in the hand before) and start the
+        // deal-in BEFORE setting state, so those cards render at the deck rather
+        // than flashing at their slots first. The FIRST push after (re)connecting
+        // has no baseline, so it isn't animated — a refresh mid-game just shows the
+        // current hand; only a genuine new round during the session deals in.
+        const cards = next.playerCards ?? [];
+        const prev = this.prevHandUuids;
+        if (prev) {
+          const fresh = cards.filter((c) => !prev.has(c.uuid)).map((c) => c.uuid);
+          if (fresh.length > 0) this.animateDeal(fresh);
+        }
+        this.prevHandUuids = new Set(cards.map((c) => c.uuid));
+        this.state.set(next);
+      });
     }
   }
 
@@ -80,15 +95,45 @@ export class Board implements OnInit, OnDestroy{
     const g = this.geometry();
     const counts = this.state()?.nrOfCardsPerPlayer;
     if (!g || !counts) return [];
-    const backs: { key: string; x: number; y: number; rot: number }[] = [];
-    for (const [playerId, n] of Object.entries(counts)) {
-      if (playerId === this.viewerId) continue; // own hand is drawn as real cards
-      const segment = g.deckSegment(playerId);
-      if (!segment) continue;
-      fanCardBacks(segment, n).forEach((c, i) =>
-        backs.push({ key: `${playerId}:${i}`, x: c.x, y: c.y, rot: c.rotDeg }),
-      );
-    }
+    // During a deal-in the backs start stacked at the deck (board centre) and fan
+    // out to their slots, staggered — the same FLIP as the viewer's own cards.
+    const dealing = this.dealtIndex().size > 0;
+    const atDeck = this.atDeck();
+
+    // Deal clockwise: order opponents by their angle around the board centre,
+    // clockwise from the viewer (screen coords: clockwise = increasing atan2).
+    const mid = (seg: [Pt, Pt]) => ({ x: (seg[0].x + seg[1].x) / 2, y: (seg[0].y + seg[1].y) / 2 });
+    const vSeg = this.viewerId ? g.deckSegment(this.viewerId) : undefined;
+    const vm = vSeg ? mid(vSeg) : { x: 300, y: 600 };
+    const viewerAngle = Math.atan2(vm.y - 300, vm.x - 300);
+    const opponents = Object.keys(counts)
+      .filter((pid) => pid !== this.viewerId && g.deckSegment(pid))
+      .map((pid) => {
+        const m = mid(g.deckSegment(pid)!);
+        const cw = (Math.atan2(m.y - 300, m.x - 300) - viewerAngle + 2 * Math.PI) % (2 * Math.PI);
+        return { pid, cw };
+      })
+      .sort((a, b) => a.cw - b.cw);
+
+    const backs: {
+      key: string; x: number; y: number; rot: number; delay: number; z?: number;
+    }[] = [];
+    opponents.forEach(({ pid }, oi) => {
+      const seat = oi + 1; // the viewer is seat 0; opponents take the next seats clockwise
+      fanCardBacks(g.deckSegment(pid)!, counts[pid]).forEach((c, i) => {
+        // Round-robin: i = round (card index), seat = offset within the round.
+        const delay = dealing ? i * 700 + seat * 350 : 0;
+        backs.push({
+          key: `${pid}:${i}`,
+          x: atDeck ? 315 : c.x, // deck centre while dealing
+          y: atDeck ? 300 : c.y,
+          rot: atDeck ? 0 : c.rotDeg,
+          delay,
+          // Sooner-flying backs sit on top of the deck stack (taken off the top).
+          z: dealing ? 400 - Math.round(delay / 20) : undefined,
+        });
+      });
+    });
     return backs;
   });
   private eventSource?: EventSource;
@@ -109,6 +154,14 @@ export class Board implements OnInit, OnDestroy{
   private flyerSeq = 0;
   private prevCounts: Record<string, number> | undefined;
   private syntheticUuid = -1;
+
+  // Deal-in animation: while a deal is in flight, `dealtIndex` maps each freshly
+  // dealt card uuid to its stagger order; `atDeck` is true for the first frame so
+  // the cards render stacked at the deck (board centre) before fanning to their
+  // slots. Reading both in the `cards` computed drives the FLIP.
+  private readonly dealtIndex = signal<Map<number, number>>(new Map());
+  private readonly atDeck = signal(false);
+  private prevHandUuids: Set<number> | undefined;
 
   // One list of every card (hand + pile), each with a target position. Moving a
   // card from a hand slot to the pile target makes the same element animate there.
@@ -138,15 +191,36 @@ export class Board implements OnInit, OnDestroy{
 
     // Stable DOM order (by uuid) so playing a card never reorders the list — only
     // its target changes, so the same element transitions cleanly every time.
+    // Deal-in FLIP: a freshly dealt card renders at the deck (board centre) for the
+    // first frame, then transitions to its slot with a per-card stagger delay.
+    const dealt = this.dealtIndex();
+    const atDeck = this.atDeck();
     return [...handCards, ...pile]
       .sort((a, b) => a.uuid - b.uuid)
-      .map((c) => ({
-        uuid: c.uuid,
-        suit: c.suit,
-        value: c.value,
-        inPile: pileUuids.has(c.uuid), // played cards are inert (no click / hover)
-        ...target.get(c.uuid)!,
-      }));
+      .map((c) => {
+        const t = target.get(c.uuid)!;
+        const dealOrder = dealt.get(c.uuid);
+        const dealing = dealOrder !== undefined;
+        const useDeck = dealing && atDeck;
+        // Round-robin deal: delay by ROUND (the card's index in the hand). The
+        // viewer is seat 0, so no per-seat offset. 700ms between rounds (slow).
+        const dealDelay = dealing ? (dealOrder ?? 0) * 700 : 0;
+        return {
+          uuid: c.uuid,
+          suit: c.suit,
+          value: c.value,
+          inPile: pileUuids.has(c.uuid), // played cards are inert (no click / hover)
+          x: useDeck ? 52.5 : t.x,
+          y: useDeck ? 50 : t.y,
+          rot: t.rot,
+          scale: useDeck ? 0.3 : t.scale, // deck-sized (≈ the 5% backs) then grows to hand size
+          // While dealing, the sooner a card flies (lower delay) the higher it sits,
+          // so it's taken off the TOP of the deck stack.
+          z: dealing ? 400 - Math.round(dealDelay / 20) : t.z,
+          dealDelay,
+          dealing, // true while this card is dealing in (drives the flip)
+        };
+      });
   });
 
   // --- Selection: delegated to the ported PawnAndCardSelection state machine ---
@@ -194,6 +268,18 @@ export class Board implements OnInit, OnDestroy{
       }
       this.prevCounts = counts ? { ...counts } : undefined;
     });
+  }
+
+  /** Kick off the deal-in FLIP for the given freshly-dealt card uuids. */
+  private animateDeal(uuids: number[]): void {
+    const order = new Map<number, number>();
+    uuids.forEach((u, i) => order.set(u, i));
+    this.dealtIndex.set(order);
+    this.atDeck.set(true); // first frame: stacked at the deck
+    // Release next frame so they transition out to their slots (staggered by delay).
+    requestAnimationFrame(() => requestAnimationFrame(() => this.atDeck.set(false)));
+    // Clear once the last card has finished (last round's delay + the transition).
+    setTimeout(() => this.dealtIndex.set(new Map()), uuids.length * 700 + 2000);
   }
 
   /**
