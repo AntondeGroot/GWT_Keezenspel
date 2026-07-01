@@ -9,6 +9,10 @@
 // shrinks to fit. padding-bottom (relative to width) is the reserved hand area.
 .stage {
   position: relative;
+  // Contain the board's internal z-indexes (pawns up to ~600, buttons, cards) in
+  // one stacking context, so they can't paint above app chrome like the rules
+  // modal or the top nav.
+  isolation: isolate;
   width: min(600px, 92vmin);
   margin: 0 auto;
   padding-bottom: 30%; // reserved hand strip below the board

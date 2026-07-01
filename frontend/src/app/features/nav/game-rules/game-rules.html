@@ -1,0 +1,25 @@
+<button class="rulesButton" (click)="open.set(true)">
+  <img src="/study-icon.svg" class="rules-btn-icon" alt="" /> {{ i18n.t('rulesButton') }}
+</button>
+
+@if (open()) {
+  <div class="rules-overlay" (click)="open.set(false)">
+    <div class="rules-content" (click)="$event.stopPropagation()">
+      <span class="rules-title">{{ i18n.t('rulesTitle') }}</span>
+
+      @for (section of sections; track section.titleKey) {
+        <div class="rules-section">
+          <span class="rules-section-title">{{ i18n.t(section.titleKey) }}</span>
+          @for (row of section.rows; track row.card) {
+            <div class="rules-row">
+              <div class="rules-card-chip" [class.rules-card-red]="row.red">{{ row.card }}</div>
+              <div class="rules-row-text">{{ i18n.t(row.hint) }}</div>
+            </div>
+          }
+        </div>
+      }
+
+      <span class="rules-close-hint">{{ i18n.t('rulesClickToClose') }}</span>
+    </div>
+  </div>
+}
