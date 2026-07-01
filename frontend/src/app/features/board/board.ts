@@ -7,6 +7,8 @@ import { Card } from './card/card';
 import {highlightForPawn1, highlightForPawn2} from './pawn-highlight';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
 import { Translations } from '../../i18n/translations.service';
+import { MoveRejection } from './move-rejected/move-rejection.service';
+import { localRejectionKey, rejectionMessageKey } from './rejection-message';
 
 @Component({
   selector: 'app-board',
@@ -29,6 +31,7 @@ export class Board implements OnInit, OnDestroy{
   private readonly movesService = inject(MovesService);
   private readonly cardsService = inject(CardsService);
   protected readonly i18n = inject(Translations);
+  private readonly rejection = inject(MoveRejection);
   private readonly session = resolveGameSession();
   private readonly sessionId = this.session.sessionId;
   private readonly viewerId = this.session.playerId;
@@ -244,6 +247,15 @@ export class Board implements OnInit, OnDestroy{
     const card = this.selection.getCard();
     const pawn1 = this.selection.getPawn1();
     if (!card || !pawn1 || !this.sessionId || !this.viewerId) return;
+
+    // Explain selections the server would reject with a bare 400 (no reason),
+    // instead of misreporting them as "not your turn".
+    const localKey = localRejectionKey(pawn1.tileNr, card.value);
+    if (localKey) {
+      this.rejection.show(this.i18n.t(localKey));
+      return;
+    }
+
     const apiPawn1 = this.findPawn(pawn1.id);
     if (!apiPawn1) return;
     const pawn2 = this.selection.getPawn2();
@@ -263,18 +275,27 @@ export class Board implements OnInit, OnDestroy{
 
   private send(card: CardModel | undefined, move: MoveRequest): void {
     if (!this.sessionId || !this.viewerId) return;
+    this.previewTiles.set(new Set()); // stop the move preview while submitting
+    this.touch();
     this.movesService.makeMove(this.sessionId, this.viewerId, move).subscribe({
-      // Only fly the card to the pile if the server actually accepted the move.
       next: (response) => {
-        if (response.result === 'CAN_MAKE_MOVE' && card) {
-          this.pile.update((p) => [...p, card]);
+        if (response.result === 'CAN_MAKE_MOVE') {
+          if (card) this.pile.update((p) => [...p, card]);
+          this.selection.reset(); // accepted → clear the selection
+          this.touch();
+        } else {
+          // Rejected by the rules (still a 200): explain why, and keep the
+          // selection so the player can adjust it.
+          this.rejection.show(
+            this.i18n.t(rejectionMessageKey(response.rejectionReason), response.rejectionDetail ?? ''),
+          );
         }
       },
-      error: () => {}, // illegal / not your turn (400): card stays in the hand
+      error: () => {
+        // 400 — typically not your turn (or a stale double-submit).
+        this.rejection.show(this.i18n.t('moveRejectedNotYourTurn'));
+      },
     });
-    this.selection.reset();
-    this.previewTiles.set(new Set());
-    this.touch();
   }
 
   // Forfeit the turn (the amber forfeit button) — DELETE /cards/{session}/{player}.
