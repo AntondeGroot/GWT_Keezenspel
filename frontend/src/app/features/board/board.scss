@@ -56,6 +56,32 @@
     inset -4px -4px 4px rgba(255, 255, 255, 0.5);
 }
 
+// Move preview: a gold disc pulsing over a tile the selected move would land on
+// (ported from .tile-highlight-pulse / yellowPulse).
+.tile-highlight-pulse::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: yellowPulse 1s ease infinite;
+}
+
+@keyframes yellowPulse {
+  0% {
+    background-color: rgba(255, 215, 0, 0);
+    width: 0;
+    height: 0;
+  }
+  100% {
+    background-color: rgba(255, 215, 0, 0.7);
+    width: 100%;
+    height: 100%;
+  }
+}
+
 // A pawn (the <app-pawn> SVG). Size is tied to --cell (≈1.43 × cell, which is
 // 50px when cell≈35 at 3 players) so pawns shrink as the board/cells shrink.
 // left/top are the tile CENTRE; translate centres the pawn and lifts it so it

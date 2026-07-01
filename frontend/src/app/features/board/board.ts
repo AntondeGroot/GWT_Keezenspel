@@ -157,49 +157,65 @@ export class Board implements OnInit, OnDestroy{
     if (!handCard) return;
     this.selection.setCard({ id: handCard.uuid, value: handCard.value });
     this.touch();
-    this.maybeFetchRecommendedSplit();
+    this.checkMove();
   }
 
   protected selectPawn(id: string): void {
     this.selection.addPawnById(id);
     this.touch();
-    this.maybeFetchRecommendedSplit();
+    this.checkMove();
   }
 
-  // When a 7-split is first formed, ask the server for its recommended step split
-  // (the allocation landing a pawn deepest in the finish) and adopt it as the
-  // starting value — applied once; the player can still adjust the boxes after.
-  private maybeFetchRecommendedSplit(): void {
-    if (!this.selection.isSplitDefaultPending() || !this.sessionId || !this.viewerId) return;
+  // Tiles the previewed move would land on (key = "playerId:tileNr"); they pulse.
+  protected readonly previewTiles = signal<Set<string>>(new Set());
+  protected isPreview(playerId: string, tileNr: number): boolean {
+    return this.previewTiles().has(`${playerId}:${tileNr}`);
+  }
+
+  // Preview the current selection: ask the server which tile(s) it would land on
+  // and pulse them. When a 7-split first forms, adopt the recommended allocation
+  // once, then re-check to preview it. Mirrors the GWT presenter's checkMove().
+  private checkMove(): void {
     const card = this.selection.getCard();
     const pawn1 = this.selection.getPawn1();
-    const pawn2 = this.selection.getPawn2();
-    if (!card || !pawn1 || !pawn2) return;
+    if (!card || !pawn1 || !this.sessionId || !this.viewerId) {
+      this.previewTiles.set(new Set());
+      return;
+    }
     const apiPawn1 = this.findPawn(pawn1.id);
-    const apiPawn2 = this.findPawn(pawn2.id);
-    if (!apiPawn1 || !apiPawn2) return;
+    if (!apiPawn1) return;
+    const pawn2 = this.selection.getPawn2();
+    const apiPawn2 = pawn2 ? this.findPawn(pawn2.id) : undefined;
 
     this.movesService
       .checkMove(this.sessionId, this.viewerId, {
         playerId: this.viewerId,
         cardId: card.id,
         pawn1Id: apiPawn1.pawnId,
-        pawn2Id: apiPawn2.pawnId,
+        pawn2Id: apiPawn2?.pawnId,
         stepsPawn1: this.selection.getNrStepsPawn1(),
         stepsPawn2: this.selection.getNrStepsPawn2(),
         tempMessageType: 'CHECK_MOVE',
       })
       .subscribe({
         next: (res) => {
-          if (!this.selection.isSplitDefaultPending()) return; // selection changed meanwhile
-          this.selection.clearSplitDefaultPending();
-          const s1 = res.recommendedStepsPawn1 ?? -1;
-          const s2 = res.recommendedStepsPawn2 ?? -1;
-          if (s1 >= 0 && s2 >= 0) {
-            this.selection.setNrStepsPawn1(s1);
-            this.selection.setNrStepsPawn2(s2);
-            this.touch();
+          // First time a 7-split forms: adopt the recommended split, then re-check.
+          if (this.selection.isSplitDefaultPending()) {
+            this.selection.clearSplitDefaultPending();
+            const s1 = res.recommendedStepsPawn1 ?? -1;
+            const s2 = res.recommendedStepsPawn2 ?? -1;
+            if (s1 >= 0 && s2 >= 0) {
+              this.selection.setNrStepsPawn1(s1);
+              this.selection.setNrStepsPawn2(s2);
+              this.touch();
+              this.checkMove();
+              return;
+            }
           }
+          // Highlight the landing tile(s) — the last tile of each pawn's path.
+          this.previewTiles.set(
+            new Set((res.tiles ?? []).map((t) => `${t.playerId}:${t.tileNr}`)),
+          );
         },
         error: () => {},
       });
@@ -209,10 +225,12 @@ export class Board implements OnInit, OnDestroy{
   protected onStepsPawn1(value: string): void {
     this.selection.setNrStepsPawn1ForSplit(value);
     this.touch();
+    this.checkMove();
   }
   protected onStepsPawn2(value: string): void {
     this.selection.setNrStepsPawn2ForSplit(value);
     this.touch();
+    this.checkMove();
   }
 
   protected readonly highlightForPawn1 = highlightForPawn1;
@@ -253,6 +271,7 @@ export class Board implements OnInit, OnDestroy{
       error: () => {}, // illegal / not your turn (400): card stays in the hand
     });
     this.selection.reset();
+    this.previewTiles.set(new Set());
     this.touch();
   }
 
@@ -261,6 +280,7 @@ export class Board implements OnInit, OnDestroy{
     if (!this.sessionId || !this.viewerId) return;
     this.cardsService.playerForfeits(this.sessionId, this.viewerId).subscribe({ error: () => {} });
     this.selection.reset();
+    this.previewTiles.set(new Set());
     this.touch();
   }
 }
