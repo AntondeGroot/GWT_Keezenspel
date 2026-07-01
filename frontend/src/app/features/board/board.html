@@ -35,6 +35,7 @@
           [style.--card-scale]="c.scale"
           [style.z-index]="c.z"
           [class.selected]="selectedCardUuid() === c.uuid"
+          [class.played]="c.inPile"
           (click)="selectCard(c.uuid)" />
       }
     </div>

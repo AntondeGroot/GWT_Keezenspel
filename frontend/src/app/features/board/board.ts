@@ -110,7 +110,13 @@ export class Board implements OnInit, OnDestroy{
     // its target changes, so the same element transitions cleanly every time.
     return [...handCards, ...pile]
       .sort((a, b) => a.uuid - b.uuid)
-      .map((c) => ({ uuid: c.uuid, suit: c.suit, value: c.value, ...target.get(c.uuid)! }));
+      .map((c) => ({
+        uuid: c.uuid,
+        suit: c.suit,
+        value: c.value,
+        inPile: pileUuids.has(c.uuid), // played cards are inert (no click / hover)
+        ...target.get(c.uuid)!,
+      }));
   });
 
   // --- Selection: delegated to the ported PawnAndCardSelection state machine ---
