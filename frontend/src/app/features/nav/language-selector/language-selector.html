@@ -1,0 +1,5 @@
+<select class="lang-listbox" (change)="onChange($any($event.target).value)">
+  @for (lang of languages; track lang.code) {
+    <option [value]="lang.code" [selected]="lang.code === i18n.locale()">{{ lang.name }}</option>
+  }
+</select>

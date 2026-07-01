@@ -1,0 +1,53 @@
+import type { Dictionary } from '../keys';
+
+// Ported from AppConstants_de.properties (Deutsch).
+export const de: Dictionary = {
+  playCard: 'Karte spielen',
+  forfeit: 'Passen',
+  leaveGame: 'Spiel verlassen',
+  send: 'Senden',
+  pawn1: 'Figur 1',
+  pawn2: 'Figur 2',
+  confirmLeaveGame: 'Möchtest du das Spiel wirklich verlassen?',
+  canvasNotSupported: 'Canvas wird in deinem Browser nicht unterstützt.',
+  hintAce: 'Ass: Setze eine Figur aufs Spielfeld oder bewege sie 1 Schritt vorwärts.',
+  hintFour:
+    'Vier: Bewege 4 Schritte rückwärts.\nTipp: Nutze dies auf deinem Startfeld, um das ganze Brett abzukürzen.',
+  hintSeven:
+    'Sieben: Mache insgesamt 7 Schritte mit einer oder zwei Figuren.\n Wähle erst die Karte, dann optional eine zweite Figur. Hinweis: Figur 1 bewegt sich immer zuerst.',
+  hintJack:
+    'Bube: Tausche deine Figur mit einer feindlichen Figur.\nEinen geeigneten Gegner kannst du erst nach dem Wählen dieser Karte auswählen.',
+  hintQueen: 'Dame: Bewege 12 Schritte vorwärts.',
+  hintKing: 'König: Setze eine Figur aufs Spielfeld.',
+  rulesButton: 'Spielregeln',
+  rulesTitle: 'Spielregeln',
+  rulesGettingOnBoard: 'Auf das Spielfeld kommen',
+  rulesSpecialCards: 'Sonderkarten',
+  rulesClickToClose: 'Klicke irgendwo zum Schließen',
+  moveRejectedTitle: 'Dieser Zug ist nicht möglich',
+  moveRejectedGeneric: 'Dieser Zug ist nicht erlaubt.',
+  moveRejectedNotYourTurn: 'Du bist nicht an der Reihe (oder der Zug wurde bereits gespielt).',
+  moveRejectedInvalidSelection: 'Wähle zuerst eine Figur und eine Karte.',
+  moveRejectedDontHaveCard: 'Du hast diese Karte nicht.',
+  moveRejectedWrongCardForMove: 'Mit dieser Karte ist dieser Zug nicht möglich.',
+  moveRejectedPawnOnNest:
+    'Diese Figur ist noch im Nest — bring sie zuerst mit einem Ass oder König aufs Feld.',
+  moveRejectedPawnNotOnNest: 'Diese Figur ist schon auf dem Spielfeld.',
+  moveRejectedPawnNotOnBoard: 'Du kannst nur Figuren tauschen, die auf dem Spielfeld stehen.',
+  moveRejectedNotYourPawn: 'Diese Figur gehört dir nicht.',
+  moveRejectedDestinationOccupiedByOwnPawn:
+    'Eine deiner eigenen Figuren steht schon auf diesem Feld.',
+  moveRejectedDestinationBlocked: 'Dorthin kannst du nicht ziehen — der Weg ist blockiert.',
+  moveRejectedStartTileOccupied:
+    'Dein Startfeld ist besetzt, du kannst nicht aufs Spielfeld kommen.',
+  moveRejectedCannotPassStartTile:
+    'Du kannst nicht an einer Figur auf ihrem Startfeld vorbeiziehen.',
+  moveRejectedCannotSwitchOpponentOnOwnStart:
+    'Du kannst nicht mit einem Gegner tauschen, der auf seinem eigenen Startfeld steht.',
+  moveRejectedCannotSwitchOwnPawns: 'Du kannst nicht zwei eigene Figuren tauschen.',
+  moveRejectedMustMoveExactSteps: 'Mit dieser Figur kannst du nur %s Felder ziehen.',
+  moveRejectedPawnClosedInFinish:
+    'Diese Figur ist im Ziel eingeschlossen und kann sich nicht bewegen.',
+  moveRejectedSplitNeedsTwoOwnPawns: 'Für eine 7er-Teilung brauchst du zwei eigene Figuren.',
+  moveRejectedSplitStepsNotSeven: 'Die zwei Teile der 7 müssen zusammen 7 Felder ergeben.',
+};
