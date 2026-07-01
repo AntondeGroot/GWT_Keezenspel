@@ -11,8 +11,8 @@
         <app-pawn class="pawn"
                   [color]="p.color"
                   (click)="selectPawn(p.id)"
-                  [highlight]="p.id === selectedPawnId() ? highlightForPawn1(p.color)
-                           : p.id === selectedPawn2Id() ? highlightForPawn2(p.color)
+                  [highlight]="p.id === pawn1Id() ? highlightForPawn1(p.color)
+                           : p.id === pawn2Id() ? highlightForPawn2(p.color)
                            : undefined"
                   [style.left.%]="p.x / 6"
                   [style.top.%]="p.y / 6"
@@ -41,6 +41,18 @@
     <div class="button-container">
       <button class="send-button" [disabled]="!canPlay()" (click)="playCard()">Play card</button>
       <button class="forfeit-button" (click)="forfeit()">Forfeit</button>
+
+      <!-- 7-split: divide the 7 across the two selected pawns (sum stays 7). -->
+      @if (splitVisible()) {
+        <div class="pawn-steps">
+          <label class="pawn-steps__label pawn-steps__label--1">◆</label>
+          <input class="pawn-steps__input pawn-steps__input--1" type="number" min="0" max="7"
+                 [value]="stepsPawn1()" (input)="onStepsPawn1($any($event.target).value)" />
+          <label class="pawn-steps__label pawn-steps__label--2">◆</label>
+          <input class="pawn-steps__input pawn-steps__input--2" type="number" min="0" max="7"
+                 [value]="stepsPawn2()" (input)="onStepsPawn2($any($event.target).value)" />
+        </div>
+      }
     </div>
   </div>
 }
