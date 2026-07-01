@@ -10,7 +10,7 @@
  * Tile numbers: < 0 = nest, 0..15 = normal board, >= 16 = finish.
  */
 
-export type SelMoveType = 'move' | 'onBoard' | 'switch' | 'split';
+export type SelMoveType = 'move' | 'onBoard' | 'switch' | 'split' | 'forfeit';
 
 /** Minimal pawn shape the selection needs (adapt the API Pawn into this). */
 export interface SelPawn {
@@ -114,8 +114,10 @@ export class PawnAndCardSelection {
   }
 
   private secondPawnIsOnNormalBoardWhenYouPlayJack(): void {
-    // A Jack can only switch with a pawn on the normal board.
-    if (this.pawn2 != null && !isNormalBoard(this.pawn2)) {
+    // A Jack switches your pawn with ANOTHER player's pawn on the normal board.
+    // Drop pawn2 if it is off the normal board, or if it is one of your own
+    // (you cannot switch two of your own pawns — the Seven->Jack bugfix test).
+    if (this.pawn2 != null && (!isNormalBoard(this.pawn2) || this.pawn2.playerId === this.playerId)) {
       this.pawn2 = null;
     }
   }
@@ -404,6 +406,28 @@ export class PawnAndCardSelection {
   }
   setMoveType(moveType: SelMoveType | null): void {
     this.moveType = moveType;
+    // Forfeiting is not a card play: clear the pawn/card selection so nothing
+    // stale is carried into the move. (The GWT tests assert this; the literal
+    // Java setter does not do it — see the note in the spec.)
+    if (moveType === 'forfeit') {
+      this.card = null;
+      this.pawn1 = null;
+      this.pawn2 = null;
+      this.cardWasAutoSelected = false;
+      this.nrStepsPawn1 = 0;
+      this.nrStepsPawn2 = 0;
+    }
+  }
+
+  /**
+   * Consume the pending move type and clear it (the GWT `createMoveMessage`
+   * side-effect). Returns the move type that was in effect; a second call returns
+   * null, preventing an accidental double-play.
+   */
+  commitMove(): SelMoveType | null {
+    const moveType = this.moveType;
+    this.moveType = null;
+    return moveType;
   }
   getNrStepsPawn1(): number {
     return this.nrStepsPawn1;
