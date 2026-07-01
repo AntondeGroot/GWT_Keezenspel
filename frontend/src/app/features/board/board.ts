@@ -6,6 +6,7 @@ import { Pawn } from './pawn/pawn';
 import { Card } from './card/card';
 import {highlightForPawn1, highlightForPawn2} from './pawn-highlight';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
+import { Translations } from '../../i18n/translations.service';
 
 @Component({
   selector: 'app-board',
@@ -27,6 +28,7 @@ export class Board implements OnInit, OnDestroy{
   }
   private readonly movesService = inject(MovesService);
   private readonly cardsService = inject(CardsService);
+  protected readonly i18n = inject(Translations);
   private readonly session = resolveGameSession();
   private readonly sessionId = this.session.sessionId;
   private readonly viewerId = this.session.playerId;

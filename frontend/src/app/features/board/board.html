@@ -40,8 +40,8 @@
     </div>
 
     <div class="button-container">
-      <button class="send-button" [disabled]="!canPlay()" (click)="playCard()">Play card</button>
-      <button class="forfeit-button" (click)="forfeit()">Forfeit</button>
+      <button class="send-button" [disabled]="!canPlay()" (click)="playCard()">{{ i18n.t('playCard') }}</button>
+      <button class="forfeit-button" (click)="forfeit()">{{ i18n.t('forfeit') }}</button>
 
       <!-- 7-split: divide the 7 across the two selected pawns (sum stays 7). -->
       @if (splitVisible()) {
