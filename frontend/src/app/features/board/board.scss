@@ -97,6 +97,13 @@
   transform: translate(-50%, -80%);
   box-sizing: border-box;
   cursor: pointer;
+  transition: filter 0.12s ease;
+}
+
+// Hover feedback — a subtle brighten + shadow so it reads as clickable, with no
+// size change (the pawn keeps its footprint).
+.pawn:hover {
+  filter: brightness(1.15) drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5));
 }
 
 // Cards (hand + pile) live in one layer inside the board, positioned by left/top%
