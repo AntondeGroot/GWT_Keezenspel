@@ -1,10 +1,11 @@
-import { Component, signal, inject, computed, OnInit, OnDestroy } from '@angular/core';
+import { Component, signal, inject, computed, effect, OnInit, OnDestroy } from '@angular/core';
 import { GameStatePush, MovesService, CardsService, Card as CardModel, MoveRequest } from '../../api';
 import { buildBoard } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { Pawn } from './pawn/pawn';
 import { Card } from './card/card';
 import {highlightForPawn1, highlightForPawn2} from './pawn-highlight';
+import { PawnAndCardSelection } from './pawn-and-card-selection';
 
 @Component({
   selector: 'app-board',
@@ -107,9 +108,32 @@ export class Board implements OnInit, OnDestroy{
       .map((c) => ({ uuid: c.uuid, suit: c.suit, value: c.value, ...target.get(c.uuid)! }));
   });
 
-  protected readonly selectedCardUuid = signal<number | undefined>(undefined);
-  protected readonly selectedPawnId = signal<string | undefined>(undefined);
-  protected readonly selectedPawn2Id = signal<string | undefined>(undefined);
+  // --- Selection: delegated to the ported PawnAndCardSelection state machine ---
+  private readonly selection = new PawnAndCardSelection();
+  // The selection is a plain mutable object, not a signal; bump `rev` after every
+  // change so the computed selectors below recompute and the view updates.
+  private readonly rev = signal(0);
+  private touch(): void {
+    this.rev.update((v) => v + 1);
+  }
+
+  constructor() {
+    // Feed the selection the current player, pawns (with live positions) and hand
+    // from every server push, so it can validate moves and auto-select cards.
+    effect(() => {
+      const s = this.state();
+      if (this.viewerId) this.selection.setPlayerId(this.viewerId);
+      this.selection.updatePawns(
+        (s?.pawns ?? []).map((p) => ({
+          id: `${p.pawnId.playerId}:${p.pawnId.pawnNr}`,
+          playerId: p.pawnId.playerId,
+          tileNr: p.currentTileId.tileNr,
+        })),
+      );
+      this.selection.setHand((s?.playerCards ?? []).map((c) => ({ id: c.uuid, value: c.value })));
+      this.touch();
+    });
+  }
 
   private findPawn(id: string) {
     return this.state()?.pawns?.find(
@@ -117,83 +141,85 @@ export class Board implements OnInit, OnDestroy{
     );
   }
 
+  // Reactive selectors over the selection (reading rev() makes them recompute).
+  protected readonly selectedCardUuid = computed(() => (this.rev(), this.selection.getCard()?.id));
+  protected readonly pawn1Id = computed(() => (this.rev(), this.selection.getPawnId1()));
+  protected readonly pawn2Id = computed(() => (this.rev(), this.selection.getPawnId2()));
+  protected readonly splitVisible = computed(() => (this.rev(), this.selection.isSplitBoxesVisible()));
+  protected readonly stepsPawn1 = computed(() => (this.rev(), this.selection.getNrStepsPawn1()));
+  protected readonly stepsPawn2 = computed(() => (this.rev(), this.selection.getNrStepsPawn2()));
+  protected readonly canPlay = computed(
+    () => (this.rev(), this.selection.getCard() != null && this.selection.getPawn1() != null),
+  );
+
   protected selectCard(uuid: number): void {
-    this.selectedCardUuid.set(uuid);
+    const handCard = this.hand().find((c) => c.uuid === uuid);
+    if (!handCard) return;
+    this.selection.setCard({ id: handCard.uuid, value: handCard.value });
+    this.touch();
   }
 
   protected selectPawn(id: string): void {
-    const card = this.hand().find((c) => c.uuid === this.selectedCardUuid());
-    // Jack (switch) needs two pawns: keep the first, set the second on the next
-    // click on a different pawn. Other cards just (re)select one pawn.
-    const needsTwo = card?.value === 11;
-    if (needsTwo && this.selectedPawnId() !== undefined && this.selectedPawnId() !== id) {
-      this.selectedPawn2Id.set(id);
-    } else {
-      this.selectedPawnId.set(id);
-      this.selectedPawn2Id.set(undefined);
-    }
+    this.selection.addPawnById(id);
+    this.touch();
+  }
+
+  // The 7-split step inputs (shown when splitVisible()).
+  protected onStepsPawn1(value: string): void {
+    this.selection.setNrStepsPawn1ForSplit(value);
+    this.touch();
+  }
+  protected onStepsPawn2(value: string): void {
+    this.selection.setNrStepsPawn2ForSplit(value);
+    this.touch();
   }
 
   protected readonly highlightForPawn1 = highlightForPawn1;
   protected readonly highlightForPawn2 = highlightForPawn2;
 
-  // The "play card" button is enabled once a card and a pawn are selected.
-  protected readonly canPlay = computed(
-    () => this.selectedCardUuid() !== undefined && this.selectedPawnId() !== undefined,
-  );
-
-  // Submit the current selection (the green send / "play card" button).
+  // Submit the current selection (the green "play card" button). The server
+  // re-derives the move type from the card + pawns, so we just send the pieces.
   protected playCard(): void {
-    const cardUuid = this.selectedCardUuid();
-    const pawnId = this.selectedPawnId();
-    if (cardUuid === undefined || pawnId === undefined) return;
-
-    const card = this.hand().find((c) => c.uuid === cardUuid);
-    const pawn1 = this.findPawn(pawnId);
+    const card = this.selection.getCard();
+    const pawn1 = this.selection.getPawn1();
     if (!card || !pawn1 || !this.sessionId || !this.viewerId) return;
+    const apiPawn1 = this.findPawn(pawn1.id);
+    if (!apiPawn1) return;
+    const pawn2 = this.selection.getPawn2();
+    const apiPawn2 = pawn2 ? this.findPawn(pawn2.id) : undefined;
+    const handCard = this.hand().find((c) => c.uuid === card.id);
 
-    // A Jack is a switch: wait for a second pawn, then send both. The server
-    // classifies it as SWITCH from (jack + two on-board pawns).
-    let pawn2;
-    if (card.value === 11) {
-      const pawn2Id = this.selectedPawn2Id();
-      if (pawn2Id === undefined) return; // still waiting for the second pawn
-      pawn2 = this.findPawn(pawn2Id);
-      if (!pawn2) return;
-    }
-
-    this.send(card, {
+    this.send(handCard, {
       playerId: this.viewerId,
-      cardId: cardUuid,
-      pawn1Id: pawn1.pawnId,
-      pawn2Id: pawn2?.pawnId, // undefined for non-switch moves
-      stepsPawn1: card.value,
+      cardId: card.id,
+      pawn1Id: apiPawn1.pawnId,
+      pawn2Id: apiPawn2?.pawnId,
+      stepsPawn1: this.selection.getNrStepsPawn1(),
+      stepsPawn2: this.selection.getNrStepsPawn2(),
       tempMessageType: 'MAKE_MOVE',
     });
   }
 
-  private send(card: CardModel, move: MoveRequest): void {
+  private send(card: CardModel | undefined, move: MoveRequest): void {
     if (!this.sessionId || !this.viewerId) return;
     this.movesService.makeMove(this.sessionId, this.viewerId, move).subscribe({
       // Only fly the card to the pile if the server actually accepted the move.
       next: (response) => {
-        if (response.result === 'CAN_MAKE_MOVE') {
+        if (response.result === 'CAN_MAKE_MOVE' && card) {
           this.pile.update((p) => [...p, card]);
         }
       },
       error: () => {}, // illegal / not your turn (400): card stays in the hand
     });
-    this.selectedCardUuid.set(undefined);
-    this.selectedPawnId.set(undefined);
-    this.selectedPawn2Id.set(undefined);
+    this.selection.reset();
+    this.touch();
   }
 
   // Forfeit the turn (the amber forfeit button) — DELETE /cards/{session}/{player}.
   protected forfeit(): void {
     if (!this.sessionId || !this.viewerId) return;
     this.cardsService.playerForfeits(this.sessionId, this.viewerId).subscribe({ error: () => {} });
-    this.selectedCardUuid.set(undefined);
-    this.selectedPawnId.set(undefined);
-    this.selectedPawn2Id.set(undefined);
+    this.selection.reset();
+    this.touch();
   }
 }
