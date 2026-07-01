@@ -1,6 +1,6 @@
 import { Component, signal, inject, computed, effect, OnInit, OnDestroy } from '@angular/core';
 import { GameStatePush, MovesService, CardsService, Card as CardModel, MoveRequest } from '../../api';
-import { buildBoard } from './board-geometry';
+import { buildBoard, fanCardBacks } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { Pawn } from './pawn/pawn';
 import { Card } from './card/card';
@@ -72,13 +72,43 @@ export class Board implements OnInit, OnDestroy{
       return {x: pt.x, y: pt.y, zIndex: Math.round(pt.y), color: colorOfPawn, id: pawnId}}).filter(x => x !== null);
   })
   protected readonly cell  = computed(() => this.geometry()?.cellDistance ?? 0);
+
+  // Face-down card backs for every OTHER player, fanned by their public card
+  // count (nrOfCardsPerPlayer). Only counts are ever known here — never values —
+  // so there is nothing to peek at in the DOM.
+  protected readonly cardBacks = computed(() => {
+    const g = this.geometry();
+    const counts = this.state()?.nrOfCardsPerPlayer;
+    if (!g || !counts) return [];
+    const backs: { key: string; x: number; y: number; rot: number }[] = [];
+    for (const [playerId, n] of Object.entries(counts)) {
+      if (playerId === this.viewerId) continue; // own hand is drawn as real cards
+      const segment = g.deckSegment(playerId);
+      if (!segment) continue;
+      fanCardBacks(segment, n).forEach((c, i) =>
+        backs.push({ key: `${playerId}:${i}`, x: c.x, y: c.y, rot: c.rotDeg }),
+      );
+    }
+    return backs;
+  });
   private eventSource?: EventSource;
 
   protected readonly hand = computed(() => this.state()?.playerCards ?? []);
 
   // Cards the viewer has played, kept client-side so the same element can fly to
   // the pile (the server's playedCards is just strings, no uuid to track).
+  // Opponents' played cards are appended here too (synthetic negative uuids) so
+  // they persist on the pile after their fly-in.
   protected readonly pile = signal<CardModel[]>([]);
+
+  // Transient face-up cards flying from an opponent's fan to the pile as they
+  // play. x/y are board-% (like the cards); the `.card` transition animates them.
+  protected readonly flyers = signal<
+    { id: number; x: number; y: number; rot: number; scale: number; suit: number; value: number }[]
+  >([]);
+  private flyerSeq = 0;
+  private prevCounts: Record<string, number> | undefined;
+  private syntheticUuid = -1;
 
   // One list of every card (hand + pile), each with a target position. Moving a
   // card from a hand slot to the pile target makes the same element animate there.
@@ -144,6 +174,74 @@ export class Board implements OnInit, OnDestroy{
       this.selection.setHand((s?.playerCards ?? []).map((c) => ({ id: c.uuid, value: c.value })));
       this.touch();
     });
+
+    // Detect when another player plays a single card (count −1) and fly it from
+    // their fan to the pile. A forfeit drops the count by more than one, so it is
+    // deliberately not animated.
+    effect(() => {
+      const counts = this.state()?.nrOfCardsPerPlayer;
+      const played = this.state()?.playedCards ?? [];
+      const prev = this.prevCounts;
+      if (counts && prev) {
+        for (const [pid, n] of Object.entries(counts)) {
+          if (pid !== this.viewerId && prev[pid] !== undefined && prev[pid] - n === 1) {
+            this.flyOpponentCard(pid, prev[pid], played);
+          }
+        }
+      }
+      this.prevCounts = counts ? { ...counts } : undefined;
+    });
+  }
+
+  /**
+   * Spawn a card flying from `from` to the pile centre, then drop the flyer and
+   * leave `landCard` on the pile. Shared by opponents' plays and the viewer's own.
+   */
+  private spawnFlyer(
+    from: { x: number; y: number; rot: number },
+    startScale: number,
+    suit: number,
+    value: number,
+    landCard: CardModel,
+  ): void {
+    const id = ++this.flyerSeq;
+    this.flyers.update((f) => [
+      ...f,
+      { id, x: from.x, y: from.y, rot: from.rot, scale: startScale, suit, value },
+    ]);
+    // Next frame, fly to the pile centre at pile size.
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() =>
+        this.flyers.update((f) =>
+          f.map((fl) => (fl.id === id ? { ...fl, x: 52.5, y: 50, rot: 0, scale: 0.6 } : fl)),
+        ),
+      ),
+    );
+    setTimeout(() => {
+      this.flyers.update((f) => f.filter((fl) => fl.id !== id));
+      this.pile.update((p) => [...p, landCard]);
+    }, 600);
+  }
+
+  /** Animate an opponent's just-played card from its fan slot to the pile. */
+  private flyOpponentCard(playerId: string, fanCount: number, played: string[]): void {
+    const segment = this.geometry()?.deckSegment(playerId);
+    const last = played[played.length - 1];
+    if (!segment || !last) return;
+    const [suit, value] = last.split('_').map(Number);
+    const slot = fanCardBacks(segment, fanCount).at(-1); // the outermost card leaves
+    if (!slot) return;
+    // Back-sized start (0.3 of a full card ≈ a 30px back); synthetic pile card.
+    this.spawnFlyer({ x: slot.x / 6, y: slot.y / 6, rot: slot.rotDeg }, 0.3, suit, value, {
+      uuid: this.syntheticUuid--,
+      suit,
+      value,
+    } as CardModel);
+  }
+
+  /** Animate the viewer's own just-played card from its (snapshotted) hand slot. */
+  private flyOwnCard(card: CardModel, from: { x: number; y: number }): void {
+    this.spawnFlyer({ x: from.x, y: from.y, rot: 0 }, 1, card.suit ?? 0, card.value ?? 1, card);
   }
 
   private findPawn(id: string) {
@@ -282,12 +380,17 @@ export class Board implements OnInit, OnDestroy{
   private send(card: CardModel | undefined, move: MoveRequest): void {
     if (!this.sessionId || !this.viewerId) return;
     this.previewTiles.set(new Set()); // stop the move preview while submitting
+    // Snapshot the played card's current hand slot BEFORE sending: the server push
+    // will have removed it from the hand by the time the move is confirmed, so on
+    // success we fly a clone from here (ported from the GWT captureCardStartPos).
+    const start = card ? this.cards().find((c) => c.uuid === card.uuid) : undefined;
     this.touch();
     this.movesService.makeMove(this.sessionId, this.viewerId, move).subscribe({
       next: (response) => {
         if (response.result === 'CAN_MAKE_MOVE') {
-          if (card) this.pile.update((p) => [...p, card]);
           this.selection.reset(); // accepted → clear the selection
+          if (card && start) this.flyOwnCard(card, { x: start.x, y: start.y });
+          else if (card) this.pile.update((p) => [...p, card]);
           this.touch();
         } else {
           // Rejected by the rules (still a 200): explain why, and keep the

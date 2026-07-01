@@ -40,6 +40,8 @@ export interface BoardGeometry {
   cellDistance: number;
   /** Centre pixel of a specific tile, or undefined if it does not exist. */
   position(playerId: string, tileNr: number): Pt | undefined;
+  /** The [start, end] pixels of a player's card-deck line (where their hand fans). */
+  deckSegment(playerId: string): [Pt, Pt] | undefined;
 }
 
 /** Matches Point.roundedValue: round to one decimal. */
@@ -139,6 +141,21 @@ export function buildBoard(
     return { ...tile, x: r.x, y: r.y };
   });
 
+  // Card-deck segment per player — the line just below a section's tiles where
+  // that player's hand fans out. Port of Board.createBoard's cardsDeckPoints:
+  // build player 0's [begin, end] from tile 1 and the previous player's tile 13
+  // (shifted a row down), rotate it per player, then orient for the viewer.
+  const deckBegin: Pt = { x: at(p0, 1).x, y: at(p0, 1).y + cell + 3 };
+  const deckEnd: Pt = { x: at(byInt(last).id, 13).x, y: at(byInt(last).id, 13).y + cell + 3 };
+  const viewerRot = (-360 / nrPlayers) * viewerInt;
+  const deckPoints = new Map<string, [Pt, Pt]>();
+  for (let k = 0; k < nrPlayers; k++) {
+    const kRot = (360 / nrPlayers) * k;
+    const b = rotate(rotate(deckBegin, CENTER, kRot), CENTER, viewerRot);
+    const e = rotate(rotate(deckEnd, CENTER, kRot), CENTER, viewerRot);
+    deckPoints.set(byInt(k).id, [b, e]);
+  }
+
   return {
     tiles: rotated,
     cellDistance: cell,
@@ -146,7 +163,53 @@ export function buildBoard(
       const m = rotated.find((t) => t.playerId === playerId && t.tileNr === tileNr);
       return m ? { x: m.x, y: m.y } : undefined;
     },
+    deckSegment: (playerId) => deckPoints.get(playerId),
   };
+}
+
+/**
+ * Fan `nrCards` card-back positions along a player's deck `segment`, ported from
+ * the GWT drawCardsIcons: pivot a point out beyond the board, then spread the
+ * cards on an arc facing the centre. Returns each card's centre + rotation (deg).
+ * The spread scales with the count (full spread at 5 cards) so it never gaps.
+ */
+export function fanCardBacks(
+  [start, end]: [Pt, Pt],
+  nrCards: number,
+): { x: number; y: number; rotDeg: number }[] {
+  if (nrCards <= 0) return [];
+  const rawMidX = (start.x + end.x) / 2;
+  const rawMidY = (start.y + end.y) / 2;
+  const radX = rawMidX - CENTER.x;
+  const radY = rawMidY - CENTER.y;
+  const radLen = Math.sqrt(radX * radX + radY * radY);
+  if (radLen < 1) return [];
+  const radNx = radX / radLen;
+  const radNy = radY / radLen;
+
+  const midX = rawMidX + radNx * 40; // push the fan clear of the tiles
+  const midY = rawMidY + radNy * 40;
+  const pivotDist = 120;
+  const pivotX = midX + radNx * pivotDist;
+  const pivotY = midY + radNy * pivotDist;
+
+  const fullSpreadW = Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2);
+  const scaledSpreadW = (fullSpreadW * Math.max(0, nrCards - 1)) / 4;
+  const halfFan = Math.atan2(scaledSpreadW / 2, pivotDist);
+  const fanRadius = Math.sqrt(pivotDist * pivotDist + (scaledSpreadW / 2) ** 2);
+  const baseDir = Math.atan2(CENTER.y - pivotY, CENTER.x - pivotX);
+
+  const out: { x: number; y: number; rotDeg: number }[] = [];
+  for (let i = 0; i < nrCards; i++) {
+    const t = nrCards <= 1 ? 0 : i / (nrCards - 1);
+    const cardAngle = baseDir - halfFan + t * 2 * halfFan;
+    out.push({
+      x: pivotX + fanRadius * Math.cos(cardAngle),
+      y: pivotY + fanRadius * Math.sin(cardAngle),
+      rotDeg: ((cardAngle + Math.PI / 2) * 180) / Math.PI,
+    });
+  }
+  return out;
 }
 
 /** Tile circle diameter in px (matches createCircle: 2 * (cell / 2) - 3). */
