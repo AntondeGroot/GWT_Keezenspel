@@ -3,6 +3,7 @@
     <div class="board" [style.--cell]="cell() / 6">
       @for (t of tiles(); track t.playerId + ':' + t.tileNr) {
         <div class="tile"
+             [class.tile-highlight-pulse]="isPreview(t.playerId, t.tileNr)"
              [style.left.%]="t.x / 6"
              [style.top.%]="t.y / 6"
              [style.background-color]="t.color"></div>
