@@ -23,7 +23,9 @@
         <div class="card-back"
              [style.left.%]="b.x / 6"
              [style.top.%]="b.y / 6"
-             [style.--rot.deg]="b.rot"></div>
+             [style.--rot.deg]="b.rot"
+             [style.z-index]="b.z"
+             [style.transition-delay.ms]="b.delay"></div>
       }
     </div>
 
@@ -40,8 +42,11 @@
           [style.--rot.deg]="c.rot"
           [style.--card-scale]="c.scale"
           [style.z-index]="c.z"
+          [style.transition-delay.ms]="c.dealDelay"
+          [style.--deal-delay]="c.dealDelay"
           [class.selected]="selectedCardUuid() === c.uuid"
           [class.played]="c.inPile"
+          [class.dealing]="c.dealing"
           (click)="selectCard(c.uuid)" />
       }
 
