@@ -234,6 +234,17 @@
   transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) translateY(-8px) scale(1.03);
 }
 
+// Played cards (on the pile) are inert: no clicks, no hover/selected growth —
+// they keep their pile transform (position + rotation + 0.6 scale).
+.card.played {
+  pointer-events: none;
+  cursor: default;
+
+  &:hover {
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(var(--card-scale, 1));
+  }
+}
+
 // Selected card: lifted with a gold ring + glow.
 .card.selected {
   transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) translateY(-20px) scale(1.05);
