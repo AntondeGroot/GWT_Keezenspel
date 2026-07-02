@@ -453,6 +453,29 @@ export class Board implements OnInit, OnDestroy{
     this.checkMove();
   }
 
+  // The − / + steppers; setNr...ForSplit wraps 8→0 and −1→7, like the GWT.
+  protected stepPawn1(delta: number): void {
+    this.onStepsPawn1(String(this.stepsPawn1() + delta));
+  }
+  protected stepPawn2(delta: number): void {
+    this.onStepsPawn2(String(this.stepsPawn2() + delta));
+  }
+
+  private playerColor(playerId: string): string {
+    return this.state()?.players?.find((p) => p.id === playerId)?.color ?? '#888888';
+  }
+
+  // Step-box label + input-border colours match each pawn's board highlight colour
+  // (which depends on the pawn's own colour), like the GWT updateStepBoxColors.
+  protected readonly pawn1Highlight = computed(() => {
+    const id = this.pawn1Id();
+    return id ? highlightForPawn1(this.playerColor(id.split(':')[0])) : undefined;
+  });
+  protected readonly pawn2Highlight = computed(() => {
+    const id = this.pawn2Id();
+    return id ? highlightForPawn2(this.playerColor(id.split(':')[0])) : undefined;
+  });
+
   protected readonly highlightForPawn1 = highlightForPawn1;
   protected readonly highlightForPawn2 = highlightForPawn2;
 
