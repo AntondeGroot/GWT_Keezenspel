@@ -212,41 +212,69 @@
   }
 }
 
-// 7-split step inputs — ported from .pawnIntegerBoxes/.TextBoxForPawnSteps.
-// Red marker + border = pawn 1, green = pawn 2 (match the pawn highlights).
+// 7-split step boxes — ported from .pawnIntegerBoxes/.TextBoxForPawnSteps + the
+// mobile-ux ± steppers. Label + input border take each pawn's highlight colour
+// (set inline from pawn1Highlight()/pawn2Highlight()).
 .pawn-steps {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 6px;
-  padding: 4px 6px;
+  padding: 6px;
   border-radius: 8px;
   background-color: rgba(255, 200, 100, 0.15);
   border: 1px solid rgba(201, 162, 39, 0.5);
 
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
   &__label {
-    font-size: 14pt;
-    line-height: 1;
-    &--1 {
-      color: #ef5350;
-    }
-    &--2 {
-      color: #66bb6a;
-    }
+    font: 600 13pt 'Lato', 'Helvetica Neue', sans-serif;
+    white-space: nowrap; // never wrap onto two lines
+    min-width: 3.8em; // keep the two rows aligned across languages
   }
 
   &__input {
-    width: 34px;
+    width: 30px;
     text-align: center;
+    border: 2px solid #c9a227; // overridden inline by the pawn highlight colour
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.92);
     color: #2a1800;
     font: 12pt 'Lato', 'Helvetica Neue', sans-serif;
-    &--1 {
-      border: 2px solid #ef5350;
+
+    // Hide the native number spinners — we use the ± buttons instead.
+    -moz-appearance: textfield;
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
-    &--2 {
-      border: 2px solid #66bb6a;
-    }
+  }
+}
+
+// − / + steppers (ported from .pawn-step-btn).
+.pawn-step-btn {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 14pt;
+  font-weight: 600;
+  line-height: 1;
+  border: 2px solid #c9a227;
+  background: linear-gradient(145deg, #3a2000, #251400);
+  color: #f4d03f;
+  cursor: pointer;
+  box-shadow:
+    2px 2px 8px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  &:active {
+    background: linear-gradient(145deg, #251400, #1a0e00);
+    transform: translateY(1px);
   }
 }
 
