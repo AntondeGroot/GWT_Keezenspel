@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: CI
 
 on:
   push:
@@ -7,36 +7,109 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  # ── OpenAPI spec lint ────────────────────────────────────────────────
+  openapi-lint:
+    name: OpenAPI lint
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v7
-
-      - name: Set up Node
-        uses: actions/setup-node@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
-
       - name: Lint OpenAPI spec
         run: npx --yes @redocly/cli@2 lint
 
-      - name: Set up JDK 25
-        uses: actions/setup-java@v5
+  # ── Angular (frontend) tests ─────────────────────────────────────────
+  angular:
+    name: Angular tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      # postinstall generates the OpenAPI client, so npm ci produces src/app/api
+      - run: npm ci
+      - name: Unit tests (Vitest)
+        run: npm test -- --no-watch
+
+  # ── GWT client unit tests (Java) ─────────────────────────────────────
+  gwt-unit:
+    name: GWT client unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
         with:
           java-version: '25'
           distribution: 'temurin'
           cache: maven
+      # `test` phase = surefire only (no GWT compile, no server). -Denv=dev keeps
+      # the env-prod GWT-app unpack off; -am builds the shared module dependency.
+      - name: Test GWT client
+        run: mvn -B -Denv=dev -pl GWT_Keezenspel-client -am test
 
-      - name: Set up Chrome
-        uses: browser-actions/setup-chrome@v2
+  # ── Backend (server) unit tests ──────────────────────────────────────
+  backend:
+    name: Backend unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+      # Even pure unit tests need Chrome: BaseUnitTest's SpringAppSuiteExtension
+      # runs WebDriverManager.chromedriver().setup() for the whole suite.
+      - uses: browser-actions/setup-chrome@v2
+      # -Denv=dev skips the env-prod GWT-app unpack (server unit tests don't need
+      # the compiled client). Failsafe (*_IT) doesn't run in the `test` phase.
+      - name: Test server
+        run: mvn -B -Denv=dev -pl GWT_Keezenspel-server -am test
 
-      - name: Build, test and run integration tests
-        run: mvn -B clean install --file pom.xml
+  # ── GWT integration tests (Selenium browser) ─────────────────────────
+  gwt-integration:
+    name: GWT integration tests (browser)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+      - uses: browser-actions/setup-chrome@v2
+      # Full default build (env-prod) so the compiled GWT app is served at :4200;
+      # run only the failsafe *_IT browser tests (surefire runs in the jobs above).
+      - name: Run *_IT (Selenium)
+        run: mvn -B clean verify -Dsurefire.skip=true
 
-      - name: Run mutation tests
-        run: mvn -B -pl GWT_Keezenspel-server pitest:mutationCoverage
-
+  # ── Mutation tests (server) ──────────────────────────────────────────
+  mutation:
+    name: Mutation tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+      # PIT runs the server unit tests, which (via BaseUnitTest) set up ChromeDriver.
+      - uses: browser-actions/setup-chrome@v2
+      # Install the modules first so the deps are in the local repo, then run PIT on
+      # the server module ALONE — the `pitest` prefix only resolves against that pom
+      # (a multi-module `-am` reactor can't resolve it). Mirrors the original CI.
+      - name: Build (deps into local repo)
+        run: mvn -B -Denv=dev -DskipTests install
+      - name: PIT mutation coverage
+        run: mvn -B -Denv=dev -pl GWT_Keezenspel-server pitest:mutationCoverage
       - name: Upload mutation report
         if: always()
         uses: actions/upload-artifact@v7
