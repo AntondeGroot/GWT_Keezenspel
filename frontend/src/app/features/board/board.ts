@@ -1,6 +1,9 @@
 import { Component, signal, inject, computed, effect, OnInit, OnDestroy } from '@angular/core';
-import { GameStatePush, MovesService, CardsService, Card as CardModel, MoveRequest } from '../../api';
-import { buildBoard, fanCardBacks, Pt } from './board-geometry';
+import {
+  GameStatePush, MovesService, CardsService, Card as CardModel, MoveRequest,
+  MoveResponse, Pawn as ApiPawn, PositionKey,
+} from '../../api';
+import { buildBoard, fanCardBacks, Pt, BoardGeometry } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { Pawn } from './pawn/pawn';
 import { Card } from './card/card';
@@ -23,6 +26,19 @@ export class Board implements OnInit, OnDestroy{
       this.eventSource = new EventSource(this.streamUrl);
       this.eventSource.addEventListener('gamestate', (event: MessageEvent) => {
         const next = JSON.parse(event.data) as GameStatePush;
+
+        // Animate the pawns of the last move. Detect a NEW move (its paths changed)
+        // and set it up BEFORE state.set, so pawns hold their start tiles instead of
+        // snapping to the server's already-final positions. Skipped on the first push.
+        const mr = next.lastMoveResponse;
+        const moveKey = mr
+          ? JSON.stringify([mr.movePawn1, mr.movePawn2, mr.movePawnKilledByPawn1, mr.movePawnKilledByPawn2])
+          : '';
+        if (this.prevMoveKey !== undefined && moveKey && moveKey !== this.prevMoveKey) {
+          this.animateMove(mr!);
+        }
+        this.prevMoveKey = moveKey;
+
         // Detect a deal (cards that weren't in the hand before) and start the
         // deal-in BEFORE setting state, so those cards render at the deck rather
         // than flashing at their slots first. The FIRST push after (re)connecting
@@ -76,15 +92,27 @@ export class Board implements OnInit, OnDestroy{
     const g = this.geometry();
     const s = this.state();
     if(!g || !s?.pawns) return [];
+    const anim = this.pawnAnim();
     const colorOf = (playerId: string) =>
       s.players!.find((p) => p.id === playerId)?.color || '#f2f2f2';
     return s.pawns.map((pawn) => {
-      const tile = pawn.currentTileId;
-      const pt = g.position(tile.playerId, tile.tileNr)
-      const colorOfPawn = colorOf(pawn.playerId);
       const pawnId = `${pawn.pawnId.playerId}:${pawn.pawnId.pawnNr}`;
-      if(!pt) return null;
-      return {x: pt.x, y: pt.y, zIndex: Math.round(pt.y), color: colorOfPawn, id: pawnId}}).filter(x => x !== null);
+      // While a pawn is moving, its position (and step transition ms) comes from the
+      // animation override instead of the server's already-final tile.
+      const a = anim.get(pawnId);
+      let x: number, y: number;
+      if (a) {
+        x = a.x;
+        y = a.y;
+      } else {
+        const tile = pawn.currentTileId;
+        const pt = g.position(tile.playerId, tile.tileNr);
+        if (!pt) return null;
+        x = pt.x;
+        y = pt.y;
+      }
+      return { x, y, zIndex: Math.round(y), color: colorOf(pawn.playerId), id: pawnId, moveMs: a?.ms ?? 0 };
+    }).filter(x => x !== null);
   })
   protected readonly cell  = computed(() => this.geometry()?.cellDistance ?? 0);
 
@@ -162,6 +190,11 @@ export class Board implements OnInit, OnDestroy{
   private readonly dealtIndex = signal<Map<number, number>>(new Map());
   private readonly atDeck = signal(false);
   private prevHandUuids: Set<number> | undefined;
+
+  // Pawn move animation: pawnId -> its current animated pixel position + the
+  // transition duration for the current step. Present only while a pawn is moving.
+  protected readonly pawnAnim = signal<Map<string, { x: number; y: number; ms: number }>>(new Map());
+  private prevMoveKey: string | undefined;
 
   // One list of every card (hand + pile), each with a target position. Moving a
   // card from a hand slot to the pile target makes the same element animate there.
@@ -280,6 +313,79 @@ export class Board implements OnInit, OnDestroy{
     requestAnimationFrame(() => requestAnimationFrame(() => this.atDeck.set(false)));
     // Clear once the last card has finished (last round's delay + the transition).
     setTimeout(() => this.dealtIndex.set(new Map()), uuids.length * 700 + 2000);
+  }
+
+  // --- Pawn move animation (ported from PawnAnimation) ---------------------
+
+  /** Walk each of a move's pawns along its path; killed pawns go home after the killer. */
+  private animateMove(mr: MoveResponse): void {
+    const g = this.geometry();
+    if (!g) return;
+    const d1 = this.animatePawnPath(g, mr.pawn1, mr.movePawn1, 0);
+    const d2 = this.animatePawnPath(g, mr.pawn2, mr.movePawn2, 0);
+    this.animatePawnPath(g, mr.pawnKilledByPawn1, mr.movePawnKilledByPawn1, d1);
+    this.animatePawnPath(g, mr.pawnKilledByPawn2, mr.movePawnKilledByPawn2, d2);
+  }
+
+  /**
+   * Hold a pawn at its path start (so the server's final tile doesn't snap), then
+   * walk its waypoints after `delayMs`. Returns the total animation time in ms.
+   */
+  private animatePawnPath(
+    g: BoardGeometry,
+    pawn: ApiPawn | undefined,
+    move: PositionKey[] | undefined,
+    delayMs: number,
+  ): number {
+    if (!pawn || !move || move.length < 2) return 0;
+    const id = `${pawn.pawnId.playerId}:${pawn.pawnId.pawnNr}`;
+    const points: Pt[] = [];
+    for (const t of move) {
+      const p = g.position(t.playerId, t.tileNr);
+      if (p) points.push(p);
+    }
+    if (points.length < 2) return 0;
+
+    let total = 0;
+    for (let i = 1; i < points.length; i++) {
+      total += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+    }
+    const speed = this.moveSpeed(total); // px/ms
+    this.setPawnAnim(id, points[0].x, points[0].y, 0); // hold at the start now
+    const walk = () =>
+      requestAnimationFrame(() => requestAnimationFrame(() => this.stepPawnPath(id, points, 1, speed)));
+    if (delayMs > 0) setTimeout(walk, delayMs);
+    else walk();
+    return Math.round(total / speed);
+  }
+
+  private stepPawnPath(id: string, points: Pt[], i: number, speed: number): void {
+    if (i >= points.length) {
+      this.clearPawnAnim(id); // done — settle onto the server's final tile
+      return;
+    }
+    const d = Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+    const ms = Math.max(16, Math.round(d / speed));
+    this.setPawnAnim(id, points[i].x, points[i].y, ms);
+    setTimeout(() => this.stepPawnPath(id, points, i + 1, speed), ms);
+  }
+
+  /** px/ms — faster over longer paths (ported from calculateSpeed). */
+  private moveSpeed(distance: number): number {
+    if (distance > 400) return 0.16;
+    if (distance > 200) return 0.12;
+    return 0.1;
+  }
+
+  private setPawnAnim(id: string, x: number, y: number, ms: number): void {
+    this.pawnAnim.update((m) => new Map(m).set(id, { x, y, ms }));
+  }
+  private clearPawnAnim(id: string): void {
+    this.pawnAnim.update((m) => {
+      const n = new Map(m);
+      n.delete(id);
+      return n;
+    });
   }
 
   /**

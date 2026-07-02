@@ -17,6 +17,7 @@
                            : undefined"
                   [style.left.%]="p.x / 6"
                   [style.top.%]="p.y / 6"
+                  [style.--move-ms]="p.moveMs + 'ms'"
                   [style.z-index]="p.zIndex" />
       }
       @for (b of cardBacks(); track b.key) {
