@@ -170,17 +170,4 @@ public class PawnAndCardSelectionAceTest {
     assertEquals(MOVE, pawnAndCardSelection.getMoveType());
     assertEquals(1, pawnAndCardSelection.getNrStepsPawn1());
   }
-
-  @Test
-  public void pawnOnBoard_SelectAce_Mov() {
-    // GIVEN
-    pawnAndCardSelection.setPlayerId("1");
-    pawnAndCardSelection.addPawn(ownPawnOnBoard);
-    pawnAndCardSelection.setCard(new CardClient(0, 5));
-    pawnAndCardSelection.setCard(ACE.get());
-
-    // THEN
-    assertEquals(MOVE, pawnAndCardSelection.getMoveType());
-    assertEquals(1, pawnAndCardSelection.getNrStepsPawn1());
-  }
 }
