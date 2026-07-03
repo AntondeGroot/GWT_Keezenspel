@@ -60,10 +60,18 @@ Source root: `GWT_Keezenspel-client/src/test/java/adg/`
 | [ ] | `BoardTest.java` | 2 | `board.spec.ts` (only 1 `it` present) | 🟡 Partial — confirm both cases covered |
 | [ ] | `PawnAnimationKeyTest.java` | 4 | _none_ | ❌ Not migrated |
 | [x] | `PawnHighlightColorsTest.java` | 22 | `pawn-highlight.spec.ts` | ✅ Migrated & verified (22/22) |
-| [ ] | `keezen/util/CookieTest.java` | 18 | _none_ | ❌ Not migrated |
+| [~] | `keezen/util/CookieTest.java` | 18 | `session.spec.ts` (6) | 🟡 Partial (6/18) — see note |
 
 > `CardEnum.java` is a test helper/fixture (0 `@Test`), not a test — migrate only if the Angular
 > specs still need the equivalent card enum data.
+
+> **`CookieTest` (6/18 migrated).** Only the `pickValue` group (6) has an Angular counterpart —
+> ported to `session.spec.ts` against the extracted `pickValue` in `session.ts`. The other 12
+> (`needsLocaleRedirect` ×4, `buildRedirectUrl` ×8) are **not applicable to Angular**: they model
+> GWT reloading the page with a `?locale=` param (GWT compiles one permutation per locale), whereas
+> Angular switches language at runtime via the `Translations` service with no reload. Porting them
+> would add unused production code, so they stay GWT-only and retire when GWT is removed. Revisit
+> only if a locale-based redirect is ever introduced in Angular.
 
 **Client unit total: 8 / 12 files migrated** (the whole `PawnAndCardSelection*` family).
 
@@ -119,8 +127,8 @@ Source root: `GWT_Keezenspel-server/src/test/java/adg/keezen/IntegrationTests/`
 
 | Category | Migrated | Remaining |
 | --- | --- | --- |
-| GWT client unit tests | 9 / 12 files | `Board` (partial), `PawnAnimationKey`, `Cookie` |
+| GWT client unit tests | 9.5 / 12 files | `Board` (partial), `PawnAnimationKey`, `Cookie` (6/18, rest N/A) |
 | GWT integration tests (`_IT`) | 0 / 20 files | all 20 |
 
-**Not yet migrated:** `BoardTest` (finish), `PawnAnimationKeyTest`, `CookieTest`, and all 20
-`*_IT` integration tests.
+**Not yet migrated:** `BoardTest` (finish), `PawnAnimationKeyTest`, `CookieTest` `pickValue` done
+(12 remaining tests are GWT-only, not applicable to Angular), and all 20 `*_IT` integration tests.

@@ -10,9 +10,18 @@ export interface GameSessionRef {
   playerId: string | null;
 }
 
+/**
+ * URL parameter is authoritative (GameRoom places it there for this session);
+ * the cookie is only a fallback for a page refresh where the URL has no value.
+ * A faithful port of the GWT Cookie.pickValue — an empty URL value counts as
+ * absent, so it too falls back to the cookie.
+ */
+export function pickValue(urlVal: string | null, cookieVal: string | null): string | null {
+  return urlVal ? urlVal : cookieVal;
+}
+
 function urlParam(name: string): string | null {
-  const value = new URLSearchParams(window.location.search).get(name);
-  return value && value.length > 0 ? value : null;
+  return new URLSearchParams(window.location.search).get(name);
 }
 
 function cookie(name: string): string | null {
@@ -22,7 +31,7 @@ function cookie(name: string): string | null {
 
 export function resolveGameSession(): GameSessionRef {
   return {
-    sessionId: urlParam('sessionid') ?? cookie('sessionid'),
-    playerId: urlParam('playerid') ?? cookie('playerid'),
+    sessionId: pickValue(urlParam('sessionid'), cookie('sessionid')),
+    playerId: pickValue(urlParam('playerid'), cookie('playerid')),
   };
 }
