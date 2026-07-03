@@ -44,6 +44,10 @@ Current Angular specs:
 - `frontend/src/app/features/board/pawn-and-card-selection.spec.ts` — `PawnAndCardSelection*Test`
 - `frontend/src/app/features/board/pawn-highlight.spec.ts` — `PawnHighlightColorsTest`
 - `frontend/src/app/features/board/pawn-key.spec.ts` — `PawnAnimationKeyTest`
+- `frontend/src/app/features/board/card-selection.spec.ts` — `Card_IT` (component)
+- `frontend/src/app/features/board/board-render.spec.ts` — `Board_IT` counts + `MobileLocale_IT` i18n
+- `frontend/src/app/features/board/auto-select-card.spec.ts` — `AutoSelectCardBorder_IT`
+- `frontend/src/app/features/board/pawn-highlight-render.spec.ts` — `PawnHighlightColors_IT` (wiring)
 
 ---
 
@@ -102,13 +106,13 @@ headless Chrome against the GWT DOM. They bind to **GWT-specific CSS classes** (
 
 | ✔ | Java IT file | Cases | Bucket | Target |
 | --- | --- | --- | --- | --- |
-| [ ] | `AutoSelectCardBorder_IT.java` | 2 | C | Angular component test |
-| [ ] | `Board_IT.java` | 5 | C | Angular component test |
+| [x] | `AutoSelectCardBorder_IT.java` | 2 | C | ✅ `auto-select-card.spec.ts` (2/2) |
+| [~] | `Board_IT.java` | 5 | C | ✅ `board-render.spec.ts` counts (3); title = static `index.html`; centering → D |
 | [x] | `Card_IT.java` | 4 | C | ✅ `card-selection.spec.ts` (4/4) — Proof C |
-| [ ] | `PawnHighlightColors_IT.java` | 7 | C | Angular component test |
-| [ ] | `MobileLayoutCheck_IT.java` | 1 | C | Angular component test |
-| [ ] | `MobileLocale_IT.java` | 5 | C | Angular component test |
-| [ ] | `Chat_IT.java` | 5 | C | Angular component test (mock chat svc) |
+| [x] | `PawnHighlightColors_IT.java` | 7 | C | ✅ `pawn-highlight-render.spec.ts` (wiring) + `pawn-highlight.spec.ts` (colour maths) |
+| [ ] | `MobileLocale_IT.java` | 5 | C | ✅ `board-render.spec.ts` i18n text (2); `mobile.html` redirect + reload = N/A (SPA) |
+| [ ] | `MobileLayoutCheck_IT.java` | 1 | ~~C~~ **D** | Playwright E2E — pure viewport/overlap geometry, jsdom can't |
+| [ ] | `Chat_IT.java` | 5 | ~~C~~ **blocked** | No Angular chat feature yet — nothing to test until it's built |
 | [ ] | `CardAnimation_IT.java` | 1 | D | Playwright E2E |
 | [ ] | `CardDisplay_IT.java` | 6 | D | Playwright E2E |
 | [ ] | `CardSevenSplit_IT.java` | 1 | D | Playwright E2E |
@@ -131,8 +135,19 @@ Buckets: **A** = pure backend (no browser), **B** = disabled stub, **C** = front
 > once as a Playwright helper layer (a `Steps`-equivalent DSL + API-seeding via Playwright's
 > `request` fixture). `ScreenshotOnFailure` and `TestTemplate` are already unused/disabled today.
 
-**Integration total: 1 / 20 migrated** (`Card_IT`, bucket C) — 17 in scope for the frontend
-(C: 7, D: 10), 2 stay Java (A), 1 N/A (B).
+**Bucket C: component-testing pass complete.** Five files landed as Angular component specs
+(`card-selection`, `auto-select-card`, `pawn-highlight-render`, `board-render`) — 16 new `it`s, all
+green under `ng test`. On inspection bucket C was not uniformly jsdom-testable, so it reshaped:
+- **Fully migrated (component tests):** `Card_IT`, `AutoSelectCardBorder_IT`, `PawnHighlightColors_IT`.
+- **Partially migrated (rest → D/N/A):** `Board_IT` (counts done; vertical-centering → D; title is
+  static `index.html`), `MobileLocale_IT` (i18n button text done; `mobile.html` redirect + reload = N/A
+  for a responsive SPA).
+- **Reclassified C → D:** `MobileLayoutCheck_IT` (viewport/overlap geometry — needs a real browser).
+- **Blocked:** `Chat_IT` — the Angular app has **no chat feature yet**; can't test UI that doesn't exist.
+
+**Integration total: ~6 / 20 covered on the frontend** (C bucket's testable assertions). Remaining:
+bucket D (10 originals + the geometry slices reclassified from C), 2 stay Java (A), `SendButtonSpinner`
+N/A (B), `Chat_IT` blocked until the feature exists.
 
 ---
 
@@ -200,5 +215,7 @@ seeding hooks.
    ✅ **Done** — `Card_IT` → `card-selection.spec.ts` (4/4). Harness recipe captured under bucket C above.
 2. **Proof D:** stand up Playwright + the boot/serve/reset harness, migrate one bucket-D test
    (e.g. `Winner2Players_IT`). This is the infra milestone.
-3. Fan out the rest of C, then D, reusing the helper layer.
+3. ~~Fan out the rest of C~~ ✅ **Done** — bucket C component-testing pass complete (see section 2).
+   Then D, reusing the helper layer.
 4. Relocate bucket A into the backend test module; retire bucket B note.
+5. Build the Angular chat feature, then unblock `Chat_IT`.
