@@ -3,9 +3,9 @@
  * PawnHighlightColors. Pawn 1 prefers red, pawn 2 prefers green; either falls
  * back to blue if it would clash (be too close in hue) with the pawn's own colour.
  */
-const RED = '#ef5350';
-const GREEN = '#66bb6a';
-const BLUE = '#1e90ff';
+export const RED = '#ef5350';
+export const GREEN = '#66bb6a';
+export const BLUE = '#1e90ff';
 
 function hexToRgb(hex: string): [number, number, number] {
   const h = hex.slice(1);
@@ -16,7 +16,7 @@ function hexToRgb(hex: string): [number, number, number] {
   ];
 }
 
-function computeHue([r, g, b]: [number, number, number]): number {
+export function computeHue([r, g, b]: [number, number, number]): number {
   r /= 255;
   g /= 255;
   b /= 255;
@@ -31,7 +31,7 @@ function computeHue([r, g, b]: [number, number, number]): number {
   return hue < 0 ? hue + 360 : hue;
 }
 
-function clashes(pawnColor: string | undefined, highlight: string): boolean {
+export function clashes(pawnColor: string | undefined, highlight: string): boolean {
   if (!pawnColor) return false;
   let diff = Math.abs(computeHue(hexToRgb(pawnColor)) - computeHue(hexToRgb(highlight)));
   if (diff > 180) diff = 360 - diff;

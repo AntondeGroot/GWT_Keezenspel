@@ -59,7 +59,7 @@ Source root: `GWT_Keezenspel-client/src/test/java/adg/`
 | [x] | `PawnAndCardSelectionForfeitTest.java` | 1 | `pawn-and-card-selection.spec.ts` › `- Forfeit` | Migrated — verify case-by-case |
 | [ ] | `BoardTest.java` | 2 | `board.spec.ts` (only 1 `it` present) | 🟡 Partial — confirm both cases covered |
 | [ ] | `PawnAnimationKeyTest.java` | 4 | _none_ | ❌ Not migrated |
-| [ ] | `PawnHighlightColorsTest.java` | 22 | _none_ | ❌ Not migrated |
+| [x] | `PawnHighlightColorsTest.java` | 22 | `pawn-highlight.spec.ts` | ✅ Migrated & verified (22/22) |
 | [ ] | `keezen/util/CookieTest.java` | 18 | _none_ | ❌ Not migrated |
 
 > `CardEnum.java` is a test helper/fixture (0 `@Test`), not a test — migrate only if the Angular
@@ -119,8 +119,8 @@ Source root: `GWT_Keezenspel-server/src/test/java/adg/keezen/IntegrationTests/`
 
 | Category | Migrated | Remaining |
 | --- | --- | --- |
-| GWT client unit tests | 8 / 12 files | `Board` (partial), `PawnAnimationKey`, `PawnHighlightColors`, `Cookie` |
+| GWT client unit tests | 9 / 12 files | `Board` (partial), `PawnAnimationKey`, `Cookie` |
 | GWT integration tests (`_IT`) | 0 / 20 files | all 20 |
 
-**Not yet migrated:** `BoardTest` (finish), `PawnAnimationKeyTest`, `PawnHighlightColorsTest`,
-`CookieTest`, and all 20 `*_IT` integration tests.
+**Not yet migrated:** `BoardTest` (finish), `PawnAnimationKeyTest`, `CookieTest`, and all 20
+`*_IT` integration tests.
