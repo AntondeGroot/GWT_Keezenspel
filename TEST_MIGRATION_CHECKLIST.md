@@ -38,8 +38,12 @@ GWT itself is removed** from the project — at which point the whole GWT test s
 
 Current Angular specs:
 - `frontend/src/app/app.spec.ts`
-- `frontend/src/app/features/board/board.spec.ts`
-- `frontend/src/app/features/board/pawn-and-card-selection.spec.ts`
+- `frontend/src/app/session.spec.ts` — `CookieTest` (pickValue)
+- `frontend/src/app/features/board/board.spec.ts` — component smoke test (not part of a GWT port)
+- `frontend/src/app/features/board/board-geometry.spec.ts` — `BoardTest`
+- `frontend/src/app/features/board/pawn-and-card-selection.spec.ts` — `PawnAndCardSelection*Test`
+- `frontend/src/app/features/board/pawn-highlight.spec.ts` — `PawnHighlightColorsTest`
+- `frontend/src/app/features/board/pawn-key.spec.ts` — `PawnAnimationKeyTest`
 
 ---
 
@@ -57,7 +61,7 @@ Source root: `GWT_Keezenspel-client/src/test/java/adg/`
 | [x] | `PawnAndCardSelectionAutoSelectTest.java` | 10 | `pawn-and-card-selection.spec.ts` › `- AutoSelect` | Migrated — verify case-by-case |
 | [x] | `PawnAndCardSelectionValidationTest.java` | 5 | `pawn-and-card-selection.spec.ts` › `- Validation` | Migrated — verify case-by-case |
 | [x] | `PawnAndCardSelectionForfeitTest.java` | 1 | `pawn-and-card-selection.spec.ts` › `- Forfeit` | Migrated — verify case-by-case |
-| [ ] | `BoardTest.java` | 2 | `board.spec.ts` (only 1 `it` present) | 🟡 Partial — confirm both cases covered |
+| [x] | `BoardTest.java` | 2 | `board-geometry.spec.ts` | ✅ Migrated & verified (2/2) |
 | [x] | `PawnAnimationKeyTest.java` | 4 | `pawn-key.spec.ts` | ✅ Migrated & verified (4/4) |
 | [x] | `PawnHighlightColorsTest.java` | 22 | `pawn-highlight.spec.ts` | ✅ Migrated & verified (22/22) |
 | [~] | `keezen/util/CookieTest.java` | 18 | `session.spec.ts` (6) | 🟡 Partial (6/18) — see note |
@@ -127,8 +131,9 @@ Source root: `GWT_Keezenspel-server/src/test/java/adg/keezen/IntegrationTests/`
 
 | Category | Migrated | Remaining |
 | --- | --- | --- |
-| GWT client unit tests | 10.5 / 12 files | `Board` (partial); `Cookie` (6/18, rest N/A) |
+| GWT client unit tests | 11.5 / 12 files | `Cookie` only (6/18 migrated, other 12 GWT-only / N/A) |
 | GWT integration tests (`_IT`) | 0 / 20 files | all 20 |
 
-**Not yet migrated:** `BoardTest` (finish); `CookieTest` `pickValue` done (12 remaining tests are
-GWT-only, not applicable to Angular); and all 20 `*_IT` integration tests.
+**Client unit tests: effectively complete.** Every migratable case is ported; the only unported
+GWT cases are `CookieTest`'s 12 locale-redirect tests, which are GWT-only (not applicable to
+Angular). **Remaining work is all integration:** the 20 `*_IT` tests.
