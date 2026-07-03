@@ -9,6 +9,7 @@ import { Pawn } from './pawn/pawn';
 import { Card } from './card/card';
 import {highlightForPawn1, highlightForPawn2} from './pawn-highlight';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
+import { pawnKey } from './pawn-key';
 import { Translations } from '../../i18n/translations.service';
 import { MoveRejection } from './move-rejected/move-rejection.service';
 import { localRejectionKey, rejectionMessageKey } from './rejection-message';
@@ -96,7 +97,7 @@ export class Board implements OnInit, OnDestroy{
     const colorOf = (playerId: string) =>
       s.players!.find((p) => p.id === playerId)?.color || '#f2f2f2';
     return s.pawns.map((pawn) => {
-      const pawnId = `${pawn.pawnId.playerId}:${pawn.pawnId.pawnNr}`;
+      const pawnId = pawnKey(pawn.pawnId);
       // While a pawn is moving, its position (and step transition ms) comes from the
       // animation override instead of the server's already-final tile.
       const a = anim.get(pawnId);
@@ -273,7 +274,7 @@ export class Board implements OnInit, OnDestroy{
       if (this.viewerId) this.selection.setPlayerId(this.viewerId);
       this.selection.updatePawns(
         (s?.pawns ?? []).map((p) => ({
-          id: `${p.pawnId.playerId}:${p.pawnId.pawnNr}`,
+          id: pawnKey(p.pawnId),
           playerId: p.pawnId.playerId,
           tileNr: p.currentTileId.tileNr,
         })),
@@ -338,7 +339,7 @@ export class Board implements OnInit, OnDestroy{
     delayMs: number,
   ): number {
     if (!pawn || !move || move.length < 2) return 0;
-    const id = `${pawn.pawnId.playerId}:${pawn.pawnId.pawnNr}`;
+    const id = pawnKey(pawn.pawnId);
     const points: Pt[] = [];
     for (const t of move) {
       const p = g.position(t.playerId, t.tileNr);
@@ -463,7 +464,7 @@ export class Board implements OnInit, OnDestroy{
 
   private findPawn(id: string) {
     return this.state()?.pawns?.find(
-      (p) => `${p.pawnId.playerId}:${p.pawnId.pawnNr}` === id,
+      (p) => pawnKey(p.pawnId) === id,
     );
   }
 
