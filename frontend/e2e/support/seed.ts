@@ -1,0 +1,55 @@
+import { APIRequestContext } from '@playwright/test';
+
+// Replicates the GWT ApiUtil / ApiCallsHelper seeding layer over HTTP, so a
+// Playwright test can set up backend game state exactly like the Selenium ITs did.
+// `api` is a Playwright APIRequestContext whose baseURL points at the backend
+// (E2E_API_URL, default http://localhost:4200) — NOT the ng-serve UI.
+
+export interface SeededGame {
+  sessionId: string;
+  /** playerIds in join order (index 0 == player 0, etc.). */
+  playerIds: string[];
+}
+
+/** POST /games → add N players → /test/start-game. Additive: creates a new session. */
+export async function createGame(api: APIRequestContext, maxPlayers: number): Promise<SeededGame> {
+  const created = await api.post('/games', {
+    data: { roomName: `e2e-${Date.now()}`, maxPlayers },
+  });
+  const { sessionId } = (await created.json()) as { sessionId: string };
+
+  for (let i = 0; i < maxPlayers; i++) {
+    // The Player schema requires both id and name (GWT sent Player(id, name)).
+    await api.post(`/games/${sessionId}/players`, {
+      data: { id: `player${i}`, name: `player${i}` },
+    });
+  }
+  await api.post(`/test/start-game/${sessionId}`);
+
+  const players = (await (await api.get(`/games/${sessionId}/players`)).json()) as {
+    id: string;
+  }[];
+  return { sessionId, playerIds: players.map((p) => p.id) };
+}
+
+/** POST /test/set-pawn/{session}/{player}/{pawnNr}/{sectionOwner}/{tileNr}. */
+export async function setPawn(
+  api: APIRequestContext,
+  sessionId: string,
+  playerId: string,
+  pawnNr: number,
+  sectionOwnerId: string,
+  tileNr: number,
+): Promise<void> {
+  await api.post(`/test/set-pawn/${sessionId}/${playerId}/${pawnNr}/${sectionOwnerId}/${tileNr}`);
+}
+
+/** POST /test/set-card/{session}/{player}/{value}. */
+export async function setCard(
+  api: APIRequestContext,
+  sessionId: string,
+  playerId: string,
+  cardValue: number,
+): Promise<void> {
+  await api.post(`/test/set-card/${sessionId}/${playerId}/${cardValue}`);
+}

@@ -201,6 +201,27 @@ rendering `Board` in a component test without a backend:
 7-split math, SSE-driven animation). Rewrite against a **real backend** using the existing test-only
 seeding hooks.
 
+**Proof D — done (smoke green: seed real game → Angular renders it over SSE).** Harness established:
+- `frontend/playwright.config.ts` (`npm run e2e`). Serves Angular via `ng serve` on **:4300** (the
+  backend occupies ng's default 4200), `proxy.conf.json` forwards API + SSE to the backend
+  (`E2E_API_URL`, default `http://localhost:4200`). `workers: 1` (shared backend state).
+- `frontend/e2e/support/seed.ts` — the `ApiUtil`/`ApiCallsHelper` seeding layer over HTTP
+  (`createGame`, `setPawn`, `setCard`). **Gotcha:** `POST /games/{s}/players` needs `{id, name}`
+  (both required by the `Player` schema) — `{name}` alone 400s.
+- Tests seed via an `APIRequestContext` at `E2E_API_URL`, then drive the UI at `baseURL` (:4300).
+- Setup cost: `npm i -D @playwright/test` + `npx playwright install chromium` (Playwright 1.61.1
+  wanted the 1228 browser build).
+- **Backend note:** the running :4200 backend serves the *GWT* app, not Angular — Angular is served
+  separately by the harness. For CI, boot an isolated backend (realCardDeck profile) rather than a
+  developer's running instance.
+
+> **Bucket-D reality check — several targets are blocked by unbuilt Angular features.**
+> `Winner2Players_IT` / `Winner_IT` assert on a **winner/medal + player-status UI that Angular does
+> not have yet** (`board.ts` ignores `winners`; nothing renders a medal or `playerNotPlaying`).
+> `PlayerStatus*_IT` likewise. These are **blocked** (like `Chat_IT`) until those features exist.
+> Viable D targets whose UI exists: `MovingOnBoard_IT`, `Pawn_IT`, `CardAnimation_IT`,
+> `CardSevenSplit_IT`, `CardDisplay_IT`.
+
 ### Cross-cutting decisions
 - **Selectors:** add `data-testid` attributes to Angular components as the stable selector layer.
   Do *not* recreate the GWT suite's brittle CSS-class coupling.
@@ -213,8 +234,10 @@ seeding hooks.
 ### Suggested sequencing
 1. ~~**Proof C:** migrate one bucket-C test as an Angular component test — no new tooling.~~
    ✅ **Done** — `Card_IT` → `card-selection.spec.ts` (4/4). Harness recipe captured under bucket C above.
-2. **Proof D:** stand up Playwright + the boot/serve/reset harness, migrate one bucket-D test
-   (e.g. `Winner2Players_IT`). This is the infra milestone.
+2. ~~**Proof D:** stand up Playwright + the serve/seed harness, migrate one bucket-D test.~~
+   ✅ **Done** — `frontend/e2e/proof-d.spec.ts` smoke green (seed → SSE → render). Recipe under
+   bucket D above. (`Winner2Players_IT` turned out blocked — no Angular winner UI — so the proof used
+   a render smoke; real D tests target `MovingOnBoard_IT` / `Pawn_IT` / etc.)
 3. ~~Fan out the rest of C~~ ✅ **Done** — bucket C component-testing pass complete (see section 2).
    Then D, reusing the helper layer.
 4. Relocate bucket A into the backend test module; retire bucket B note.
