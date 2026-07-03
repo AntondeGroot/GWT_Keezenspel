@@ -92,38 +92,47 @@ two identically named `selectPawnTwice_Deselects` tests, in the Ace and Jack fil
 
 Source root: `GWT_Keezenspel-server/src/test/java/adg/keezen/IntegrationTests/`
 
-> These are **Selenium browser tests** of the GWT UI. There is currently **no** e2e/component
-> browser-test framework wired into `frontend/` (only Vitest unit tests). Decide the target
-> (Vitest component test, Playwright, etc.) before migrating — none are done yet.
+These are **Selenium browser tests** that boot the real Spring backend on port 4200 (with test-only
+seeding hooks: `/test/reset`, `setPawnPosition`, `setCardForPlayer`, `createNPlayerGame`) and drive
+headless Chrome against the GWT DOM. They bind to **GWT-specific CSS classes** (`cardDiv`,
+`TextBoxForPawnSteps1`, `pawnIntegerBoxes`, …) that the Angular app does not use — so each is a
+**rewrite** against the Angular DOM, not a port.
 
-| ✔ | Java IT file | Cases | What it covers | Status |
+**Chosen strategy (hybrid) — see Part 3 below.** The 20 files split into four buckets by target:
+
+| ✔ | Java IT file | Cases | Bucket | Target |
 | --- | --- | --- | --- | --- |
-| [ ] | `AutoSelectCardBorder_IT.java` | 2 | Auto-selected card border highlight | ❌ Not migrated |
-| [ ] | `Board_IT.java` | 5 | Board rendering/layout | ❌ Not migrated |
-| [ ] | `CardAnimation_IT.java` | 1 | Card animation | ❌ Not migrated |
-| [ ] | `CardDisplay_IT.java` | 6 | Card display | ❌ Not migrated |
-| [ ] | `CardSevenSplit_IT.java` | 1 | Seven-card split move | ❌ Not migrated |
-| [ ] | `Card_IT.java` | 4 | Card behaviour | ❌ Not migrated |
-| [ ] | `Chat_IT.java` | 5 | In-game chat | ❌ Not migrated |
-| [ ] | `GameStateLastMoveResponse_IT.java` | 2 | Last-move response rendering | ❌ Not migrated |
-| [ ] | `JackAnimationFromOpponentPerspective_IT.java` | 1 | Jack animation (opponent view) | ❌ Not migrated |
-| [ ] | `LeaveGame_IT.java` | 7 | Leaving a game | ❌ Not migrated |
-| [ ] | `MobileLayoutCheck_IT.java` | 1 | Mobile layout | ❌ Not migrated |
-| [ ] | `MobileLocale_IT.java` | 5 | Mobile locale/i18n | ❌ Not migrated |
-| [ ] | `MovingOnBoard_IT.java` | 5 | Moving pawns on board | ❌ Not migrated |
-| [ ] | `PawnHighlightColors_IT.java` | 7 | Pawn highlight colours | ❌ Not migrated |
-| [ ] | `Pawn_IT.java` | 5 | Pawn behaviour | ❌ Not migrated |
-| [ ] | `PlayerStatusMock_IT.java` | 5 | Player status (mocked) | ❌ Not migrated |
-| [ ] | `PlayerStatusReal_IT.java` | 3 | Player status (real) | ❌ Not migrated |
-| [ ] | `SendButtonSpinner_IT.java` | 1 | Send-button spinner | ❌ Not migrated |
-| [ ] | `Winner2Players_IT.java` | 2 | Winner with 2 players | ❌ Not migrated |
-| [ ] | `Winner_IT.java` | 1 | Winner detection | ❌ Not migrated |
+| [ ] | `AutoSelectCardBorder_IT.java` | 2 | C | Angular component test |
+| [ ] | `Board_IT.java` | 5 | C | Angular component test |
+| [x] | `Card_IT.java` | 4 | C | ✅ `card-selection.spec.ts` (4/4) — Proof C |
+| [ ] | `PawnHighlightColors_IT.java` | 7 | C | Angular component test |
+| [ ] | `MobileLayoutCheck_IT.java` | 1 | C | Angular component test |
+| [ ] | `MobileLocale_IT.java` | 5 | C | Angular component test |
+| [ ] | `Chat_IT.java` | 5 | C | Angular component test (mock chat svc) |
+| [ ] | `CardAnimation_IT.java` | 1 | D | Playwright E2E |
+| [ ] | `CardDisplay_IT.java` | 6 | D | Playwright E2E |
+| [ ] | `CardSevenSplit_IT.java` | 1 | D | Playwright E2E |
+| [ ] | `JackAnimationFromOpponentPerspective_IT.java` | 1 | D | Playwright E2E |
+| [ ] | `MovingOnBoard_IT.java` | 5 | D | Playwright E2E |
+| [ ] | `Pawn_IT.java` | 5 | D | Playwright E2E |
+| [ ] | `PlayerStatusMock_IT.java` | 5 | D | Playwright E2E |
+| [ ] | `PlayerStatusReal_IT.java` | 3 | D | Playwright E2E |
+| [ ] | `Winner2Players_IT.java` | 2 | D | Playwright E2E |
+| [ ] | `Winner_IT.java` | 1 | D | Playwright E2E |
+| [ ] | `GameStateLastMoveResponse_IT.java` | 2 | A | Stay Java (backend API) — not a frontend migration |
+| [ ] | `LeaveGame_IT.java` | 7 | A | Stay Java (backend API + raw SSE) |
+| — | `SendButtonSpinner_IT.java` | 0 | B | N/A — disabled stub (empty body); revisit if re-enabled |
 
-> IT support files (`Utils/*.java`: `Steps`, `Player`, `TestUtils`, `TestTemplate`,
-> `SpringAppTestHelper`, `ScreenshotOnFailure`, etc.) are shared infrastructure, not tests —
-> migrate only the behaviours they support.
+Buckets: **A** = pure backend (no browser), **B** = disabled stub, **C** = frontend-only
+(render/CSS/layout/i18n, faked API), **D** = true E2E (real game logic, SSE, animation, geometry).
 
-**Integration total: 0 / 20 `_IT` files migrated.**
+> IT support files (`Utils/*.java`: `Steps`, `Player`, `TestUtils`, `SpringAppTestHelper`,
+> `ScreenshotOnFailure`, etc.) are shared infrastructure, not tests. For bucket D they get rewritten
+> once as a Playwright helper layer (a `Steps`-equivalent DSL + API-seeding via Playwright's
+> `request` fixture). `ScreenshotOnFailure` and `TestTemplate` are already unused/disabled today.
+
+**Integration total: 1 / 20 migrated** (`Card_IT`, bucket C) — 17 in scope for the frontend
+(C: 7, D: 10), 2 stay Java (A), 1 N/A (B).
 
 ---
 
@@ -137,3 +146,59 @@ Source root: `GWT_Keezenspel-server/src/test/java/adg/keezen/IntegrationTests/`
 **Client unit tests: effectively complete.** Every migratable case is ported; the only unported
 GWT cases are `CookieTest`'s 12 locale-redirect tests, which are GWT-only (not applicable to
 Angular). **Remaining work is all integration:** the 20 `*_IT` tests.
+
+---
+
+## Part 3: Integration test strategy (hybrid)
+
+Decision (chosen): a **hybrid** — route each `*_IT` to the cheapest home that can still make its
+assertion faithfully. See the bucket column in section 2.
+
+**A — Backend, stays Java (2).** `GameStateLastMoveResponse_IT`, `LeaveGame_IT` never open a browser;
+they assert backend JSON/HTTP + raw SSE. Not a frontend migration. Best relocated into the server
+test module; out of scope for `frontend/`.
+
+**B — Disabled (1).** `SendButtonSpinner_IT` is an empty stub (logic commented out as flaky). Nothing
+to migrate; leave N/A until/if re-enabled.
+
+**C — Angular component tests (7).** Assertions are genuinely client-side (border toggling, highlight
+colours, layout geometry, i18n text). Write as Angular TestBed/Vitest component tests with a **faked
+API** — runs in the existing `ng test`/Vitest suite, no browser, no backend. Fast.
+
+**Proof C — done (`Card_IT` → `card-selection.spec.ts`, 4/4).** Established the reusable harness for
+rendering `Board` in a component test without a backend:
+- Providers: `[provideHttpClient(), provideApi('')]`. Import `Board` directly (standalone).
+- Set `document.cookie = 'playerid=0'` **before** `createComponent` (that's the viewer seat, read by
+  `resolveGameSession()` at construction). Do **not** set `sessionid` → `ngOnInit` opens no
+  `EventSource` (jsdom has none). No initial HTTP fetch happens; state arrives only via SSE normally.
+- Seed the private state signal directly:
+  `(fixture.componentInstance as any).state.set({ players:[{id,name,playerInt,color}…], pawns:[],
+  winners:[], version:1, currentPlayerId, playerCards:[…] })`. The card layer only renders once
+  `tiles().length > 0`, so **players with `playerInt` are required** (geometry needs them), even for a
+  card test.
+- Run with `CI=1 npx ng test --watch=false` (component specs need the `@angular/build:unit-test`
+  builder's environment; they do **not** run under raw `npx vitest run`).
+- **jsdom caveat:** component stylesheets are not applied to `getComputedStyle`, so assert the
+  state that drives styling (e.g. the `selected` class), not computed px/colour. Exact border
+  px/colour is a real-browser check → bucket D (Playwright).
+
+**D — Playwright E2E (10).** Assertions *are* backend behaviour (winner/medal order, move legality,
+7-split math, SSE-driven animation). Rewrite against a **real backend** using the existing test-only
+seeding hooks.
+
+### Cross-cutting decisions
+- **Selectors:** add `data-testid` attributes to Angular components as the stable selector layer.
+  Do *not* recreate the GWT suite's brittle CSS-class coupling.
+- **Multiplayer:** the GWT suite fakes it with one browser + cookie-swap + refresh. Playwright can
+  reuse that, or use multiple browser contexts (cleaner) for observer/SSE tests.
+- **Orchestration (the real infra cost, shared by all of D):** boot Spring backend on 4200 → serve
+  the Angular build (or `ng serve` + `proxy.conf.json`) → run Playwright → `/test/reset` between
+  tests. New CI job (the repo already splits CI into angular / gwt-unit / gwt-integration / backend).
+
+### Suggested sequencing
+1. ~~**Proof C:** migrate one bucket-C test as an Angular component test — no new tooling.~~
+   ✅ **Done** — `Card_IT` → `card-selection.spec.ts` (4/4). Harness recipe captured under bucket C above.
+2. **Proof D:** stand up Playwright + the boot/serve/reset harness, migrate one bucket-D test
+   (e.g. `Winner2Players_IT`). This is the infra milestone.
+3. Fan out the rest of C, then D, reusing the helper layer.
+4. Relocate bucket A into the backend test module; retire bucket B note.
