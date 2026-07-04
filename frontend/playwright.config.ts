@@ -21,7 +21,9 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
   workers: 1, // shared backend state — keep tests serial
-  reporter: 'list',
+  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+  // Warm up ng serve (first compile is slow in CI) before the tests run.
+  globalSetup: './e2e/global-setup.ts',
   use: {
     baseURL: `http://localhost:${NG_PORT}`,
     trace: 'on-first-retry',
@@ -30,6 +32,6 @@ export default defineConfig({
     command: `npm run start -- --port ${NG_PORT} --proxy-config proxy.conf.json`,
     url: `http://localhost:${NG_PORT}`,
     reuseExistingServer: true,
-    timeout: 180_000,
+    timeout: 240_000,
   },
 });

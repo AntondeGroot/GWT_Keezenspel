@@ -44,6 +44,16 @@ export async function setPawn(
   await api.post(`/test/set-pawn/${sessionId}/${playerId}/${pawnNr}/${sectionOwnerId}/${tileNr}`);
 }
 
+/** POST /test/set-only-card/{session}/{player}/{value} — make it the player's only card. */
+export async function setOnlyCard(
+  api: APIRequestContext,
+  sessionId: string,
+  playerId: string,
+  cardValue: number,
+): Promise<void> {
+  await api.post(`/test/set-only-card/${sessionId}/${playerId}/${cardValue}`);
+}
+
 /** POST /test/set-card/{session}/{player}/{value}. */
 export async function setCard(
   api: APIRequestContext,

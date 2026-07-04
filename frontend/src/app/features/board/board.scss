@@ -13,9 +13,25 @@
   // one stacking context, so they can't paint above app chrome like the rules
   // modal or the top nav.
   isolation: isolate;
-  width: min(600px, 92vmin);
+
+  // Board width: never exceed 600px, and small enough that the opponents' card
+  // backs (which fan ~12% beyond every edge) and the viewer's hand all fit —
+  //   • WIDTH: the board + a ~12% side strip on each side ≤ viewport width, so
+  //     side opponents (3–4 players) don't spill off-screen. Factor 1.24.
+  //   • HEIGHT: the board + top strip (12%) + hand strip (30%) + chrome (header +
+  //     hint + footer ≈ 230px) ≤ viewport height. Factor 1.42.
+  --board-w: min(600px, calc(96vw / 1.24), calc((100vh - 230px) / 1.42));
+  // The reserved strip above the board for the top opponent's card backs. The
+  // card-layer is offset by this too, so cards stay aligned with the tiles.
+  --hand-top: calc(0.12 * var(--board-w));
+  width: var(--board-w);
   margin: 0 auto;
-  padding-bottom: 30%; // reserved hand strip below the board
+
+  // Reserve the card strips as a fraction of the BOARD width. A `%` padding
+  // resolves against the PARENT width (huge on wide desktops) — the bug that used
+  // to blow the stage up to ~984px — so tie both to --board-w instead.
+  padding-top: var(--hand-top);
+  padding-bottom: calc(0.3 * var(--board-w)); // the viewer's hand reaches ~129%
 }
 
 .board {
@@ -29,7 +45,10 @@
 // spill below into the stage's reserved area (overflow is visible).
 .card-layer {
   position: absolute;
-  top: 0;
+  // Offset to match the board, which padding-top pushes down by --hand-top. With
+  // top:0 the layer would stay at the padding edge and the cards (and pile) would
+  // sit ~12% too high, overlapping the tiles.
+  top: var(--hand-top);
   left: 0;
   width: 100%;
   aspect-ratio: 1;
@@ -327,4 +346,51 @@
     0 0 0 3px #f4d03f,
     0 0 12px rgba(244, 208, 63, 0.7);
   z-index: 60;
+}
+
+// Special cards (Ace/Four/Seven/Jack/Queen/King): a gold ring so the player
+// notices the cards that do something. Ported from the GWT .specialCard. The
+// pulsing glow only plays while the card is a resting hand card (not selected,
+// played, or flying) so it never fights the .selected box-shadow.
+.card.special {
+  outline: 2px solid rgba(212, 175, 55, 0.9);
+  outline-offset: 1px;
+  border-radius: 5px;
+}
+
+.card.special:not(.selected):not(.played):not(.flyer) {
+  animation: golden-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes golden-pulse {
+  0%,
+  100% {
+    box-shadow:
+      4px 5px 14px rgba(0, 0, 0, 0.55),
+      1px 1px 4px rgba(0, 0, 0, 0.3),
+      0 0 4px 2px rgba(212, 175, 55, 0.5);
+  }
+  50% {
+    box-shadow:
+      4px 5px 14px rgba(0, 0, 0, 0.55),
+      1px 1px 4px rgba(0, 0, 0, 0.3),
+      0 0 9px 5px rgba(212, 175, 55, 0.9);
+  }
+}
+
+// Card suggestion (hovered/selected special card). A normal-flow row centered
+// below the hand — the stage reserves the hand strip above, so this sits cleanly
+// under the cards without any board-% positioning. min-height reserves two lines
+// so showing/clearing the hint doesn't shift the footer. Ported from GWT
+// .cardHintLabel.
+.card-hint {
+  max-width: min(600px, 92vmin);
+  margin: 0.4rem auto 0;
+  padding: 0 8px;
+  text-align: center;
+  font-style: italic;
+  color: #c8b87a;
+  white-space: pre-wrap;
+  line-height: 1.25;
+  min-height: 2.6em;
 }
