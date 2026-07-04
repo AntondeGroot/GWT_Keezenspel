@@ -11,8 +11,21 @@ import {highlightForPawn1, highlightForPawn2} from './pawn-highlight';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
 import { pawnKey } from './pawn-key';
 import { Translations } from '../../i18n/translations.service';
+import { TranslationKey } from '../../i18n/keys';
 import { MoveRejection } from './move-rejected/move-rejection.service';
 import { localRejectionKey, rejectionMessageKey } from './rejection-message';
+
+// Cards that do something special (Ace, Four, Seven, Jack, Queen, King): they get
+// a gold highlight in the hand and a hint/suggestion when hovered or selected.
+const SPECIAL_CARD_VALUES = new Set([1, 4, 7, 11, 12, 13]);
+const HINT_KEYS: Record<number, TranslationKey> = {
+  1: 'hintAce',
+  4: 'hintFour',
+  7: 'hintSeven',
+  11: 'hintJack',
+  12: 'hintQueen',
+  13: 'hintKing',
+};
 
 @Component({
   selector: 'app-board',
@@ -244,6 +257,8 @@ export class Board implements OnInit, OnDestroy{
           suit: c.suit,
           value: c.value,
           inPile: pileUuids.has(c.uuid), // played cards are inert (no click / hover)
+          // Only hand cards are highlighted; a played/pile card is not "special" anymore.
+          special: !pileUuids.has(c.uuid) && SPECIAL_CARD_VALUES.has(c.value),
           x: useDeck ? 52.5 : t.x,
           y: useDeck ? 50 : t.y,
           rot: t.rot,
@@ -486,6 +501,25 @@ export class Board implements OnInit, OnDestroy{
     this.touch();
     this.checkMove();
   }
+
+  /** The card value currently hovered in the hand (drives the hint), or null. */
+  private readonly hoveredCardValue = signal<number | null>(null);
+  protected hoverCard(value: number | null): void {
+    this.hoveredCardValue.set(value);
+  }
+
+  /**
+   * Hint/suggestion for the special card the player is eyeing: the hovered card,
+   * falling back to the selected card when nothing is hovered. Empty for a regular
+   * card — only Ace/Four/Seven/Jack/Queen/King have a hint (mirrors the GWT
+   * updateCardHint). `rev()` makes it recompute when the selection changes.
+   */
+  protected readonly hint = computed(() => {
+    this.rev();
+    const value = this.hoveredCardValue() ?? this.selection.getCard()?.value ?? null;
+    const key = value == null ? undefined : HINT_KEYS[value];
+    return key ? this.i18n.t(key) : '';
+  });
 
   protected selectPawn(id: string): void {
     this.selection.addPawnById(id);

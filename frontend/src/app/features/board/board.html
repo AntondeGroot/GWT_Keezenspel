@@ -46,9 +46,12 @@
           [style.transition-delay.ms]="c.dealDelay"
           [style.--deal-delay]="c.dealDelay"
           [class.selected]="selectedCardUuid() === c.uuid"
+          [class.special]="c.special"
           [class.played]="c.inPile"
           [class.dealing]="c.dealing"
-          (click)="selectCard(c.uuid)" />
+          (click)="selectCard(c.uuid)"
+          (mouseenter)="hoverCard(c.value)"
+          (mouseleave)="hoverCard(null)" />
       }
 
       @for (f of flyers(); track f.id) {
@@ -89,4 +92,9 @@
       }
     </div>
   </div>
+
+  <!-- Suggestion for the hovered/selected special card (empty for regular cards).
+       A flow row centered below the hand; the cards stay absolutely positioned so
+       a played card can still fly to the pile. -->
+  <div class="card-hint">{{ hint() }}</div>
 }
