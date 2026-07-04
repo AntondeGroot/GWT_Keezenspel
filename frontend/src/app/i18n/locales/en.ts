@@ -3,6 +3,7 @@ import type { Dictionary } from '../keys';
 // Ported from AppConstants.properties (the GWT default/English locale).
 // `\n` is a real newline; `%s` is a positional placeholder filled by Translations.t().
 export const en: Dictionary = {
+  gameName: 'Tock',
   playCard: 'Play Card',
   forfeit: 'Forfeit',
   leaveGame: 'Leave game',

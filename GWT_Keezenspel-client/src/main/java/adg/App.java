@@ -9,6 +9,9 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -25,6 +28,13 @@ public class App implements EntryPoint {
     // If the cookie locale doesn't match ?locale= in the URL, the page reloads.
     Cookie.createLanguageCookie();
     if (Cookie.syncGwtLocale()) return;
+
+    // Localize the tab title + heading (the static HTML ships "Keezenspel").
+    Window.setTitle(CONSTANTS.gameName());
+    Element titleEl = Document.get().getElementById("game-title");
+    if (titleEl != null) {
+      titleEl.setInnerText(CONSTANTS.gameName());
+    }
 
     FlowPanel topNav = new FlowPanel();
     topNav.addStyleName("top-nav-panel");

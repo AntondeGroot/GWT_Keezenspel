@@ -14,6 +14,7 @@ export const LANGUAGES: { code: Locale; name: string }[] = [
 ];
 
 export type TranslationKey =
+  | 'gameName'
   | 'playCard'
   | 'forfeit'
   | 'leaveGame'

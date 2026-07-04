@@ -2,6 +2,7 @@ import type { Dictionary } from '../keys';
 
 // Ported from AppConstants_nl.properties (Nederlands).
 export const nl: Dictionary = {
+  gameName: 'Keezen',
   playCard: 'Kaart spelen',
   forfeit: 'Kaarten weggooien',
   leaveGame: 'Spel verlaten',
