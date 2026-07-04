@@ -2,6 +2,7 @@ import type { Dictionary } from '../keys';
 
 // Ported from AppConstants_nb.properties (Norsk).
 export const nb: Dictionary = {
+  gameName: 'Tock',
   playCard: 'Spill kort',
   forfeit: 'Kast bort kortene',
   leaveGame: 'Forlat spillet',

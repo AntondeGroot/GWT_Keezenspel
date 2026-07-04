@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
+import { Translations } from './i18n/translations.service';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -14,10 +15,13 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('renders the Keezenspel title bar', async () => {
+  it('renders the localized game name in the title bar', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Keezenspel');
+    // The title bar shows the localized game name (e.g. Tock/Keezen/Dog), not a
+    // hardcoded string — so it tracks whatever the current locale resolves to.
+    const expected = TestBed.inject(Translations).t('gameName');
+    expect(compiled.querySelector('h1')?.textContent?.trim()).toBe(expected);
   });
 });

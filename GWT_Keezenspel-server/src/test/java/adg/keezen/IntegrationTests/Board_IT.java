@@ -36,7 +36,7 @@ class Board_IT extends BaseIntegrationTest {
 
   @Test
   public void verifyTitle() {
-    assertEquals("Keezenspel", driver.getTitle());
+    assertEquals("Tock", driver.getTitle());
   }
 
   @Test
