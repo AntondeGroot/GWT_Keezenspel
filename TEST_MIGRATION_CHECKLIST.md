@@ -113,9 +113,9 @@ headless Chrome against the GWT DOM. They bind to **GWT-specific CSS classes** (
 | [ ] | `MobileLocale_IT.java` | 5 | C | ✅ `board-render.spec.ts` i18n text (2); `mobile.html` redirect + reload = N/A (SPA) |
 | [ ] | `MobileLayoutCheck_IT.java` | 1 | ~~C~~ **D** | Playwright E2E — pure viewport/overlap geometry, jsdom can't |
 | [ ] | `Chat_IT.java` | 5 | ~~C~~ **blocked** | No Angular chat feature yet — nothing to test until it's built |
-| [ ] | `CardAnimation_IT.java` | 1 | D | Playwright E2E |
-| [ ] | `CardDisplay_IT.java` | 6 | D | Playwright E2E |
-| [ ] | `CardSevenSplit_IT.java` | 1 | D | Playwright E2E |
+| [x] | `CardAnimation_IT.java` | 1 | D | ✅ `card-animation.spec.ts` (1/1) — no-pawn move keeps the card |
+| [x] | `CardDisplay_IT.java` | 5 | D | ✅ `card-display.spec.ts` — hand renders, forfeit→pile, next player has hand |
+| [x] | `CardSevenSplit_IT.java` | 1 | D | ✅ `card-seven-split.spec.ts` (1/1) — re-select-7 reset regression |
 | [ ] | `JackAnimationFromOpponentPerspective_IT.java` | 1 | D | Playwright E2E |
 | [x] | `MovingOnBoard_IT.java` | 4 | D | ✅ `moving-on-board.spec.ts` (4/4) — first real bucket-D |
 | [~] | `Pawn_IT.java` | 4 | D | ✅ `pawn-selection.spec.ts` (3 selection cases); case 4 (forfeit→move) TODO |
@@ -145,10 +145,11 @@ green under `ng test`. On inspection bucket C was not uniformly jsdom-testable, 
 - **Reclassified C → D:** `MobileLayoutCheck_IT` (viewport/overlap geometry — needs a real browser).
 - **Blocked:** `Chat_IT` — the Angular app has **no chat feature yet**; can't test UI that doesn't exist.
 
-**Integration total: ~8 / 20 covered on the frontend** — C bucket's testable assertions plus the
-first two real bucket-D E2E files (`MovingOnBoard_IT` 4/4, `Pawn_IT` selection 3/4). Remaining:
-the rest of bucket D (reusing the `steps.ts` harness), 2 stay Java (A), `SendButtonSpinner` N/A (B),
-and the blocked ones (`Chat_IT`, `Winner*`, `PlayerStatus*`) until their Angular features exist.
+**Integration total: ~11 / 20 covered on the frontend** — C bucket's testable assertions plus five
+real bucket-D E2E files (`MovingOnBoard_IT`, `Pawn_IT` selection, `CardDisplay_IT`, `CardAnimation_IT`,
+`CardSevenSplit_IT`). Remaining bucket-D with UI that exists: `JackAnimationFromOpponentPerspective_IT`,
+`MobileLayoutCheck_IT`, and `Pawn_IT` case 4. Then 2 stay Java (A), `SendButtonSpinner` N/A (B), and the
+blocked ones (`Chat_IT`, `Winner*`, `PlayerStatus*`) until their Angular features exist.
 
 ---
 
@@ -157,7 +158,7 @@ and the blocked ones (`Chat_IT`, `Winner*`, `PlayerStatus*`) until their Angular
 | Category | Migrated | Remaining |
 | --- | --- | --- |
 | GWT client unit tests | 11.5 / 12 files | `Cookie` only (6/18 migrated, other 12 GWT-only / N/A) |
-| GWT integration tests (`_IT`) | ~8 / 20 files (C bucket + D: MovingOnBoard, Pawn) | rest of D, blocked (Chat/Winner/PlayerStatus), A stays Java |
+| GWT integration tests (`_IT`) | ~11 / 20 files (C bucket + D: MovingOnBoard, Pawn, CardDisplay, CardAnimation, CardSevenSplit) | rest of D, blocked (Chat/Winner/PlayerStatus), A stays Java |
 
 **Client unit tests: effectively complete.** Every migratable case is ported; the only unported
 GWT cases are `CookieTest`'s 12 locale-redirect tests, which are GWT-only (not applicable to
@@ -202,11 +203,20 @@ rendering `Board` in a component test without a backend:
 7-split math, SSE-driven animation). Rewrite against a **real backend** using the existing test-only
 seeding hooks.
 
-**Bucket-D real migrations landed — the harness is now in place (2 files, 7 cases).**
+**Bucket-D real migrations landed — the harness is in place (5 files, 12 cases).**
 - `MovingOnBoard_IT` → `e2e/moving-on-board.spec.ts` (4/4): nest→board with Ace, nest→board with
   King, on-board move with Ace, Jack switch — real UI moves, positions asserted via SSE.
 - `Pawn_IT` (selection) → `e2e/pawn-selection.spec.ts` (3): click own pawn selects it, second own
   pawn steals the selection, opponent pawn can't be selected. Case 4 (forfeit ×2 → move) is TODO.
+- `CardDisplay_IT` → `e2e/card-display.spec.ts` (3): hand renders (5 cards), forfeit clears the hand
+  and moves all of them to the pile, and the next player still sees their own hand. (Case 5's
+  `canvasCards2 data-played-count` = the pile-card count assertion.)
+- `CardAnimation_IT` → `e2e/card-animation.spec.ts` (1): selecting a card with no pawn keeps it in
+  hand — Angular disables Play for the illegal move rather than sending + server-rejecting.
+- `CardSevenSplit_IT` → `e2e/card-seven-split.spec.ts` (1): the step-box desync regression — editing
+  a split then re-selecting the 7 snaps the boxes back to the model default. Angular passes (no bug).
+- Helpers grew: `handCards`/`pileCards`/`forfeit` in `steps.ts`, plus `openBoard`/`viewAs` game-open
+  helpers (fresh N-player game, view as a given player, optional backend setup).
 - **Selector layer:** added `data-testid="pawn-{playerId}:{pawnNr}"` and `data-testid="card-{value}"`
   to `board.html` (the checklist's stated stable-selector strategy).
 - **Steps DSL:** `e2e/support/steps.ts` — `playCard({value, pawns})`, `clickPawn`, `pawnCentre`,
