@@ -10,6 +10,8 @@ export const de: Dictionary = {
   pawn1: 'Figur 1',
   pawn2: 'Figur 2',
   confirmLeaveGame: 'Möchtest du das Spiel wirklich verlassen?',
+  confirmLeaveYes: 'Verlassen',
+  confirmLeaveNo: 'Bleiben',
   canvasNotSupported: 'Canvas wird in deinem Browser nicht unterstützt.',
   hintAce: 'Ass: Setze eine Figur aufs Spielfeld oder bewege sie 1 Schritt vorwärts.',
   hintFour:

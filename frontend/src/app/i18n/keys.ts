@@ -22,6 +22,8 @@ export type TranslationKey =
   | 'pawn1'
   | 'pawn2'
   | 'confirmLeaveGame'
+  | 'confirmLeaveYes'
+  | 'confirmLeaveNo'
   | 'canvasNotSupported'
   | 'hintAce'
   | 'hintFour'
