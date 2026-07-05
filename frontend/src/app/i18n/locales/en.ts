@@ -13,6 +13,7 @@ export const en: Dictionary = {
   confirmLeaveGame: 'Are you sure you want to leave the game?',
   confirmLeaveYes: 'Leave',
   confirmLeaveNo: 'Stay',
+  playerFinished: 'finished!',
   canvasNotSupported: 'Canvas is not supported in your browser.',
   hintAce: 'Ace: place a pawn on the board or move 1 step forward.',
   hintFour:

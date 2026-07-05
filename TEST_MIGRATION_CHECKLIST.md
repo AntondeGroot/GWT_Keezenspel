@@ -121,8 +121,8 @@ headless Chrome against the GWT DOM. They bind to **GWT-specific CSS classes** (
 | [x] | `Pawn_IT.java` | 4 | D | ✅ `pawn-selection.spec.ts` (3 selection + case 4: forfeit ×2 → next player moves) |
 | [ ] | `PlayerStatusMock_IT.java` | 5 | D | Playwright E2E |
 | [ ] | `PlayerStatusReal_IT.java` | 3 | D | Playwright E2E |
-| [ ] | `Winner2Players_IT.java` | 2 | D | Playwright E2E |
-| [ ] | `Winner_IT.java` | 1 | D | Playwright E2E |
+| [x] | `Winner2Players_IT.java` | 2 | D | ✅ `winner.spec.ts` — medal to the right player + finished state |
+| [x] | `Winner_IT.java` | 1 | D | ✅ `winner.spec.ts` — medals in finishing order (gold, silver) |
 | [ ] | `GameStateLastMoveResponse_IT.java` | 2 | A | Stay Java (backend API) — not a frontend migration |
 | [ ] | `LeaveGame_IT.java` | 7 | A | Stay Java (backend API + raw SSE) |
 | — | `SendButtonSpinner_IT.java` | 0 | B | N/A — disabled stub (empty body); revisit if re-enabled |
@@ -145,12 +145,19 @@ green under `ng test`. On inspection bucket C was not uniformly jsdom-testable, 
 - **Reclassified C → D:** `MobileLayoutCheck_IT` (viewport/overlap geometry — needs a real browser).
 - **Blocked:** `Chat_IT` — the Angular app has **no chat feature yet**; can't test UI that doesn't exist.
 
-**Integration total: ~12 / 20 covered on the frontend — every readily-migratable IT is now done.**
+**Winner/medal feature built + `Winner_IT`/`Winner2Players_IT` migrated.** The backend already
+populates `place` (1/2/3) and `isActive` on a finisher; the roster (built earlier) renders the medal
++ dimmed/struck "finished" state, and a new **`app-winner-banner`** (reads `GameStore.winners`)
+announces each finisher with a celebratory plaque. Covered by `winner-banner.spec.ts` (4 component
+tests) and `e2e/winner.spec.ts` (3): 2-player winner gets gold + finished + banner; the 2-player
+bug guard (the winner, not the other colour, gets the medal); 3-player medals in finishing order.
+
+**Integration total: ~14 / 20 covered on the frontend — every readily-migratable IT is now done.**
 C bucket's testable assertions plus seven real bucket-D E2E files (`MovingOnBoard_IT`, `Pawn_IT`,
 `CardDisplay_IT`, `CardAnimation_IT`, `CardSevenSplit_IT`, `JackAnimationFromOpponentPerspective_IT`,
 `MobileLayoutCheck_IT`). The remaining eight are **not** currently migratable:
-- **Blocked on unbuilt Angular features (5):** `Chat_IT`, `Winner_IT`, `Winner2Players_IT`,
-  `PlayerStatusMock_IT`, `PlayerStatusReal_IT` — no chat, winner/medal, or player-status UI yet.
+- **Blocked on unbuilt Angular features (3):** `Chat_IT`, `PlayerStatusMock_IT`,
+  `PlayerStatusReal_IT` — no chat or player-status UI yet. (Winner/medal is now built — see below.)
 - **Stay Java (2, bucket A):** `GameStateLastMoveResponse_IT`, `LeaveGame_IT` (backend JSON/SSE).
 - **N/A stub (1, bucket B):** `SendButtonSpinner_IT` (disabled).
 
@@ -161,7 +168,7 @@ C bucket's testable assertions plus seven real bucket-D E2E files (`MovingOnBoar
 | Category | Migrated | Remaining |
 | --- | --- | --- |
 | GWT client unit tests | 11.5 / 12 files | `Cookie` only (6/18 migrated, other 12 GWT-only / N/A) |
-| GWT integration tests (`_IT`) | ~12 / 20 files — all readily-migratable done (C bucket + 7 D files) | 5 blocked (Chat/Winner/PlayerStatus, need features), 2 stay Java (A), 1 N/A stub (B) |
+| GWT integration tests (`_IT`) | ~14 / 20 files (C bucket + 9 D files incl. Winner/Winner2Players) | 3 blocked (Chat/PlayerStatus, need features), 2 stay Java (A), 1 N/A stub (B) |
 
 **Client unit tests: effectively complete.** Every migratable case is ported; the only unported
 GWT cases are `CookieTest`'s 12 locale-redirect tests, which are GWT-only (not applicable to

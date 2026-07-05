@@ -68,6 +68,7 @@ export class Board implements OnInit, OnDestroy{
         }
         this.prevHandUuids = new Set(cards.map((c) => c.uuid));
         this.gameStore.players.set(next.players ?? []);
+        this.gameStore.winners.set(next.winners ?? []);
         this.state.set(next);
       });
     }

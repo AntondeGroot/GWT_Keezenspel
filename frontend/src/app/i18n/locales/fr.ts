@@ -12,6 +12,7 @@ export const fr: Dictionary = {
   confirmLeaveGame: 'Êtes-vous sûr de vouloir quitter le jeu ?',
   confirmLeaveYes: 'Quitter',
   confirmLeaveNo: 'Rester',
+  playerFinished: 'a terminé !',
   canvasNotSupported: "Canvas n'est pas pris en charge par votre navigateur.",
   hintAce: "As : placez un pion sur le plateau ou avancez d'1 case.",
   hintFour:

@@ -12,6 +12,7 @@ export const nl: Dictionary = {
   confirmLeaveGame: 'Weet je zeker dat je het spel wilt verlaten?',
   confirmLeaveYes: 'Verlaten',
   confirmLeaveNo: 'Blijven',
+  playerFinished: 'is uit!',
   canvasNotSupported: 'Canvas wordt niet ondersteund in je browser.',
   hintAce: 'Aas: zet een pion op het bord of beweeg 1 stap vooruit.',
   hintFour:

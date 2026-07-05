@@ -1,0 +1,15 @@
+@if (current(); as w) {
+  <div
+    class="winner-banner"
+    role="status"
+    (click)="dismiss()"
+    [style.--player-color]="w.color"
+    data-testid="winner-banner"
+  >
+    <span class="winner-banner__medal">{{ w.medal }}</span>
+    <span class="winner-banner__text">
+      <span class="winner-banner__name">{{ w.name }}</span>
+      <span class="winner-banner__label">{{ i18n.t('playerFinished') }}</span>
+    </span>
+  </div>
+}
