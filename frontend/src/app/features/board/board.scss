@@ -7,31 +7,40 @@
 
 // Stage = the board + a reserved strip below it for the hand. Targets 600px,
 // shrinks to fit. padding-bottom (relative to width) is the reserved hand area.
+// The play area stacks the board, the card hint, and the controls, and owns
+// --board-w so the controls can size/position relative to the board.
+//
+// Board width: never exceed 600px, and small enough that the opponents' card
+// backs (which fan ~12% beyond every edge) and the viewer's hand all fit —
+//   • WIDTH: the board + a ~12% side strip on each side ≤ viewport width, so
+//     side opponents (3–4 players) don't spill off-screen. Factor 1.24.
+//   • HEIGHT: the board + top strip (12%) + hand strip (30%) + chrome (header +
+//     hint + footer ≈ 230px) ≤ viewport height. Factor 1.42. On mobile the
+//     controls sit in flow below the hint, so more height is reserved there.
+.play {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  --board-w: min(600px, calc(96vw / 1.24), calc((100vh - 230px) / 1.42));
+  --hand-top: calc(0.12 * var(--board-w));
+}
+
 .stage {
   position: relative;
-  // Contain the board's internal z-indexes (pawns up to ~600, buttons, cards) in
-  // one stacking context, so they can't paint above app chrome like the rules
-  // modal or the top nav.
+  // Contain the board's internal z-indexes (pawns up to ~600, cards) in one
+  // stacking context, so they can't paint above app chrome like the rules modal.
   isolation: isolate;
-
-  // Board width: never exceed 600px, and small enough that the opponents' card
-  // backs (which fan ~12% beyond every edge) and the viewer's hand all fit —
-  //   • WIDTH: the board + a ~12% side strip on each side ≤ viewport width, so
-  //     side opponents (3–4 players) don't spill off-screen. Factor 1.24.
-  //   • HEIGHT: the board + top strip (12%) + hand strip (30%) + chrome (header +
-  //     hint + footer ≈ 230px) ≤ viewport height. Factor 1.42.
-  --board-w: min(600px, calc(96vw / 1.24), calc((100vh - 230px) / 1.42));
-  // The reserved strip above the board for the top opponent's card backs. The
-  // card-layer is offset by this too, so cards stay aligned with the tiles.
-  --hand-top: calc(0.12 * var(--board-w));
   width: var(--board-w);
-  margin: 0 auto;
 
   // Reserve the card strips as a fraction of the BOARD width. A `%` padding
   // resolves against the PARENT width (huge on wide desktops) — the bug that used
-  // to blow the stage up to ~984px — so tie both to --board-w instead.
+  // to blow the stage up — so tie both to --board-w instead. Top strip = the top
+  // opponent's card backs (the card-layer is offset by the same amount so cards
+  // stay aligned with the tiles); bottom strip = the viewer's hand (reaches ~129%).
   padding-top: var(--hand-top);
-  padding-bottom: calc(0.3 * var(--board-w)); // the viewer's hand reaches ~129%
+  padding-bottom: calc(0.3 * var(--board-w));
 }
 
 .board {
@@ -164,13 +173,38 @@
 // it's the same element (tracked by uuid), it's the same card that flies.
 // Button container — ported from the GWT .buttonContainer/.sendButton/.forfeitButton.
 // A dark gold-bordered panel beside the board with the play (send) + forfeit buttons.
+// Actions + roster. Mobile: a centered row directly below the hint. Desktop: a
+// column pinned in the right gutter (which has plenty of room), roster enlarged.
+.controls {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  box-sizing: border-box; // keep the padded row within the viewport
+  margin-top: 8px;
+  padding: 0 6px 8px;
+}
+
+@media (min-width: 700px) {
+  .controls {
+    position: fixed;
+    top: 50%;
+    right: clamp(16px, 4vw, 72px);
+    transform: translateY(-50%);
+    // Roster on top (informational); Play/Forfeit below, nearer the hand & cards.
+    flex-direction: column-reverse;
+    align-items: stretch;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    gap: 18px;
+    z-index: 200;
+  }
+}
+
 .button-container {
-  position: absolute;
-  left: 100%; // just to the right of the board (GWT: left: 600px)
-  top: 50%;
-  transform: translateY(-50%);
-  margin-left: 16px;
-  z-index: 200;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -393,4 +427,32 @@
   white-space: pre-wrap;
   line-height: 1.25;
   min-height: 2.6em;
+}
+
+// Narrow / short screens: the controls sit in flow below the hint, so reserve
+// extra height for them when sizing the board, and cap the buttons so long labels
+// ("Jouer la carte", "Karte spielen") wrap to two lines and the box stays narrow
+// enough to share the row with the roster in every language instead of pushing it
+// onto a second (overflowing) row. Placed last so it overrides the base button
+// rules above (notably the `font` shorthand, which would otherwise reset the size).
+@media (max-width: 699px) {
+  .play { --board-w: min(600px, calc(96vw / 1.24), calc((100vh - 326px) / 1.42)); }
+
+  .button-container { padding: 8px; gap: 6px; max-width: 148px; }
+  .send-button,
+  .forfeit-button {
+    font-size: 11pt;
+    padding: 5px 10px;
+    letter-spacing: 0.3px;
+    white-space: normal;
+    line-height: 1.15;
+  }
+
+  // Compact the 7-split step boxes so they fit within the capped button width
+  // instead of overflowing it.
+  .pawn-steps { padding: 5px; gap: 5px; }
+  .pawn-steps__row { gap: 4px; }
+  .pawn-steps__label { font-size: 10.5pt; min-width: 0; }
+  .pawn-steps__input { width: 26px; font-size: 11pt; }
+  .pawn-step-btn { width: 26px; height: 26px; font-size: 12pt; }
 }
