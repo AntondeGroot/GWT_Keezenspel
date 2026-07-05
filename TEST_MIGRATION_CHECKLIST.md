@@ -117,8 +117,8 @@ headless Chrome against the GWT DOM. They bind to **GWT-specific CSS classes** (
 | [ ] | `CardDisplay_IT.java` | 6 | D | Playwright E2E |
 | [ ] | `CardSevenSplit_IT.java` | 1 | D | Playwright E2E |
 | [ ] | `JackAnimationFromOpponentPerspective_IT.java` | 1 | D | Playwright E2E |
-| [ ] | `MovingOnBoard_IT.java` | 5 | D | Playwright E2E |
-| [ ] | `Pawn_IT.java` | 5 | D | Playwright E2E |
+| [x] | `MovingOnBoard_IT.java` | 4 | D | ✅ `moving-on-board.spec.ts` (4/4) — first real bucket-D |
+| [~] | `Pawn_IT.java` | 4 | D | ✅ `pawn-selection.spec.ts` (3 selection cases); case 4 (forfeit→move) TODO |
 | [ ] | `PlayerStatusMock_IT.java` | 5 | D | Playwright E2E |
 | [ ] | `PlayerStatusReal_IT.java` | 3 | D | Playwright E2E |
 | [ ] | `Winner2Players_IT.java` | 2 | D | Playwright E2E |
@@ -145,9 +145,10 @@ green under `ng test`. On inspection bucket C was not uniformly jsdom-testable, 
 - **Reclassified C → D:** `MobileLayoutCheck_IT` (viewport/overlap geometry — needs a real browser).
 - **Blocked:** `Chat_IT` — the Angular app has **no chat feature yet**; can't test UI that doesn't exist.
 
-**Integration total: ~6 / 20 covered on the frontend** (C bucket's testable assertions). Remaining:
-bucket D (10 originals + the geometry slices reclassified from C), 2 stay Java (A), `SendButtonSpinner`
-N/A (B), `Chat_IT` blocked until the feature exists.
+**Integration total: ~8 / 20 covered on the frontend** — C bucket's testable assertions plus the
+first two real bucket-D E2E files (`MovingOnBoard_IT` 4/4, `Pawn_IT` selection 3/4). Remaining:
+the rest of bucket D (reusing the `steps.ts` harness), 2 stay Java (A), `SendButtonSpinner` N/A (B),
+and the blocked ones (`Chat_IT`, `Winner*`, `PlayerStatus*`) until their Angular features exist.
 
 ---
 
@@ -156,7 +157,7 @@ N/A (B), `Chat_IT` blocked until the feature exists.
 | Category | Migrated | Remaining |
 | --- | --- | --- |
 | GWT client unit tests | 11.5 / 12 files | `Cookie` only (6/18 migrated, other 12 GWT-only / N/A) |
-| GWT integration tests (`_IT`) | 0 / 20 files | all 20 |
+| GWT integration tests (`_IT`) | ~8 / 20 files (C bucket + D: MovingOnBoard, Pawn) | rest of D, blocked (Chat/Winner/PlayerStatus), A stays Java |
 
 **Client unit tests: effectively complete.** Every migratable case is ported; the only unported
 GWT cases are `CookieTest`'s 12 locale-redirect tests, which are GWT-only (not applicable to
@@ -200,6 +201,20 @@ rendering `Board` in a component test without a backend:
 **D — Playwright E2E (10).** Assertions *are* backend behaviour (winner/medal order, move legality,
 7-split math, SSE-driven animation). Rewrite against a **real backend** using the existing test-only
 seeding hooks.
+
+**Bucket-D real migrations landed — the harness is now in place (2 files, 7 cases).**
+- `MovingOnBoard_IT` → `e2e/moving-on-board.spec.ts` (4/4): nest→board with Ace, nest→board with
+  King, on-board move with Ace, Jack switch — real UI moves, positions asserted via SSE.
+- `Pawn_IT` (selection) → `e2e/pawn-selection.spec.ts` (3): click own pawn selects it, second own
+  pawn steals the selection, opponent pawn can't be selected. Case 4 (forfeit ×2 → move) is TODO.
+- **Selector layer:** added `data-testid="pawn-{playerId}:{pawnNr}"` and `data-testid="card-{value}"`
+  to `board.html` (the checklist's stated stable-selector strategy).
+- **Steps DSL:** `e2e/support/steps.ts` — `playCard({value, pawns})`, `clickPawn`, `pawnCentre`,
+  `waitPawnSettled` (polls the box until still, = GWT `waitUntilPawnStopsMoving`), `isPawnSelected`
+  (reads `--pawn-highlight`), `dist`. Reuse for the remaining D targets.
+- **Perspective/turns:** unlike the GWT ordered shared session (which relied on natural turn order),
+  each case seeds a fresh game and plays as **player0** (the starting player). `setPlayerIdPlaying`
+  was only a viewer cookie-swap + refresh, never a backend "set current player", so nothing is lost.
 
 **Proof D — done (smoke green: seed real game → Angular renders it over SSE).** Harness established:
 - `frontend/playwright.config.ts` (`npm run e2e`). Serves Angular via `ng serve` on **:4300** (the

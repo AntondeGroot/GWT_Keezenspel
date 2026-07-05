@@ -11,6 +11,7 @@
         }
         @for (p of pawns(); track p.id){
           <app-pawn class="pawn"
+                    [attr.data-testid]="'pawn-' + p.id"
                     [color]="p.color"
                     (click)="selectPawn(p.id)"
                     [highlight]="p.id === pawn1Id() ? highlightForPawn1(p.color)
@@ -37,6 +38,7 @@
       <div class="card-layer">
         @for (c of cards(); track c.uuid) {
           <app-card class="card"
+            [attr.data-testid]="'card-' + c.value"
             [suit]="c.suit"
             [value]="c.value"
             [style.left.%]="c.x"
