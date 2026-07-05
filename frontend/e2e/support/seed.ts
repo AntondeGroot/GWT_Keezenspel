@@ -58,7 +58,12 @@ export async function setOnlyCard(
   await api.post(`/test/set-only-card/${sessionId}/${playerId}/${cardValue}`);
 }
 
-/** POST /test/set-card/{session}/{player}/{value}. */
+/**
+ * POST /test/set-card/{session}/{player}/{value}. NOTE: this *replaces* the player's
+ * first card with one of `cardValue` — it does not append, so the hand size is
+ * unchanged (see `CardsDeck.giveCardToPlayerForTesting`). To reduce a hand to a single
+ * known card, use `setOnlyCard` instead.
+ */
 export async function setCard(
   api: APIRequestContext,
   sessionId: string,

@@ -119,8 +119,8 @@ headless Chrome against the GWT DOM. They bind to **GWT-specific CSS classes** (
 | [x] | `JackAnimationFromOpponentPerspective_IT.java` | 1 | D | ✅ `jack-animation.spec.ts` — observer sees the swap (move via API) |
 | [x] | `MovingOnBoard_IT.java` | 4 | D | ✅ `moving-on-board.spec.ts` (4/4) — first real bucket-D |
 | [x] | `Pawn_IT.java` | 4 | D | ✅ `pawn-selection.spec.ts` (3 selection + case 4: forfeit ×2 → next player moves) |
-| [ ] | `PlayerStatusMock_IT.java` | 5 | D | Playwright E2E |
-| [ ] | `PlayerStatusReal_IT.java` | 3 | D | Playwright E2E |
+| [x] | `PlayerStatusMock_IT.java` | 5 | D | ✅ `player-status.spec.ts` — turn walks the roster (forfeit → next chip lights up) |
+| [x] | `PlayerStatusReal_IT.java` | 3 | D | ✅ `player-status.spec.ts` — real forfeit flips `chip--turn`/`chip--inactive` |
 | [x] | `Winner2Players_IT.java` | 2 | D | ✅ `winner.spec.ts` — medal to the right player + finished state |
 | [x] | `Winner_IT.java` | 1 | D | ✅ `winner.spec.ts` — medals in finishing order (gold, silver) |
 | [ ] | `GameStateLastMoveResponse_IT.java` | 2 | A | Stay Java (backend API) — not a frontend migration |
@@ -152,12 +152,14 @@ announces each finisher with a celebratory plaque. Covered by `winner-banner.spe
 tests) and `e2e/winner.spec.ts` (3): 2-player winner gets gold + finished + banner; the 2-player
 bug guard (the winner, not the other colour, gets the medal); 3-player medals in finishing order.
 
-**Integration total: ~14 / 20 covered on the frontend — every readily-migratable IT is now done.**
-C bucket's testable assertions plus seven real bucket-D E2E files (`MovingOnBoard_IT`, `Pawn_IT`,
+**Integration total: ~16 / 20 covered on the frontend — every readily-migratable IT is now done.**
+C bucket's testable assertions plus the real bucket-D E2E files (`MovingOnBoard_IT`, `Pawn_IT`,
 `CardDisplay_IT`, `CardAnimation_IT`, `CardSevenSplit_IT`, `JackAnimationFromOpponentPerspective_IT`,
-`MobileLayoutCheck_IT`). The remaining eight are **not** currently migratable:
-- **Blocked on unbuilt Angular features (3):** `Chat_IT`, `PlayerStatusMock_IT`,
-  `PlayerStatusReal_IT` — no chat or player-status UI yet. (Winner/medal is now built — see below.)
+`MobileLayoutCheck_IT`, `PlayerStatusMock_IT`, `PlayerStatusReal_IT`). The remaining four are **not**
+currently migratable:
+- **Blocked on an unbuilt Angular feature (1):** `Chat_IT` — no chat UI yet. (The player-status UI
+  turned out to already exist — the roster renders `isPlaying`/`isActive` — so `PlayerStatus*_IT`
+  were migratable after all; see below. Winner/medal is likewise built.)
 - **Stay Java (2, bucket A):** `GameStateLastMoveResponse_IT`, `LeaveGame_IT` (backend JSON/SSE).
 - **N/A stub (1, bucket B):** `SendButtonSpinner_IT` (disabled).
 
@@ -168,7 +170,7 @@ C bucket's testable assertions plus seven real bucket-D E2E files (`MovingOnBoar
 | Category | Migrated | Remaining |
 | --- | --- | --- |
 | GWT client unit tests | 11.5 / 12 files | `Cookie` only (6/18 migrated, other 12 GWT-only / N/A) |
-| GWT integration tests (`_IT`) | ~14 / 20 files (C bucket + 9 D files incl. Winner/Winner2Players) | 3 blocked (Chat/PlayerStatus, need features), 2 stay Java (A), 1 N/A stub (B) |
+| GWT integration tests (`_IT`) | ~16 / 20 files (C bucket + 11 D files incl. Winner/Winner2Players + PlayerStatus×2) | 1 blocked (Chat, needs feature), 2 stay Java (A), 1 N/A stub (B) |
 
 **Client unit tests: effectively complete.** Every migratable case is ported; the only unported
 GWT cases are `CookieTest`'s 12 locale-redirect tests, which are GWT-only (not applicable to
@@ -213,7 +215,7 @@ rendering `Board` in a component test without a backend:
 7-split math, SSE-driven animation). Rewrite against a **real backend** using the existing test-only
 seeding hooks.
 
-**Bucket-D real migrations landed — the harness is in place (8 files, 21 cases).**
+**Bucket-D real migrations landed — the harness is in place (10 files, 27 cases).**
 - `MovingOnBoard_IT` → `e2e/moving-on-board.spec.ts` (4/4): nest→board with Ace, nest→board with
   King, on-board move with Ace, Jack switch — real UI moves, positions asserted via SSE.
 - `Pawn_IT` (selection) → `e2e/pawn-selection.spec.ts` (3): click own pawn selects it, second own
@@ -233,6 +235,12 @@ seeding hooks.
 - `MobileLayoutCheck_IT` → `e2e/mobile-layout.spec.ts` (7): for 2–8 players the board, roster and
   buttons are all on screen and never overlap. (Largely overlaps the existing `controls-layout` /
   `board-layout` suites, now made explicit per player count.)
+- `PlayerStatusReal_IT` + `PlayerStatusMock_IT` → `e2e/player-status.spec.ts` (2 + 4): the turn/active
+  state on the roster. Real: a UI forfeit flips the forfeiter's chip to `chip--turn` off + `chip--inactive`
+  on and lights up the next seat. Mock: a serial turn-walk (player0 → forfeit → player1 → forfeit →
+  player2, who stays active after playing an Ace), watched over SSE from one observer page. No feature
+  build — the roster already rendered `isPlaying`/`isActive`; added `data-testid="chip-{id}"` as the
+  stable selector + a `chipState` helper.
 - Helpers grew: `handCards`/`pileCards`/`forfeit`, `openBoard`/`viewAs` (now with `viewport` +
   `gameOptions`), and `makeMove` in `seed.ts`.
 
@@ -263,12 +271,14 @@ forfeit when you must play — Play stays the green action. Covered by `e2e/forf
   separately by the harness. For CI, boot an isolated backend (realCardDeck profile) rather than a
   developer's running instance.
 
-> **Bucket-D reality check — several targets are blocked by unbuilt Angular features.**
-> `Winner2Players_IT` / `Winner_IT` assert on a **winner/medal + player-status UI that Angular does
-> not have yet** (`board.ts` ignores `winners`; nothing renders a medal or `playerNotPlaying`).
-> `PlayerStatus*_IT` likewise. These are **blocked** (like `Chat_IT`) until those features exist.
-> Viable D targets whose UI exists: `MovingOnBoard_IT`, `Pawn_IT`, `CardAnimation_IT`,
-> `CardSevenSplit_IT`, `CardDisplay_IT`.
+> **Bucket-D reality check — the winner/medal and player-status UI now exist, so those targets are
+> no longer blocked.** The roster (`app-player-list`) renders both the medal/finished state (for
+> `Winner_IT` / `Winner2Players_IT`) and the turn/active state — each chip binds `chip--turn` to
+> `isPlaying` and `chip--inactive` to `!isActive`, the exact Angular equivalent of GWT's
+> `playerPlaying playerActive` / `playerNotPlaying playerInactive` classes (`ViewDrawing.java:281`).
+> So `PlayerStatus*_IT` were migratable against the existing roster — no feature build was needed,
+> just the E2E specs (`player-status.spec.ts`). The **only** D target still blocked on an unbuilt
+> feature is `Chat_IT` (no chat UI).
 
 ### Cross-cutting decisions
 - **Selectors:** add `data-testid` attributes to Angular components as the stable selector layer.

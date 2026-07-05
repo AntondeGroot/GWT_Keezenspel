@@ -84,6 +84,20 @@ export async function forfeit(page: Page): Promise<void> {
   await page.locator('.forfeit-button').click();
 }
 
+/**
+ * A roster chip's turn/inactive state, by player id — the Angular equivalent of
+ * GWT's `playerPlaying playerActive` / `playerNotPlaying playerInactive` classes
+ * (`chip--turn` ← isPlaying, `chip--inactive` ← !isActive). Used by the player-
+ * status specs to watch the turn move around the roster over SSE.
+ */
+export async function chipState(
+  page: Page,
+  playerId: string,
+): Promise<{ onTurn: boolean; inactive: boolean }> {
+  const cls = (await page.getByTestId(`chip-${playerId}`).getAttribute('class')) ?? '';
+  return { onTurn: cls.includes('chip--turn'), inactive: cls.includes('chip--inactive') };
+}
+
 /** A pawn is "selected" when the board sets its --pawn-highlight (pawn1/pawn2). */
 export async function isPawnSelected(page: Page, id: string): Promise<boolean> {
   return page
