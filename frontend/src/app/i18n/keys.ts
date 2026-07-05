@@ -24,6 +24,7 @@ export type TranslationKey =
   | 'confirmLeaveGame'
   | 'confirmLeaveYes'
   | 'confirmLeaveNo'
+  | 'playerFinished'
   | 'canvasNotSupported'
   | 'hintAce'
   | 'hintFour'

@@ -12,6 +12,7 @@ export const de: Dictionary = {
   confirmLeaveGame: 'Möchtest du das Spiel wirklich verlassen?',
   confirmLeaveYes: 'Verlassen',
   confirmLeaveNo: 'Bleiben',
+  playerFinished: 'ist fertig!',
   canvasNotSupported: 'Canvas wird in deinem Browser nicht unterstützt.',
   hintAce: 'Ass: Setze eine Figur aufs Spielfeld oder bewege sie 1 Schritt vorwärts.',
   hintFour:

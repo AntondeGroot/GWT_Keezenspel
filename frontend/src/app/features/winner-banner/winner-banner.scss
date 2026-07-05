@@ -1,0 +1,78 @@
+// A celebratory plaque that drops in below the title bar when a player finishes.
+.winner-banner {
+  position: fixed;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: min(440px, 92vw);
+  padding: 12px 22px 12px 16px;
+  cursor: pointer;
+  border-radius: 14px;
+  border: 2px solid #f4d03f;
+  background:
+    radial-gradient(120% 160% at 20% 0%, rgba(244, 208, 63, 0.22), transparent 60%),
+    linear-gradient(160deg, #3a2410, #241206);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.55),
+    0 0 26px rgba(244, 208, 63, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  animation: winner-drop 0.5s cubic-bezier(0.18, 0.9, 0.3, 1.4) both;
+}
+
+.winner-banner__medal {
+  flex: 0 0 auto;
+  font-size: 2.4rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+  animation: winner-pop 0.6s ease 0.15s both;
+}
+
+.winner-banner__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.winner-banner__name {
+  font: 700 1.25rem 'Cinzel', Georgia, serif;
+  letter-spacing: 0.5px;
+  // Tint the name with the player's colour, kept legible on the dark plaque.
+  color: color-mix(in srgb, var(--player-color, #f4d03f) 55%, #fdf3cf);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.winner-banner__label {
+  font: 600 0.82rem 'Lato', 'Helvetica Neue', sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #d8cead;
+}
+
+@keyframes winner-drop {
+  from { opacity: 0; transform: translate(-50%, -26px) scale(0.9); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+@keyframes winner-pop {
+  0% { transform: scale(0.4) rotate(-18deg); }
+  60% { transform: scale(1.25) rotate(8deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@media (max-width: 699px) {
+  .winner-banner { top: 84px; padding: 10px 18px 10px 14px; gap: 11px; }
+  .winner-banner__medal { font-size: 2rem; }
+  .winner-banner__name { font-size: 1.1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .winner-banner,
+  .winner-banner__medal { animation: none; }
+}

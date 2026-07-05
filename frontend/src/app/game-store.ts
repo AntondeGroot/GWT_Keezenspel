@@ -10,4 +10,7 @@ import { Player } from './api';
 export class GameStore {
   /** Players from the latest server push: name, colour, turn/active flags, medal place. */
   readonly players = signal<Player[]>([]);
+
+  /** Player ids in the order they finished (1st, 2nd, 3rd, …). */
+  readonly winners = signal<string[]>([]);
 }

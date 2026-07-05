@@ -5,11 +5,12 @@ import { LanguageSelector } from './features/nav/language-selector/language-sele
 import { GameRules } from './features/nav/game-rules/game-rules';
 import { LeaveGame } from './features/nav/leave-game/leave-game';
 import { MoveRejected } from './features/board/move-rejected/move-rejected';
+import { WinnerBanner } from './features/winner-banner/winner-banner';
 import { Translations } from './i18n/translations.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Board, LanguageSelector, GameRules, LeaveGame, MoveRejected],
+  imports: [RouterOutlet, Board, LanguageSelector, GameRules, LeaveGame, MoveRejected, WinnerBanner],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
