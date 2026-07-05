@@ -15,6 +15,7 @@
       @for (c of chips(); track c.id) {
         <div
           class="chip"
+          [attr.data-testid]="'chip-' + c.id"
           [class.chip--turn]="c.isPlaying"
           [class.chip--inactive]="!c.isActive"
           [style.--player-color]="c.color"
