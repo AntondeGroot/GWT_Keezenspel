@@ -4,9 +4,19 @@ import { createGame } from './seed';
 
 const UI = 'http://localhost:4300';
 
+export interface Viewport {
+  width: number;
+  height: number;
+}
+
 /** Open the board in a fresh browser context viewing the game as `playerId`. */
-export async function viewAs(browser: Browser, sessionId: string, playerId: string): Promise<Page> {
-  const ctx = await browser.newContext();
+export async function viewAs(
+  browser: Browser,
+  sessionId: string,
+  playerId: string,
+  viewport?: Viewport,
+): Promise<Page> {
+  const ctx = await browser.newContext(viewport ? { viewport } : {});
   await ctx.addCookies([{ name: 'playerid', value: playerId, url: UI }]);
   const page = await ctx.newPage();
   await page.goto(`/?sessionid=${sessionId}&playerid=${playerId}`);
@@ -20,15 +30,17 @@ export async function openBoard(
   opts: {
     players?: number;
     as?: string;
+    viewport?: Viewport;
+    gameOptions?: Record<string, unknown>;
     setup?: (api: Awaited<ReturnType<typeof request.newContext>>, sessionId: string) => Promise<void>;
   } = {},
 ): Promise<{ page: Page; sessionId: string }> {
   const as = opts.as ?? 'player0';
   const api = await request.newContext({ baseURL: API_URL });
-  const { sessionId } = await createGame(api, opts.players ?? 3);
+  const { sessionId } = await createGame(api, opts.players ?? 3, opts.gameOptions);
   if (opts.setup) await opts.setup(api, sessionId);
   await api.dispose();
-  const page = await viewAs(browser, sessionId, as);
+  const page = await viewAs(browser, sessionId, as, opts.viewport);
   return { page, sessionId };
 }
 
