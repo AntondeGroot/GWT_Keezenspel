@@ -12,9 +12,13 @@ export interface SeededGame {
 }
 
 /** POST /games → add N players → /test/start-game. Additive: creates a new session. */
-export async function createGame(api: APIRequestContext, maxPlayers: number): Promise<SeededGame> {
+export async function createGame(
+  api: APIRequestContext,
+  maxPlayers: number,
+  gameOptions?: Record<string, unknown>,
+): Promise<SeededGame> {
   const created = await api.post('/games', {
-    data: { roomName: `e2e-${Date.now()}`, maxPlayers },
+    data: { roomName: `e2e-${Date.now()}`, maxPlayers, ...(gameOptions ? { gameOptions } : {}) },
   });
   const { sessionId } = (await created.json()) as { sessionId: string };
 
@@ -62,4 +66,24 @@ export async function setCard(
   cardValue: number,
 ): Promise<void> {
   await api.post(`/test/set-card/${sessionId}/${playerId}/${cardValue}`);
+}
+
+/**
+ * POST /moves/{session}/{player} — play a move straight through the API, the way
+ * the GWT `ApiCallsHelper.makeMove` drove opponent moves. `move` carries the card
+ * and pawn(s); the server validates and infers the move type.
+ */
+export async function makeMove(
+  api: APIRequestContext,
+  sessionId: string,
+  playerId: string,
+  move: {
+    cardId: number;
+    pawn1Id?: { playerId: string; pawnNr: number };
+    pawn2Id?: { playerId: string; pawnNr: number };
+    stepsPawn1?: number;
+    stepsPawn2?: number;
+  },
+): Promise<void> {
+  await api.post(`/moves/${sessionId}/${playerId}`, { data: { playerId, ...move } });
 }

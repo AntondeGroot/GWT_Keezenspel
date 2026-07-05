@@ -498,6 +498,11 @@ export class Board implements OnInit, OnDestroy{
     () => (this.rev(), this.selection.getCard() != null && this.selection.getPawn1() != null),
   );
 
+  // The backend allows a forfeit only when the player has no legal move; when they
+  // do have one they must play it, so the Forfeit button is disabled. Defaults to
+  // enabled until a state with the flag arrives (don't lock the player out).
+  protected readonly canForfeit = computed(() => this.state()?.canForfeit ?? true);
+
   protected selectCard(uuid: number): void {
     const handCard = this.hand().find((c) => c.uuid === uuid);
     if (!handCard) return;

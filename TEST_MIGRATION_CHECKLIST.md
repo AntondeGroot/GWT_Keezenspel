@@ -111,14 +111,14 @@ headless Chrome against the GWT DOM. They bind to **GWT-specific CSS classes** (
 | [x] | `Card_IT.java` | 4 | C | ✅ `card-selection.spec.ts` (4/4) — Proof C |
 | [x] | `PawnHighlightColors_IT.java` | 7 | C | ✅ `pawn-highlight-render.spec.ts` (wiring) + `pawn-highlight.spec.ts` (colour maths) |
 | [ ] | `MobileLocale_IT.java` | 5 | C | ✅ `board-render.spec.ts` i18n text (2); `mobile.html` redirect + reload = N/A (SPA) |
-| [ ] | `MobileLayoutCheck_IT.java` | 1 | ~~C~~ **D** | Playwright E2E — pure viewport/overlap geometry, jsdom can't |
+| [x] | `MobileLayoutCheck_IT.java` | 2 | D | ✅ `mobile-layout.spec.ts` (2–8 players: board/roster/buttons on screen, no overlap) |
 | [ ] | `Chat_IT.java` | 5 | ~~C~~ **blocked** | No Angular chat feature yet — nothing to test until it's built |
 | [x] | `CardAnimation_IT.java` | 1 | D | ✅ `card-animation.spec.ts` (1/1) — no-pawn move keeps the card |
 | [x] | `CardDisplay_IT.java` | 5 | D | ✅ `card-display.spec.ts` — hand renders, forfeit→pile, next player has hand |
 | [x] | `CardSevenSplit_IT.java` | 1 | D | ✅ `card-seven-split.spec.ts` (1/1) — re-select-7 reset regression |
-| [ ] | `JackAnimationFromOpponentPerspective_IT.java` | 1 | D | Playwright E2E |
+| [x] | `JackAnimationFromOpponentPerspective_IT.java` | 1 | D | ✅ `jack-animation.spec.ts` — observer sees the swap (move via API) |
 | [x] | `MovingOnBoard_IT.java` | 4 | D | ✅ `moving-on-board.spec.ts` (4/4) — first real bucket-D |
-| [~] | `Pawn_IT.java` | 4 | D | ✅ `pawn-selection.spec.ts` (3 selection cases); case 4 (forfeit→move) TODO |
+| [x] | `Pawn_IT.java` | 4 | D | ✅ `pawn-selection.spec.ts` (3 selection + case 4: forfeit ×2 → next player moves) |
 | [ ] | `PlayerStatusMock_IT.java` | 5 | D | Playwright E2E |
 | [ ] | `PlayerStatusReal_IT.java` | 3 | D | Playwright E2E |
 | [ ] | `Winner2Players_IT.java` | 2 | D | Playwright E2E |
@@ -145,11 +145,14 @@ green under `ng test`. On inspection bucket C was not uniformly jsdom-testable, 
 - **Reclassified C → D:** `MobileLayoutCheck_IT` (viewport/overlap geometry — needs a real browser).
 - **Blocked:** `Chat_IT` — the Angular app has **no chat feature yet**; can't test UI that doesn't exist.
 
-**Integration total: ~11 / 20 covered on the frontend** — C bucket's testable assertions plus five
-real bucket-D E2E files (`MovingOnBoard_IT`, `Pawn_IT` selection, `CardDisplay_IT`, `CardAnimation_IT`,
-`CardSevenSplit_IT`). Remaining bucket-D with UI that exists: `JackAnimationFromOpponentPerspective_IT`,
-`MobileLayoutCheck_IT`, and `Pawn_IT` case 4. Then 2 stay Java (A), `SendButtonSpinner` N/A (B), and the
-blocked ones (`Chat_IT`, `Winner*`, `PlayerStatus*`) until their Angular features exist.
+**Integration total: ~12 / 20 covered on the frontend — every readily-migratable IT is now done.**
+C bucket's testable assertions plus seven real bucket-D E2E files (`MovingOnBoard_IT`, `Pawn_IT`,
+`CardDisplay_IT`, `CardAnimation_IT`, `CardSevenSplit_IT`, `JackAnimationFromOpponentPerspective_IT`,
+`MobileLayoutCheck_IT`). The remaining eight are **not** currently migratable:
+- **Blocked on unbuilt Angular features (5):** `Chat_IT`, `Winner_IT`, `Winner2Players_IT`,
+  `PlayerStatusMock_IT`, `PlayerStatusReal_IT` — no chat, winner/medal, or player-status UI yet.
+- **Stay Java (2, bucket A):** `GameStateLastMoveResponse_IT`, `LeaveGame_IT` (backend JSON/SSE).
+- **N/A stub (1, bucket B):** `SendButtonSpinner_IT` (disabled).
 
 ---
 
@@ -158,7 +161,7 @@ blocked ones (`Chat_IT`, `Winner*`, `PlayerStatus*`) until their Angular feature
 | Category | Migrated | Remaining |
 | --- | --- | --- |
 | GWT client unit tests | 11.5 / 12 files | `Cookie` only (6/18 migrated, other 12 GWT-only / N/A) |
-| GWT integration tests (`_IT`) | ~11 / 20 files (C bucket + D: MovingOnBoard, Pawn, CardDisplay, CardAnimation, CardSevenSplit) | rest of D, blocked (Chat/Winner/PlayerStatus), A stays Java |
+| GWT integration tests (`_IT`) | ~12 / 20 files — all readily-migratable done (C bucket + 7 D files) | 5 blocked (Chat/Winner/PlayerStatus, need features), 2 stay Java (A), 1 N/A stub (B) |
 
 **Client unit tests: effectively complete.** Every migratable case is ported; the only unported
 GWT cases are `CookieTest`'s 12 locale-redirect tests, which are GWT-only (not applicable to
@@ -203,7 +206,7 @@ rendering `Board` in a component test without a backend:
 7-split math, SSE-driven animation). Rewrite against a **real backend** using the existing test-only
 seeding hooks.
 
-**Bucket-D real migrations landed — the harness is in place (5 files, 12 cases).**
+**Bucket-D real migrations landed — the harness is in place (8 files, 21 cases).**
 - `MovingOnBoard_IT` → `e2e/moving-on-board.spec.ts` (4/4): nest→board with Ace, nest→board with
   King, on-board move with Ace, Jack switch — real UI moves, positions asserted via SSE.
 - `Pawn_IT` (selection) → `e2e/pawn-selection.spec.ts` (3): click own pawn selects it, second own
@@ -215,8 +218,21 @@ seeding hooks.
   hand — Angular disables Play for the illegal move rather than sending + server-rejecting.
 - `CardSevenSplit_IT` → `e2e/card-seven-split.spec.ts` (1): the step-box desync regression — editing
   a split then re-selecting the 7 snaps the boxes back to the model default. Angular passes (no bug).
-- Helpers grew: `handCards`/`pileCards`/`forfeit` in `steps.ts`, plus `openBoard`/`viewAs` game-open
-  helpers (fresh N-player game, view as a given player, optional backend setup).
+- `Pawn_IT` case 4 → in `e2e/pawn-selection.spec.ts` (1): after two players forfeit (no legal move),
+  the third player still moves onto the board over SSE.
+- `JackAnimationFromOpponentPerspective_IT` → `e2e/jack-animation.spec.ts` (1): player0 plays a jack
+  switch via the **API** (not the UI); the observer (player1) receives it over SSE and both pawns
+  animate to each other's tiles. Uses the new `makeMove` seed helper.
+- `MobileLayoutCheck_IT` → `e2e/mobile-layout.spec.ts` (7): for 2–8 players the board, roster and
+  buttons are all on screen and never overlap. (Largely overlaps the existing `controls-layout` /
+  `board-layout` suites, now made explicit per player count.)
+- Helpers grew: `handCards`/`pileCards`/`forfeit`, `openBoard`/`viewAs` (now with `viewport` +
+  `gameOptions`), and `makeMove` in `seed.ts`.
+
+**New feature (not a migration): the must-play rule.** With the `mustPlayIfPossible` game option on,
+the backend sends `canForfeit=false` while a legal move exists. The board now wires the **Forfeit**
+button to it (`[disabled]="!canForfeit()"`, computed from `state().canForfeit ?? true`), so you can't
+forfeit when you must play — Play stays the green action. Covered by `e2e/forfeit-rule.spec.ts` (2).
 - **Selector layer:** added `data-testid="pawn-{playerId}:{pawnNr}"` and `data-testid="card-{value}"`
   to `board.html` (the checklist's stated stable-selector strategy).
 - **Steps DSL:** `e2e/support/steps.ts` — `playCard({value, pawns})`, `clickPawn`, `pawnCentre`,
