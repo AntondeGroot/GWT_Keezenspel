@@ -7,6 +7,7 @@ import { buildBoard, fanCardBacks, Pt, BoardGeometry } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { Pawn } from './pawn/pawn';
 import { Card } from './card/card';
+import { PlayerList } from '../player-list/player-list';
 import {highlightForPawn1, highlightForPawn2} from './pawn-highlight';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
 import { pawnKey } from './pawn-key';
@@ -30,7 +31,7 @@ const HINT_KEYS: Record<number, TranslationKey> = {
 
 @Component({
   selector: 'app-board',
-  imports: [Pawn, Card],
+  imports: [Pawn, Card, PlayerList],
   templateUrl: './board.html',
   styleUrl: './board.scss',
 })

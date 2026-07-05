@@ -1,12 +1,7 @@
-// A team-aware scoreboard strip, pinned top-left below the title bar and the
-// Leave-game button. Decorative — pointer-events pass through to the board.
+// A team-aware scoreboard. Placed by the board's .controls group: a row below the
+// hint on mobile, a column in the right gutter on desktop.
 :host {
-  position: fixed;
-  top: 106px;
-  left: 16px;
-  z-index: 20;
-  max-width: min(320px, 46vw);
-  pointer-events: none;
+  display: block;
   font-family: 'Lato', 'Helvetica Neue', sans-serif;
 
   // Team accents — a separate channel from the players' pawn colours (avatar
@@ -33,18 +28,21 @@
 .team-line[data-team='D'] .team-line__lbl { color: var(--team-d); }
 .team-line__who { margin-left: 5px; color: #ded4ad; }
 
-/* ── Chip strip in turn order ────────────────────────────────────────── */
+/* ── Chips in turn order. Mobile: a compact grid that wraps beside the buttons
+      (so 6–8 players don't run off-screen). Desktop: a single column in the
+      right gutter. ──────────────────────────────────────────────────────── */
 .roster__chips {
   display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
+  flex-flow: row wrap;
+  gap: 6px;
 }
 
 .chip {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 3px 11px 3px 3px;
+  // enough padding that the avatar's ~3.5px colour ring clears the chip border
+  padding: 5px 12px 5px 5px;
   border-radius: 999px;
   background: rgba(6, 18, 11, 0.82);
   border: 1px solid rgba(201, 162, 39, 0.26);
@@ -81,10 +79,14 @@
 }
 
 .chip__name {
+  flex: 1 1 auto;
+  min-width: 0;
   font-size: 13px;
   font-weight: 600;
   color: #e7ddb8;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tag {
@@ -139,8 +141,24 @@
   .chip__name { color: #b7ae9b; font-style: italic; text-decoration: line-through; }
 }
 
-@media (max-width: 620px) {
-  :host { top: 100px; left: 8px; max-width: min(260px, 62vw); }
+// Mobile: keep the roster narrow so its chips wrap into ~2 columns beside the
+// buttons, and compact them so even an 8-player game stays on screen.
+@media (max-width: 699px) {
+  :host { max-width: 178px; } // two fixed-width chips (84px) + gap per row
+  .chip { width: 84px; box-sizing: border-box; padding: 3px 7px 3px 3px; gap: 5px; }
+  .chip__avatar { width: 24px; height: 24px; }
+  .chip__initial { font-size: 11px; }
+  .chip__name { font-size: 11px; }
+}
+
+// Desktop: the roster sits in the right column — a single stack of larger chips.
+@media (min-width: 700px) {
+  .roster__chips { flex-flow: column nowrap; align-items: stretch; gap: 8px; }
+  .chip { padding: 6px 14px 6px 6px; }
+  .chip__avatar { width: 34px; height: 34px; }
+  .chip__initial { font-size: 14px; }
+  .chip__name { font-size: 14px; }
+  .team-line { font-size: 13.5px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
