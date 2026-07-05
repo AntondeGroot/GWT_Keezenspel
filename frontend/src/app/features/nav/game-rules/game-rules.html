@@ -1,5 +1,5 @@
-<button class="rulesButton" (click)="open.set(true)">
-  <img src="/study-icon.svg" class="rules-btn-icon" alt="" /> {{ i18n.t('rulesButton') }}
+<button class="rulesButton" (click)="open.set(true)" [attr.aria-label]="i18n.t('rulesButton')">
+  <img src="/study-icon.svg" class="rules-btn-icon" alt="" /><span class="rules-btn-label">{{ i18n.t('rulesButton') }}</span>
 </button>
 
 @if (open()) {

@@ -10,6 +10,8 @@ export const nl: Dictionary = {
   pawn1: 'Pion 1',
   pawn2: 'Pion 2',
   confirmLeaveGame: 'Weet je zeker dat je het spel wilt verlaten?',
+  confirmLeaveYes: 'Verlaten',
+  confirmLeaveNo: 'Blijven',
   canvasNotSupported: 'Canvas wordt niet ondersteund in je browser.',
   hintAce: 'Aas: zet een pion op het bord of beweeg 1 stap vooruit.',
   hintFour:

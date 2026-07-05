@@ -436,7 +436,7 @@
 // onto a second (overflowing) row. Placed last so it overrides the base button
 // rules above (notably the `font` shorthand, which would otherwise reset the size).
 @media (max-width: 699px) {
-  .play { --board-w: min(600px, calc(96vw / 1.24), calc((100vh - 326px) / 1.42)); }
+  .play { --board-w: min(600px, calc(96vw / 1.24), calc((100vh - 348px) / 1.42)); }
 
   .button-container { padding: 8px; gap: 6px; max-width: 148px; }
   .send-button,

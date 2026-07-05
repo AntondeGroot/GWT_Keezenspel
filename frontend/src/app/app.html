@@ -2,13 +2,15 @@
 
 <app-leave-game />
 
-<div class="top-nav-panel">
-  <app-game-rules />
-  <app-language-selector />
-</div>
-
 <app-board />
 
 <app-move-rejected />
 
-<footer class="footer-bar"></footer>
+<!-- Rules + language. Desktop: hoisted to the fixed top-right nav. Mobile: they
+     sit in the footer bar (Option D), out of the title's way. -->
+<footer class="footer-bar">
+  <div class="footer-nav">
+    <app-game-rules />
+    <app-language-selector />
+  </div>
+</footer>

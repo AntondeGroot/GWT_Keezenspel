@@ -11,6 +11,8 @@ export const en: Dictionary = {
   pawn1: 'Pawn 1',
   pawn2: 'Pawn 2',
   confirmLeaveGame: 'Are you sure you want to leave the game?',
+  confirmLeaveYes: 'Leave',
+  confirmLeaveNo: 'Stay',
   canvasNotSupported: 'Canvas is not supported in your browser.',
   hintAce: 'Ace: place a pawn on the board or move 1 step forward.',
   hintFour:

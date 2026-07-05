@@ -10,6 +10,8 @@ export const nb: Dictionary = {
   pawn1: 'Brikke 1',
   pawn2: 'Brikke 2',
   confirmLeaveGame: 'Er du sikker på at du vil forlate spillet?',
+  confirmLeaveYes: 'Forlat',
+  confirmLeaveNo: 'Bli',
   canvasNotSupported: 'Canvas støttes ikke i nettleseren din.',
   hintAce: 'Ess: plasser en brikke på brettet eller flytt 1 steg fremover.',
   hintFour:

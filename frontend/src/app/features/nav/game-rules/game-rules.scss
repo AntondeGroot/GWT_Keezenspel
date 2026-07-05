@@ -32,6 +32,19 @@
   top: -1px;
 }
 
+// Mobile: the rules control lives in the footer as a book icon only (its label
+// moves out to save room).
+@media (max-width: 699px) {
+  .rulesButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 9px;
+  }
+  .rules-btn-label { display: none; }
+  .rules-btn-icon { height: 20px; margin-right: 0; top: 0; }
+}
+
 .rules-overlay {
   position: fixed;
   inset: 0;
