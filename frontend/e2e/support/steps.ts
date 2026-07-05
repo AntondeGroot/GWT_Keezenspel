@@ -1,4 +1,36 @@
-import { Page, expect } from '@playwright/test';
+import { Page, Browser, expect, request } from '@playwright/test';
+import { API_URL } from '../../playwright.config';
+import { createGame } from './seed';
+
+const UI = 'http://localhost:4300';
+
+/** Open the board in a fresh browser context viewing the game as `playerId`. */
+export async function viewAs(browser: Browser, sessionId: string, playerId: string): Promise<Page> {
+  const ctx = await browser.newContext();
+  await ctx.addCookies([{ name: 'playerid', value: playerId, url: UI }]);
+  const page = await ctx.newPage();
+  await page.goto(`/?sessionid=${sessionId}&playerid=${playerId}`);
+  await page.waitForSelector('app-card.card', { timeout: 30000 });
+  return page;
+}
+
+/** Seed a fresh N-player game, run optional backend setup, open it as `as`. */
+export async function openBoard(
+  browser: Browser,
+  opts: {
+    players?: number;
+    as?: string;
+    setup?: (api: Awaited<ReturnType<typeof request.newContext>>, sessionId: string) => Promise<void>;
+  } = {},
+): Promise<{ page: Page; sessionId: string }> {
+  const as = opts.as ?? 'player0';
+  const api = await request.newContext({ baseURL: API_URL });
+  const { sessionId } = await createGame(api, opts.players ?? 3);
+  if (opts.setup) await opts.setup(api, sessionId);
+  await api.dispose();
+  const page = await viewAs(browser, sessionId, as);
+  return { page, sessionId };
+}
 
 // A small Steps DSL over the Angular board — the Playwright equivalent of the GWT
 // IntegrationTests `Steps`/`TestUtils` helpers, driving moves through the real UI
@@ -23,6 +55,21 @@ export function dist(a: Pt, b: Pt): number {
 /** Click a pawn (dispatchEvent so clustered nest pawns still get the exact one). */
 export async function clickPawn(page: Page, id: string): Promise<void> {
   await page.getByTestId(`pawn-${id}`).dispatchEvent('click');
+}
+
+/** Hand cards currently in the viewer's hand (not flown to the pile). */
+export function handCards(page: Page) {
+  return page.locator('app-card.card:not(.played):not(.flyer)');
+}
+
+/** Cards resting on the central pile (played / forfeited). */
+export function pileCards(page: Page) {
+  return page.locator('app-card.card.played');
+}
+
+/** Forfeit the viewer's hand (click the Forfeit button). */
+export async function forfeit(page: Page): Promise<void> {
+  await page.locator('.forfeit-button').click();
 }
 
 /** A pawn is "selected" when the board sets its --pawn-highlight (pawn1/pawn2). */
