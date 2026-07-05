@@ -1,0 +1,148 @@
+// A team-aware scoreboard strip, pinned top-left below the title bar and the
+// Leave-game button. Decorative — pointer-events pass through to the board.
+:host {
+  position: fixed;
+  top: 106px;
+  left: 16px;
+  z-index: 20;
+  max-width: min(320px, 46vw);
+  pointer-events: none;
+  font-family: 'Lato', 'Helvetica Neue', sans-serif;
+
+  // Team accents — a separate channel from the players' pawn colours (avatar
+  // rings) and from the gold turn signal.
+  --team-a: #cf9350; // bronze
+  --team-b: #8fa8c8; // pewter
+  --team-c: #a6c07e; // sage
+  --team-d: #c98fb0; // mauve
+}
+
+/* ── Team summary lines (only in team games) ─────────────────────────── */
+.roster__teams {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 9px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.team-line { font-size: 12.5px; line-height: 1.4; }
+.team-line__lbl { font-weight: 800; letter-spacing: 0.03em; }
+.team-line[data-team='A'] .team-line__lbl { color: var(--team-a); }
+.team-line[data-team='B'] .team-line__lbl { color: var(--team-b); }
+.team-line[data-team='C'] .team-line__lbl { color: var(--team-c); }
+.team-line[data-team='D'] .team-line__lbl { color: var(--team-d); }
+.team-line__who { margin-left: 5px; color: #ded4ad; }
+
+/* ── Chip strip in turn order ────────────────────────────────────────── */
+.roster__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 11px 3px 3px;
+  border-radius: 999px;
+  background: rgba(6, 18, 11, 0.82);
+  border: 1px solid rgba(201, 162, 39, 0.26);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+// Avatar: the lobby profile picture, ringed in the player's in-game colour. The
+// initial shows through as a fallback when there's no picture (or it fails).
+.chip__avatar {
+  position: relative;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #1c2b20;
+  box-shadow: 0 0 0 2.5px var(--player-color), 0 0 0 3.5px #0a1610;
+}
+.chip__initial {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #fdf6e3;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+.chip__pic {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.chip__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e7ddb8;
+  white-space: nowrap;
+}
+
+.tag {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #14251b;
+}
+.tag[data-team='A'] { background: var(--team-a); }
+.tag[data-team='B'] { background: var(--team-b); }
+.tag[data-team='C'] { background: var(--team-c); }
+.tag[data-team='D'] { background: var(--team-d); }
+
+.chip__medal { flex: 0 0 auto; font-size: 15px; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5)); }
+
+.chip__dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f4d03f;
+  box-shadow: 0 0 8px 2px rgba(244, 208, 63, 0.7);
+  animation: turn-pulse 1.4s ease-in-out infinite;
+}
+@keyframes turn-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.82); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+
+// Player on turn: gold chip + glow.
+.chip--turn {
+  border-color: #f4d03f;
+  background: linear-gradient(rgba(244, 208, 63, 0.14), rgba(6, 18, 11, 0.85));
+  box-shadow: 0 0 14px rgba(244, 208, 63, 0.28);
+
+  .chip__name { color: #fdf3cf; font-weight: 700; }
+}
+
+// Left / finished / inactive: dimmed, grey ring, struck-through name.
+.chip--inactive {
+  opacity: 0.5;
+
+  .chip__avatar {
+    box-shadow: 0 0 0 2.5px #b9b3a2, 0 0 0 3.5px #0a1610;
+    filter: grayscale(0.5);
+  }
+  .chip__name { color: #b7ae9b; font-style: italic; text-decoration: line-through; }
+}
+
+@media (max-width: 620px) {
+  :host { top: 100px; left: 8px; max-width: min(260px, 62vw); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip__dot { animation: none; }
+}

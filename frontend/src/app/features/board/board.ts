@@ -12,6 +12,7 @@ import { PawnAndCardSelection } from './pawn-and-card-selection';
 import { pawnKey } from './pawn-key';
 import { Translations } from '../../i18n/translations.service';
 import { TranslationKey } from '../../i18n/keys';
+import { GameStore } from '../../game-store';
 import { MoveRejection } from './move-rejected/move-rejection.service';
 import { localRejectionKey, rejectionMessageKey } from './rejection-message';
 
@@ -65,6 +66,7 @@ export class Board implements OnInit, OnDestroy{
           if (fresh.length > 0) this.animateDeal(fresh);
         }
         this.prevHandUuids = new Set(cards.map((c) => c.uuid));
+        this.gameStore.players.set(next.players ?? []);
         this.state.set(next);
       });
     }
@@ -77,6 +79,7 @@ export class Board implements OnInit, OnDestroy{
   private readonly cardsService = inject(CardsService);
   protected readonly i18n = inject(Translations);
   private readonly rejection = inject(MoveRejection);
+  private readonly gameStore = inject(GameStore);
   private readonly session = resolveGameSession();
   private readonly sessionId = this.session.sessionId;
   private readonly viewerId = this.session.playerId;
