@@ -123,8 +123,8 @@ headless Chrome against the GWT DOM. They bind to **GWT-specific CSS classes** (
 | [x] | `PlayerStatusReal_IT.java` | 3 | D | ✅ `player-status.spec.ts` — real forfeit flips `chip--turn`/`chip--inactive` |
 | [x] | `Winner2Players_IT.java` | 2 | D | ✅ `winner.spec.ts` — medal to the right player + finished state |
 | [x] | `Winner_IT.java` | 1 | D | ✅ `winner.spec.ts` — medals in finishing order (gold, silver) |
-| [ ] | `GameStateLastMoveResponse_IT.java` | 2 | A | Stay Java (backend API) — not a frontend migration |
-| [ ] | `LeaveGame_IT.java` | 7 | A | Stay Java (backend API + raw SSE) |
+| [x] | `GameStateLastMoveResponse_IT.java` | 2 | A | ✅ Relocated → `ApiTests/GameStateLastMoveResponseTest` (`BaseUnitTest`, surefire) |
+| [x] | `LeaveGame_IT.java` | 7 | A | ✅ Relocated → `ApiTests/LeaveGameTest` (`BaseUnitTest`, surefire) |
 | — | `SendButtonSpinner_IT.java` | 0 | B | N/A — disabled stub (empty body); revisit if re-enabled |
 
 Buckets: **A** = pure backend (no browser), **B** = disabled stub, **C** = frontend-only
@@ -157,7 +157,9 @@ C bucket's testable assertions plus the real bucket-D E2E files (`MovingOnBoard_
 `CardDisplay_IT`, `CardAnimation_IT`, `CardSevenSplit_IT`, `JackAnimationFromOpponentPerspective_IT`,
 `MobileLayoutCheck_IT`, `PlayerStatusMock_IT`, `PlayerStatusReal_IT`, `Chat_IT`). The remaining three
 stay off the frontend by nature — no feature is now blocking:
-- **Stay Java (2, bucket A):** `GameStateLastMoveResponse_IT`, `LeaveGame_IT` (backend JSON/SSE).
+- **Backend API tests, relocated (2, bucket A):** `GameStateLastMoveResponse_IT` → `GameStateLastMoveResponseTest`
+  and `LeaveGame_IT` → `LeaveGameTest`, now under `ApiTests` extending `BaseUnitTest` (surefire, no
+  `@Tag("browser")`) alongside the other backend API tests. They never opened a browser.
 - **N/A stub (1, bucket B):** `SendButtonSpinner_IT` (disabled).
 
 ---
@@ -167,7 +169,7 @@ stay off the frontend by nature — no feature is now blocking:
 | Category | Migrated | Remaining |
 | --- | --- | --- |
 | GWT client unit tests | 11.5 / 12 files | `Cookie` only (6/18 migrated, other 12 GWT-only / N/A) |
-| GWT integration tests (`_IT`) | ~17 / 20 files (C bucket + 12 D files incl. Winner/Winner2Players + PlayerStatus×2 + Chat) | 2 stay Java (A), 1 N/A stub (B) |
+| GWT integration tests (`_IT`) | ~17 / 20 files (C bucket + 12 D incl. Winner×2, PlayerStatus×2, Chat); A relocated to backend | Only the B stub (`SendButtonSpinner_IT`, disabled), N/A |
 
 **Client unit tests: effectively complete.** Every migratable case is ported; the only unported
 GWT cases are `CookieTest`'s 12 locale-redirect tests, which are GWT-only (not applicable to
@@ -180,9 +182,12 @@ Angular). **Remaining work is all integration:** the 20 `*_IT` tests.
 Decision (chosen): a **hybrid** — route each `*_IT` to the cheapest home that can still make its
 assertion faithfully. See the bucket column in section 2.
 
-**A — Backend, stays Java (2).** `GameStateLastMoveResponse_IT`, `LeaveGame_IT` never open a browser;
-they assert backend JSON/HTTP + raw SSE. Not a frontend migration. Best relocated into the server
-test module; out of scope for `frontend/`.
+**A — Backend, stays Java (2). ✅ Relocated.** `GameStateLastMoveResponse_IT`, `LeaveGame_IT` never
+open a browser; they assert backend JSON/HTTP + raw SSE. Not a frontend migration. Moved out of the
+`IntegrationTests` (browser) package into `ApiTests` as `GameStateLastMoveResponseTest` / `LeaveGameTest`,
+extending `BaseUnitTest` (surefire, no `@Tag("browser")`) — so they run in the backend test job with the
+other API tests instead of the browser/failsafe job. Same Spring app boot (`SpringAppSuiteExtension`),
+same assertions; only their home and lifecycle group changed.
 
 **B — Disabled (1).** `SendButtonSpinner_IT` is an empty stub (logic commented out as flaky). Nothing
 to migrate; leave N/A until/if re-enabled.
@@ -299,7 +304,8 @@ forfeit when you must play — Play stays the green action. Covered by `e2e/forf
    a render smoke; real D tests target `MovingOnBoard_IT` / `Pawn_IT` / etc.)
 3. ~~Fan out the rest of C~~ ✅ **Done** — bucket C component-testing pass complete (see section 2).
    Then D, reusing the helper layer.
-4. Relocate bucket A into the backend test module; retire bucket B note.
+4. ~~Relocate bucket A into the backend test module; retire bucket B note.~~ ✅ **Done (A)** — both
+   moved to `ApiTests` (`BaseUnitTest`). Bucket B (`SendButtonSpinner_IT`) remains a disabled stub, N/A.
 5. ~~Build the Angular chat feature, then unblock `Chat_IT`.~~ ✅ **Done** — `app-chat` + `ChatService`
    (with a TS port of `ChatCipher`), shown only while the chat server is reachable; `Chat_IT` →
    `e2e/chat.spec.ts` (visibility + layout), with a `:4100` chat-server mock in the harness

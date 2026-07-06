@@ -1,11 +1,11 @@
-package adg.keezen.IntegrationTests;
+package adg.keezen.ApiTests;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import adg.keezen.ApiUtils.ApiUtil;
 import adg.keezen.utils.ApiCallsHelper;
-import adg.keezen.utils.BaseIntegrationTest;
+import adg.keezen.utils.BaseUnitTest;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
  * 2. CardsApiDelegateImpl not clearing lastMoveResponse on forfeit,
  *    causing the last move animation to replay after a forfeit.
  */
-public class GameStateLastMoveResponse_IT extends BaseIntegrationTest {
+public class GameStateLastMoveResponseTest extends BaseUnitTest {
 
   private static final int CARD_VALUE = 5;
 
