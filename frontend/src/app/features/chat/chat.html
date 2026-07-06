@@ -1,0 +1,27 @@
+@if (chat.available()) {
+  <section class="chat" aria-label="Chat">
+    <div class="chat__display" data-testid="chat-display">
+      @for (m of chat.messages(); track $index) {
+        <div class="chat__line">
+          <span class="chat__meta">{{ m.time }} {{ m.sender }}:</span>
+          <span class="chat__text">{{ m.text }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="chat__compose">
+      <input
+        #input
+        class="chat__input"
+        data-testid="chat-input"
+        type="text"
+        placeholder="Message"
+        aria-label="Chat message"
+        (keydown.enter)="send(input)"
+      />
+      <button class="chat__send" data-testid="chat-send" type="button" (click)="send(input)">
+        Send
+      </button>
+    </div>
+  </section>
+}
