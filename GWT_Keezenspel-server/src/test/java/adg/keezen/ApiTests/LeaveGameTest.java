@@ -1,10 +1,10 @@
-package adg.keezen.IntegrationTests;
+package adg.keezen.ApiTests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import adg.keezen.ApiUtils.ApiUtil;
 import adg.keezen.utils.ApiCallsHelper;
-import adg.keezen.utils.BaseIntegrationTest;
+import adg.keezen.utils.BaseUnitTest;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -27,7 +27,7 @@ import org.springframework.web.client.HttpClientErrorException;
  * - The player is marked inactive with no medal
  * - The game is removed from the registry when all players leave
  */
-public class LeaveGame_IT extends BaseIntegrationTest {
+public class LeaveGameTest extends BaseUnitTest {
 
   private final ApiCallsHelper apiHelper = new ApiCallsHelper();
   private String sessionId;
