@@ -112,7 +112,7 @@ headless Chrome against the GWT DOM. They bind to **GWT-specific CSS classes** (
 | [x] | `PawnHighlightColors_IT.java` | 7 | C | ✅ `pawn-highlight-render.spec.ts` (wiring) + `pawn-highlight.spec.ts` (colour maths) |
 | [ ] | `MobileLocale_IT.java` | 5 | C | ✅ `board-render.spec.ts` i18n text (2); `mobile.html` redirect + reload = N/A (SPA) |
 | [x] | `MobileLayoutCheck_IT.java` | 2 | D | ✅ `mobile-layout.spec.ts` (2–8 players: board/roster/buttons on screen, no overlap) |
-| [ ] | `Chat_IT.java` | 5 | ~~C~~ **blocked** | No Angular chat feature yet — nothing to test until it's built |
+| [x] | `Chat_IT.java` | 4 | D | ✅ `chat.spec.ts` — chat feature built (`app-chat`); visibility gated on server + layout |
 | [x] | `CardAnimation_IT.java` | 1 | D | ✅ `card-animation.spec.ts` (1/1) — no-pawn move keeps the card |
 | [x] | `CardDisplay_IT.java` | 5 | D | ✅ `card-display.spec.ts` — hand renders, forfeit→pile, next player has hand |
 | [x] | `CardSevenSplit_IT.java` | 1 | D | ✅ `card-seven-split.spec.ts` (1/1) — re-select-7 reset regression |
@@ -143,7 +143,7 @@ green under `ng test`. On inspection bucket C was not uniformly jsdom-testable, 
   static `index.html`), `MobileLocale_IT` (i18n button text done; `mobile.html` redirect + reload = N/A
   for a responsive SPA).
 - **Reclassified C → D:** `MobileLayoutCheck_IT` (viewport/overlap geometry — needs a real browser).
-- **Blocked:** `Chat_IT` — the Angular app has **no chat feature yet**; can't test UI that doesn't exist.
+- **Now built & migrated:** `Chat_IT` — the Angular chat feature (`app-chat`) exists; see bucket D.
 
 **Winner/medal feature built + `Winner_IT`/`Winner2Players_IT` migrated.** The backend already
 populates `place` (1/2/3) and `isActive` on a finisher; the roster (built earlier) renders the medal
@@ -152,14 +152,11 @@ announces each finisher with a celebratory plaque. Covered by `winner-banner.spe
 tests) and `e2e/winner.spec.ts` (3): 2-player winner gets gold + finished + banner; the 2-player
 bug guard (the winner, not the other colour, gets the medal); 3-player medals in finishing order.
 
-**Integration total: ~16 / 20 covered on the frontend — every readily-migratable IT is now done.**
+**Integration total: ~17 / 20 covered on the frontend — every migratable IT is now done.**
 C bucket's testable assertions plus the real bucket-D E2E files (`MovingOnBoard_IT`, `Pawn_IT`,
 `CardDisplay_IT`, `CardAnimation_IT`, `CardSevenSplit_IT`, `JackAnimationFromOpponentPerspective_IT`,
-`MobileLayoutCheck_IT`, `PlayerStatusMock_IT`, `PlayerStatusReal_IT`). The remaining four are **not**
-currently migratable:
-- **Blocked on an unbuilt Angular feature (1):** `Chat_IT` — no chat UI yet. (The player-status UI
-  turned out to already exist — the roster renders `isPlaying`/`isActive` — so `PlayerStatus*_IT`
-  were migratable after all; see below. Winner/medal is likewise built.)
+`MobileLayoutCheck_IT`, `PlayerStatusMock_IT`, `PlayerStatusReal_IT`, `Chat_IT`). The remaining three
+stay off the frontend by nature — no feature is now blocking:
 - **Stay Java (2, bucket A):** `GameStateLastMoveResponse_IT`, `LeaveGame_IT` (backend JSON/SSE).
 - **N/A stub (1, bucket B):** `SendButtonSpinner_IT` (disabled).
 
@@ -170,7 +167,7 @@ currently migratable:
 | Category | Migrated | Remaining |
 | --- | --- | --- |
 | GWT client unit tests | 11.5 / 12 files | `Cookie` only (6/18 migrated, other 12 GWT-only / N/A) |
-| GWT integration tests (`_IT`) | ~16 / 20 files (C bucket + 11 D files incl. Winner/Winner2Players + PlayerStatus×2) | 1 blocked (Chat, needs feature), 2 stay Java (A), 1 N/A stub (B) |
+| GWT integration tests (`_IT`) | ~17 / 20 files (C bucket + 12 D files incl. Winner/Winner2Players + PlayerStatus×2 + Chat) | 2 stay Java (A), 1 N/A stub (B) |
 
 **Client unit tests: effectively complete.** Every migratable case is ported; the only unported
 GWT cases are `CookieTest`'s 12 locale-redirect tests, which are GWT-only (not applicable to
@@ -215,7 +212,7 @@ rendering `Board` in a component test without a backend:
 7-split math, SSE-driven animation). Rewrite against a **real backend** using the existing test-only
 seeding hooks.
 
-**Bucket-D real migrations landed — the harness is in place (10 files, 27 cases).**
+**Bucket-D real migrations landed — the harness is in place (11 files, 30 cases).**
 - `MovingOnBoard_IT` → `e2e/moving-on-board.spec.ts` (4/4): nest→board with Ace, nest→board with
   King, on-board move with Ace, Jack switch — real UI moves, positions asserted via SSE.
 - `Pawn_IT` (selection) → `e2e/pawn-selection.spec.ts` (3): click own pawn selects it, second own
@@ -235,6 +232,10 @@ seeding hooks.
 - `MobileLayoutCheck_IT` → `e2e/mobile-layout.spec.ts` (7): for 2–8 players the board, roster and
   buttons are all on screen and never overlap. (Largely overlaps the existing `controls-layout` /
   `board-layout` suites, now made explicit per player count.)
+- `Chat_IT` → `e2e/chat.spec.ts` (3, covering its 4 assertions): the chat panel is hidden while the
+  chat server is down, shows input/send/display once it's up, and the send button sits just above the
+  footer. Needed a new feature (`app-chat` + `ChatService` + a TS `ChatCipher` port) and a `:4100`
+  chat-server mock in the harness (`e2e/support/chat-mock.ts`, the Playwright twin of `ChatServerMock`).
 - `PlayerStatusReal_IT` + `PlayerStatusMock_IT` → `e2e/player-status.spec.ts` (2 + 4): the turn/active
   state on the roster. Real: a UI forfeit flips the forfeiter's chip to `chip--turn` off + `chip--inactive`
   on and lights up the next seat. Mock: a serial turn-walk (player0 → forfeit → player1 → forfeit →
@@ -277,8 +278,8 @@ forfeit when you must play — Play stays the green action. Covered by `e2e/forf
 > `isPlaying` and `chip--inactive` to `!isActive`, the exact Angular equivalent of GWT's
 > `playerPlaying playerActive` / `playerNotPlaying playerInactive` classes (`ViewDrawing.java:281`).
 > So `PlayerStatus*_IT` were migratable against the existing roster — no feature build was needed,
-> just the E2E specs (`player-status.spec.ts`). The **only** D target still blocked on an unbuilt
-> feature is `Chat_IT` (no chat UI).
+> just the E2E specs (`player-status.spec.ts`). `Chat_IT`'s chat feature has since been built
+> (`app-chat` + `ChatService`), so no D target is blocked on an unbuilt feature any more.
 
 ### Cross-cutting decisions
 - **Selectors:** add `data-testid` attributes to Angular components as the stable selector layer.
@@ -299,4 +300,7 @@ forfeit when you must play — Play stays the green action. Covered by `e2e/forf
 3. ~~Fan out the rest of C~~ ✅ **Done** — bucket C component-testing pass complete (see section 2).
    Then D, reusing the helper layer.
 4. Relocate bucket A into the backend test module; retire bucket B note.
-5. Build the Angular chat feature, then unblock `Chat_IT`.
+5. ~~Build the Angular chat feature, then unblock `Chat_IT`.~~ ✅ **Done** — `app-chat` + `ChatService`
+   (with a TS port of `ChatCipher`), shown only while the chat server is reachable; `Chat_IT` →
+   `e2e/chat.spec.ts` (visibility + layout), with a `:4100` chat-server mock in the harness
+   (`e2e/support/chat-mock.ts`).
