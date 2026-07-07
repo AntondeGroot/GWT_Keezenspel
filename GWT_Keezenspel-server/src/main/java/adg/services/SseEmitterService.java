@@ -2,8 +2,10 @@ package adg.services;
 
 import adg.keezen.GameSession;
 import adg.keezen.GameState;
+import adg.keezen.TradeRequest;
 import adg.processing.MoveAvailabilityChecker;
 import com.adg.openapi.model.Card;
+import com.adg.openapi.model.Trade;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -156,6 +158,15 @@ public class SseEmitterService {
 
     if (playerId.equals(gs.getPlayerIdTurn()) && !canForfeit) {
       gs.recordMustPlayBlocked();
+    }
+
+    // A pending team card-trade is public (both the requester and their teammate act on it).
+    TradeRequest pending = gs.getPendingTrade();
+    if (pending != null) {
+      push.setTrade(new Trade()
+          .requesterId(pending.getRequesterId())
+          .teammateId(pending.getTeammateId())
+          .offeredCard(pending.getOfferedCard()));
     }
 
     return push;

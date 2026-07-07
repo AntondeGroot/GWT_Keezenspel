@@ -562,7 +562,7 @@ public class GameState {
    * trade is already pending. Returns true if the request was recorded.
    */
   public boolean requestTrade(String requesterId, Card offeredCard) {
-    if (!teamPlay || !teamCardTrade || pendingTrade != null) {
+    if (!hasStarted || !teamPlay || !teamCardTrade || pendingTrade != null) {
       return false;
     }
     String teammate = teammateOf(requesterId);
