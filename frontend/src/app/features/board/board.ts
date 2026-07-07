@@ -12,6 +12,7 @@ import { Card } from './card/card';
 import { PlayerList } from '../player-list/player-list';
 import {highlightForPawn1, highlightForPawn2} from './pawn-highlight';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
+import { teammateCaptureKeys } from './teammate-capture';
 import { pawnKey } from './pawn-key';
 import { Translations } from '../../i18n/translations.service';
 import { TranslationKey } from '../../i18n/keys';
@@ -555,6 +556,24 @@ export class Board implements OnInit, OnDestroy{
   protected readonly previewTiles = signal<Set<string>>(new Set());
   protected isPreview(playerId: string, tileNr: number): boolean {
     return this.previewTiles().has(`${playerId}:${tileNr}`);
+  }
+
+  // Of those, the ones that would land on a teammate's pawn (team play only) — the board
+  // warns on these in red instead of the usual gold. The mover is the viewer (you only ever
+  // preview your own move); step 4 (playing a teammate's pawns) will generalise the mover.
+  protected readonly teammateCaptureTiles = computed(() => {
+    const s = this.state();
+    if (!s?.pawns || !s.players || !this.viewerId) return new Set<string>();
+    const teamOf = (playerId: string) =>
+      s.players!.find((p) => p.id === playerId)?.teamId ?? null;
+    const occupants = s.pawns.map((p) => ({
+      key: `${p.currentTileId.playerId}:${p.currentTileId.tileNr}`,
+      ownerId: p.playerId,
+    }));
+    return teammateCaptureKeys(this.previewTiles(), occupants, teamOf, this.viewerId);
+  });
+  protected isTeammateCapture(playerId: string, tileNr: number): boolean {
+    return this.teammateCaptureTiles().has(`${playerId}:${tileNr}`);
   }
 
   // Preview the current selection: ask the server which tile(s) it would land on

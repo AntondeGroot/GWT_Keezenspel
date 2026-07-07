@@ -116,6 +116,41 @@
   }
 }
 
+// Teammate-capture warning: landing here would send your own side home. Deliberately NOT
+// just "gold but red" — a persistent red ring plus a throbbing fill reads differently in
+// FORM from the gold grow-in disc, so it's distinguishable without relying on hue alone.
+.tile-capture-warning::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 2px solid #e0473a;
+  pointer-events: none;
+  animation: redWarnPulse 0.8s ease-in-out infinite;
+}
+
+@keyframes redWarnPulse {
+  0%,
+  100% {
+    background-color: rgba(224, 71, 58, 0.25);
+  }
+  50% {
+    background-color: rgba(224, 71, 58, 0.78);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile-capture-warning::after {
+    animation: none;
+    background-color: rgba(224, 71, 58, 0.6);
+  }
+}
+
 // A pawn (the <app-pawn> SVG). Size is tied to --cell (≈1.43 × cell, which is
 // 50px when cell≈35 at 3 players) so pawns shrink as the board/cells shrink.
 // left/top are the tile CENTRE; translate centres the pawn and lifts it so it
