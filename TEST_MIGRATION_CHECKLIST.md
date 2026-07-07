@@ -194,9 +194,11 @@ Flows with backend-logic tests but **no** GWT IT and (until noted) no Angular E2
 | Flow | GWT IT? | Angular E2E? | Notes |
 | --- | --- | --- | --- |
 | Play a full **7-split** (select 7 + 2 pawns + steps → Play) | ✗ (only the step-box UI regression) | ✅ **added** — `card-seven-split.spec.ts` › "playing a 7-split" | Guards the played-7-lingers-in-hand regression (2026 bugfix) |
-| **Capture / kill** (land on an opponent → sent home) | ✗ | ✗ | Backend `MovingAndKillTest` only |
-| Play a **Four** (move backward) | ✗ | ✗ | Backend logic only |
-| Play a **Queen** (12 forward) | ✗ | ✗ | Backend logic only |
+| **Capture / kill** (land on an opponent → sent home) | ✗ | ✅ **added** — `card-plays.spec.ts` | Backend `MovingAndKillTest` also |
+| Play a **Four** (move backward) | ✗ | ✅ **added** — `card-plays.spec.ts` | Backend logic also |
+| Play a **Queen** (12 forward) | ✗ | ✅ **added** — `card-plays.spec.ts` | Backend logic also |
+
+All four gap flows now have an end-to-end UI test. Remaining rows are placeholders for future gaps.
 
 Already covered through the UI in E2E (not gaps): **Ace**/**King** (nest → board), **Jack switch**
 (`moving-on-board.spec.ts`; also observer-side via API in `jack-animation.spec.ts`), forfeit, winner
