@@ -52,4 +52,7 @@ export const fr: Dictionary = {
   moveRejectedPawnClosedInFinish: "Ce pion est enfermé dans l'arrivée et ne peut pas bouger.",
   moveRejectedSplitNeedsTwoOwnPawns: 'Une division du 7 nécessite deux de vos propres pions.',
   moveRejectedSplitStepsNotSeven: 'Les deux parties du 7 doivent totaliser 7 cases.',
+  moveRejectedMustFinishOwnPawnsFirst: 'Rentre d\'abord tous tes propres pions avant de jouer ceux de ton coéquipier.',
+  teamHandoffTitle: 'Tes pions sont à l\'arrivée !',
+  teamHandoffMessage: 'Tu peux maintenant jouer les pions de ton coéquipier.',
 };

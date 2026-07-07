@@ -11,8 +11,10 @@ import adg.util.PawnAndCardSelectionValidation;
 import adg.util.SelectionValidation;
 import com.adg.openapi.api.MovesApiDelegate;
 import com.adg.openapi.model.Card;
+import com.adg.openapi.model.MoveRejectionReason;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
+import com.adg.openapi.model.MoveResult;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.TestMoveResponse;
 import java.util.Objects;
@@ -112,6 +114,13 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
     }
 
     MoveResponse response = new MoveResponse();
+    // Team-play hand-off: you must finish your own pawns before playing a teammate's. Gated
+    // here so every move type (and the preview) inherits it; a no-op when teams are off.
+    if (!gameState.isTeamMoveAllowed(playerId, pawn1)) {
+      response.setResult(MoveResult.CANNOT_MAKE_MOVE);
+      response.setRejectionReason(MoveRejectionReason.MUST_FINISH_OWN_PAWNS_FIRST);
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    }
     switch (validation.getMoveType()) {
       case MOVE -> gameState.processOnMove(moveRequest, response);
       case SPLIT -> gameState.processOnSplit(moveRequest, response);

@@ -1,0 +1,49 @@
+// A friendly, self-dismissing banner near the top of the board — same wood/gold family as
+// the move-rejected dialog, but positive and non-blocking (it slides in and fades away).
+.team-handoff-toast {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  max-width: 380px;
+  width: min(88%, 380px);
+  padding: 14px 22px;
+  text-align: center;
+  color: #e8d5a0;
+  background-image: linear-gradient(160deg, #1f1000 0%, #0d0800 100%);
+  border: 2px solid #c9a227;
+  border-radius: 12px;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(201, 162, 39, 0.25);
+  cursor: pointer;
+  animation: handoffIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes handoffIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.team-handoff-title {
+  font: 700 1.05em 'Cinzel', Georgia, serif;
+  color: #f4d03f;
+  margin-bottom: 2px;
+}
+.team-handoff-text {
+  font-size: 0.92em;
+  line-height: 1.35;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .team-handoff-toast {
+    animation: none;
+  }
+}

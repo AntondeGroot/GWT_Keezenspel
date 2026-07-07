@@ -452,11 +452,42 @@ public class GameState {
   // ── Winner tracking ───────────────────────────────────────────────────────
 
   public void checkForWinners(ArrayList<String> winners) {
+    if (teamPlay) {
+      checkForTeamWinners(winners);
+      return;
+    }
     for (Player player : players) {
       if (!winners.contains(player.getId()) && hasAllPawnsOnFinish(player.getId())) {
         recordWinner(player, winners);
       }
     }
+  }
+
+  /**
+   * In team play a team places only when <em>both</em> members have all their pawns home — so a
+   * player who finishes their own pawns first gets no place yet, stays active, and keeps taking
+   * turns (to play their teammate's pawns) until the pair is done. Both members share the place.
+   */
+  private void checkForTeamWinners(ArrayList<String> winners) {
+    for (Player player : players) {
+      Integer team = player.getTeamId();
+      if (team == null || winners.contains(player.getId())) {
+        continue;
+      }
+      List<Player> members = teamMembers(team);
+      if (members.stream().allMatch(m -> hasAllPawnsOnFinish(m.getId()))) {
+        int place = winners.size() / 2 + 1; // teams are pairs (see assignTeams)
+        for (Player member : members) {
+          recordWinner(member, place, winners);
+        }
+      }
+    }
+  }
+
+  private List<Player> teamMembers(int teamId) {
+    return players.stream()
+        .filter(p -> Integer.valueOf(teamId).equals(p.getTeamId()))
+        .toList();
   }
 
   private boolean hasAllPawnsOnFinish(String playerId) {
@@ -468,12 +499,41 @@ public class GameState {
   }
 
   private void recordWinner(Player player, ArrayList<String> winners) {
-    player.setPlace(winners.size() + 1);
+    recordWinner(player, winners.size() + 1, winners);
+  }
+
+  private void recordWinner(Player player, int place, ArrayList<String> winners) {
+    player.setPlace(place);
     winners.add(player.getId());
     cardsDeck.forfeitCardsForPlayer(player.getId());
     player.setIsPlaying(false);
     player.setIsActive(false);
     version.incrementAndGet();
+  }
+
+  /**
+   * Team-play hand-off rule: you may move your own pawns freely, but a teammate's pawns only
+   * once all of your own are home — and never a non-teammate's pawn. No restriction when teams
+   * are off. Gated at the move entry point so every move type inherits it.
+   */
+  public boolean isTeamMoveAllowed(String moverId, Pawn pawn) {
+    if (!teamPlay || pawn == null) {
+      return true;
+    }
+    String owner = pawn.getPlayerId();
+    if (owner.equals(moverId)) {
+      return true; // your own pawn
+    }
+    if (!sameTeam(moverId, owner)) {
+      return false; // never an opponent's pawn
+    }
+    return hasAllPawnsOnFinish(moverId); // a teammate's pawn, only after your own are home
+  }
+
+  private boolean sameTeam(String playerA, String playerB) {
+    Player a = findPlayerById(playerA);
+    Player b = findPlayerById(playerB);
+    return a != null && b != null && a.getTeamId() != null && a.getTeamId().equals(b.getTeamId());
   }
 
   // ── Board logic ───────────────────────────────────────────────────────────

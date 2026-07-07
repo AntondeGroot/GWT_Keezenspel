@@ -51,4 +51,7 @@ export const nb: Dictionary = {
   moveRejectedPawnClosedInFinish: 'Den brikken er stengt inne på mål og kan ikke flytte.',
   moveRejectedSplitNeedsTwoOwnPawns: 'En 7-deling krever to av dine egne brikker.',
   moveRejectedSplitStepsNotSeven: 'De to delene av 7-eren må til sammen bli 7 steg.',
+  moveRejectedMustFinishOwnPawnsFirst: 'Få alle dine egne brikker i mål før du spiller lagkameratens.',
+  teamHandoffTitle: 'Brikkene dine er i mål!',
+  teamHandoffMessage: 'Du kan nå spille lagkameratens brikker.',
 };
