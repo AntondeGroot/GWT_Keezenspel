@@ -23,7 +23,9 @@
   flex-direction: column;
   align-items: center;
 
-  --board-w: min(600px, calc(96vw / 1.24), calc((100vh - 230px) / 1.42));
+  // Height budget uses dvh (the *visible* viewport) so the board fits between the mobile
+  // browser's top/bottom chrome instead of being sized to the full screen.
+  --board-w: min(600px, calc(96vw / 1.24), calc((100dvh - 230px) / 1.42));
   --hand-top: calc(0.12 * var(--board-w));
 }
 
@@ -436,7 +438,7 @@
 // onto a second (overflowing) row. Placed last so it overrides the base button
 // rules above (notably the `font` shorthand, which would otherwise reset the size).
 @media (max-width: 699px) {
-  .play { --board-w: min(600px, calc(96vw / 1.24), calc((100vh - 348px) / 1.42)); }
+  .play { --board-w: min(600px, calc(96vw / 1.24), calc((100dvh - 348px) / 1.42)); }
 
   .button-container { padding: 8px; gap: 6px; max-width: 148px; }
   .send-button,

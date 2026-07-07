@@ -3,7 +3,8 @@
 html,
 body {
   margin: 0;
-  height: 100vh;
+  height: 100vh; // fallback for browsers without dvh
+  height: 100dvh; // the *visible* viewport — excludes mobile browser chrome (address bar / nav bar)
   overflow: hidden; // clip to the viewport — no scrollbar (matches the original)
   background: radial-gradient(ellipse at center, #1a3a1a 0%, #0d1f0d 100%);
   font-family: 'Lato', 'Helvetica Neue', sans-serif;
