@@ -7,7 +7,7 @@
                [class.tile-highlight-pulse]="isPreview(t.playerId, t.tileNr)"
                [style.left.%]="t.x / 6"
                [style.top.%]="t.y / 6"
-               [style.background-color]="t.color"></div>
+               [style.--tile-color]="t.color"></div>
         }
         @for (p of pawns(); track p.id){
           <app-pawn class="pawn"

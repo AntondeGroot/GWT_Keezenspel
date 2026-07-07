@@ -1,7 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { GameStore } from '../../game-store';
 import { Player } from '../../api';
-import { basePath } from '../../base-path';
+import { seatColor } from '../../player-colors';
 
 const MEDALS: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
@@ -53,12 +53,15 @@ export class PlayerList {
     const chips: Chip[] = players.map((p, i) => ({
       id: p.id ?? String(i),
       name: p.name ?? '',
-      color: p.color ?? '#8a8a8a',
+      color: seatColor(p.playerInt),
       isPlaying: p.isPlaying === true,
       isActive: p.isActive !== false,
       medal: MEDALS[p.place ?? -1] ?? '',
       team: teamsOn ? teamLetter(teamOf(p)) : null,
-      avatar: p.profilePic ? `${basePath()}/profile-pic/${p.profilePic}` : null,
+      // Profile pics are served by GameRoom at the site ROOT (nginx `location /` → :4100),
+      // not by the Keezen backend — so this is a root-absolute URL, NOT basePath-prefixed
+      // (a /keezen/… URL would hit the Keezen backend, which has no profile-pic endpoint).
+      avatar: p.profilePic ? `/profile-pic/${p.profilePic}` : null,
       initial: (p.name?.trim()?.[0] ?? '?').toUpperCase(),
     }));
 

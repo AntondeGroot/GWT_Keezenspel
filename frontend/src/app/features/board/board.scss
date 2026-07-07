@@ -77,15 +77,15 @@
   border: 1px solid rgba(0, 0, 0, 0.4);
   border-radius: 50%;
 
-  // Background colour is set per-tile inline by the component (#f2f2f2 for the
-  // neutral track, the owner's colour for start / nest / finish). This is just a
-  // fallback if none is bound.
-  background-color: #f2f2f2;
-  // Colour-agnostic 3D disc: translucent dark top-left + light bottom-right, so
-  // the inset highlight/shadow works on any tile colour (no per-colour shades).
+  // --tile-color is set per-tile inline by the component (#f2f2f2 for the neutral
+  // track, the owner's colour for start / nest / finish); #f2f2f2 fallback if unbound.
+  background-color: var(--tile-color, #f2f2f2);
+  // 3D disc shaded from the tile's OWN colour (ported from GWT's darken/lighten):
+  // a darker shade top-left, a lighter shade bottom-right — a lighter tint of the
+  // colour, not flat white.
   box-shadow:
-    inset 3px 3px 4px rgba(0, 0, 0, 0.35),
-    inset -4px -4px 4px rgba(255, 255, 255, 0.5);
+    inset 3px 3px 4px color-mix(in srgb, var(--tile-color, #f2f2f2) 60%, #000),
+    inset -4px -4px 4px color-mix(in srgb, var(--tile-color, #f2f2f2) 50%, #fff);
 }
 
 // Move preview: a gold disc pulsing over a tile the selected move would land on
