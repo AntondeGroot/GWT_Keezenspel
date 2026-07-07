@@ -61,6 +61,7 @@ public class ProcessOnSplit {
 
     if (!pawnsAreSamePlayer()) return;
     if (!cardIsSeven()) return;
+    if (!playerHoldsCard()) return;
     if (!stepsAddUpToSeven()) return;
 
     buildSplitMoveRequests();
@@ -98,6 +99,20 @@ public class ProcessOnSplit {
     if (!isSeven(card)) {
       response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
       response.setRejectionReason(MoveRejectionReason.WRONG_CARD_FOR_MOVE);
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Reject a split whose 7 the player no longer holds (e.g. already played and now on the
+   * pile). The single-move path guards this in GameState.processMove; the split path must
+   * too, so a played card can't be re-used even for a CHECK preview.
+   */
+  private boolean playerHoldsCard() {
+    if (!gs.playerHasCard(playerId, card)) {
+      response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
+      response.setRejectionReason(MoveRejectionReason.DONT_HAVE_CARD);
       return false;
     }
     return true;

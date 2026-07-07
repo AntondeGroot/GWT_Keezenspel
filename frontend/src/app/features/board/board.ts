@@ -301,7 +301,15 @@ export class Board implements OnInit, OnDestroy{
           tileNr: p.currentTileId.tileNr,
         })),
       );
-      this.selection.setHand((s?.playerCards ?? []).map((c) => ({ id: c.uuid, value: c.value })));
+      // Exclude cards already on the pile so a played card can never be (auto-)selected —
+      // the display hand does the same (see `handCards`). Guards against a played card
+      // lingering in the server's playerCards for a beat after it flew to the pile.
+      const pileUuids = new Set(this.pile().map((c) => c.uuid));
+      this.selection.setHand(
+        (s?.playerCards ?? [])
+          .filter((c) => !pileUuids.has(c.uuid))
+          .map((c) => ({ id: c.uuid, value: c.value })),
+      );
       this.touch();
     });
 

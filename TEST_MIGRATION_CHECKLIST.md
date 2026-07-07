@@ -177,6 +177,37 @@ Angular). **Remaining work is all integration:** the 20 `*_IT` tests.
 
 ---
 
+## Coverage gaps (beyond migration)
+
+**Migration is not the same as coverage.** This document tracks porting the *existing* GWT tests
+1-for-1. It does **not** claim the Angular app is fully tested — because the GWT suite itself never
+exercised some flows through the browser, and a faithful migration can only preserve the coverage
+that existed, not invent tests for behaviour that was only ever checked at the backend-logic level
+(or not at all). The **game logic** for everything below is covered by the server-side Java unit
+tests (`MovingWithCard7Test`, `MovingAndKillTest`, `SevenSplitRecommenderTest`, `ExactMoveRequiredTest`,
+…), which are **out of scope for the Angular migration** (they stay Java, see the Scope table). The
+gap is specifically **end-to-end UI coverage** — driving the play through the Angular UI and asserting
+the result.
+
+Flows with backend-logic tests but **no** GWT IT and (until noted) no Angular E2E:
+
+| Flow | GWT IT? | Angular E2E? | Notes |
+| --- | --- | --- | --- |
+| Play a full **7-split** (select 7 + 2 pawns + steps → Play) | ✗ (only the step-box UI regression) | ✅ **added** — `card-seven-split.spec.ts` › "playing a 7-split" | Guards the played-7-lingers-in-hand regression (2026 bugfix) |
+| **Capture / kill** (land on an opponent → sent home) | ✗ | ✗ | Backend `MovingAndKillTest` only |
+| Play a **Four** (move backward) | ✗ | ✗ | Backend logic only |
+| Play a **Queen** (12 forward) | ✗ | ✗ | Backend logic only |
+
+Already covered through the UI in E2E (not gaps): **Ace**/**King** (nest → board), **Jack switch**
+(`moving-on-board.spec.ts`; also observer-side via API in `jack-animation.spec.ts`), forfeit, winner
+medals, hand/pile display.
+
+> Lesson: when a UI regression appears in a flow with no browser test (like the played-7 bugs), the
+> fix should land **with** a new E2E for that flow — it's *new* coverage, not a migration. Add rows
+> here as those gaps get closed.
+
+---
+
 ## Part 3: Integration test strategy (hybrid)
 
 Decision (chosen): a **hybrid** — route each `*_IT` to the cheapest home that can still make its
