@@ -5,15 +5,13 @@ import { seatColor } from '../../player-colors';
 
 const MEDALS: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
-// teamId isn't in the generated Player model yet — read it defensively so team
-// mode lights up automatically once the backend starts sending it.
-function teamOf(p: Player): string | number | null {
-  const t = (p as { teamId?: string | number | null }).teamId;
-  return t ?? null;
+// teamId is set by the backend only in team games (0-based, opposite-seat pairs);
+// null otherwise, so team mode lights up on its own when teams are on.
+function teamOf(p: Player): number | null {
+  return p.teamId ?? null;
 }
-function teamLetter(t: string | number | null): string {
-  if (t == null) return '';
-  return typeof t === 'number' ? String.fromCharCode(65 + t) : String(t);
+function teamLetter(t: number | null): string {
+  return t == null ? '' : String.fromCharCode(65 + t);
 }
 
 interface Chip {

@@ -478,6 +478,9 @@ components:
         playerInt:
           description: under the hood this is player 0 til player 8, this makes it easier to see who is the next player etc.
           type: integer
+        teamId:
+          description: 0-based team index in team play (0 = Team A, 1 = Team B); null when teams are off
+          type: integer
 
     GameState:
       type: object

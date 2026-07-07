@@ -38,7 +38,17 @@ public class KeezenGameOptions {
             TypeEnum.BOOLEAN,
             "true")
             .labelKey("gameOption.mustPlayIfPossible.label")
-            .descriptionKey("gameOption.mustPlayIfPossible.description")
+            .descriptionKey("gameOption.mustPlayIfPossible.description"),
+        new GameOption(
+            "teamPlay",
+            "Team play",
+            "Play in teams of two: each player pairs with the player directly opposite, so the "
+                + "table splits into pairs (8 players make 4 teams). Teammates help each other, and "
+                + "a team wins once both members' pawns are all home.",
+            TypeEnum.BOOLEAN,
+            "false")
+            .labelKey("gameOption.teamPlay.label")
+            .descriptionKey("gameOption.teamPlay.description")
     );
   }
 
@@ -53,6 +63,7 @@ public class KeezenGameOptions {
     switch (key) {
       case "exactMoveRequired"    -> gameState.setExactMoveRequired(toBoolean(value));
       case "mustPlayIfPossible"   -> gameState.setMustPlayIfPossible(toBoolean(value));
+      case "teamPlay"             -> gameState.setTeamPlay(toBoolean(value));
       default -> Log.info("KeezenGameOptions: unknown option key '" + key + "', ignoring");
     }
   }
