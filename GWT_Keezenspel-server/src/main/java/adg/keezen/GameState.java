@@ -42,6 +42,7 @@ public class GameState {
   private volatile int animationSpeed;
   private volatile boolean exactMoveRequired = false;
   private volatile boolean mustPlayIfPossible = false;
+  private volatile boolean teamPlay = false;
   private volatile long mustPlayBlockedSinceMs = 0;
   private static final long MUST_PLAY_TIMEOUT_MS = 3 * 60 * 1000L;
   private Boolean hasStarted = false;
@@ -62,6 +63,7 @@ public class GameState {
     hasStarted = true;
     if (shuffle) shufflePlayers();
     assignPlayerInts();
+    assignTeams();
     activateAllPlayers();
     initializePawns();
     initializeCards();
@@ -103,6 +105,27 @@ public class GameState {
     int i = 0;
     for (Player player : players) {
       player.setPlayerInt(i++);
+    }
+  }
+
+  /**
+   * In team play, teams are PAIRS: each player teams up with the player directly opposite
+   * (seat + n/2). So n players make n/2 teams — 4→2, 6→3, 8→4. teamId = seat % (n/2), which
+   * pairs seat i with seat i+n/2 under the same id. Assigned only for an even count of at least
+   * four (2 players would be a single pair with no opponents; odd counts can't pair) — otherwise
+   * teamId stays null, the state omits it, and the roster shows no teams. Runs after
+   * assignPlayerInts.
+   */
+  private void assignTeams() {
+    int n = players.size();
+    if (!teamPlay || n < 4 || n % 2 != 0) return;
+    int teamCount = n / 2;
+    // The loop index is the seat: this runs right after assignPlayerInts over the same list,
+    // so index == playerInt (and avoids unboxing the nullable getPlayerInt()).
+    int seat = 0;
+    for (Player player : players) {
+      player.setTeamId(seat % teamCount);
+      seat++;
     }
   }
 
@@ -826,6 +849,14 @@ public class GameState {
 
   public boolean isMustPlayIfPossible() {
     return mustPlayIfPossible;
+  }
+
+  public void setTeamPlay(boolean teamPlay) {
+    this.teamPlay = teamPlay;
+  }
+
+  public boolean isTeamPlay() {
+    return teamPlay;
   }
 
   public void recordMustPlayBlocked() {

@@ -61,7 +61,33 @@ public final class GameOptionTranslations {
           "nb", "Når aktivert kan du ikke stå over turen hvis et gyldig trekk er mulig. "
               + "Brikker som allerede er i mål er unntatt — du må aldri flytte dem.",
           "it", "Se attivato, non puoi passare il turno se è disponibile una mossa valida. "
-              + "Le pedine già arrivate sono esentate — non sei mai obbligato a spostarle."));
+              + "Le pedine già arrivate sono esentate — non sei mai obbligato a spostarle."),
+      "gameOption.teamPlay.label", Map.of(
+          "nl", "Teamspel",
+          "de", "Teamspiel",
+          "fr", "Jeu en équipe",
+          "nb", "Lagspill",
+          "it", "Gioco a squadre"),
+      "gameOption.teamPlay.description", Map.of(
+          "nl", "Speel in teams van twee: elke speler vormt een team met de speler recht "
+              + "tegenover hem, dus de tafel valt uiteen in paren (8 spelers maken 4 teams). "
+              + "Teamgenoten helpen elkaar, en een team wint zodra alle pionnen van beide spelers "
+              + "thuis zijn.",
+          "de", "Spielt in Zweierteams: jeder Spieler bildet ein Team mit dem direkt "
+              + "gegenübersitzenden Spieler, der Tisch teilt sich also in Paare (8 Spieler ergeben "
+              + "4 Teams). Teamkollegen helfen einander, und ein Team gewinnt, sobald alle Figuren "
+              + "beider Mitglieder im Ziel sind.",
+          "fr", "Jouez en équipes de deux : chaque joueur fait équipe avec le joueur situé juste "
+              + "en face, la table se répartit donc en paires (8 joueurs font 4 équipes). Les "
+              + "coéquipiers s'entraident, et une équipe gagne dès que tous les pions des deux "
+              + "membres sont à l'arrivée.",
+          "nb", "Spill i lag på to: hver spiller danner lag med spilleren rett overfor, så "
+              + "bordet deles i par (8 spillere gir 4 lag). Lagkamerater hjelper hverandre, og et "
+              + "lag vinner når alle brikkene til begge medlemmene er i mål.",
+          "it", "Gioca in squadre da due: ogni giocatore fa squadra con quello seduto di fronte, "
+              + "quindi il tavolo si divide in coppie (8 giocatori formano 4 squadre). I compagni "
+              + "si aiutano a vicenda e una squadra vince quando tutte le pedine di entrambi i "
+              + "membri sono arrivate."));
 
   /**
    * The localized string for a {@code labelKey}/{@code descriptionKey}, or {@code
