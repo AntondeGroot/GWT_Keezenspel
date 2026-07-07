@@ -3,7 +3,7 @@
 .lang-listbox {
   font: 600 13pt 'Cinzel', Georgia, serif;
   color: #f4d03f;
-  background-image: url('/globe-language.svg'), linear-gradient(145deg, #3a2000, #251400);
+  background-image: var(--globe-language-image, url('/globe-language.svg')), linear-gradient(145deg, #3a2000, #251400);
   background-repeat: no-repeat, no-repeat;
   background-position: 8px center, 0 0;
   background-size: 20px 20px, 100% 100%;
@@ -15,7 +15,7 @@
   outline: none;
 
   &:hover {
-    background-image: url('/globe-language.svg'), linear-gradient(145deg, #4a2800, #341a00);
+    background-image: var(--globe-language-image, url('/globe-language.svg')), linear-gradient(145deg, #4a2800, #341a00);
     border-color: #e0b830;
   }
 

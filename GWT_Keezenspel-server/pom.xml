@@ -407,5 +407,41 @@
         </property>
       </activation>
     </profile>
+
+    <!-- Bundle the built Angular app into the jar's static resources instead of the
+         compiled GWT client. Activating this with -Penv-angular deactivates the
+         activeByDefault env-prod profile, so no GWT client war is unpacked. The Angular
+         build must exist first: `cd frontend && npm run build` (outputs
+         frontend/dist/frontend/browser). The copy runs at prepare-package with
+         overwrite=true, so Angular's index.html wins over the committed GWT one. -->
+    <profile>
+      <id>env-angular</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-angular-app</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.outputDirectory}/public</outputDirectory>
+                  <overwrite>true</overwrite>
+                  <resources>
+                    <resource>
+                      <directory>${basedir}/../frontend/dist/frontend/browser</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 </project>

@@ -265,8 +265,8 @@ forfeit when you must play — Play stays the green action. Covered by `e2e/forf
 
 **Proof D — done (smoke green: seed real game → Angular renders it over SSE).** Harness established:
 - `frontend/playwright.config.ts` (`npm run e2e`). Serves Angular via `ng serve` on **:4300** (the
-  backend occupies ng's default 4200), `proxy.conf.json` forwards API + SSE to the backend
-  (`E2E_API_URL`, default `http://localhost:4200`). `workers: 1` (shared backend state).
+  backend now runs on 4200, ng serves on NG_PORT=4300), `proxy.conf.json` forwards API + SSE to the
+  backend (`E2E_API_URL`, default `http://localhost:4200`). `workers: 1` (shared backend state).
 - `frontend/e2e/support/seed.ts` — the `ApiUtil`/`ApiCallsHelper` seeding layer over HTTP
   (`createGame`, `setPawn`, `setCard`). **Gotcha:** `POST /games/{s}/players` needs `{id, name}`
   (both required by the `Player` schema) — `{name}` alone 400s.

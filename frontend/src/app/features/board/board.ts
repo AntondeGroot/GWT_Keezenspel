@@ -5,6 +5,7 @@ import {
 } from '../../api';
 import { buildBoard, fanCardBacks, Pt, BoardGeometry } from './board-geometry';
 import { resolveGameSession } from '../../session';
+import { basePath } from '../../base-path';
 import { Pawn } from './pawn/pawn';
 import { Card } from './card/card';
 import { PlayerList } from '../player-list/player-list';
@@ -85,7 +86,7 @@ export class Board implements OnInit, OnDestroy{
   private readonly session = resolveGameSession();
   private readonly sessionId = this.session.sessionId;
   private readonly viewerId = this.session.playerId;
-  private readonly streamUrl = `/gamestates/${this.sessionId}/${this.viewerId}/stream`;
+  private readonly streamUrl = `${basePath()}/gamestates/${this.sessionId}/${this.viewerId}/stream`;
   protected readonly state = signal<GameStatePush | undefined>(undefined);
   protected readonly geometry = computed(() => {
     const s = this.state();

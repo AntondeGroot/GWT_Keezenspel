@@ -69,11 +69,12 @@ jobs:
           E2E_API_URL: http://localhost:4200
           CI: '1'
         run: |
-          # Backend with the /test hooks on :4200 (matches proxy.conf.json).
+          # Backend with the /test hooks on :4200 (matches proxy.conf.json). The `test`
+          # Spring profile enables TestResetController (/test/**), gated off in production.
           # -Denv=dev skips the env-prod GWT-app unpack (the browser loads the
           # Angular app from ng serve, not the backend's static resources).
           ( cd .. && nohup mvn -B -Denv=dev -pl GWT_Keezenspel-server -am spring-boot:run \
-              -Dspring-boot.run.arguments="--server.port=4200 --spring.devtools.restart.enabled=false" \
+              -Dspring-boot.run.arguments="--server.port=4200 --spring.profiles.active=test --spring.devtools.restart.enabled=false" \
               > "$RUNNER_TEMP/backend.log" 2>&1 & )
           echo "Waiting for backend on :4200 ..."
           for i in $(seq 1 150); do

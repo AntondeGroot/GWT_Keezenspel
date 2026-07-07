@@ -30,7 +30,7 @@
 }
 
 .front {
-  background-image: url('/card-deck.png');
+  background-image: var(--card-deck-image, url('/card-deck.png'));
   background-repeat: no-repeat;
   // 13 cols x 5 rows. Percent background-position picks a cell via col/(cols-1)
   // and row/(rows-1), so it scales with the card.

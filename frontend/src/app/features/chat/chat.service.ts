@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { decrypt, encrypt } from './chat-cipher';
+import { basePath } from '../../base-path';
 
 /** A chat message as it travels on the wire (message text is XOR-obfuscated). */
 interface WireMessage {
@@ -54,7 +55,7 @@ export class ChatService {
   connect(sessionId: string): void {
     this.disconnect();
     this.sessionId = sessionId;
-    this.source = new EventSource(`/chat/${sessionId}/stream`);
+    this.source = new EventSource(`${basePath()}/chat/${sessionId}/stream`);
     this.source.onmessage = (e: MessageEvent) => this.ingest(e.data);
     this.source.onerror = () => this._available.set(false);
   }
@@ -77,7 +78,7 @@ export class ChatService {
     const trimmed = text.trim();
     if (!trimmed || !this.sessionId) return;
     const body = { sender, message: encrypt(trimmed, this.sessionId) };
-    this.http.post(`/chat/${this.sessionId}`, body).subscribe({ error: () => {} });
+    this.http.post(`${basePath()}/chat/${this.sessionId}`, body).subscribe({ error: () => {} });
   }
 
   disconnect(): void {
