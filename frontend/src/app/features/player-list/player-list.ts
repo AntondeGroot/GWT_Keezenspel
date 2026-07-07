@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { GameStore } from '../../game-store';
 import { Player } from '../../api';
+import { basePath } from '../../base-path';
 
 const MEDALS: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
@@ -57,7 +58,7 @@ export class PlayerList {
       isActive: p.isActive !== false,
       medal: MEDALS[p.place ?? -1] ?? '',
       team: teamsOn ? teamLetter(teamOf(p)) : null,
-      avatar: p.profilePic ? `/profile-pic/${p.profilePic}` : null,
+      avatar: p.profilePic ? `${basePath()}/profile-pic/${p.profilePic}` : null,
       initial: (p.name?.trim()?.[0] ?? '?').toUpperCase(),
     }));
 

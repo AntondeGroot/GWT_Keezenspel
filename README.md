@@ -2,24 +2,47 @@
 
 <img src="readme-images/keezenspel_construction.svg" alt="Keezenspel construction" width="600">
 
-## To start the application:
+## To start the application (legacy GWT):
 1) in the server folder run the Application file, this is a springboot application.
 2) in a prompt run the code: ```mvn gwt:codeserver -pl *-client -am``` to start the Code Server
 3) go to : http://localhost:4200/
 
-## Deploying to Raspberry Pi
+## Running the Angular app (the new primary UI)
+The Spring backend can serve the built Angular app (this is what `./deploy.sh` ships):
 
-Run `./deploy.sh` to build, upload, and restart the service.
-
-The context path (`/keezen`) is **not** set in `application.yaml` — it is only applied on the Pi via an external override file. Create `/opt/keezen/application-override.yaml` on the Pi:
-
-```yaml
-server:
-  servlet:
-    context-path: /keezen
+```
+cd frontend && npm run build
+mvn spring-boot:run -pl *-server -am -Penv-angular   # Angular served at http://localhost:4200/
 ```
 
-This keeps local development and tests working without any prefix, while nginx on the Pi routes `https://<tunnel-url>/keezen/*` to this service. See the GameRoom README for the full nginx and cloudflared setup.
+For frontend hot-reload dev, `cd frontend && npm start` runs ng serve on 4201 and proxies the
+API to the backend on 4200. To run the legacy GWT app alongside, start the backend on another
+port: `mvn spring-boot:run -pl *-server -am -Dspring-boot.run.arguments="--server.port=4201"`.
+
+## Deploying to Raspberry Pi
+
+Run `./deploy.sh` to build the Angular app, package it into the server jar (`env-angular`),
+upload, and restart the service.
+
+**The app is reached at `/keezen`, but nginx strips that prefix before the backend.** The
+Angular build sets `base-href=/keezen/`, and the app derives the prefix from `<base href>` at
+runtime (`basePath()` in `src/app/base-path.ts`) so the browser requests `/keezen/games`,
+`/keezen/gamestates/…/stream`, `/keezen/study-icon.svg`, etc. The nginx `location /keezen/`
+block **strips** `/keezen/` (trailing slash on `proxy_pass`) and forwards `/games`, `/main-*.js`,
+… to the backend:
+
+```nginx
+location /keezen/ {
+  proxy_pass http://127.0.0.1:4200/;   # trailing slash → strips /keezen/
+  proxy_set_header Host $host;
+  # For the SSE streams (/gamestates, /chat) add if updates don't flow:
+  # proxy_http_version 1.1; proxy_buffering off; proxy_read_timeout 3600s;
+}
+```
+
+So the backend must serve at the **root — no context-path** (`deploy.sh` writes an empty
+override). A context-path of `/keezen` here would double the prefix and 404 every request.
+Local dev/tests run at the root too (default base-href `/` → `basePath()` returns `''`).
 
 
 ## This project is used to learn 

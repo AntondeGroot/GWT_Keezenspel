@@ -35,7 +35,9 @@ public class SpringAppTestHelper {
     }
 
     SpringApplication app = new SpringApplication(Application.class);
-    app.setAdditionalProfiles(cardDeckIsReal ? "realCardDeck" : "mockedCardDeck");
+    // `test` enables the /test/** seeding hooks (TestResetController); the card-deck
+    // profile picks the deck. Both are absent in production, so the hooks don't exist there.
+    app.setAdditionalProfiles(cardDeckIsReal ? "realCardDeck" : "mockedCardDeck", "test");
     app.setDefaultProperties(Map.of("server.port", "4200"));
     context = app.run();
     isReal = cardDeckIsReal;

@@ -4,11 +4,19 @@ import adg.keezen.GameRegistry;
 import adg.keezen.GameSession;
 import com.adg.openapi.model.Card;
 import com.adg.openapi.model.PositionKey;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Test-only seeding hooks (/test/**). Gated behind the `test` Spring profile so these
+ * endpoints exist for unit/IT tests and the Playwright E2E run, but NOT in production
+ * (which starts with no active profile). Activated by SpringAppTestHelper (Java tests)
+ * and via --spring.profiles.active=test when a backend is booted for E2E.
+ */
+@Profile("test")
 @RestController
 @RequestMapping("/test")
 public class TestResetController {
