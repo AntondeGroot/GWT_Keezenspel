@@ -1,6 +1,7 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { GameStore } from '../../game-store';
 import { Translations } from '../../i18n/translations.service';
+import { seatColor } from '../../player-colors';
 
 const MEDALS: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
@@ -49,7 +50,7 @@ export class WinnerBanner {
         this.announce({
           name: player?.name ?? '',
           medal: MEDALS[place] ?? '🏅',
-          color: player?.color ?? '#f4d03f',
+          color: seatColor(player?.playerInt),
         });
       }
       this.seen = winners.length;

@@ -6,6 +6,7 @@ import {
 import { buildBoard, fanCardBacks, Pt, BoardGeometry } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { basePath } from '../../base-path';
+import { seatColor } from '../../player-colors';
 import { Pawn } from './pawn/pawn';
 import { Card } from './card/card';
 import { PlayerList } from '../player-list/player-list';
@@ -102,7 +103,7 @@ export class Board implements OnInit, OnDestroy{
     const s = this.state();
     if (!g || !s?.players) return [];
     const colorOf = (playerId: string) =>
-      s.players!.find((p) => p.id === playerId)?.color || '#f2f2f2';
+      seatColor(s.players!.find((p) => p.id === playerId)?.playerInt);
     return g.tiles.map((t) => ({
       ...t,
       color: t.tileNr <= 0 || t.tileNr >= 16 ? colorOf(t.playerId) : '#f2f2f2',
@@ -114,7 +115,7 @@ export class Board implements OnInit, OnDestroy{
     if(!g || !s?.pawns) return [];
     const anim = this.pawnAnim();
     const colorOf = (playerId: string) =>
-      s.players!.find((p) => p.id === playerId)?.color || '#f2f2f2';
+      seatColor(s.players!.find((p) => p.id === playerId)?.playerInt);
     return s.pawns.map((pawn) => {
       const pawnId = pawnKey(pawn.pawnId);
       // While a pawn is moving, its position (and step transition ms) comes from the
@@ -614,7 +615,7 @@ export class Board implements OnInit, OnDestroy{
   }
 
   private playerColor(playerId: string): string {
-    return this.state()?.players?.find((p) => p.id === playerId)?.color ?? '#888888';
+    return seatColor(this.state()?.players?.find((p) => p.id === playerId)?.playerInt);
   }
 
   // Step-box label + input-border colours match each pawn's board highlight colour
