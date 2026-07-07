@@ -289,6 +289,28 @@ paths:
           description: player forfeited successfully
         '400':
           description: player could not forfeit
+
+  /trade/{sessionId}:
+    post:
+      summary: Team card trade — request, accept, reject or cancel a King/Ace swap
+      operationId: teamTrade
+      parameters:
+        - $ref: '#/components/parameters/sessionId'
+      tags:
+        - trade
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeAction'
+      responses:
+        '200':
+          description: Trade action applied
+        '400':
+          description: Trade action was not allowed
+        '404':
+          description: Game not found
   /gamestates/{sessionId}:
     get:
       summary: Get gamestate of a specific game
@@ -563,6 +585,46 @@ components:
         canForfeit:
           type: boolean
           description: Whether this player is allowed to forfeit their turn right now
+        trade:
+          $ref: '#/components/schemas/Trade'
+
+    Trade:
+      type: object
+      description: |
+        A pending team card-trade (present only while one is open). The requester offered a
+        card and is asking their teammate for a King or Ace.
+      required:
+        - requesterId
+        - teammateId
+      properties:
+        requesterId:
+          type: string
+          description: The player who asked for a King/Ace
+        teammateId:
+          type: string
+          description: The teammate being asked
+        offeredCard:
+          $ref: '#/components/schemas/Card'
+
+    TradeAction:
+      type: object
+      description: A team card-trade action from a player.
+      required:
+        - action
+        - playerId
+      properties:
+        action:
+          type: string
+          enum:
+            - REQUEST
+            - ACCEPT
+            - REJECT
+            - CANCEL
+        playerId:
+          type: string
+        card:
+          $ref: '#/components/schemas/Card'
+          description: The offered card (REQUEST) or the King/Ace handed over (ACCEPT)
 
     GameOption:
       type: object

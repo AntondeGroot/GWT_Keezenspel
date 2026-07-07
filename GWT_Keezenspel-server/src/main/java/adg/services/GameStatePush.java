@@ -4,6 +4,7 @@ import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveResponse;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.Player;
+import com.adg.openapi.model.Trade;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,9 @@ public class GameStatePush {
 
   // Whether this player is allowed to forfeit their turn right now
   private boolean canForfeit = true;
+
+  // The pending team card-trade, if any (null otherwise)
+  private Trade trade;
 
   public String getCurrentPlayerId() { return currentPlayerId; }
   public void setCurrentPlayerId(String v) { currentPlayerId = v; }
@@ -59,4 +63,7 @@ public class GameStatePush {
 
   public boolean isCanForfeit() { return canForfeit; }
   public void setCanForfeit(boolean v) { canForfeit = v; }
+
+  public Trade getTrade() { return trade; }
+  public void setTrade(Trade v) { trade = v; }
 }

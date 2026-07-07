@@ -66,6 +66,12 @@
     <Class name="adg.keezen.TradeRequest"/>
     <Bug pattern="EI_EXPOSE_REP2"/>
   </Match>
+
+  <!-- Spring injects the SseEmitterService singleton by constructor; holding it by reference is the DI pattern, not an exposure -->
+  <Match>
+    <Class name="adg.services.TradeApiDelegateImpl"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
   <!-- PlayerHand.getHand() returns the live list so callers can add/remove cards directly -->
   <Match>
     <Class name="adg.keezen.PlayerHand"/>
