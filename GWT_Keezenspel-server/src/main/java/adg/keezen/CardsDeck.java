@@ -127,6 +127,11 @@ public class CardsDeck implements CardsDeckInterface, IsSerializable {
     return playerHands.get(playerId).hasCard(card);
   }
 
+  public void moveCardBetweenHands(String fromPlayerId, String toPlayerId, Card card) {
+    playerHands.get(fromPlayerId).getHand().remove(card);
+    playerHands.get(toPlayerId).addCard(card);
+  }
+
   public boolean playerDoesNotHaveCard(String playerId, Card card) {
     return !playerHasCard(playerId, card);
   }

@@ -22,14 +22,21 @@ class KeezenGameOptionsTest {
   // ── all() ─────────────────────────────────────────────────────────────────
 
   @Test
-  void all_returnsThreeOptions() {
-    assertEquals(3, KeezenGameOptions.all().size());
+  void all_returnsFourOptions() {
+    assertEquals(4, KeezenGameOptions.all().size());
   }
 
   @Test
   void all_containsTeamPlay() {
     boolean found = KeezenGameOptions.all().stream()
         .anyMatch(o -> "teamPlay".equals(o.getKey()));
+    assertTrue(found);
+  }
+
+  @Test
+  void all_containsTeamCardTrade() {
+    boolean found = KeezenGameOptions.all().stream()
+        .anyMatch(o -> "teamCardTrade".equals(o.getKey()));
     assertTrue(found);
   }
 

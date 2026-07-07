@@ -56,6 +56,16 @@
     <Class name="adg.keezen.GameState"/>
     <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
+
+  <!-- TradeRequest holds a Card (a generated model with no copy constructor); it is shared by reference intentionally, like the rest of the domain -->
+  <Match>
+    <Class name="adg.keezen.TradeRequest"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+  </Match>
+  <Match>
+    <Class name="adg.keezen.TradeRequest"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
   <!-- PlayerHand.getHand() returns the live list so callers can add/remove cards directly -->
   <Match>
     <Class name="adg.keezen.PlayerHand"/>

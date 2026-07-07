@@ -98,6 +98,11 @@ public class CardsDeckMock implements CardsDeckInterface, IsSerializable {
     return playerHands.get(playerId).hasCard(card);
   }
 
+  public void moveCardBetweenHands(String fromPlayerId, String toPlayerId, Card card) {
+    playerHands.get(fromPlayerId).getHand().remove(card);
+    playerHands.get(toPlayerId).addCard(card);
+  }
+
   public void reset() {
     roundNr = 0;
     playerHands.clear();
