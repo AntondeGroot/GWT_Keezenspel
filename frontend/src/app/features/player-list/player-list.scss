@@ -5,11 +5,13 @@
   font-family: 'Lato', 'Helvetica Neue', sans-serif;
 
   // Team accents — a separate channel from the players' pawn colours (avatar
-  // rings) and from the gold turn signal.
-  --team-a: #cf9350; // bronze
-  --team-b: #8fa8c8; // pewter
-  --team-c: #a6c07e; // sage
-  --team-d: #c98fb0; // mauve
+  // rings) and from the gold turn signal. Bold, well-spaced hues so teams stay
+  // distinguishable for low-vision players; kept in sync with player-colors.ts
+  // TEAM_PALETTE (the pawn pennants use the same colours + a per-team shape).
+  --team-a: #f0932a; // orange
+  --team-b: #4da3e8; // blue
+  --team-c: #35be83; // green
+  --team-d: #ee7ab6; // pink
 }
 
 /* ── Team summary lines (only in team games) ─────────────────────────── */

@@ -18,3 +18,17 @@ export function seatColor(playerInt: number | null | undefined): string {
   if (playerInt == null) return FALLBACK;
   return PALETTE[playerInt] ?? FALLBACK;
 }
+
+/**
+ * Team accents for team play, keyed by 0-based `teamId`. Bold, well-spaced hues (with the
+ * pennant's shape as a second, colour-independent cue) so teams stay distinguishable for
+ * low-vision players. Kept light enough that the roster's dark tag text stays legible, and
+ * mirrored in player-list.scss `--team-a…d` so a pawn's pennant and its team's scoreline
+ * match. Undefined when the player has no team (teams off), so no pennant shows.
+ */
+const TEAM_PALETTE = ['#f0932a', '#4da3e8', '#35be83', '#ee7ab6'] as const; // orange, blue, green, pink
+
+export function teamAccent(teamId: number | null | undefined): string | undefined {
+  if (teamId == null) return undefined;
+  return TEAM_PALETTE[teamId];
+}
