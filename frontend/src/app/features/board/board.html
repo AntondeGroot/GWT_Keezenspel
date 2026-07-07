@@ -13,6 +13,7 @@
           <app-pawn class="pawn"
                     [attr.data-testid]="'pawn-' + p.id"
                     [color]="p.color"
+                    [teamId]="p.teamId"
                     (click)="selectPawn(p.id)"
                     [highlight]="p.id === pawn1Id() ? highlightForPawn1(p.color)
                              : p.id === pawn2Id() ? highlightForPawn2(p.color)

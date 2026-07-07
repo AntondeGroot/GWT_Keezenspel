@@ -10,3 +10,8 @@ svg {
   // fit and centres it, same as the GWT pawn image.
   overflow: visible;
 }
+
+// The team pennant sits proud of the pawn; a soft shadow lifts it off the felt.
+.pennant {
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.45));
+}

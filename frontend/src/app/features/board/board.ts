@@ -114,8 +114,9 @@ export class Board implements OnInit, OnDestroy{
     const s = this.state();
     if(!g || !s?.pawns) return [];
     const anim = this.pawnAnim();
-    const colorOf = (playerId: string) =>
-      seatColor(s.players!.find((p) => p.id === playerId)?.playerInt);
+    const playerOf = (playerId: string) => s.players!.find((p) => p.id === playerId);
+    const colorOf = (playerId: string) => seatColor(playerOf(playerId)?.playerInt);
+    const teamOf = (playerId: string) => playerOf(playerId)?.teamId ?? null;
     return s.pawns.map((pawn) => {
       const pawnId = pawnKey(pawn.pawnId);
       // While a pawn is moving, its position (and step transition ms) comes from the
@@ -132,7 +133,10 @@ export class Board implements OnInit, OnDestroy{
         x = pt.x;
         y = pt.y;
       }
-      return { x, y, zIndex: Math.round(y), color: colorOf(pawn.playerId), id: pawnId, moveMs: a?.ms ?? 0 };
+      return {
+        x, y, zIndex: Math.round(y), color: colorOf(pawn.playerId),
+        teamId: teamOf(pawn.playerId), id: pawnId, moveMs: a?.ms ?? 0,
+      };
     }).filter(x => x !== null);
   })
   protected readonly cell  = computed(() => this.geometry()?.cellDistance ?? 0);
