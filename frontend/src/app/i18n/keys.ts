@@ -56,7 +56,10 @@ export type TranslationKey =
   | 'moveRejectedMustMoveExactSteps'
   | 'moveRejectedPawnClosedInFinish'
   | 'moveRejectedSplitNeedsTwoOwnPawns'
-  | 'moveRejectedSplitStepsNotSeven';
+  | 'moveRejectedSplitStepsNotSeven'
+  | 'moveRejectedMustFinishOwnPawnsFirst'
+  | 'teamHandoffTitle'
+  | 'teamHandoffMessage';
 
 /** A full set of strings for one language. */
 export type Dictionary = Record<TranslationKey, string>;

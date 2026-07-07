@@ -51,4 +51,7 @@ export const en: Dictionary = {
   moveRejectedPawnClosedInFinish: "That pawn is closed in on the finish and can't move.",
   moveRejectedSplitNeedsTwoOwnPawns: 'A 7-split needs two of your own pawns.',
   moveRejectedSplitStepsNotSeven: 'The two parts of the 7 must add up to 7 steps.',
+  moveRejectedMustFinishOwnPawnsFirst: 'Finish getting your own pawns home before you play your teammate\'s.',
+  teamHandoffTitle: 'Your pawns are home!',
+  teamHandoffMessage: 'You can now play your teammate\'s pawns.',
 };

@@ -58,6 +58,8 @@ export function rejectionMessageKey(reason: MoveRejectionReason | undefined): Tr
       return 'moveRejectedSplitNeedsTwoOwnPawns';
     case 'SPLIT_STEPS_NOT_SEVEN':
       return 'moveRejectedSplitStepsNotSeven';
+    case 'MUST_FINISH_OWN_PAWNS_FIRST':
+      return 'moveRejectedMustFinishOwnPawnsFirst';
     default:
       return 'moveRejectedGeneric';
   }

@@ -18,6 +18,7 @@ import { Translations } from '../../i18n/translations.service';
 import { TranslationKey } from '../../i18n/keys';
 import { GameStore } from '../../game-store';
 import { MoveRejection } from './move-rejected/move-rejection.service';
+import { TeamHandoff } from './team-handoff/team-handoff.service';
 import { localRejectionKey, rejectionMessageKey } from './rejection-message';
 
 // Cards that do something special (Ace, Four, Seven, Jack, Queen, King): they get
@@ -84,6 +85,7 @@ export class Board implements OnInit, OnDestroy{
   private readonly cardsService = inject(CardsService);
   protected readonly i18n = inject(Translations);
   private readonly rejection = inject(MoveRejection);
+  private readonly teamHandoff = inject(TeamHandoff);
   private readonly gameStore = inject(GameStore);
   private readonly session = resolveGameSession();
   private readonly sessionId = this.session.sessionId;
@@ -337,7 +339,30 @@ export class Board implements OnInit, OnDestroy{
       }
       this.prevCounts = counts ? { ...counts } : undefined;
     });
+
+    // Announce the hand-off once: the moment your own pawns are all home in a team game, you may
+    // start playing your teammate's pawns. Fires on the transition, like the card-fly effect above.
+    effect(() => {
+      const allHome = this.viewerOwnPawnsAllHome();
+      if (allHome && !this.prevOwnPawnsHome) {
+        this.teamHandoff.show(this.i18n.t('teamHandoffMessage'));
+      }
+      this.prevOwnPawnsHome = allHome;
+    });
   }
+
+  private prevOwnPawnsHome = false;
+
+  // Team play: are all of the viewer's own pawns home (finish tiles, tileNr ≥ 16)? Drives the
+  // one-time hand-off announcement. False outside a team game.
+  private readonly viewerOwnPawnsAllHome = computed(() => {
+    const s = this.state();
+    if (!s?.pawns || !s.players || !this.viewerId) return false;
+    const inTeam = s.players.find((p) => p.id === this.viewerId)?.teamId != null;
+    if (!inTeam) return false;
+    const own = s.pawns.filter((p) => p.playerId === this.viewerId);
+    return own.length > 0 && own.every((p) => (p.currentTileId?.tileNr ?? -1) >= 16);
+  });
 
   /** Kick off the deal-in FLIP for the given freshly-dealt card uuids. */
   private animateDeal(uuids: number[]): void {

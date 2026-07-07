@@ -54,4 +54,7 @@ export const de: Dictionary = {
     'Diese Figur ist im Ziel eingeschlossen und kann sich nicht bewegen.',
   moveRejectedSplitNeedsTwoOwnPawns: 'Für eine 7er-Teilung brauchst du zwei eigene Figuren.',
   moveRejectedSplitStepsNotSeven: 'Die zwei Teile der 7 müssen zusammen 7 Felder ergeben.',
+  moveRejectedMustFinishOwnPawnsFirst: 'Bring erst alle eigenen Figuren ins Ziel, bevor du die deines Teamkollegen spielst.',
+  teamHandoffTitle: 'Deine Figuren sind im Ziel!',
+  teamHandoffMessage: 'Du kannst jetzt die Figuren deines Teamkollegen spielen.',
 };
