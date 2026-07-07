@@ -46,9 +46,18 @@ public class KeezenGameOptions {
                 + "table splits into pairs (8 players make 4 teams). Teammates help each other, and "
                 + "a team wins once both members' pawns are all home.",
             TypeEnum.BOOLEAN,
-            "false")
+            "true")
             .labelKey("gameOption.teamPlay.label")
-            .descriptionKey("gameOption.teamPlay.description")
+            .descriptionKey("gameOption.teamPlay.description"),
+        new GameOption(
+            "teamCardTrade",
+            "Ask teammate for a King or Ace",
+            "Team play only: offer a card to your teammate and ask for a King or Ace to get a "
+                + "pawn on the board. They hand one over (a two-way swap) or decline.",
+            TypeEnum.BOOLEAN,
+            "true")
+            .labelKey("gameOption.teamCardTrade.label")
+            .descriptionKey("gameOption.teamCardTrade.description")
     );
   }
 
@@ -64,6 +73,7 @@ public class KeezenGameOptions {
       case "exactMoveRequired"    -> gameState.setExactMoveRequired(toBoolean(value));
       case "mustPlayIfPossible"   -> gameState.setMustPlayIfPossible(toBoolean(value));
       case "teamPlay"             -> gameState.setTeamPlay(toBoolean(value));
+      case "teamCardTrade"        -> gameState.setTeamCardTrade(toBoolean(value));
       default -> Log.info("KeezenGameOptions: unknown option key '" + key + "', ignoring");
     }
   }

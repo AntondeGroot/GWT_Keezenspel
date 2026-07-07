@@ -1,6 +1,8 @@
 package adg.keezen;
 
 import static adg.util.BoardLogic.isPawnOnFinish;
+import static adg.util.CardValueCheck.isAce;
+import static adg.util.CardValueCheck.isKing;
 import static adg.util.PlayerStatus.hasFinished;
 import static adg.util.PlayerStatus.setActive;
 import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
@@ -43,6 +45,8 @@ public class GameState {
   private volatile boolean exactMoveRequired = false;
   private volatile boolean mustPlayIfPossible = false;
   private volatile boolean teamPlay = false;
+  private volatile boolean teamCardTrade = false;
+  private volatile TradeRequest pendingTrade = null;
   private volatile long mustPlayBlockedSinceMs = 0;
   private static final long MUST_PLAY_TIMEOUT_MS = 3 * 60 * 1000L;
   private Boolean hasStarted = false;
@@ -77,6 +81,7 @@ public class GameState {
     playerColors.clear();
     activePlayers.clear();
     winners.clear();
+    pendingTrade = null;
   }
 
   public void reset() {
@@ -85,6 +90,7 @@ public class GameState {
     resetActivePlayers();
     resetCards();
     resetTurn();
+    pendingTrade = null;
     version.incrementAndGet();
   }
 
@@ -534,6 +540,95 @@ public class GameState {
     Player a = findPlayerById(playerA);
     Player b = findPlayerById(playerB);
     return a != null && b != null && a.getTeamId() != null && a.getTeamId().equals(b.getTeamId());
+  }
+
+  // ── Team card trade (step 5) ──────────────────────────────────────────────
+
+  public void setTeamCardTrade(boolean teamCardTrade) {
+    this.teamCardTrade = teamCardTrade;
+  }
+
+  public boolean isTeamCardTrade() {
+    return teamCardTrade;
+  }
+
+  public TradeRequest getPendingTrade() {
+    return pendingTrade;
+  }
+
+  /**
+   * A player offers one of their cards and asks their teammate for a King or Ace. Allowed only in
+   * a team game with the trade sub-option on, when the requester holds the offered card and no
+   * trade is already pending. Returns true if the request was recorded.
+   */
+  public boolean requestTrade(String requesterId, Card offeredCard) {
+    if (!teamPlay || !teamCardTrade || pendingTrade != null) {
+      return false;
+    }
+    String teammate = teammateOf(requesterId);
+    if (teammate == null || offeredCard == null || !cardsDeck.playerHasCard(requesterId, offeredCard)) {
+      return false;
+    }
+    pendingTrade = new TradeRequest(requesterId, teammate, offeredCard);
+    version.incrementAndGet();
+    return true;
+  }
+
+  /**
+   * The teammate accepts by handing over a King or Ace: the two cards are swapped and the trade
+   * clears. Only the addressed teammate may accept, and only with a King/Ace they actually hold.
+   */
+  public boolean acceptTrade(String teammateId, Card kingOrAce) {
+    if (pendingTrade == null || !pendingTrade.getTeammateId().equals(teammateId)) {
+      return false;
+    }
+    if (kingOrAce == null || !isKingOrAce(kingOrAce) || !cardsDeck.playerHasCard(teammateId, kingOrAce)) {
+      return false;
+    }
+    String requesterId = pendingTrade.getRequesterId();
+    cardsDeck.moveCardBetweenHands(requesterId, teammateId, pendingTrade.getOfferedCard());
+    cardsDeck.moveCardBetweenHands(teammateId, requesterId, kingOrAce);
+    pendingTrade = null;
+    version.incrementAndGet();
+    return true;
+  }
+
+  /** The teammate declines (can't or won't); the trade clears with no swap. */
+  public boolean rejectTrade(String teammateId) {
+    if (pendingTrade == null || !pendingTrade.getTeammateId().equals(teammateId)) {
+      return false;
+    }
+    pendingTrade = null;
+    version.incrementAndGet();
+    return true;
+  }
+
+  /** The requester withdraws their pending offer. */
+  public boolean cancelTrade(String requesterId) {
+    if (pendingTrade == null || !pendingTrade.getRequesterId().equals(requesterId)) {
+      return false;
+    }
+    pendingTrade = null;
+    version.incrementAndGet();
+    return true;
+  }
+
+  private String teammateOf(String playerId) {
+    Player player = findPlayerById(playerId);
+    Integer teamId = player == null ? null : player.getTeamId();
+    if (teamId == null) {
+      return null;
+    }
+    for (Player other : players) {
+      if (!other.getId().equals(playerId) && teamId.equals(other.getTeamId())) {
+        return other.getId();
+      }
+    }
+    return null;
+  }
+
+  private boolean isKingOrAce(Card card) {
+    return isKing(card) || isAce(card);
   }
 
   // ── Board logic ───────────────────────────────────────────────────────────

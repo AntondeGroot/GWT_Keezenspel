@@ -87,7 +87,25 @@ public final class GameOptionTranslations {
           "it", "Gioca in squadre da due: ogni giocatore fa squadra con quello seduto di fronte, "
               + "quindi il tavolo si divide in coppie (8 giocatori formano 4 squadre). I compagni "
               + "si aiutano a vicenda e una squadra vince quando tutte le pedine di entrambi i "
-              + "membri sono arrivate."));
+              + "membri sono arrivate."),
+      "gameOption.teamCardTrade.label", Map.of(
+          "nl", "Vraag teamgenoot om een Heer of Aas",
+          "de", "Teamkollegen um König oder Ass bitten",
+          "fr", "Demander un Roi ou un As à son coéquipier",
+          "nb", "Be lagkameraten om en Konge eller Ess",
+          "it", "Chiedi al compagno un Re o un Asso"),
+      "gameOption.teamCardTrade.description", Map.of(
+          "nl", "Alleen bij teamspel: bied een kaart aan je teamgenoot aan en vraag om een Heer "
+              + "of Aas om een pion op het bord te krijgen. Zij geven er een (een ruil) of weigeren.",
+          "de", "Nur im Teamspiel: biete deinem Teamkollegen eine Karte an und bitte um einen "
+              + "König oder ein Ass, um eine Figur aufs Brett zu bekommen. Er gibt einen her (ein "
+              + "Tausch) oder lehnt ab.",
+          "fr", "En jeu en équipe seulement : propose une carte à ton coéquipier et demande un "
+              + "Roi ou un As pour sortir un pion. Il t'en donne un (un échange) ou refuse.",
+          "nb", "Bare i lagspill: tilby et kort til lagkameraten og be om en Konge eller Ess for "
+              + "å få en brikke på brettet. Han gir deg ett (et bytte) eller takker nei.",
+          "it", "Solo nel gioco a squadre: offri una carta al compagno e chiedi un Re o un Asso "
+              + "per portare una pedina in gioco. Lui te ne dà uno (uno scambio) o rifiuta."));
 
   /**
    * The localized string for a {@code labelKey}/{@code descriptionKey}, or {@code

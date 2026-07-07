@@ -27,6 +27,9 @@ public interface CardsDeckInterface {
 
   boolean playerHasCard(String playerId, Card card);
 
+  /** Moves a single card from one player's hand to another's (used by the team card trade). */
+  void moveCardBetweenHands(String fromPlayerId, String toPlayerId, Card card);
+
   void reset();
 
   ArrayList<Card> getPlayedCards();
