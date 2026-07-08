@@ -106,6 +106,12 @@ export class Board implements OnInit, OnDestroy{
     const cards = next.playerCards ?? [];
     const prev = this.prevHandUuids;
     if (prev) {
+      // A new round deals a fresh batch, growing the hand. Card uuids are REUSED across rounds, so
+      // the finished round's pile must be cleared here — otherwise a redealt card whose uuid still
+      // lingers in the (never-otherwise-cleared) pile is filtered out of the hand and silently
+      // vanishes. Gate on the hand actually growing so a net-neutral trade (1 out, 1 in) doesn't
+      // wipe the current round's pile.
+      if (cards.length > prev.size) this.pile.set([]);
       const fresh = cards.filter((c) => !prev.has(c.uuid)).map((c) => c.uuid);
       if (fresh.length > 0) this.animateDeal(fresh);
     }
