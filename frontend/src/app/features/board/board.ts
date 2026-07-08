@@ -26,6 +26,8 @@ import { localRejectionKey, rejectionMessageKey } from './rejection-message';
 // Cards that do something special (Ace, Four, Seven, Jack, Queen, King): they get
 // a gold highlight in the hand and a hint/suggestion when hovered or selected.
 const SPECIAL_CARD_VALUES = new Set([1, 4, 7, 11, 12, 13]);
+// How long the viewer's own card swells + glows before it flies to the pile.
+const POP_MS = 180;
 const HINT_KEYS: Record<number, TranslationKey> = {
   1: 'hintAce',
   4: 'hintFour',
@@ -239,7 +241,7 @@ export class Board implements OnInit, OnDestroy{
   protected readonly flyers = signal<
     {
       id: number; x: number; y: number; rot: number; scale: number;
-      suit: number; value: number; flip?: 'in' | 'out';
+      suit: number; value: number; flip?: 'in' | 'out'; glow?: boolean;
     }[]
   >([]);
   private flyerSeq = 0;
@@ -607,24 +609,37 @@ export class Board implements OnInit, OnDestroy{
     value: number,
     landCard: CardModel,
     flip?: 'in' | 'out',
+    pop?: boolean,
   ): void {
     const id = ++this.flyerSeq;
     this.flyers.update((f) => [
       ...f,
-      { id, x: from.x, y: from.y, rot: from.rot, scale: startScale, suit, value, flip },
+      { id, x: from.x, y: from.y, rot: from.rot, scale: startScale, suit, value, flip, glow: pop },
     ]);
-    // Next frame, fly to the pile centre at pile size.
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() =>
-        this.flyers.update((f) =>
-          f.map((fl) => (fl.id === id ? { ...fl, x: 52.5, y: 50, rot: 0, scale: 0.6 } : fl)),
-        ),
-      ),
-    );
-    setTimeout(() => {
+
+    const flyToPile = () =>
+      this.flyers.update((f) =>
+        f.map((fl) => (fl.id === id ? { ...fl, x: 52.5, y: 50, rot: 0, scale: 0.6, glow: false } : fl)),
+      );
+    const land = () => {
       this.flyers.update((f) => f.filter((fl) => fl.id !== id));
       this.pile.update((p) => [...p, landCard]);
-    }, 600);
+    };
+
+    if (pop) {
+      // Swell the card + glow (a "played!" beat), hold POP_MS, then fly to the pile.
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() =>
+          this.flyers.update((f) => f.map((fl) => (fl.id === id ? { ...fl, scale: 1.2 } : fl))),
+        ),
+      );
+      setTimeout(flyToPile, POP_MS);
+      setTimeout(land, POP_MS + 600);
+    } else {
+      // Next frame, fly straight to the pile centre at pile size.
+      requestAnimationFrame(() => requestAnimationFrame(flyToPile));
+      setTimeout(land, 600);
+    }
   }
 
   /** Animate an opponent's just-played card from its fan slot to the pile. */
@@ -647,9 +662,10 @@ export class Board implements OnInit, OnDestroy{
     );
   }
 
-  /** Animate the viewer's own just-played card from its (snapshotted) hand slot. */
+  /** Animate the viewer's own just-played card from its (snapshotted) hand slot. It pops with a
+   *  white glow before it flies (ported from the GWT own-card play). */
   private flyOwnCard(card: CardModel, from: { x: number; y: number }): void {
-    this.spawnFlyer({ x: from.x, y: from.y, rot: 0 }, 1, card.suit ?? 0, card.value ?? 1, card);
+    this.spawnFlyer({ x: from.x, y: from.y, rot: 0 }, 1, card.suit ?? 0, card.value ?? 1, card, undefined, true);
   }
 
   /** Fly a transient face-up card from one board-% point to another (used by the trade swap). */

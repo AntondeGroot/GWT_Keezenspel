@@ -64,6 +64,7 @@
           <app-card class="card flyer"
             [class.flip-in]="f.flip === 'in'"
             [class.flip-out]="f.flip === 'out'"
+            [class.popped]="f.glow"
             [suit]="f.suit"
             [value]="f.value"
             [style.left.%]="f.x"
