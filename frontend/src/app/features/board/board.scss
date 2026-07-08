@@ -175,6 +175,24 @@
   filter: brightness(1.15) drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5));
 }
 
+// Leave animation (animate.leave): when a player leaves, their pawns are removed from the push —
+// fade + shrink them out in place instead of popping. Keeps the .pawn centring transform.
+.pawn-leaving {
+  animation: pawn-vanish 0.35s ease forwards;
+  pointer-events: none;
+}
+@keyframes pawn-vanish {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -80%) scale(0.3);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pawn-leaving {
+    animation-duration: 0.01s;
+  }
+}
+
 // Face-down card back for another player's hand (ported from .cardBackIcon).
 // Sized as a fraction of the board so it scales; carries NO card value.
 .card-back {

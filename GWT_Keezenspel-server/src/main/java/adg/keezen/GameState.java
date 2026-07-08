@@ -223,8 +223,9 @@ public class GameState {
 
   public void processLeaveGame(String playerId) {
     cardsDeck.forfeitCardsForPlayer(playerId);
+    cancelTradeForDeparture(playerId);
     leavers.add(playerId);
-    resetPawnsForPlayer(playerId);
+    removePawnsForPlayer(playerId);
     deactivateAndStopPlayingPlayer(playerId);
     if (allActivePlayersExhausted()) {
       startNewRound();
@@ -250,6 +251,7 @@ public class GameState {
 
   public void processOnForfeit(String playerId) {
     cardsDeck.forfeitCardsForPlayer(playerId);
+    cancelTradeForDeparture(playerId);
     forfeitPlayer(playerId);
     version.incrementAndGet();
   }
@@ -263,12 +265,9 @@ public class GameState {
     }
   }
 
-  private void resetPawnsForPlayer(String playerId) {
-    for (Pawn pawn : pawns) {
-      if (playerId.equals(pawn.getPlayerId())) {
-        pawn.setCurrentTileId(pawn.getNestTileId());
-      }
-    }
+  /** A departed player is out of the game — take their pawns off the board entirely. */
+  private void removePawnsForPlayer(String playerId) {
+    pawns.removeIf(pawn -> playerId.equals(pawn.getPlayerId()));
   }
 
   private void deactivateAndStopPlayingPlayer(String playerId) {
@@ -485,17 +484,37 @@ public class GameState {
   private void checkForTeamWinners(ArrayList<String> winners) {
     for (Player player : players) {
       Integer team = player.getTeamId();
-      if (team == null || winners.contains(player.getId())) {
+      if (team == null) {
         continue;
       }
       List<Player> members = teamMembers(team);
-      if (members.stream().allMatch(m -> hasAllPawnsOnFinish(m.getId()))) {
-        int place = winners.size() / 2 + 1; // teams are pairs (see assignTeams)
-        for (Player member : members) {
+      if (members.stream().anyMatch(m -> winners.contains(m.getId()))) {
+        continue; // team already placed
+      }
+      // A departed teammate is out of the game: their pawns are gone and don't need to come home.
+      // The team places once every member STILL PRESENT has all pawns on the finish — so a lone
+      // survivor wins on their own four. A fully-abandoned team can't win, and a leaver earns no
+      // place (only present members are recorded).
+      List<Player> present = members.stream()
+          .filter(m -> !leavers.contains(m.getId()))
+          .toList();
+      if (!present.isEmpty() && present.stream().allMatch(m -> hasAllPawnsOnFinish(m.getId()))) {
+        int place = distinctTeamsPlaced(winners) + 1;
+        for (Player member : present) {
           recordWinner(member, place, winners);
         }
       }
     }
+  }
+
+  /** How many distinct teams are already in the winners list — the next team places behind them. */
+  private int distinctTeamsPlaced(ArrayList<String> winners) {
+    return (int) winners.stream()
+        .map(this::findPlayerById)
+        .filter(p -> p != null && p.getTeamId() != null)
+        .map(Player::getTeamId)
+        .distinct()
+        .count();
   }
 
   private List<Player> teamMembers(int teamId) {
@@ -609,6 +628,14 @@ public class GameState {
       return false;
     }
     String requesterId = pendingTrade.getRequesterId();
+    // The requester must still hold the card they offered — if they left or forfeited, that card
+    // was moved to the pile, and swapping it would duplicate it (and sink the teammate's card into
+    // a discarded hand). Drop the stale trade rather than corrupt the hands.
+    if (!cardsDeck.playerHasCard(requesterId, pendingTrade.getOfferedCard())) {
+      pendingTrade = null;
+      version.incrementAndGet();
+      return false;
+    }
     cardsDeck.moveCardBetweenHands(requesterId, teammateId, pendingTrade.getOfferedCard());
     cardsDeck.moveCardBetweenHands(teammateId, requesterId, kingOrAce);
     pendingTrade = null;
@@ -634,6 +661,15 @@ public class GameState {
     pendingTrade = null;
     version.incrementAndGet();
     return true;
+  }
+
+  /** Drop a pending trade if this player (leaving or forfeiting) is either party to it. */
+  private void cancelTradeForDeparture(String playerId) {
+    if (pendingTrade != null
+        && (playerId.equals(pendingTrade.getRequesterId())
+            || playerId.equals(pendingTrade.getTeammateId()))) {
+      pendingTrade = null;
+    }
   }
 
   private String teammateOf(String playerId) {

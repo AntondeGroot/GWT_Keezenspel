@@ -12,6 +12,7 @@
         }
         @for (p of pawns(); track p.id){
           <app-pawn class="pawn"
+                    animate.leave="pawn-leaving"
                     [attr.data-testid]="'pawn-' + p.id"
                     [color]="p.color"
                     [teamId]="p.teamId"

@@ -32,7 +32,7 @@ class LeaveGameTest {
   }
 
   @Test
-  void whenPlayerLeaves_theirPawnsReturnToNest() {
+  void whenPlayerLeaves_theirPawnsAreRemovedFromTheBoard() {
     // GIVEN player "0" has pawns on the board
     placePawnOnBoard(gameState, new PawnId("0", 0), new PositionKey("0", 3));
     placePawnOnBoard(gameState, new PawnId("0", 1), new PositionKey("0", 5));
@@ -42,15 +42,10 @@ class LeaveGameTest {
     // WHEN player "0" leaves
     gameState.processLeaveGame("0");
 
-    // THEN all their pawns are back on their nest tiles
-    for (Pawn pawn : gameState.getPawns()) {
-      if ("0".equals(pawn.getPlayerId())) {
-        assertEquals(
-            pawn.getNestTileId(),
-            pawn.getCurrentTileId(),
-            "Pawn " + pawn.getPawnId().getPawnNr() + " should be on its nest tile after leaving");
-      }
-    }
+    // THEN a departed player is out — their pawns are removed from the board entirely
+    assertTrue(
+        gameState.getPawns().stream().noneMatch(p -> "0".equals(p.getPlayerId())),
+        "a departed player's pawns should be removed from the board");
   }
 
   @Test
