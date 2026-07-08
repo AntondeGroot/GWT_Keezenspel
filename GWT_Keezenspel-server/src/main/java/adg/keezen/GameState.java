@@ -542,6 +542,21 @@ public class GameState {
     return a != null && b != null && a.getTeamId() != null && a.getTeamId().equals(b.getTeamId());
   }
 
+  /**
+   * Whether the mover may control (move/switch) this pawn: always their own, and — in team play,
+   * once all their own pawns are home — their teammate's. Used by the move processors' ownership
+   * checks so a teammate's pawns can be played, while opponents' stay off-limits.
+   */
+  public boolean mayControlPawn(String moverId, Pawn pawn) {
+    if (pawn == null) {
+      return false;
+    }
+    if (pawn.getPlayerId().equals(moverId)) {
+      return true;
+    }
+    return teamPlay && sameTeam(moverId, pawn.getPlayerId()) && hasAllPawnsOnFinish(moverId);
+  }
+
   // ── Team card trade (step 5) ──────────────────────────────────────────────
 
   public void setTeamCardTrade(boolean teamCardTrade) {

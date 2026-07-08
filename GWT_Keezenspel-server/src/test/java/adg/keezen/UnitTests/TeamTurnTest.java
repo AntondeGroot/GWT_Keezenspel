@@ -71,6 +71,28 @@ class TeamTurnTest {
   }
 
   @Test
+  void mayControlPawn_ownAlways_teammateOnceHome_opponentNever() {
+    GameState gs = teamGame();
+    assertTrue(gs.mayControlPawn("0", pawnOf(gs, "0")), "your own pawn");
+    assertFalse(gs.mayControlPawn("0", pawnOf(gs, "2")), "teammate's pawn before your own are home");
+    assertFalse(gs.mayControlPawn("0", pawnOf(gs, "1")), "an opponent's pawn");
+    place4PawnsOnFinish(gs, "0");
+    assertTrue(gs.mayControlPawn("0", pawnOf(gs, "2")), "teammate's pawn once your own are home");
+    assertFalse(gs.mayControlPawn("0", pawnOf(gs, "1")), "still never an opponent's");
+  }
+
+  @Test
+  void mayControlPawn_teamsOff_onlyYourOwn() {
+    GameState gs = new GameSession().getGameState();
+    for (int i = 0; i < 4; i++) {
+      gs.addPlayer(new Player(String.valueOf(i), String.valueOf(i)));
+    }
+    gs.start(false); // teams off
+    assertTrue(gs.mayControlPawn("0", pawnOf(gs, "0")));
+    assertFalse(gs.mayControlPawn("0", pawnOf(gs, "1")), "no teams → opponents' pawns off-limits");
+  }
+
+  @Test
   void teamsOff_allowsAnyPawn() {
     GameState gs = new GameSession().getGameState();
     for (int i = 0; i < 4; i++) {

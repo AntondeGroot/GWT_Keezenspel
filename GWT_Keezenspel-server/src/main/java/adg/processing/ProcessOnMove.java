@@ -17,7 +17,6 @@ import com.adg.openapi.model.MoveResult;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PositionKey;
 import java.util.LinkedList;
-import java.util.Objects;
 
 public class ProcessOnMove {
 
@@ -116,13 +115,14 @@ public class ProcessOnMove {
 
   private boolean pawnOwnershipIsValid() {
     if (isJack(card)) return true;
+    // Your own pawns, plus a teammate's once your own are all home (mayControlPawn).
     if (moveMessage.getPawn1Id() != null
-        && !Objects.equals(moveMessage.getPawn1Id().getPlayerId(), playerId)) {
+        && !gs.mayControlPawn(playerId, gs.getPawn(moveMessage.getPawn1Id()))) {
       reject(CANNOT_MAKE_MOVE, MoveRejectionReason.NOT_YOUR_PAWN);
       return false;
     }
     if (moveMessage.getPawn2Id() != null
-        && !Objects.equals(moveMessage.getPawn2Id().getPlayerId(), playerId)) {
+        && !gs.mayControlPawn(playerId, gs.getPawn(moveMessage.getPawn2Id()))) {
       reject(CANNOT_MAKE_MOVE, MoveRejectionReason.NOT_YOUR_PAWN);
       return false;
     }
