@@ -11,6 +11,7 @@ import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PawnId;
+import com.adg.openapi.model.Player;
 import com.adg.openapi.model.PositionKey;
 import java.util.ArrayList;
 import org.junit.jupiter.api.AfterEach;
@@ -51,6 +52,25 @@ class WinnerLogicTest {
     assertFalse(Boolean.TRUE.equals(
         gameState.getPlayers().stream().filter(p -> p.getId().equals("0")).findFirst().get().getIsActive()),
         "Player 0 should no longer be active after winning");
+  }
+
+  @Test
+  void twoPlayers_teamPlayOn_stillRegistersAnIndividualWin() {
+    // 2 players cannot form teams (needs an even count of at least 4), so team play must fall back
+    // to individual play. Regression: teamPlay used to stay on, and the team win-check kept waiting
+    // for a non-existent partner, so a player who got all 4 pawns home was never recorded as a
+    // winner (an unwinnable game).
+    GameState gs = new GameSession().getGameState();
+    gs.setTeamPlay(true);
+    gs.addPlayer(new Player("0", "0"));
+    gs.addPlayer(new Player("1", "1"));
+    gs.start(false);
+    assertFalse(gs.isTeamPlay(), "2 players cannot form teams → team play disabled");
+
+    place4PawnsOnFinish(gs, "0");
+    ArrayList<String> w = new ArrayList<>();
+    gs.checkForWinners(w);
+    assertTrue(w.contains("0"), "finishing all pawns must win, even with the team option enabled");
   }
 
   @Test
