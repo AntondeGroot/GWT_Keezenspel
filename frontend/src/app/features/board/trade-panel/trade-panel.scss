@@ -1,0 +1,147 @@
+// The team card-trade dialog — a wood/gold parley over the board, matching the move-rejected
+// and hand-off styling. A dimmed backdrop, a centred card, a scrollable hand of cards.
+.trade-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  background: rgba(4, 8, 5, 0.55);
+  animation: tradeFade 0.15s ease;
+}
+
+@keyframes tradeFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.trade-dialog {
+  width: min(92vw, 440px);
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 20px 22px 18px;
+  text-align: center;
+  color: #e8d5a0;
+  background-image: linear-gradient(160deg, #1f1000 0%, #0d0800 100%);
+  border: 2px solid #c9a227;
+  border-radius: 12px;
+  box-shadow:
+    0 16px 50px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(201, 162, 39, 0.25);
+}
+
+.trade-title {
+  font: 700 1.25em 'Cinzel', Georgia, serif;
+  color: #f4d03f;
+  margin-bottom: 4px;
+  text-wrap: balance;
+}
+.trade-sub {
+  font-size: 0.9em;
+  color: #cdbb8c;
+  margin-bottom: 16px;
+  text-wrap: pretty;
+}
+
+// Hand of cards — a wrapping, centred row. Each app-card's width is set here; height follows
+// from its aspect-ratio.
+.trade-hand {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.trade-card {
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 7px;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+  transition:
+    transform 0.12s ease,
+    border-color 0.12s ease;
+}
+.trade-card app-card {
+  width: 46px;
+}
+.trade-card:hover {
+  transform: translateY(-4px);
+}
+.trade-card.selected {
+  border-color: #f4d03f;
+  transform: translateY(-6px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+.trade-card.dim {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+.trade-card.dim:hover {
+  transform: none;
+}
+
+.trade-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+.trade-btn {
+  font: 600 0.95em 'Lato', sans-serif;
+  padding: 9px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    filter 0.12s ease,
+    background 0.12s ease;
+}
+.trade-btn.primary {
+  background: linear-gradient(180deg, #e6be3f, #c9a227);
+  color: #241400;
+  border-color: #8c6a10;
+}
+.trade-btn.primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+.trade-btn.primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.trade-btn.ghost {
+  background: rgba(255, 255, 255, 0.06);
+  color: #e8d5a0;
+  border-color: rgba(201, 162, 39, 0.4);
+}
+.trade-btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.trade-spinner {
+  width: 30px;
+  height: 30px;
+  margin: 4px auto 18px;
+  border-radius: 50%;
+  border: 3px solid rgba(201, 162, 39, 0.25);
+  border-top-color: #f4d03f;
+  animation: tradeSpin 0.9s linear infinite;
+}
+@keyframes tradeSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trade-overlay {
+    animation: none;
+  }
+  .trade-spinner {
+    animation: none;
+  }
+}

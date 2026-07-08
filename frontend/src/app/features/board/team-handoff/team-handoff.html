@@ -1,6 +1,6 @@
-@if (handoff.message(); as message) {
+@if (handoff.notice(); as notice) {
   <div class="team-handoff-toast" (click)="handoff.close()" role="status">
-    <div class="team-handoff-title">{{ i18n.t('teamHandoffTitle') }}</div>
-    <div class="team-handoff-text">{{ message }}</div>
+    <div class="team-handoff-title">{{ notice.title }}</div>
+    <div class="team-handoff-text">{{ notice.message }}</div>
   </div>
 }

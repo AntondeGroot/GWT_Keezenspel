@@ -31,6 +31,9 @@ public class GameStatePush {
   // Whether this player is allowed to forfeit their turn right now
   private boolean canForfeit = true;
 
+  // Whether the King/Ace team trade sub-option is enabled
+  private boolean teamCardTrade = false;
+
   // The pending team card-trade, if any (null otherwise)
   private Trade trade;
 
@@ -63,6 +66,9 @@ public class GameStatePush {
 
   public boolean isCanForfeit() { return canForfeit; }
   public void setCanForfeit(boolean v) { canForfeit = v; }
+
+  public boolean isTeamCardTrade() { return teamCardTrade; }
+  public void setTeamCardTrade(boolean v) { teamCardTrade = v; }
 
   public Trade getTrade() { return trade; }
   public void setTrade(Trade v) { trade = v; }

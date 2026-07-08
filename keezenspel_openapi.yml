@@ -585,6 +585,9 @@ components:
         canForfeit:
           type: boolean
           description: Whether this player is allowed to forfeit their turn right now
+        teamCardTrade:
+          type: boolean
+          description: Whether the King/Ace team trade sub-option is enabled (drives the Ask button)
         trade:
           $ref: '#/components/schemas/Trade'
 

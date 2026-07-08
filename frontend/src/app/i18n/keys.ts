@@ -59,7 +59,24 @@ export type TranslationKey =
   | 'moveRejectedSplitStepsNotSeven'
   | 'moveRejectedMustFinishOwnPawnsFirst'
   | 'teamHandoffTitle'
-  | 'teamHandoffMessage';
+  | 'teamHandoffMessage'
+  | 'tradeAskButton'
+  | 'tradeOfferTitle'
+  | 'tradeOfferSub'
+  | 'tradeAsk'
+  | 'tradeClose'
+  | 'tradeWaitingTitle'
+  | 'tradeWaitingSub'
+  | 'tradeCancel'
+  | 'tradeRespondTitle'
+  | 'tradeRespondSub'
+  | 'tradeDecline'
+  | 'tradeGive'
+  | 'tradeGotTitle'
+  | 'tradeGotAceMessage'
+  | 'tradeGotKingMessage'
+  | 'tradeRejectedTitle'
+  | 'tradeRejectedMessage';
 
 /** A full set of strings for one language. */
 export type Dictionary = Record<TranslationKey, string>;
