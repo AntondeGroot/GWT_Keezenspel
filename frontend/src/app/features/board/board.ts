@@ -7,6 +7,7 @@ import { buildBoard, fanCardBacks, Pt, BoardGeometry } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { basePath } from '../../base-path';
 import { seatColor } from '../../player-colors';
+import { SoundService } from '../../sound.service';
 import { Pawn } from './pawn/pawn';
 import { Card } from './card/card';
 import { PlayerList } from '../player-list/player-list';
@@ -87,6 +88,7 @@ export class Board implements OnInit, OnDestroy{
   protected readonly i18n = inject(Translations);
   private readonly rejection = inject(MoveRejection);
   private readonly teamHandoff = inject(TeamHandoff);
+  private readonly sound = inject(SoundService);
   private readonly gameStore = inject(GameStore);
   private readonly session = resolveGameSession();
   protected readonly sessionId = this.session.sessionId;
@@ -392,7 +394,27 @@ export class Board implements OnInit, OnDestroy{
       this.prevMyTrade = iAmIn;
       this.prevHandForTrade = hand;
     });
+
+    // Sound effects (ported from the GWT AudioPlayer): a soft click when the turn passes to a
+    // new player, and a fanfare when a player finishes (gains a place). Fires on the transition.
+    effect(() => {
+      const s = this.state();
+      const cur = s?.currentPlayerId;
+      if (cur && this.prevCurrentPlayerId !== undefined && cur !== this.prevCurrentPlayerId) {
+        this.sound.play('turnChange');
+      }
+      if (cur) this.prevCurrentPlayerId = cur;
+
+      const medals = (s?.players ?? []).filter((p) => (p.place ?? -1) > -1).length;
+      if (this.prevMedalCount >= 0 && medals > this.prevMedalCount) {
+        this.sound.play('medalAwarded');
+      }
+      this.prevMedalCount = medals;
+    });
   }
+
+  private prevCurrentPlayerId: string | undefined;
+  private prevMedalCount = -1;
 
   private prevOwnPawnsHome = false;
   private prevMyTrade: Trade | null = null;
@@ -474,10 +496,14 @@ export class Board implements OnInit, OnDestroy{
   private animateMove(mr: MoveResponse): void {
     const g = this.geometry();
     if (!g) return;
+    if (mr.moveType === 'onBoard') this.sound.play('pawnOnBoard');
     const d1 = this.animatePawnPath(g, mr.pawn1, mr.movePawn1, 0);
     const d2 = this.animatePawnPath(g, mr.pawn2, mr.movePawn2, 0);
     this.animatePawnPath(g, mr.pawnKilledByPawn1, mr.movePawnKilledByPawn1, d1);
     this.animatePawnPath(g, mr.pawnKilledByPawn2, mr.movePawnKilledByPawn2, d2);
+    // A captured pawn "dies" as it's flung home — play the kill sound as that begins.
+    if (mr.pawnKilledByPawn1) this.sound.play('pawnKilled', d1);
+    if (mr.pawnKilledByPawn2) this.sound.play('pawnKilled', d2);
   }
 
   /**
@@ -849,6 +875,7 @@ export class Board implements OnInit, OnDestroy{
     const card = this.selection.getCard();
     const pawn1 = this.selection.getPawn1();
     if (!card || !pawn1 || !this.sessionId || !this.viewerId) return;
+    this.sound.play('buttonClick');
 
     // Explain selections the server would reject with a bare 400 (no reason),
     // instead of misreporting them as "not your turn".
@@ -908,6 +935,7 @@ export class Board implements OnInit, OnDestroy{
   // Forfeit the turn (the amber forfeit button) — DELETE /cards/{session}/{player}.
   protected forfeit(): void {
     if (!this.sessionId || !this.viewerId) return;
+    this.sound.play('buttonClick');
     // Snapshot my hand-card positions BEFORE the server push clears them, then fly
     // each to the pile, staggered (same as an opponent's forfeit).
     const myCards = this.cards().filter((c) => !c.inPile);

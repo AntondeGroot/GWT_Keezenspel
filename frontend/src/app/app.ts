@@ -2,6 +2,7 @@ import { Component, effect, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Board } from './features/board/board';
 import { LanguageSelector } from './features/nav/language-selector/language-selector';
+import { VolumeSlider } from './features/nav/volume-slider/volume-slider';
 import { GameRules } from './features/nav/game-rules/game-rules';
 import { LeaveGame } from './features/nav/leave-game/leave-game';
 import { MoveRejected } from './features/board/move-rejected/move-rejected';
@@ -13,7 +14,7 @@ import { basePath } from './base-path';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Board, LanguageSelector, GameRules, LeaveGame, MoveRejected, TeamHandoffPopup, WinnerBanner, ChatPanel],
+  imports: [RouterOutlet, Board, LanguageSelector, VolumeSlider, GameRules, LeaveGame, MoveRejected, TeamHandoffPopup, WinnerBanner, ChatPanel],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
