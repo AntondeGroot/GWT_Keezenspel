@@ -422,6 +422,12 @@
   pointer-events: none;
 }
 
+// A hand card masked while its swap flyer animates in (the trade). The flyer lands on the
+// real card's slot, then this clears and the card appears.
+.card.trade-hidden {
+  opacity: 0;
+}
+
 // Selected card: lifted with a gold ring + glow.
 .card.selected {
   transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) translateY(-20px) scale(1.05);

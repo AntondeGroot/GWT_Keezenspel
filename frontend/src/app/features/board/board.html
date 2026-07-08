@@ -54,6 +54,7 @@
             [class.special]="c.special"
             [class.played]="c.inPile"
             [class.dealing]="c.dealing"
+            [class.trade-hidden]="c.hidden"
             (click)="selectCard(c.uuid)"
             (mouseenter)="hoverCard(c.value)"
             (mouseleave)="hoverCard(null)" />
@@ -61,6 +62,8 @@
 
         @for (f of flyers(); track f.id) {
           <app-card class="card flyer"
+            [class.flip-in]="f.flip === 'in'"
+            [class.flip-out]="f.flip === 'out'"
             [suit]="f.suit"
             [value]="f.value"
             [style.left.%]="f.x"
