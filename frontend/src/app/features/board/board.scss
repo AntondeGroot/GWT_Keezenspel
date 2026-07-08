@@ -460,6 +460,8 @@
   border-radius: 5px;
 }
 
+// Resting special: a soft gold glow pulse — only while unselected, so it never fights the
+// selection ring's box-shadow.
 .card.special:not(.selected):not(.played):not(.flyer) {
   animation: golden-pulse 1.6s ease-in-out infinite;
 }
@@ -477,6 +479,48 @@
       4px 5px 14px rgba(0, 0, 0, 0.55),
       1px 1px 4px rgba(0, 0, 0, 0.3),
       0 0 9px 5px rgba(212, 175, 55, 0.9);
+  }
+}
+
+// Every hand special card — resting OR selected — catches the light: a soft diagonal gleam sweeps
+// across its face. `overflow: hidden` clips the gleam to the card, while the lift + selection ring
+// sit outside it, so a selected special card stays lifted/ringed AND shiny.
+.card.special:not(.played):not(.flyer) {
+  overflow: hidden;
+}
+.card.special:not(.played):not(.flyer)::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -75%;
+  width: 45%;
+  height: 200%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: translateX(0) rotate(20deg);
+  // 2.5s cycle, cross window 36% → the band takes ~0.9s to sweep across, then rests ~1.6s.
+  animation: card-sheen 2.5s ease-in-out infinite;
+}
+@keyframes card-sheen {
+  0% {
+    transform: translateX(0) rotate(20deg);
+  }
+  36%,
+  100% {
+    transform: translateX(400%) rotate(20deg);
+  }
+}
+
+// A SELECTED special card uses the normal selected look (lift + gold ring + glow); drop the flat
+// .special outline so it doesn't double up with the selection ring.
+.card.selected.special {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card.special:not(.played):not(.flyer)::after {
+    animation: none;
+    opacity: 0;
   }
 }
 
