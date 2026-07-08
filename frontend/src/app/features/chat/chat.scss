@@ -3,25 +3,120 @@
 // match the roster/board furniture.
 .chat {
   position: fixed;
-  left: 0;
-  right: 0;
+  // Desktop: tucked into the bottom of the right gutter (below the centred controls), aligned to
+  // their right margin — out of the way of the centred board rather than over it.
+  right: clamp(16px, 4vw, 72px);
   bottom: 44px; // clear the desktop footer (26px + 6px border) with a small gap above it
   z-index: 90; // under the footer (100) and the top-right nav (200)
   display: flex;
   flex-direction: column;
   gap: 6px;
-  width: 100%;
-  max-width: 420px;
-  margin: 0 auto;
-  padding: 0 10px;
+  width: 300px;
+  max-width: calc(100vw - 32px);
   box-sizing: border-box;
   font-family: 'Lato', 'Helvetica Neue', sans-serif;
 }
 
+// Mobile chat button + popup backdrop — hidden on desktop, where the panel shows inline.
+.chat-fab,
+.chat-backdrop {
+  display: none;
+}
+
 @media (max-width: 699px) {
-  // The mobile footer is taller (holds Rules + Language), so sit higher above it.
+  // On mobile the panel collapses into a floating button and only shows as a popup when opened.
   .chat {
-    bottom: 66px;
+    display: none;
+    left: auto;
+    right: 14px;
+    bottom: 124px; // above the fab
+    width: min(88vw, 340px);
+    max-width: none;
+    margin: 0;
+    padding: 10px;
+    border-radius: 12px;
+    background: linear-gradient(160deg, #1f1000, #0d0800);
+    border: 1px solid #c9a227;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+    z-index: 160;
+  }
+  .chat.chat--open {
+    display: flex;
+    animation: chatPop 0.16s ease;
+  }
+  .chat__display {
+    max-height: 44vh;
+  }
+
+  // The floating chat button — a gold coin bottom-right, above the footer.
+  .chat-fab {
+    display: grid;
+    place-items: center;
+    position: fixed;
+    right: 14px;
+    bottom: 62px;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid #8c6a10;
+    background: radial-gradient(circle at 35% 30%, #f4d24a, #c9a227 65%, #a07a12);
+    color: #241400; // the bubble (currentColor)
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    z-index: 155;
+  }
+  .chat-fab:active {
+    transform: translateY(1px);
+  }
+  .chat-fab svg {
+    width: 26px;
+    height: 26px;
+    display: block;
+  }
+  .chat-fab__badge {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #d23b2b;
+    border: 2px solid #1a0e00;
+    color: #fff;
+    font: 700 11px 'Lato', sans-serif;
+    display: grid;
+    place-items: center;
+    line-height: 1;
+    box-sizing: border-box;
+  }
+
+  .chat-backdrop.chat-backdrop--open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    background: rgba(4, 8, 5, 0.5);
+  }
+}
+
+@keyframes chatPop {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat.chat--open {
+    animation: none;
   }
 }
 
