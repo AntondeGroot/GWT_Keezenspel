@@ -606,11 +606,12 @@ export class Board implements OnInit, OnDestroy{
     suit: number,
     value: number,
     landCard: CardModel,
+    flip?: 'in' | 'out',
   ): void {
     const id = ++this.flyerSeq;
     this.flyers.update((f) => [
       ...f,
-      { id, x: from.x, y: from.y, rot: from.rot, scale: startScale, suit, value },
+      { id, x: from.x, y: from.y, rot: from.rot, scale: startScale, suit, value, flip },
     ]);
     // Next frame, fly to the pile centre at pile size.
     requestAnimationFrame(() =>
@@ -634,12 +635,16 @@ export class Board implements OnInit, OnDestroy{
     const [suit, value] = last.split('_').map(Number);
     const slot = fanCardBacks(segment, fanCount).at(-1); // the outermost card leaves
     if (!slot) return;
-    // Back-sized start (0.3 of a full card ≈ a 30px back); synthetic pile card.
-    this.spawnFlyer({ x: slot.x / 6, y: slot.y / 6, rot: slot.rotDeg }, 0.3, suit, value, {
-      uuid: this.syntheticUuid--,
+    // Back-sized start (0.3 of a full card ≈ a 30px back); synthetic pile card. It leaves the fan
+    // face-down (as the opponent held it) and turns over mid-flight to reveal at the pile.
+    this.spawnFlyer(
+      { x: slot.x / 6, y: slot.y / 6, rot: slot.rotDeg },
+      0.3,
       suit,
       value,
-    } as CardModel);
+      { uuid: this.syntheticUuid--, suit, value } as CardModel,
+      'in',
+    );
   }
 
   /** Animate the viewer's own just-played card from its (snapshotted) hand slot. */
