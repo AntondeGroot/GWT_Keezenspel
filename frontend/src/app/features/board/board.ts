@@ -206,11 +206,17 @@ export class Board implements OnInit, OnDestroy{
   // Transient face-up cards flying from an opponent's fan to the pile as they
   // play. x/y are board-% (like the cards); the `.card` transition animates them.
   protected readonly flyers = signal<
-    { id: number; x: number; y: number; rot: number; scale: number; suit: number; value: number }[]
+    {
+      id: number; x: number; y: number; rot: number; scale: number;
+      suit: number; value: number; flip?: 'in' | 'out';
+    }[]
   >([]);
   private flyerSeq = 0;
   private prevCounts: Record<string, number> | undefined;
   private syntheticUuid = -1;
+  // Hand cards hidden while a flyer animates them in (the trade swap), so the real card
+  // doesn't pop into its slot until the flyer lands on it.
+  private readonly hiddenCardUuids = signal<Set<number>>(new Set());
 
   // Deal-in animation: while a deal is in flight, `dealtIndex` maps each freshly
   // dealt card uuid to its stagger order; `atDeck` is true for the first frame so
@@ -229,6 +235,7 @@ export class Board implements OnInit, OnDestroy{
   // card from a hand slot to the pile target makes the same element animate there.
   protected readonly cards = computed(() => {
     const pile = this.pile();
+    const hiddenSet = this.hiddenCardUuids();
     const pileUuids = new Set(pile.map((c) => c.uuid));
     const handCards = this.hand().filter((c) => !pileUuids.has(c.uuid));
     const n = handCards.length;
@@ -283,6 +290,7 @@ export class Board implements OnInit, OnDestroy{
           z: dealing ? 400 - Math.round(dealDelay / 20) : t.z,
           dealDelay,
           dealing, // true while this card is dealing in (drives the flip)
+          hidden: hiddenSet.has(c.uuid), // masked while a swap flyer animates it in
         };
       });
   });
@@ -357,32 +365,36 @@ export class Board implements OnInit, OnDestroy{
     effect(() => {
       const t = this.state()?.trade ?? null;
       const hand = this.hand();
-      const mineNow = t && t.requesterId === this.viewerId ? t : null;
-      const wasMine = this.prevOutgoingTrade;
-      if (wasMine && !mineNow) {
+      const me = this.viewerId;
+      const iAmIn = t && (t.requesterId === me || t.teammateId === me) ? t : null;
+      const wasIn = this.prevMyTrade;
+      const prevHand = this.prevHandForTrade;
+      if (wasIn && !iAmIn) {
+        const iRequested = wasIn.requesterId === me;
+        const received = hand.find((c) => !prevHand.some((p) => p.uuid === c.uuid));
+        const given = prevHand.find((c) => !hand.some((h) => h.uuid === c.uuid));
+        const mate = this.state()?.players?.find((p) => p.id === wasIn.teammateId)?.name ?? '';
         if (this.suppressTradeOutcome) {
-          this.suppressTradeOutcome = false;
-        } else {
-          const offeredGone = !hand.some((c) => c.uuid === wasMine.offeredCard?.uuid);
-          const mate = this.state()?.players?.find((p) => p.id === wasMine.teammateId)?.name ?? '';
-          if (offeredGone) {
-            // Name the card you received — the King/Ace that's newly in your hand.
-            const received = hand.find((c) => !this.prevTradeHand.has(c.uuid ?? -1));
-            const key = received?.value === 1 ? 'tradeGotAceMessage' : 'tradeGotKingMessage';
+          this.suppressTradeOutcome = false; // you cancelled — no banner, no swap
+        } else if (received && given) {
+          // Accepted: animate the swap for both teammates; name the card only for the requester.
+          this.animateTradeSwap(iRequested ? wasIn.teammateId : wasIn.requesterId, received, given);
+          if (iRequested) {
+            const key = received.value === 1 ? 'tradeGotAceMessage' : 'tradeGotKingMessage';
             this.teamHandoff.show(this.i18n.t('tradeGotTitle'), this.i18n.t(key, mate));
-          } else {
-            this.teamHandoff.show(this.i18n.t('tradeRejectedTitle'), this.i18n.t('tradeRejectedMessage', mate));
           }
+        } else if (iRequested) {
+          this.teamHandoff.show(this.i18n.t('tradeRejectedTitle'), this.i18n.t('tradeRejectedMessage', mate));
         }
       }
-      this.prevOutgoingTrade = mineNow;
-      this.prevTradeHand = new Set(hand.map((c) => c.uuid ?? -1));
+      this.prevMyTrade = iAmIn;
+      this.prevHandForTrade = hand;
     });
   }
 
   private prevOwnPawnsHome = false;
-  private prevOutgoingTrade: Trade | null = null;
-  private prevTradeHand = new Set<number>();
+  private prevMyTrade: Trade | null = null;
+  private prevHandForTrade: CardModel[] = [];
   private suppressTradeOutcome = false;
 
   // ── Team card trade (step 5) ──────────────────────────────────────────────
@@ -559,6 +571,69 @@ export class Board implements OnInit, OnDestroy{
   /** Animate the viewer's own just-played card from its (snapshotted) hand slot. */
   private flyOwnCard(card: CardModel, from: { x: number; y: number }): void {
     this.spawnFlyer({ x: from.x, y: from.y, rot: 0 }, 1, card.suit ?? 0, card.value ?? 1, card);
+  }
+
+  /** Fly a transient face-up card from one board-% point to another (used by the trade swap). */
+  private flyTransient(
+    from: { x: number; y: number },
+    to: { x: number; y: number },
+    fromScale: number,
+    toScale: number,
+    suit: number,
+    value: number,
+    flip?: 'in' | 'out',
+    onLand?: () => void,
+  ): void {
+    const id = ++this.flyerSeq;
+    this.flyers.update((f) => [...f, { id, x: from.x, y: from.y, rot: 0, scale: fromScale, suit, value, flip }]);
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() =>
+        this.flyers.update((f) =>
+          f.map((fl) => (fl.id === id ? { ...fl, x: to.x, y: to.y, scale: toScale } : fl)),
+        ),
+      ),
+    );
+    setTimeout(() => {
+      this.flyers.update((f) => f.filter((fl) => fl.id !== id));
+      onLand?.();
+    }, 600);
+  }
+
+  /**
+   * Animate a completed card trade for a participant: the card you gave flies out to your
+   * teammate's fan, and the King/Ace you received flies in from it to its slot in your hand.
+   * Only the two teammates run this (their hands changed); opponents see nothing.
+   */
+  private animateTradeSwap(otherId: string, received: CardModel, given: CardModel): void {
+    const g = this.geometry();
+    if (!g) return;
+    const seg = g.deckSegment(otherId);
+    const other = seg
+      ? { x: (seg[0].x + seg[1].x) / 12, y: (seg[0].y + seg[1].y) / 12 } // midpoint (/2) in board-% (/6)
+      : { x: 52.5, y: 50 };
+    const hand = this.hand();
+    const i = hand.findIndex((c) => c.uuid === received.uuid);
+    const n = hand.length;
+    const slot = { x: 50 + (i - (n - 1) / 2) * 18, y: 116 };
+
+    // The card you gave leaves your hand, turns face-down, and shrinks into your teammate's
+    // fan — landing the same size/style as their other card backs.
+    this.flyTransient({ x: 50, y: 116 }, other, 1, 0.3, given.suit ?? 0, given.value ?? 1, 'out');
+
+    // The received King/Ace flies out of the teammate's fan as a back and turns over as it grows
+    // into your hand. Keep the real card hidden while it flies, then reveal it a frame BEFORE the
+    // flyer is removed (they overlap on the same slot) so there's no one-frame gap / flicker.
+    this.hiddenCardUuids.update((s) => new Set(s).add(received.uuid));
+    setTimeout(
+      () =>
+        this.hiddenCardUuids.update((s) => {
+          const next = new Set(s);
+          next.delete(received.uuid);
+          return next;
+        }),
+      560,
+    );
+    this.flyTransient(other, slot, 0.3, 1, received.suit ?? 0, received.value ?? 1, 'in');
   }
 
   /** Forfeit: fly all of an opponent's cards from their fan to the pile, staggered. */

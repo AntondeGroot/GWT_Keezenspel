@@ -77,3 +77,29 @@
     transform: rotateY(360deg); // a full half-turn onto the front
   }
 }
+
+// Team card-trade flyers: turn over mid-flight. flip-in reveals the received card's face
+// (back → front) as it flies into your hand; flip-out hides your given card (front → back)
+// as it flies into your teammate's fan. Duration matches the 0.6s flyer flight.
+:host(.flip-in) .flip {
+  animation: tradeFlipIn 0.5s ease-in-out both;
+}
+:host(.flip-out) .flip {
+  animation: tradeFlipOut 0.5s ease-in-out both;
+}
+@keyframes tradeFlipIn {
+  from {
+    transform: rotateY(180deg); // starts as a back
+  }
+  to {
+    transform: rotateY(360deg); // lands on the face
+  }
+}
+@keyframes tradeFlipOut {
+  from {
+    transform: rotateY(0deg); // starts on your card's face
+  }
+  to {
+    transform: rotateY(180deg); // lands as a back
+  }
+}
