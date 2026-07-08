@@ -1,7 +1,7 @@
 import { Component, signal, inject, computed, effect, OnInit, OnDestroy } from '@angular/core';
 import {
   GameStatePush, MovesService, CardsService, Card as CardModel, MoveRequest,
-  MoveResponse, Pawn as ApiPawn, PositionKey,
+  MoveResponse, Pawn as ApiPawn, PositionKey, Trade,
 } from '../../api';
 import { buildBoard, fanCardBacks, Pt, BoardGeometry } from './board-geometry';
 import { resolveGameSession } from '../../session';
@@ -10,6 +10,7 @@ import { seatColor } from '../../player-colors';
 import { Pawn } from './pawn/pawn';
 import { Card } from './card/card';
 import { PlayerList } from '../player-list/player-list';
+import { TradePanel } from './trade-panel/trade-panel';
 import {highlightForPawn1, highlightForPawn2} from './pawn-highlight';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
 import { teammateCaptureKeys } from './teammate-capture';
@@ -35,7 +36,7 @@ const HINT_KEYS: Record<number, TranslationKey> = {
 
 @Component({
   selector: 'app-board',
-  imports: [Pawn, Card, PlayerList],
+  imports: [Pawn, Card, PlayerList, TradePanel],
   templateUrl: './board.html',
   styleUrl: './board.scss',
 })
@@ -88,8 +89,8 @@ export class Board implements OnInit, OnDestroy{
   private readonly teamHandoff = inject(TeamHandoff);
   private readonly gameStore = inject(GameStore);
   private readonly session = resolveGameSession();
-  private readonly sessionId = this.session.sessionId;
-  private readonly viewerId = this.session.playerId;
+  protected readonly sessionId = this.session.sessionId;
+  protected readonly viewerId = this.session.playerId;
   private readonly streamUrl = `${basePath()}/gamestates/${this.sessionId}/${this.viewerId}/stream`;
   protected readonly state = signal<GameStatePush | undefined>(undefined);
   protected readonly geometry = computed(() => {
@@ -345,13 +346,73 @@ export class Board implements OnInit, OnDestroy{
     effect(() => {
       const allHome = this.viewerOwnPawnsAllHome();
       if (allHome && !this.prevOwnPawnsHome) {
-        this.teamHandoff.show(this.i18n.t('teamHandoffMessage'));
+        this.teamHandoff.show(this.i18n.t('teamHandoffTitle'), this.i18n.t('teamHandoffMessage'));
       }
       this.prevOwnPawnsHome = allHome;
+    });
+
+    // Team trade outcome (requester side): when your outgoing offer resolves, tell you whether
+    // your teammate gave you a card. An accept removes your offered card from your hand; a reject
+    // leaves it. Suppress the message when you cancelled it yourself.
+    effect(() => {
+      const t = this.state()?.trade ?? null;
+      const hand = this.hand();
+      const mineNow = t && t.requesterId === this.viewerId ? t : null;
+      const wasMine = this.prevOutgoingTrade;
+      if (wasMine && !mineNow) {
+        if (this.suppressTradeOutcome) {
+          this.suppressTradeOutcome = false;
+        } else {
+          const offeredGone = !hand.some((c) => c.uuid === wasMine.offeredCard?.uuid);
+          const mate = this.state()?.players?.find((p) => p.id === wasMine.teammateId)?.name ?? '';
+          if (offeredGone) {
+            // Name the card you received — the King/Ace that's newly in your hand.
+            const received = hand.find((c) => !this.prevTradeHand.has(c.uuid ?? -1));
+            const key = received?.value === 1 ? 'tradeGotAceMessage' : 'tradeGotKingMessage';
+            this.teamHandoff.show(this.i18n.t('tradeGotTitle'), this.i18n.t(key, mate));
+          } else {
+            this.teamHandoff.show(this.i18n.t('tradeRejectedTitle'), this.i18n.t('tradeRejectedMessage', mate));
+          }
+        }
+      }
+      this.prevOutgoingTrade = mineNow;
+      this.prevTradeHand = new Set(hand.map((c) => c.uuid ?? -1));
     });
   }
 
   private prevOwnPawnsHome = false;
+  private prevOutgoingTrade: Trade | null = null;
+  private prevTradeHand = new Set<number>();
+  private suppressTradeOutcome = false;
+
+  // ── Team card trade (step 5) ──────────────────────────────────────────────
+  protected readonly offering = signal(false);
+  protected readonly trade = computed<Trade | null>(() => this.state()?.trade ?? null);
+
+  /** Show the "Ask for a King/Ace" button: team game, trade sub-option on, no trade pending yet,
+   *  and you have cards to offer. */
+  protected readonly canAskTrade = computed(() => {
+    const s = this.state();
+    if (!s?.teamCardTrade || s.trade || !this.viewerId) return false;
+    const inTeam = s.players?.find((p) => p.id === this.viewerId)?.teamId != null;
+    return inTeam && this.hand().length > 0;
+  });
+
+  /** The other party's name — the teammate (when you're the requester) or the requester. */
+  protected readonly tradeOtherName = computed(() => {
+    const t = this.trade();
+    const s = this.state();
+    if (!t || !s?.players) return '';
+    const otherId = t.requesterId === this.viewerId ? t.teammateId : t.requesterId;
+    return s.players.find((p) => p.id === otherId)?.name ?? '';
+  });
+
+  protected askForTrade(): void {
+    this.offering.set(true);
+  }
+  protected onTradeCancelled(): void {
+    this.suppressTradeOutcome = true;
+  }
 
   // Team play: are all of the viewer's own pawns home (finish tiles, tileNr ≥ 16)? Drives the
   // one-time hand-off announcement. False outside a team game.

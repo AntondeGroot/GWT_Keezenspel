@@ -160,6 +160,8 @@ public class SseEmitterService {
       gs.recordMustPlayBlocked();
     }
 
+    push.setTeamCardTrade(gs.isTeamCardTrade());
+
     // A pending team card-trade is public (both the requester and their teammate act on it).
     TradeRequest pending = gs.getPendingTrade();
     if (pending != null) {

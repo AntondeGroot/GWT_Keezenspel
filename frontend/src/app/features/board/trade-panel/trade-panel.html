@@ -1,0 +1,57 @@
+@switch (mode()) {
+  @case ('offer') {
+    <div class="trade-overlay" (click)="dismiss()">
+      <div class="trade-dialog" (click)="$event.stopPropagation()">
+        <div class="trade-title">{{ i18n.t('tradeOfferTitle') }}</div>
+        <div class="trade-sub">{{ i18n.t('tradeOfferSub') }}</div>
+        <div class="trade-hand">
+          @for (c of hand(); track c.uuid) {
+            <button type="button" class="trade-card" [class.selected]="isSelected(c)" (click)="pick(c)">
+              <app-card [suit]="c.suit ?? 0" [value]="c.value ?? 1" />
+            </button>
+          }
+        </div>
+        <div class="trade-actions">
+          <button type="button" class="trade-btn ghost" (click)="dismiss()">{{ i18n.t('tradeClose') }}</button>
+          <button type="button" class="trade-btn primary" [disabled]="!canConfirm()" (click)="confirm()">
+            {{ i18n.t('tradeAsk') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+  @case ('waiting') {
+    <div class="trade-overlay">
+      <div class="trade-dialog">
+        <div class="trade-title">{{ i18n.t('tradeWaitingTitle') }}</div>
+        <div class="trade-sub">{{ i18n.t('tradeWaitingSub', otherName()) }}</div>
+        <div class="trade-spinner" aria-hidden="true"></div>
+        <div class="trade-actions">
+          <button type="button" class="trade-btn ghost" (click)="cancel()">{{ i18n.t('tradeCancel') }}</button>
+        </div>
+      </div>
+    </div>
+  }
+  @case ('respond') {
+    <div class="trade-overlay">
+      <div class="trade-dialog">
+        <div class="trade-title">{{ i18n.t('tradeRespondTitle', otherName()) }}</div>
+        <div class="trade-sub">{{ i18n.t('tradeRespondSub') }}</div>
+        <div class="trade-hand">
+          @for (c of hand(); track c.uuid) {
+            <button type="button" class="trade-card"
+                    [class.selected]="isSelected(c)" [class.dim]="!selectable(c)" (click)="pick(c)">
+              <app-card [suit]="c.suit ?? 0" [value]="c.value ?? 1" />
+            </button>
+          }
+        </div>
+        <div class="trade-actions">
+          <button type="button" class="trade-btn ghost" (click)="decline()">{{ i18n.t('tradeDecline') }}</button>
+          <button type="button" class="trade-btn primary" [disabled]="!canConfirm()" (click)="confirm()">
+            {{ i18n.t('tradeGive') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+}

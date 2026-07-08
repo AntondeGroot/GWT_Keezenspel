@@ -255,7 +255,8 @@
 }
 
 .send-button,
-.forfeit-button {
+.forfeit-button,
+.ask-trade-button {
   font: 600 15pt 'Cinzel', Georgia, serif;
   letter-spacing: 1px;
   border-radius: 8px;
@@ -303,6 +304,18 @@
 
   &:hover:not(:disabled) {
     background: linear-gradient(145deg, #fff0d0, #ffd870);
+  }
+}
+
+// The team card-trade "Ask" button — a cool slate tone so it's distinct from Play/Forfeit.
+.ask-trade-button {
+  background: linear-gradient(145deg, #cfe0f0, #8fa8c8);
+  border: 2px solid #3d5a80;
+  color: #12233a;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.35);
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(145deg, #dcebfb, #9db8d8);
   }
 }
 
@@ -477,7 +490,8 @@
 
   .button-container { padding: 8px; gap: 6px; max-width: 148px; }
   .send-button,
-  .forfeit-button {
+  .forfeit-button,
+  .ask-trade-button {
     font-size: 11pt;
     padding: 5px 10px;
     letter-spacing: 0.3px;
