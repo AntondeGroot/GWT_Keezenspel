@@ -29,7 +29,7 @@ public class ProcessOnSwitch {
 
     if (!selectionIsValid(pawn1t, pawn2t, card, moveResponse)) return;
     if (!pawnsAreDifferentPlayers(moveMessage, moveResponse)) return;
-    if (!activePlayerOwnsAPawn(playerId, moveMessage, moveResponse)) return;
+    if (!activePlayerOwnsAPawn(gs, playerId, pawn1t, pawn2t, moveResponse)) return;
     if (!playerHasCard(gs, playerId, card, moveResponse)) return;
 
     Pawn pawn1 = gs.getPawn(pawn1t);
@@ -68,10 +68,9 @@ public class ProcessOnSwitch {
   }
 
   private static boolean activePlayerOwnsAPawn(
-      String playerId, MoveRequest moveMessage, MoveResponse response) {
-    boolean ownsFirst = playerId.equals(moveMessage.getPawn1Id().getPlayerId());
-    boolean ownsSecond = playerId.equals(moveMessage.getPawn2Id().getPlayerId());
-    if (!ownsFirst && !ownsSecond) {
+      GameState gs, String playerId, Pawn pawn1, Pawn pawn2, MoveResponse response) {
+    // You must control one of the two pawns — your own, or a teammate's once your own are home.
+    if (!gs.mayControlPawn(playerId, pawn1) && !gs.mayControlPawn(playerId, pawn2)) {
       response.setResult(CANNOT_MAKE_MOVE);
       response.setRejectionReason(MoveRejectionReason.NOT_YOUR_PAWN);
       return false;

@@ -799,3 +799,52 @@ describe('PawnAndCardSelection - Forfeit', () => {
     expect(moveType).toBeNull();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Team play — controllable teammate pawns (step 4/5). Once all your own pawns are
+// home the board marks your teammate controllable, so their pawns become selectable.
+// ---------------------------------------------------------------------------
+describe('PawnAndCardSelection — team play', () => {
+  let sel: PawnAndCardSelection;
+  beforeEach(() => {
+    sel = new PawnAndCardSelection();
+    sel.setPlayerId('1');
+  });
+
+  it('a teammate pawn cannot be selected until they are controllable', () => {
+    sel.addPawn(pawn('2', 0, 5)); // not controllable yet
+    expect(sel.getPawnId1()).toBeNull();
+  });
+
+  it('a controllable teammate pawn on the board is selectable as pawn1', () => {
+    sel.setControllablePlayerIds(['1', '2']);
+    const mate = pawn('2', 0, 5);
+    sel.addPawn(mate);
+    expect(sel.getPawnId1()).toBe(mate.id);
+  });
+
+  it('a controllable teammate pawn on the start tile is selectable', () => {
+    sel.setControllablePlayerIds(['1', '2']);
+    const mateOnStart = pawn('2', 0, 0); // start tile = 0
+    sel.addPawn(mateOnStart);
+    expect(sel.getPawnId1()).toBe(mateOnStart.id);
+  });
+
+  it('a controllable teammate pawn in the finish is selectable', () => {
+    sel.setControllablePlayerIds(['1', '2']);
+    const mateInFinish = pawn('2', 0, 16); // finish tiles are 16..19
+    sel.addPawn(mateInFinish);
+    expect(sel.getPawnId1()).toBe(mateInFinish.id);
+  });
+
+  it('a Jack switches a controllable teammate pawn (pawn1) with an opponent (pawn2)', () => {
+    sel.setControllablePlayerIds(['1', '2']); // team {1,2}; player 3 is an opponent
+    sel.setCard(card(11)); // Jack
+    const mateOnStart = pawn('2', 0, 0);
+    const opponentOnBoard = pawn('3', 0, 5);
+    sel.addPawn(mateOnStart);
+    sel.addPawn(opponentOnBoard);
+    expect(sel.getPawnId1()).toBe(mateOnStart.id);
+    expect(sel.getPawnId2()).toBe(opponentOnBoard.id);
+  });
+});

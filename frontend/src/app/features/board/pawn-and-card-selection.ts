@@ -35,6 +35,9 @@ const sameCard = (a: SelCard | null, b: SelCard | null): boolean =>
 
 export class PawnAndCardSelection {
   private playerId: string | null = null;
+  // Player ids whose pawns the viewer may move as pawn1 — normally just themselves, plus their
+  // teammate once all their own pawns are home (team play). Empty → falls back to self only.
+  private controllable = new Set<string>();
   private pawns: SelPawn[] = [];
   private hand: SelCard[] = [];
 
@@ -59,6 +62,19 @@ export class PawnAndCardSelection {
 
   getPlayerId(): string | null {
     return this.playerId;
+  }
+
+  /** The players whose pawns can be moved as pawn1 (yourself + your teammate in team phase-2). */
+  setControllablePlayerIds(ids: string[]): void {
+    this.controllable = new Set(ids);
+  }
+
+  /** Whether the viewer may control this pawn as pawn1 (self, or a teammate in phase-2). */
+  private isControllable(pawn: SelPawn | null): boolean {
+    if (pawn == null) return false;
+    return this.controllable.size > 0
+      ? this.controllable.has(pawn.playerId)
+      : pawn.playerId === this.playerId;
   }
 
   updatePawns(pawns: SelPawn[]): void {
@@ -117,7 +133,7 @@ export class PawnAndCardSelection {
     // A Jack switches your pawn with ANOTHER player's pawn on the normal board.
     // Drop pawn2 if it is off the normal board, or if it is one of your own
     // (you cannot switch two of your own pawns — the Seven->Jack bugfix test).
-    if (this.pawn2 != null && (!isNormalBoard(this.pawn2) || this.pawn2.playerId === this.playerId)) {
+    if (this.pawn2 != null && (!isNormalBoard(this.pawn2) || this.isControllable(this.pawn2))) {
       this.pawn2 = null;
     }
   }
@@ -142,7 +158,7 @@ export class PawnAndCardSelection {
 
   private handlePlayerCanSelect2Pawns(pawn: SelPawn): void {
     if (this.aPawnWasNotDeselected(pawn)) {
-      if (this.playerId !== pawn.playerId) return;
+      if (!this.isControllable(pawn)) return;
       if (this.pawn1 == null) this.pawn1 = pawn;
       else this.pawn2 = pawn;
     }
@@ -150,14 +166,14 @@ export class PawnAndCardSelection {
 
   private handlePlayerCanSelect1Pawn(pawn: SelPawn): void {
     if (this.aPawnWasNotDeselected(pawn)) {
-      if (this.playerId === pawn.playerId) this.pawn1 = pawn;
+      if (this.isControllable(pawn)) this.pawn1 = pawn;
     }
   }
 
   private handlePlayerCanSelectTheirOwnAndOpponentsPawn(pawn: SelPawn): void {
     if (this.aPawnWasNotDeselected(pawn)) {
-      if (this.playerId === pawn.playerId) this.pawn1 = pawn;
-      if (this.playerId !== pawn.playerId) this.pawn2 = pawn;
+      if (this.isControllable(pawn)) this.pawn1 = pawn;
+      else this.pawn2 = pawn;
     }
   }
 
@@ -201,7 +217,7 @@ export class PawnAndCardSelection {
    */
   private autoSelectCardFor(pawn: SelPawn): void {
     if (this.playerId == null) return;
-    const isOwnPawn = this.playerId === pawn.playerId;
+    const isOwnPawn = this.isControllable(pawn);
 
     if (this.pawn1 != null && !samePawn(this.pawn1, pawn)) {
       if (isOwnPawn) this.autoSelectCardWithValue(7);

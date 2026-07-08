@@ -310,6 +310,8 @@ export class Board implements OnInit, OnDestroy{
     effect(() => {
       const s = this.state();
       if (this.viewerId) this.selection.setPlayerId(this.viewerId);
+      // In team play you may also move your teammate's pawns once all your own are home.
+      this.selection.setControllablePlayerIds(this.controllablePlayerIds());
       this.selection.updatePawns(
         (s?.pawns ?? []).map((p) => ({
           id: pawnKey(p.pawnId),
@@ -425,6 +427,23 @@ export class Board implements OnInit, OnDestroy{
   protected onTradeCancelled(): void {
     this.suppressTradeOutcome = true;
   }
+
+  // The players whose pawns the viewer may move: themselves, plus their teammate once all the
+  // viewer's own pawns are home (team play phase-2). Fed to the selection so a teammate's pawns
+  // become selectable — the backend enforces the same rule.
+  private readonly controllablePlayerIds = computed(() => {
+    const me = this.viewerId;
+    if (!me) return [];
+    const ids = [me];
+    if (this.viewerOwnPawnsAllHome()) {
+      const s = this.state();
+      const myTeam = s?.players?.find((p) => p.id === me)?.teamId;
+      const mate =
+        myTeam != null ? s?.players?.find((p) => p.id !== me && p.teamId === myTeam) : undefined;
+      if (mate) ids.push(mate.id);
+    }
+    return ids;
+  });
 
   // Team play: are all of the viewer's own pawns home (finish tiles, tileNr ≥ 16)? Drives the
   // one-time hand-off announcement. False outside a team game.
