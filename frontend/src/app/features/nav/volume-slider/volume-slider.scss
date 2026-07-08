@@ -1,0 +1,167 @@
+// A brass fader in a wooden pill — same wood/gold family as the language selector, but a
+// rounded control so it reads as a "dial". Speaker glyph gains waves with volume; the carved
+// groove fills gold up to the polished brass thumb.
+:host {
+  display: inline-flex;
+}
+
+.vol {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 13px 5px 8px;
+  border: 1px solid #c9a227;
+  border-radius: 999px;
+  background: linear-gradient(145deg, #3a2000, #251400);
+  box-shadow:
+    1px 2px 6px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: border-color 0.15s ease;
+}
+.vol:hover {
+  border-color: #e0b830;
+}
+
+// ── Speaker glyph (also the mute toggle) ────────────────────────────────────
+.vol__icon {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: #f4d03f;
+  display: grid;
+  place-items: center;
+  transition: color 0.15s ease;
+}
+.vol__icon:hover {
+  color: #ffe07a;
+}
+.vol__icon svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+.spk {
+  fill: currentColor;
+}
+.wave,
+.mute-x {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+.mute-x {
+  stroke-width: 1.9;
+}
+// waves reveal with level; the cross only when muted
+.vol[data-level='low'] .wave--1 {
+  opacity: 1;
+}
+.vol[data-level='high'] .wave--1,
+.vol[data-level='high'] .wave--2 {
+  opacity: 1;
+}
+.vol[data-level='muted'] .mute-x {
+  opacity: 1;
+}
+.vol[data-level='muted'] .vol__icon {
+  color: #9a8b5f; // dimmed brass when silenced
+}
+
+// ── Carved groove + gold fill + brass thumb ─────────────────────────────────
+.vol__range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 92px;
+  height: 18px;
+  margin: 0;
+  background: none;
+  cursor: pointer;
+  // gold up to --fill%, then the dark inset groove
+  --track: linear-gradient(
+    90deg,
+    #f0cf55 0%,
+    #c9a227 var(--fill, 100%),
+    #1c1000 var(--fill, 100%),
+    #140b00 100%
+  );
+}
+
+// WebKit
+.vol__range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--track);
+  border: 1px solid #140b00;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.75);
+}
+.vol__range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe89a, #d8ab2e 58%, #a07a12);
+  border: 1px solid #6b5010;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.6),
+    inset 0 1px 1px rgba(255, 255, 255, 0.55);
+  transition: transform 0.1s ease;
+}
+.vol__range:hover::-webkit-slider-thumb {
+  transform: scale(1.12);
+}
+
+// Firefox
+.vol__range::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: #140b00;
+  border: 1px solid #140b00;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.75);
+}
+.vol__range::-moz-range-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f0cf55, #c9a227);
+}
+.vol__range::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe89a, #d8ab2e 58%, #a07a12);
+  border: 1px solid #6b5010;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.vol__range:focus-visible {
+  outline: 2px solid #f4d03f;
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+// On mobile the fader shares the footer bar with Rules + Language, so keep it compact.
+@media (max-width: 699px) {
+  .vol {
+    gap: 6px;
+    padding: 4px 10px 4px 6px;
+  }
+  .vol__range {
+    width: 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave,
+  .mute-x,
+  .vol__range::-webkit-slider-thumb {
+    transition: none;
+  }
+}
