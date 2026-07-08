@@ -62,6 +62,29 @@ class TeamTradeTest {
   }
 
   @Test
+  void pendingTrade_clearedWhenRequesterLeaves() {
+    armStandardTrade();
+    assertTrue(gs.requestTrade("0", OFFERED));
+    gs.processLeaveGame("0"); // requester leaves — their offered card is forfeited to the pile
+
+    assertNull(gs.getPendingTrade(), "the trade must not survive the requester leaving");
+    assertFalse(gs.acceptTrade("2", KING), "a stale trade cannot be accepted");
+    // Hands stay consistent: the teammate keeps their King and gets no duplicate of the forfeited card.
+    assertTrue(deck.playerHasCard("2", KING), "teammate still holds their King");
+    assertFalse(deck.playerHasCard("2", OFFERED), "no duplicate of the forfeited offered card");
+  }
+
+  @Test
+  void pendingTrade_clearedWhenTeammateLeaves() {
+    armStandardTrade();
+    assertTrue(gs.requestTrade("0", OFFERED));
+    gs.processLeaveGame("2"); // the addressed teammate leaves
+
+    assertNull(gs.getPendingTrade(), "the trade must not survive the teammate leaving");
+    assertFalse(gs.acceptTrade("2", KING));
+  }
+
+  @Test
   void aceIsAlsoAcceptable() {
     deck.giveCardToPlayerForTesting("0", OFFERED);
     deck.giveCardToPlayerForTesting("2", ACE);

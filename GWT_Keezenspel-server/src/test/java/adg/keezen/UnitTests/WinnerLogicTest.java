@@ -74,6 +74,27 @@ class WinnerLogicTest {
   }
 
   @Test
+  void teamPlay_whenTeammateLeaves_survivorWinsSolo_andLeaverGetsNoMedal() {
+    // 4-player team game; team 0 = players 0 & 2. Player 2 leaves (their pawns are removed and are
+    // NOT required to come home). Player 0 then finishes their OWN four pawns and wins the team
+    // alone; the player who left earns no place.
+    GameState gs = new GameSession().getGameState();
+    gs.setTeamPlay(true);
+    for (int i = 0; i < 4; i++) {
+      gs.addPlayer(new Player(String.valueOf(i), String.valueOf(i)));
+    }
+    gs.start(false);
+    gs.processLeaveGame("2");
+
+    place4PawnsOnFinish(gs, "0"); // only the survivor's own four
+
+    ArrayList<String> w = new ArrayList<>();
+    gs.checkForWinners(w);
+    assertTrue(w.contains("0"), "the survivor wins the team on their own four pawns");
+    assertFalse(w.contains("2"), "a player who left earns no place");
+  }
+
+  @Test
   void whenSomeoneWins_HandGetsEmptied_NextPlayerPLays() {
     // GIVEN 3 pawns already on finish, pawn 3 one step away on the preceding player's section
     placePawnOnBoard(gameState, new PawnId("0", 0), new PositionKey("0", 17));
