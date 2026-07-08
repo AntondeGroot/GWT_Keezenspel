@@ -124,7 +124,15 @@ public class GameState {
    */
   private void assignTeams() {
     int n = players.size();
-    if (!teamPlay || n < 4 || n % 2 != 0) return;
+    if (!teamPlay) return;
+    if (n < 4 || n % 2 != 0) {
+      // Teams need an even count of at least four; with fewer or an odd count there are no pairs.
+      // Turn team play OFF so every downstream check (win detection, move gating, trades, the
+      // client push) reverts to individual play — otherwise a lone player's win is never recorded
+      // because the team win-check keeps waiting for a partner that doesn't exist.
+      teamPlay = false;
+      return;
+    }
     int teamCount = n / 2;
     // The loop index is the seat: this runs right after assignPlayerInts over the same list,
     // so index == playerInt (and avoids unboxing the nullable getPlayerInt()).
