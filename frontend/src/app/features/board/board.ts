@@ -43,45 +43,74 @@ const HINT_KEYS: Record<number, TranslationKey> = {
 })
 export class Board implements OnInit, OnDestroy{
 
+  private reconnectTimer?: ReturnType<typeof setTimeout>;
+  private destroyed = false;
+
   ngOnInit(): void {
-    if(this.sessionId){
-      this.eventSource = new EventSource(this.streamUrl);
-      this.eventSource.addEventListener('gamestate', (event: MessageEvent) => {
-        const next = JSON.parse(event.data) as GameStatePush;
-
-        // Animate the pawns of the last move. Detect a NEW move (its paths changed)
-        // and set it up BEFORE state.set, so pawns hold their start tiles instead of
-        // snapping to the server's already-final positions. Skipped on the first push.
-        const mr = next.lastMoveResponse;
-        const moveKey = mr
-          ? JSON.stringify([mr.movePawn1, mr.movePawn2, mr.movePawnKilledByPawn1, mr.movePawnKilledByPawn2])
-          : '';
-        if (this.prevMoveKey !== undefined && moveKey && moveKey !== this.prevMoveKey) {
-          this.animateMove(mr!);
-        }
-        this.prevMoveKey = moveKey;
-
-        // Detect a deal (cards that weren't in the hand before) and start the
-        // deal-in BEFORE setting state, so those cards render at the deck rather
-        // than flashing at their slots first. The FIRST push after (re)connecting
-        // has no baseline, so it isn't animated — a refresh mid-game just shows the
-        // current hand; only a genuine new round during the session deals in.
-        const cards = next.playerCards ?? [];
-        const prev = this.prevHandUuids;
-        if (prev) {
-          const fresh = cards.filter((c) => !prev.has(c.uuid)).map((c) => c.uuid);
-          if (fresh.length > 0) this.animateDeal(fresh);
-        }
-        this.prevHandUuids = new Set(cards.map((c) => c.uuid));
-        this.gameStore.players.set(next.players ?? []);
-        this.gameStore.winners.set(next.winners ?? []);
-        this.state.set(next);
-      });
-    }
+    if (this.sessionId) this.connectStream();
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
+    clearTimeout(this.reconnectTimer);
     this.eventSource?.close();
+  }
+
+  /**
+   * Open the game-state SSE stream. The server sends a fresh personalized snapshot on every
+   * (re)subscribe, so if the browser gives up on the stream (readyState CLOSED) we re-establish
+   * it after a short backoff — otherwise a dropped stream leaves a STALE board that then rejects
+   * your moves as "not your turn" (ported from the GWT presenter's onError resync).
+   */
+  private connectStream(): void {
+    if (!this.sessionId || this.destroyed) return;
+    this.eventSource?.close();
+    // The reconnect snapshot is a fresh baseline, not a new move/deal — don't animate it.
+    this.prevMoveKey = undefined;
+    this.prevHandUuids = undefined;
+
+    const es = new EventSource(this.streamUrl);
+    this.eventSource = es;
+    es.addEventListener('gamestate', (event: MessageEvent) =>
+      this.handleGameState(JSON.parse(event.data) as GameStatePush),
+    );
+    es.onerror = () => {
+      // CONNECTING → the browser is auto-retrying, leave it. CLOSED → it gave up, so re-open.
+      if (es.readyState === EventSource.CLOSED) {
+        clearTimeout(this.reconnectTimer);
+        this.reconnectTimer = setTimeout(() => this.connectStream(), 2000);
+      }
+    };
+  }
+
+  private handleGameState(next: GameStatePush): void {
+    // Animate the pawns of the last move. Detect a NEW move (its paths changed)
+    // and set it up BEFORE state.set, so pawns hold their start tiles instead of
+    // snapping to the server's already-final positions. Skipped on the first push.
+    const mr = next.lastMoveResponse;
+    const moveKey = mr
+      ? JSON.stringify([mr.movePawn1, mr.movePawn2, mr.movePawnKilledByPawn1, mr.movePawnKilledByPawn2])
+      : '';
+    if (this.prevMoveKey !== undefined && moveKey && moveKey !== this.prevMoveKey) {
+      this.animateMove(mr!);
+    }
+    this.prevMoveKey = moveKey;
+
+    // Detect a deal (cards that weren't in the hand before) and start the
+    // deal-in BEFORE setting state, so those cards render at the deck rather
+    // than flashing at their slots first. The FIRST push after (re)connecting
+    // has no baseline, so it isn't animated — a refresh mid-game just shows the
+    // current hand; only a genuine new round during the session deals in.
+    const cards = next.playerCards ?? [];
+    const prev = this.prevHandUuids;
+    if (prev) {
+      const fresh = cards.filter((c) => !prev.has(c.uuid)).map((c) => c.uuid);
+      if (fresh.length > 0) this.animateDeal(fresh);
+    }
+    this.prevHandUuids = new Set(cards.map((c) => c.uuid));
+    this.gameStore.players.set(next.players ?? []);
+    this.gameStore.winners.set(next.winners ?? []);
+    this.state.set(next);
   }
   private readonly movesService = inject(MovesService);
   private readonly cardsService = inject(CardsService);
