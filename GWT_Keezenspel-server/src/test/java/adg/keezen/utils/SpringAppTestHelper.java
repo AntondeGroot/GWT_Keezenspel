@@ -1,4 +1,4 @@
-package adg.keezen.IntegrationTests.Utils;
+package adg.keezen.utils;
 
 import adg.Application;
 import java.net.URI;

@@ -1,7 +1,5 @@
 package adg.keezen.utils;
 
-import adg.keezen.IntegrationTests.Utils.SpringAppSuiteExtension;
-import adg.keezen.IntegrationTests.Utils.SpringAppTestHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 
