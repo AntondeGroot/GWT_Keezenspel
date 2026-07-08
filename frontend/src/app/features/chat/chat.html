@@ -1,5 +1,36 @@
 @if (chat.available()) {
-  <section class="chat" aria-label="Chat">
+  <!-- Mobile only (CSS): a floating chat button with an unread-count badge. Tapping it opens
+       the panel as a popup and clears the badge. Desktop hides this and shows the panel inline. -->
+  <button
+    class="chat-fab"
+    type="button"
+    (click)="toggle()"
+    [attr.aria-label]="open() ? 'Close chat' : 'Open chat'"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M5 5 h14 a2.5 2.5 0 0 1 2.5 2.5 v6 a2.5 2.5 0 0 1 -2.5 2.5 H11 l-4.5 3.5 V16.5 H5
+           a2.5 2.5 0 0 1 -2.5 -2.5 V7.5 A2.5 2.5 0 0 1 5 5 Z"
+        fill="currentColor"
+      />
+      <circle cx="9" cy="10.7" r="1.1" fill="#f4d24a" />
+      <circle cx="12" cy="10.7" r="1.1" fill="#f4d24a" />
+      <circle cx="15" cy="10.7" r="1.1" fill="#f4d24a" />
+    </svg>
+    @if (unread() > 0) {
+      <span class="chat-fab__badge">{{ unread() > 9 ? '9+' : unread() }}</span>
+    }
+  </button>
+
+  <!-- Backdrop behind the mobile popup (tap to close). -->
+  <div
+    class="chat-backdrop"
+    [class.chat-backdrop--open]="open()"
+    (click)="close()"
+    aria-hidden="true"
+  ></div>
+
+  <section class="chat" [class.chat--open]="open()" aria-label="Chat">
     <div class="chat__display" data-testid="chat-display">
       @for (m of chat.messages(); track $index) {
         <div class="chat__line">
