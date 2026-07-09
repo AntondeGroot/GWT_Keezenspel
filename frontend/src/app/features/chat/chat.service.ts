@@ -78,7 +78,11 @@ export class ChatService {
     const trimmed = text.trim();
     if (!trimmed || !this.sessionId) return;
     const body = { sender, message: encrypt(trimmed, this.sessionId) };
-    this.http.post(`${basePath()}/chat/${this.sessionId}`, body).subscribe({ error: () => {} });
+    this.http.post(`${basePath()}/chat/${this.sessionId}`, body).subscribe({
+      error: () => {
+        /* fire-and-forget: errors are non-critical here */
+      },
+    });
   }
 
   disconnect(): void {

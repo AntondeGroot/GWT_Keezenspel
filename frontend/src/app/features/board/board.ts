@@ -939,7 +939,9 @@ export class Board implements OnInit, OnDestroy {
           // Highlight the landing tile(s) — the last tile of each pawn's path.
           this.previewTiles.set(new Set((res.tiles ?? []).map((t) => `${t.playerId}:${t.tileNr}`)));
         },
-        error: () => {},
+        error: () => {
+          /* fire-and-forget: errors are non-critical here */
+        },
       });
   }
 
@@ -1054,7 +1056,11 @@ export class Board implements OnInit, OnDestroy {
     // Snapshot my hand-card positions BEFORE the server push clears them, then fly
     // each to the pile, staggered (same as an opponent's forfeit).
     const myCards = this.cards().filter((c) => !c.inPile);
-    this.cardsService.playerForfeits(this.sessionId, this.viewerId).subscribe({ error: () => {} });
+    this.cardsService.playerForfeits(this.sessionId, this.viewerId).subscribe({
+      error: () => {
+        /* fire-and-forget: errors are non-critical here */
+      },
+    });
     this.selection.reset();
     this.previewTiles.set(new Set());
     this.touch();

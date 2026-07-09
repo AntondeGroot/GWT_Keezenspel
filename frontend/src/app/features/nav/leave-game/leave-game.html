@@ -19,8 +19,13 @@
   </button>
 
   @if (confirming()) {
-    <div class="leave-overlay" (click)="cancel()">
-      <div class="leave-dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <div
+      class="leave-overlay"
+      tabindex="0"
+      (click)="$event.target === $event.currentTarget && cancel()"
+      (keydown.escape)="cancel()"
+    >
+      <div class="leave-dialog" role="dialog" aria-modal="true">
         <p class="leave-dialog__q">{{ i18n.t('confirmLeaveGame') }}</p>
         <div class="leave-dialog__actions">
           <button class="leave-dialog__cancel" (click)="cancel()">

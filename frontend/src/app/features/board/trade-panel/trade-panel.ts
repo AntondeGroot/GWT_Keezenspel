@@ -88,9 +88,11 @@ export class TradePanel {
     const sessionId = this.sessionId();
     const playerId = this.viewerId();
     if (!sessionId || !playerId) return;
-    this.tradeService
-      .teamTrade(sessionId, { action, playerId, card })
-      .subscribe({ error: () => {} });
+    this.tradeService.teamTrade(sessionId, { action, playerId, card }).subscribe({
+      error: () => {
+        /* fire-and-forget: errors are non-critical here */
+      },
+    });
   }
   private close(): void {
     this.selectedUuid.set(null);

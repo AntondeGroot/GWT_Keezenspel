@@ -1,5 +1,11 @@
 @if (rejection.message(); as message) {
-  <div class="move-rejected-dialog" (click)="rejection.close()">
+  <div
+    class="move-rejected-dialog"
+    tabindex="0"
+    (click)="rejection.close()"
+    (keydown.escape)="rejection.close()"
+    (keydown.enter)="rejection.close()"
+  >
     <div class="move-rejected-title">{{ i18n.t('moveRejectedTitle') }}</div>
     <div class="move-rejected-text">{{ message }}</div>
     <div class="move-rejected-close-hint">{{ i18n.t('rulesClickToClose') }}</div>
