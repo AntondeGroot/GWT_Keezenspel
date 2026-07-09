@@ -1,8 +1,7 @@
 package adg.keezen.move;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 
-public enum MoveType implements IsSerializable {
+public enum MoveType {
   MOVE,
   SPLIT,
   SWITCH,

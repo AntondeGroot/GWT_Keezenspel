@@ -2,14 +2,13 @@ package adg.keezen.state;
 
 import adg.keezen.player.Pawn;
 import adg.keezen.player.Player;
-import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class GameStateResponse implements IsSerializable {
+public class GameStateResponse {
   private ArrayList<Pawn> pawns;
   private ArrayList<Player> players;
   private HashMap<String, Integer> playerColors;

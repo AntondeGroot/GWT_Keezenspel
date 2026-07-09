@@ -1,10 +1,9 @@
 package adg.keezen.player;
 
 import adg.keezen.TileId;
-import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.Objects;
 
-public class Pawn implements IsSerializable {
+public class Pawn {
   private PawnId pawnId;
   private TileId currentTileId;
   private TileId nestTileId;

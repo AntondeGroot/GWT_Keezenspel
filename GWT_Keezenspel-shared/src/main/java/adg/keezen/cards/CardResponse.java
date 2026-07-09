@@ -1,12 +1,11 @@
 package adg.keezen.cards;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class CardResponse implements IsSerializable {
+public class CardResponse {
   // serializable messages cannot contain List but must use a concrete implementation like ArrayList
   // or LinkedList
   String playerUUID;

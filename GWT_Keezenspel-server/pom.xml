@@ -27,12 +27,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- GWT servlet -->
-    <dependency>
-      <groupId>org.gwtproject</groupId>
-      <artifactId>gwt-servlet-jakarta</artifactId>
-    </dependency>
-
     <!-- Spring Boot backend -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -204,16 +198,6 @@
         </configuration>
       </plugin>
 
-      <!-- Skip GWT plugin here -->
-      <plugin>
-        <groupId>net.ltgt.gwt.maven</groupId>
-        <artifactId>gwt-maven-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-          <moduleName/>
-        </configuration>
-      </plugin>
-
       <!-- OpenAPI generator -->
       <plugin>
         <groupId>org.openapitools</groupId>
@@ -308,51 +292,6 @@
   </build>
 
   <profiles>
-    <profile>
-      <!-- XXX: We want to exclude GWT_Keezenspel-client from 'env-dev' profile, Maven forces us to make a 'env-prod' profile -->
-      <id>env-prod</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>unpack-gwt-client</id>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>unpack</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>${project.groupId}</groupId>
-                      <artifactId>GWT_Keezenspel-client</artifactId>
-                      <version>${project.version}</version>
-                      <type>war</type>
-                      <outputDirectory>${project.build.outputDirectory}/public</outputDirectory>
-                      <includes>app/**</includes>
-                    </artifactItem>
-                  </artifactItems>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-      <dependencies>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>GWT_Keezenspel-client</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-          <scope>runtime</scope>
-        </dependency>
-      </dependencies>
-    </profile>
     <profile>
       <id>env-dev</id>
       <activation>

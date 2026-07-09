@@ -1,9 +1,8 @@
 package adg.keezen;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.Objects;
 
-public class TileId implements IsSerializable {
+public class TileId {
   private String playerId;
   private int tileNr;
 

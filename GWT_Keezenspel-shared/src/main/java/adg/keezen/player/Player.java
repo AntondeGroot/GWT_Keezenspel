@@ -1,9 +1,8 @@
 package adg.keezen.player;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.Objects;
 
-public class Player implements IsSerializable {
+public class Player {
   private boolean isActive;
   private boolean isPlaying;
   private String name;
