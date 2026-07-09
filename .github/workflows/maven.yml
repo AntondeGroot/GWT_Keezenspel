@@ -55,8 +55,12 @@ jobs:
           fi
       # postinstall generates the OpenAPI client, so npm ci produces src/app/api
       - run: npm ci
-      - name: Unit tests (Vitest)
-        run: npm test -- --no-watch
+      - name: Lint (eslint, --max-warnings=0)
+        run: npm run lint
+      - name: Format check (prettier)
+        run: npm run format:check
+      - name: Unit tests + coverage
+        run: npm run test:coverage
 
   # ── Frontend end-to-end tests (Playwright) ───────────────────────────
   e2e:
@@ -146,8 +150,10 @@ jobs:
           java-version: '25'
           distribution: 'temurin'
           cache: maven
-      - name: Test server
-        run: mvn -B -Denv=dev -pl backend -am test
+      # verify runs the full gate: -Werror compile, enforcer, tests (incl. ArchUnit +
+      # context smoke test), SpotBugs, and the JaCoCo coverage check.
+      - name: Verify server
+        run: mvn -B -Denv=dev -pl backend -am clean verify
 
   # ── Mutation tests (server) ──────────────────────────────────────────
   mutation:

@@ -1,0 +1,6 @@
+# Heavier gate before pushing: build + tests, both frontend and backend.
+cd frontend
+npm test -- --no-watch
+npm run build
+cd ..
+mvn -B -Denv=dev -pl backend -am test
