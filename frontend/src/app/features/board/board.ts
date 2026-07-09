@@ -415,8 +415,8 @@ export class Board implements OnInit, OnDestroy {
       if (counts && prev) {
         for (const [pid, n] of Object.entries(counts)) {
           if (pid === this.viewerId) continue;
+          if (!(pid in prev)) continue;
           const before = prev[pid];
-          if (before === undefined) continue;
           const dropped = before - n;
           if (dropped === 1)
             this.flyOpponentCard(pid, before, played); // played one card

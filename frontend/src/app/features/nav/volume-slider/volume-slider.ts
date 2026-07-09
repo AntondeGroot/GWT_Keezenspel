@@ -20,7 +20,8 @@ export class VolumeSlider {
   /** Which speaker glyph to show. */
   protected readonly level = computed(() => {
     const v = this.sound.volume();
-    return v === 0 ? 'muted' : v < 0.5 ? 'low' : 'high';
+    if (v === 0) return 'muted';
+    return v < 0.5 ? 'low' : 'high';
   });
 
   protected onInput(value: string): void {

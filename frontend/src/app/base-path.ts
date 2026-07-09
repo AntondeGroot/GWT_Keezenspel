@@ -7,6 +7,7 @@
  * src="study-icon.svg") resolve against <base href> automatically and don't need this.
  */
 export function basePath(): string {
-  const href = document.querySelector('base')?.getAttribute('href') ?? '/';
-  return href.replace(/\/+$/, ''); // '/keezen/' -> '/keezen', '/' -> ''
+  let href = document.querySelector('base')?.getAttribute('href') ?? '/';
+  while (href.endsWith('/')) href = href.slice(0, -1); // '/keezen/' -> '/keezen', '/' -> ''
+  return href;
 }
