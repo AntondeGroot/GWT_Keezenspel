@@ -270,7 +270,7 @@
                   <element>BUNDLE</element>
                   <limits>
                     <limit><counter>LINE</counter><value>COVEREDRATIO</value><minimum>0.85</minimum></limit>
-                    <limit><counter>BRANCH</counter><value>COVEREDRATIO</value><minimum>0.73</minimum></limit>
+                    <limit><counter>BRANCH</counter><value>COVEREDRATIO</value><minimum>0.74</minimum></limit>
                   </limits>
                 </rule>
               </rules>
