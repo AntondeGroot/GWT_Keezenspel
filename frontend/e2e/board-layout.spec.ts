@@ -17,7 +17,12 @@ const PLAYER_COUNTS = [2, 3, 4];
 
 type Box = { top: number; right: number; bottom: number; left: number };
 const overlaps = (a: Box, b: Box, T = 1) =>
-  !(a.right <= b.left + T || a.left >= b.right - T || a.bottom <= b.top + T || a.top >= b.bottom - T);
+  !(
+    a.right <= b.left + T ||
+    a.left >= b.right - T ||
+    a.bottom <= b.top + T ||
+    a.top >= b.bottom - T
+  );
 
 test.describe('board layout: cards vs. title / viewport / tiles', () => {
   const sessions: Record<number, string> = {};
@@ -35,7 +40,9 @@ test.describe('board layout: cards vs. title / viewport / tiles', () => {
     for (const n of PLAYER_COUNTS) {
       test(`${vp.name} · ${n} players`, async ({ browser }) => {
         const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height } });
-        await ctx.addCookies([{ name: 'playerid', value: 'player0', url: 'http://localhost:4300' }]);
+        await ctx.addCookies([
+          { name: 'playerid', value: 'player0', url: 'http://localhost:4300' },
+        ]);
         const page = await ctx.newPage();
         await page.goto(`/?sessionid=${sessions[n]}&playerid=player0`);
         await page.waitForSelector('.card-back', { timeout: 30000 });
@@ -58,11 +65,19 @@ test.describe('board layout: cards vs. title / viewport / tiles', () => {
         // (1) + (2) opponent card backs: below the title AND within the viewport.
         expect(g.backs.length).toBeGreaterThan(0);
         for (const b of g.backs) {
-          expect(b.top, `card back (top ${b.top}) overlaps title (bottom ${g.title.bottom})`)
-            .toBeGreaterThanOrEqual(g.title.bottom - T);
+          expect(
+            b.top,
+            `card back (top ${b.top}) overlaps title (bottom ${g.title.bottom})`,
+          ).toBeGreaterThanOrEqual(g.title.bottom - T);
           expect(b.left, `card back off the left edge (${b.left})`).toBeGreaterThanOrEqual(-T);
-          expect(b.right, `card back off the right edge (${b.right} > ${g.vw})`).toBeLessThanOrEqual(g.vw + T);
-          expect(b.bottom, `card back below the viewport (${b.bottom} > ${g.vh})`).toBeLessThanOrEqual(g.vh + T);
+          expect(
+            b.right,
+            `card back off the right edge (${b.right} > ${g.vw})`,
+          ).toBeLessThanOrEqual(g.vw + T);
+          expect(
+            b.bottom,
+            `card back below the viewport (${b.bottom} > ${g.vh})`,
+          ).toBeLessThanOrEqual(g.vh + T);
         }
 
         // (3) hand cards must not overlap any board tile.

@@ -27,7 +27,9 @@ test.describe('in-game chat (Chat_IT)', () => {
     await page.context().close();
   });
 
-  test('chat UI (input, send, display) becomes visible when the chat server is up', async ({ browser }) => {
+  test('chat UI (input, send, display) becomes visible when the chat server is up', async ({
+    browser,
+  }) => {
     await startChatMock();
     const { page } = await openBoard(browser, { players: 3, as: 'player0' });
     await expect(send(page)).toBeVisible();
@@ -46,8 +48,13 @@ test.describe('in-game chat (Chat_IT)', () => {
     if (!btn || !footer) throw new Error('send button or footer not laid out');
 
     const buttonBottom = btn.y + btn.height;
-    expect(buttonBottom, 'send button bottom should be above the footer top').toBeLessThan(footer.y);
-    expect(footer.y - buttonBottom, 'send button should be just above the footer').toBeLessThanOrEqual(60);
+    expect(buttonBottom, 'send button bottom should be above the footer top').toBeLessThan(
+      footer.y,
+    );
+    expect(
+      footer.y - buttonBottom,
+      'send button should be just above the footer',
+    ).toBeLessThanOrEqual(60);
     await page.context().close();
   });
 });

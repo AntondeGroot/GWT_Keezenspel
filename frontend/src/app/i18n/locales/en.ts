@@ -42,7 +42,8 @@ export const en: Dictionary = {
   moveRejectedNotYourPawn: "That pawn isn't yours.",
   moveRejectedDestinationOccupiedByOwnPawn: 'One of your own pawns is already on that tile.',
   moveRejectedDestinationBlocked: "You can't move there — the path is blocked.",
-  moveRejectedStartTileOccupied: "Your starting tile is occupied, so you can't come onto the board.",
+  moveRejectedStartTileOccupied:
+    "Your starting tile is occupied, so you can't come onto the board.",
   moveRejectedCannotPassStartTile: "You can't pass another player's pawn on their starting tile.",
   moveRejectedCannotSwitchOpponentOnOwnStart:
     "You can't switch with an opponent who is on their own starting tile.",
@@ -51,9 +52,10 @@ export const en: Dictionary = {
   moveRejectedPawnClosedInFinish: "That pawn is closed in on the finish and can't move.",
   moveRejectedSplitNeedsTwoOwnPawns: 'A 7-split needs two of your own pawns.',
   moveRejectedSplitStepsNotSeven: 'The two parts of the 7 must add up to 7 steps.',
-  moveRejectedMustFinishOwnPawnsFirst: 'Finish getting your own pawns home before you play your teammate\'s.',
+  moveRejectedMustFinishOwnPawnsFirst:
+    "Finish getting your own pawns home before you play your teammate's.",
   teamHandoffTitle: 'Your pawns are home!',
-  teamHandoffMessage: 'You can now play your teammate\'s pawns.',
+  teamHandoffMessage: "You can now play your teammate's pawns.",
   tradeAskButton: 'Ask for a King or Ace',
   tradeOfferTitle: 'Ask your teammate',
   tradeOfferSub: 'Pick a card to give, then ask for a King or Ace.',

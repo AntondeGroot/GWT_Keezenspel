@@ -35,7 +35,10 @@
 }
 
 .trade-title {
-  font: 700 1.25em 'Cinzel', Georgia, serif;
+  font:
+    700 1.25em 'Cinzel',
+    Georgia,
+    serif;
   color: #f4d03f;
   margin-bottom: 4px;
   text-wrap: balance;
@@ -92,7 +95,9 @@
   gap: 12px;
 }
 .trade-btn {
-  font: 600 0.95em 'Lato', sans-serif;
+  font:
+    600 0.95em 'Lato',
+    sans-serif;
   padding: 9px 20px;
   border-radius: 8px;
   cursor: pointer;

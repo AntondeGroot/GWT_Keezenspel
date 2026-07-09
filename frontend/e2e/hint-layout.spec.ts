@@ -46,7 +46,12 @@ function checkClean(g: {
     fails.push(`hint collides with footer (hint.bottom ${hint.bottom} > footer.top ${footer.top})`);
 
   const overlaps = (a: DOMRect, b: DOMRect) =>
-    !(a.right <= b.left + T || a.left >= b.right - T || a.bottom <= b.top + T || a.top >= b.bottom - T);
+    !(
+      a.right <= b.left + T ||
+      a.left >= b.right - T ||
+      a.bottom <= b.top + T ||
+      a.top >= b.bottom - T
+    );
   if (cards.some((c) => overlaps(hint, c))) fails.push('hint overlaps a hand card');
 
   return fails;

@@ -32,7 +32,12 @@ test.describe('mobile layout (MobileLayoutCheck_IT)', () => {
       const onScreen = (r: DOMRect | null) =>
         !!r && r.top >= -T && r.left >= -T && r.right <= g.vw + T && r.bottom <= g.vh + T;
       const overlap = (a: DOMRect, b: DOMRect) =>
-        !(a.right <= b.left + T || b.right <= a.left + T || a.bottom <= b.top + T || b.bottom <= a.top + T);
+        !(
+          a.right <= b.left + T ||
+          b.right <= a.left + T ||
+          a.bottom <= b.top + T ||
+          b.bottom <= a.top + T
+        );
 
       expect(onScreen(g.board), 'board on screen').toBe(true);
       expect(onScreen(g.buttons), 'buttons on screen').toBe(true);

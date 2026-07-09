@@ -1,5 +1,4 @@
 import { Component, effect, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { Board } from './features/board/board';
 import { LanguageSelector } from './features/nav/language-selector/language-selector';
 import { VolumeSlider } from './features/nav/volume-slider/volume-slider';
@@ -14,9 +13,19 @@ import { basePath } from './base-path';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Board, LanguageSelector, VolumeSlider, GameRules, LeaveGame, MoveRejected, TeamHandoffPopup, WinnerBanner, ChatPanel],
+  imports: [
+    Board,
+    LanguageSelector,
+    VolumeSlider,
+    GameRules,
+    LeaveGame,
+    MoveRejected,
+    TeamHandoffPopup,
+    WinnerBanner,
+    ChatPanel,
+  ],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
 export class App {
   protected readonly i18n = inject(Translations);

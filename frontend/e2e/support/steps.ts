@@ -32,7 +32,10 @@ export async function openBoard(
     as?: string;
     viewport?: Viewport;
     gameOptions?: Record<string, unknown>;
-    setup?: (api: Awaited<ReturnType<typeof request.newContext>>, sessionId: string) => Promise<void>;
+    setup?: (
+      api: Awaited<ReturnType<typeof request.newContext>>,
+      sessionId: string,
+    ) => Promise<void>;
   } = {},
 ): Promise<{ page: Page; sessionId: string }> {
   const as = opts.as ?? 'player0';

@@ -34,7 +34,9 @@ test.describe('mobile header (Option D)', () => {
           return el ? (el.getBoundingClientRect().toJSON() as DOMRect) : null;
         };
         const rects = (s: string) =>
-          [...document.querySelectorAll(s)].map((e) => e.getBoundingClientRect().toJSON() as DOMRect);
+          [...document.querySelectorAll(s)].map(
+            (e) => e.getBoundingClientRect().toJSON() as DOMRect,
+          );
         return {
           leave: rj('.leaveGameButton'),
           footer: rj('.footer-bar'),
@@ -65,10 +67,18 @@ test.describe('mobile header (Option D)', () => {
       await page.click('.leaveGameButton');
       await expect(page.locator('.leave-dialog')).toBeVisible();
       const d = await page.evaluate(() => {
-        const rj = (s: string) => document.querySelector(s)!.getBoundingClientRect().toJSON() as DOMRect;
+        const rj = (s: string) =>
+          document.querySelector(s)!.getBoundingClientRect().toJSON() as DOMRect;
         const rects = (s: string) =>
-          [...document.querySelectorAll(s)].map((e) => e.getBoundingClientRect().toJSON() as DOMRect);
-        return { dialog: rj('.leave-dialog'), btns: rects('.leave-dialog button'), vw: window.innerWidth, vh: window.innerHeight };
+          [...document.querySelectorAll(s)].map(
+            (e) => e.getBoundingClientRect().toJSON() as DOMRect,
+          );
+        return {
+          dialog: rj('.leave-dialog'),
+          btns: rects('.leave-dialog button'),
+          vw: window.innerWidth,
+          vh: window.innerHeight,
+        };
       });
       expect(d.dialog.left).toBeGreaterThanOrEqual(-T);
       expect(d.dialog.right).toBeLessThanOrEqual(d.vw + T);
@@ -91,7 +101,8 @@ test.describe('mobile header (Option D)', () => {
     await page.waitForSelector('.leaveGameButton', { timeout: 30000 });
 
     const g = await page.evaluate(() => {
-      const rj = (s: string) => document.querySelector(s)!.getBoundingClientRect().toJSON() as DOMRect;
+      const rj = (s: string) =>
+        document.querySelector(s)!.getBoundingClientRect().toJSON() as DOMRect;
       return { leave: rj('.leaveGameButton'), nav: rj('.footer-nav'), vw: window.innerWidth };
     });
     // Leave stays a labelled plaque top-left; nav is hoisted to the top-right.

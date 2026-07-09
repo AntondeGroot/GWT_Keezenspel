@@ -6,14 +6,26 @@
         <div class="trade-sub">{{ i18n.t('tradeOfferSub') }}</div>
         <div class="trade-hand">
           @for (c of hand(); track c.uuid) {
-            <button type="button" class="trade-card" [class.selected]="isSelected(c)" (click)="pick(c)">
-              <app-card [suit]="c.suit ?? 0" [value]="c.value ?? 1" />
+            <button
+              type="button"
+              class="trade-card"
+              [class.selected]="isSelected(c)"
+              (click)="pick(c)"
+            >
+              <app-card [suit]="c.suit" [value]="c.value" />
             </button>
           }
         </div>
         <div class="trade-actions">
-          <button type="button" class="trade-btn ghost" (click)="dismiss()">{{ i18n.t('tradeClose') }}</button>
-          <button type="button" class="trade-btn primary" [disabled]="!canConfirm()" (click)="confirm()">
+          <button type="button" class="trade-btn ghost" (click)="dismiss()">
+            {{ i18n.t('tradeClose') }}
+          </button>
+          <button
+            type="button"
+            class="trade-btn primary"
+            [disabled]="!canConfirm()"
+            (click)="confirm()"
+          >
             {{ i18n.t('tradeAsk') }}
           </button>
         </div>
@@ -27,7 +39,9 @@
         <div class="trade-sub">{{ i18n.t('tradeWaitingSub', otherName()) }}</div>
         <div class="trade-spinner" aria-hidden="true"></div>
         <div class="trade-actions">
-          <button type="button" class="trade-btn ghost" (click)="cancel()">{{ i18n.t('tradeCancel') }}</button>
+          <button type="button" class="trade-btn ghost" (click)="cancel()">
+            {{ i18n.t('tradeCancel') }}
+          </button>
         </div>
       </div>
     </div>
@@ -39,15 +53,27 @@
         <div class="trade-sub">{{ i18n.t('tradeRespondSub') }}</div>
         <div class="trade-hand">
           @for (c of hand(); track c.uuid) {
-            <button type="button" class="trade-card"
-                    [class.selected]="isSelected(c)" [class.dim]="!selectable(c)" (click)="pick(c)">
-              <app-card [suit]="c.suit ?? 0" [value]="c.value ?? 1" />
+            <button
+              type="button"
+              class="trade-card"
+              [class.selected]="isSelected(c)"
+              [class.dim]="!selectable(c)"
+              (click)="pick(c)"
+            >
+              <app-card [suit]="c.suit" [value]="c.value" />
             </button>
           }
         </div>
         <div class="trade-actions">
-          <button type="button" class="trade-btn ghost" (click)="decline()">{{ i18n.t('tradeDecline') }}</button>
-          <button type="button" class="trade-btn primary" [disabled]="!canConfirm()" (click)="confirm()">
+          <button type="button" class="trade-btn ghost" (click)="decline()">
+            {{ i18n.t('tradeDecline') }}
+          </button>
+          <button
+            type="button"
+            class="trade-btn primary"
+            [disabled]="!canConfirm()"
+            (click)="confirm()"
+          >
             {{ i18n.t('tradeGive') }}
           </button>
         </div>

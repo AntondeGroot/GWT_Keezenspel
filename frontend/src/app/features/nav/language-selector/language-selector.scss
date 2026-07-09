@@ -1,12 +1,21 @@
 // Ported from the GWT .lang-listbox: a dark gold-bordered dropdown with a globe
 // icon on the left, gold Cinzel text.
 .lang-listbox {
-  font: 600 13pt 'Cinzel', Georgia, serif;
+  font:
+    600 13pt 'Cinzel',
+    Georgia,
+    serif;
   color: #f4d03f;
-  background-image: var(--globe-language-image, url('/globe-language.svg')), linear-gradient(145deg, #3a2000, #251400);
+  background-image:
+    var(--globe-language-image, url('/globe-language.svg')),
+    linear-gradient(145deg, #3a2000, #251400);
   background-repeat: no-repeat, no-repeat;
-  background-position: 8px center, 0 0;
-  background-size: 20px 20px, 100% 100%;
+  background-position:
+    8px center,
+    0 0;
+  background-size:
+    20px 20px,
+    100% 100%;
   border: 1px solid #c9a227;
   border-radius: 4px;
   padding: 5px 8px 5px 36px;
@@ -15,7 +24,9 @@
   outline: none;
 
   &:hover {
-    background-image: var(--globe-language-image, url('/globe-language.svg')), linear-gradient(145deg, #4a2800, #341a00);
+    background-image:
+      var(--globe-language-image, url('/globe-language.svg')),
+      linear-gradient(145deg, #4a2800, #341a00);
     border-color: #e0b830;
   }
 

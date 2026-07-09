@@ -1,0 +1,12 @@
+# Generated OpenAPI client — regenerated on every install/build, never hand-formatted
+src/app/api/
+
+# Build & tooling output
+dist/
+coverage/
+playwright-report/
+test-results/
+node_modules/
+
+# Lockfiles
+package-lock.json

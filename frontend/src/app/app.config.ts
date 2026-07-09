@@ -13,6 +13,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     // API base path = the app's mount prefix, so calls go to /keezen/games under a
     // /keezen deploy and /games at the root.
-    provideApi(basePath())
-  ]
+    provideApi(basePath()),
+  ],
 };

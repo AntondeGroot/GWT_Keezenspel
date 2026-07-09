@@ -64,7 +64,10 @@ export class TradePanel {
   protected confirm(): void {
     const c = this.hand().find((x) => x.uuid === this.selectedUuid());
     if (!c) return;
-    this.send(this.mode() === 'respond' ? TradeAction.ActionEnum.Accept : TradeAction.ActionEnum.Request, c);
+    this.send(
+      this.mode() === 'respond' ? TradeAction.ActionEnum.Accept : TradeAction.ActionEnum.Request,
+      c,
+    );
     this.close();
   }
   protected decline(): void {
@@ -85,7 +88,9 @@ export class TradePanel {
     const sessionId = this.sessionId();
     const playerId = this.viewerId();
     if (!sessionId || !playerId) return;
-    this.tradeService.teamTrade(sessionId, { action, playerId, card }).subscribe({ error: () => {} });
+    this.tradeService
+      .teamTrade(sessionId, { action, playerId, card })
+      .subscribe({ error: () => {} });
   }
   private close(): void {
     this.selectedUuid.set(null);

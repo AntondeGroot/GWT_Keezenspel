@@ -7,8 +7,14 @@
  * The palette matches the GWT client's PlayerColors, so colours are unchanged from before.
  */
 const PALETTE = [
-  '#A52A2A', '#1a6fbd', '#008000', '#A5A500',
-  '#6A5ACD', '#FF8C00', '#008B8B', '#8B008B',
+  '#A52A2A',
+  '#1a6fbd',
+  '#008000',
+  '#A5A500',
+  '#6A5ACD',
+  '#FF8C00',
+  '#008B8B',
+  '#8B008B',
 ] as const;
 
 const FALLBACK = '#8a8a8a';

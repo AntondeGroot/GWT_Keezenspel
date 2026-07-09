@@ -22,13 +22,30 @@
   margin-bottom: 9px;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
-.team-line { font-size: 12.5px; line-height: 1.4; }
-.team-line__lbl { font-weight: 800; letter-spacing: 0.03em; }
-.team-line[data-team='A'] .team-line__lbl { color: var(--team-a); }
-.team-line[data-team='B'] .team-line__lbl { color: var(--team-b); }
-.team-line[data-team='C'] .team-line__lbl { color: var(--team-c); }
-.team-line[data-team='D'] .team-line__lbl { color: var(--team-d); }
-.team-line__who { margin-left: 5px; color: #ded4ad; }
+.team-line {
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+.team-line__lbl {
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+.team-line[data-team='A'] .team-line__lbl {
+  color: var(--team-a);
+}
+.team-line[data-team='B'] .team-line__lbl {
+  color: var(--team-b);
+}
+.team-line[data-team='C'] .team-line__lbl {
+  color: var(--team-c);
+}
+.team-line[data-team='D'] .team-line__lbl {
+  color: var(--team-d);
+}
+.team-line__who {
+  margin-left: 5px;
+  color: #ded4ad;
+}
 
 /* ── Chips in turn order. Mobile: a compact grid that wraps beside the buttons
       (so 6–8 players don't run off-screen). Desktop: a single column in the
@@ -62,7 +79,9 @@
   place-items: center;
   border-radius: 50%;
   background: #1c2b20;
-  box-shadow: 0 0 0 2.5px var(--player-color), 0 0 0 3.5px #0a1610;
+  box-shadow:
+    0 0 0 2.5px var(--player-color),
+    0 0 0 3.5px #0a1610;
 }
 .chip__initial {
   font-family: 'Cinzel', serif;
@@ -102,12 +121,25 @@
   font-weight: 800;
   color: #14251b;
 }
-.tag[data-team='A'] { background: var(--team-a); }
-.tag[data-team='B'] { background: var(--team-b); }
-.tag[data-team='C'] { background: var(--team-c); }
-.tag[data-team='D'] { background: var(--team-d); }
+.tag[data-team='A'] {
+  background: var(--team-a);
+}
+.tag[data-team='B'] {
+  background: var(--team-b);
+}
+.tag[data-team='C'] {
+  background: var(--team-c);
+}
+.tag[data-team='D'] {
+  background: var(--team-d);
+}
 
-.chip__medal { flex: 0 0 auto; font-size: 15px; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5)); }
+.chip__medal {
+  flex: 0 0 auto;
+  font-size: 15px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
 
 .chip__dot {
   flex: 0 0 auto;
@@ -119,8 +151,15 @@
   animation: turn-pulse 1.4s ease-in-out infinite;
 }
 @keyframes turn-pulse {
-  0%, 100% { opacity: 0.5; transform: scale(0.82); }
-  50% { opacity: 1; transform: scale(1.12); }
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.82);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
 }
 
 // Player on turn: gold chip + glow.
@@ -129,7 +168,10 @@
   background: linear-gradient(rgba(244, 208, 63, 0.14), rgba(6, 18, 11, 0.85));
   box-shadow: 0 0 14px rgba(244, 208, 63, 0.28);
 
-  .chip__name { color: #fdf3cf; font-weight: 700; }
+  .chip__name {
+    color: #fdf3cf;
+    font-weight: 700;
+  }
 }
 
 // Left / finished / inactive: dimmed, grey ring, struck-through name.
@@ -137,32 +179,69 @@
   opacity: 0.5;
 
   .chip__avatar {
-    box-shadow: 0 0 0 2.5px #b9b3a2, 0 0 0 3.5px #0a1610;
+    box-shadow:
+      0 0 0 2.5px #b9b3a2,
+      0 0 0 3.5px #0a1610;
     filter: grayscale(0.5);
   }
-  .chip__name { color: #b7ae9b; font-style: italic; text-decoration: line-through; }
+  .chip__name {
+    color: #b7ae9b;
+    font-style: italic;
+    text-decoration: line-through;
+  }
 }
 
 // Mobile: keep the roster narrow so its chips wrap into ~2 columns beside the
 // buttons, and compact them so even an 8-player game stays on screen.
 @media (max-width: 699px) {
-  :host { max-width: 178px; } // two fixed-width chips (84px) + gap per row
-  .chip { width: 84px; box-sizing: border-box; padding: 3px 7px 3px 3px; gap: 5px; }
-  .chip__avatar { width: 24px; height: 24px; }
-  .chip__initial { font-size: 11px; }
-  .chip__name { font-size: 11px; }
+  :host {
+    max-width: 178px;
+  } // two fixed-width chips (84px) + gap per row
+  .chip {
+    width: 84px;
+    box-sizing: border-box;
+    padding: 3px 7px 3px 3px;
+    gap: 5px;
+  }
+  .chip__avatar {
+    width: 24px;
+    height: 24px;
+  }
+  .chip__initial {
+    font-size: 11px;
+  }
+  .chip__name {
+    font-size: 11px;
+  }
 }
 
 // Desktop: the roster sits in the right column — a single stack of larger chips.
 @media (min-width: 700px) {
-  .roster__chips { flex-flow: column nowrap; align-items: stretch; gap: 8px; }
-  .chip { padding: 6px 14px 6px 6px; }
-  .chip__avatar { width: 34px; height: 34px; }
-  .chip__initial { font-size: 14px; }
-  .chip__name { font-size: 14px; }
-  .team-line { font-size: 13.5px; }
+  .roster__chips {
+    flex-flow: column nowrap;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .chip {
+    padding: 6px 14px 6px 6px;
+  }
+  .chip__avatar {
+    width: 34px;
+    height: 34px;
+  }
+  .chip__initial {
+    font-size: 14px;
+  }
+  .chip__name {
+    font-size: 14px;
+  }
+  .team-line {
+    font-size: 13.5px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chip__dot { animation: none; }
+  .chip__dot {
+    animation: none;
+  }
 }

@@ -11,7 +11,12 @@ type Api = Awaited<ReturnType<typeof request.newContext>>;
 
 /** Park a player one Ace-step from home: 3 pawns in the finish (17/18/19), the 4th
  *  on the previous section's tile 15. Playing the Ace sends the last one home → win. */
-async function setupWin(api: Api, s: string, playerId: string, prevPlayerId: string): Promise<void> {
+async function setupWin(
+  api: Api,
+  s: string,
+  playerId: string,
+  prevPlayerId: string,
+): Promise<void> {
   await setPawn(api, s, playerId, 0, playerId, 19);
   await setPawn(api, s, playerId, 1, playerId, 18);
   await setPawn(api, s, playerId, 2, playerId, 17);
@@ -22,7 +27,10 @@ const winMove = (api: Api, s: string, playerId: string) =>
   makeMove(api, s, playerId, { cardId: 1, pawn1Id: { playerId, pawnNr: 3 }, stepsPawn1: 1 });
 
 /** Read a player's roster chip (medal text + finished/dimmed state) by name. */
-function chip(page: Page, name: string): Promise<{ medal: string | null; inactive: boolean } | null> {
+function chip(
+  page: Page,
+  name: string,
+): Promise<{ medal: string | null; inactive: boolean } | null> {
   return page.evaluate((n) => {
     const c = [...document.querySelectorAll('.chip')].find(
       (el) => el.querySelector('.chip__name')?.textContent?.trim() === n,
@@ -38,7 +46,9 @@ function chip(page: Page, name: string): Promise<{ medal: string | null; inactiv
 const medalOf = (page: Page, name: string) => chip(page, name).then((c) => c?.medal ?? null);
 
 test.describe('winners & medals (Winner_IT / Winner2Players_IT)', () => {
-  test('2 players: the winner gets gold, is marked finished, and is announced', async ({ browser }) => {
+  test('2 players: the winner gets gold, is marked finished, and is announced', async ({
+    browser,
+  }) => {
     const api = await request.newContext({ baseURL: API_URL });
     const { sessionId } = await createGame(api, 2);
     await setupWin(api, sessionId, 'player0', 'player1');
@@ -54,7 +64,9 @@ test.describe('winners & medals (Winner_IT / Winner2Players_IT)', () => {
     await page.context().close();
   });
 
-  test('2 players: when player 1 wins, player 1 gets the medal — not player 0', async ({ browser }) => {
+  test('2 players: when player 1 wins, player 1 gets the medal — not player 0', async ({
+    browser,
+  }) => {
     const api = await request.newContext({ baseURL: API_URL });
     const { sessionId } = await createGame(api, 2);
     const page = await viewAs(browser, sessionId, 'player0');
@@ -70,7 +82,9 @@ test.describe('winners & medals (Winner_IT / Winner2Players_IT)', () => {
     await page.context().close();
   });
 
-  test('3 players: medals are awarded in finishing order (gold then silver)', async ({ browser }) => {
+  test('3 players: medals are awarded in finishing order (gold then silver)', async ({
+    browser,
+  }) => {
     const api = await request.newContext({ baseURL: API_URL });
     const { sessionId } = await createGame(api, 3);
     await setupWin(api, sessionId, 'player0', 'player2');

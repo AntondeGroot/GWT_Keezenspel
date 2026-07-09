@@ -10,7 +10,9 @@ import { openBoard, clickPawn } from './support/steps';
 const MUST_PLAY = { mustPlayIfPossible: true };
 
 test.describe('must-play rule — Forfeit gating', () => {
-  test('with a legal move you must play: Forfeit disabled, Play turns green', async ({ browser }) => {
+  test('with a legal move you must play: Forfeit disabled, Play turns green', async ({
+    browser,
+  }) => {
     // An Ace can take a nest pawn onto the board → player0 has a legal move.
     const { page } = await openBoard(browser, {
       gameOptions: MUST_PLAY,
@@ -30,7 +32,9 @@ test.describe('must-play rule — Forfeit gating', () => {
     await page.context().close();
   });
 
-  test('with no legal move you may forfeit even under must-play: Forfeit enabled', async ({ browser }) => {
+  test('with no legal move you may forfeit even under must-play: Forfeit enabled', async ({
+    browser,
+  }) => {
     // A 5 cannot move any pawn out of the nest → no legal move → forfeit allowed.
     const { page } = await openBoard(browser, {
       gameOptions: MUST_PLAY,

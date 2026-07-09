@@ -97,8 +97,10 @@ export function buildBoard(
     const pInt = j < 0 ? last : 0;
     const tileNr = j < 0 ? j + 16 : j;
     tiles.push({ playerId: byInt(pInt).id, tileNr, x: round1(start.x), y: round1(start.y) });
-    if (j < -3) start.y += cell; // down for 6 tiles
-    else if (j < 1) start.x -= cell; // left for 4 tiles
+    if (j < -3)
+      start.y += cell; // down for 6 tiles
+    else if (j < 1)
+      start.x -= cell; // left for 4 tiles
     else start.y -= cell; // up for 5 tiles
   }
 
