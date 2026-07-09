@@ -4,6 +4,7 @@ import com.adg.openapi.model.NewGameRequest;
 import com.adg.openapi.model.Player;
 import java.util.List;
 import java.util.Map;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -14,6 +15,11 @@ public class ApiCallsHelper {
   private final RestTemplate restTemplate;
   private final String baseUrl = "http://localhost:4200";
 
+  private static final ParameterizedTypeReference<Map<String, Object>> MAP_TYPE =
+      new ParameterizedTypeReference<>() {};
+  private static final ParameterizedTypeReference<List<Map<String, Object>>> LIST_TYPE =
+      new ParameterizedTypeReference<>() {};
+
   public ApiCallsHelper() {
     this.restTemplate = new RestTemplate();
   }
@@ -21,7 +27,7 @@ public class ApiCallsHelper {
   // ---------- GAMES ----------
   public List<Map<String, Object>> getAllGames() {
     String url = baseUrl + "/games";
-    ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, null, List.class);
+    ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(url, HttpMethod.GET, null, LIST_TYPE);
     return response.getBody();
   }
 
@@ -38,7 +44,7 @@ public class ApiCallsHelper {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<NewGameRequest> entity = new HttpEntity<>(request, headers);
-    ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
+    ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.POST, entity, MAP_TYPE);
     return response.getBody().get("sessionId").toString();
   }
 
@@ -53,10 +59,10 @@ public class ApiCallsHelper {
   // ---------- PLAYERS ----------
   public List<Map<String, Object>> getAllPlayersInGame(String sessionId) {
     String url =
-        UriComponentsBuilder.fromHttpUrl(baseUrl + "/games/{sessionId}/players")
+        UriComponentsBuilder.fromUriString(baseUrl + "/games/{sessionId}/players")
             .buildAndExpand(sessionId)
             .toString();
-    ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, null, List.class);
+    ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(url, HttpMethod.GET, null, LIST_TYPE);
     return response.getBody();
   }
 
@@ -64,8 +70,8 @@ public class ApiCallsHelper {
     String url = baseUrl + "/games/" + sessionId + "/players";
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
-    ResponseEntity<Map> response =
-        restTemplate.postForEntity(url, new HttpEntity<>(player, headers), Map.class);
+    ResponseEntity<Map<String, Object>> response =
+        restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(player, headers), MAP_TYPE);
     return response.getBody().get("playerId").toString();
   }
 
@@ -76,7 +82,7 @@ public class ApiCallsHelper {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<Map<String, Object>> entity = new HttpEntity<>(moveRequest, headers);
-    ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
+    ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.POST, entity, MAP_TYPE);
     return response.getBody();
   }
 
@@ -86,26 +92,26 @@ public class ApiCallsHelper {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<Map<String, Object>> entity = new HttpEntity<>(moveRequest, headers);
-    ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
+    ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.POST, entity, MAP_TYPE);
     return response.getBody();
   }
 
   /** Returns the raw response so callers can assert the status (200 body / 204 empty / 404 throws). */
-  public ResponseEntity<Map> getLastMove(String sessionId) {
+  public ResponseEntity<Map<String, Object>> getLastMove(String sessionId) {
     String url = baseUrl + "/moves/" + sessionId + "/last";
-    return restTemplate.exchange(url, HttpMethod.GET, null, Map.class);
+    return restTemplate.exchange(url, HttpMethod.GET, null, MAP_TYPE);
   }
 
   // ---------- CARDS ----------
   public Map<String, Object> getPubliclyAvailableCardInformation(String sessionId) {
     String url = baseUrl + "/cards/" + sessionId;
-    ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, null, Map.class);
+    ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.GET, null, MAP_TYPE);
     return response.getBody();
   }
 
   public List<Map<String, Object>> getPlayerCards(String sessionId, String playerId) {
     String url = baseUrl + "/cards/" + sessionId + "/" + playerId;
-    ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, null, List.class);
+    ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(url, HttpMethod.GET, null, LIST_TYPE);
     return response.getBody();
   }
 
@@ -148,13 +154,13 @@ public class ApiCallsHelper {
   // ---------- GAME STATES ----------
   public Map<String, Object> getGameState(String sessionId) {
     String url = baseUrl + "/gamestates/" + sessionId;
-    ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, null, Map.class);
+    ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.GET, null, MAP_TYPE);
     return response.getBody();
   }
 
   public Map<String, Object> getGameDetails(String sessionId) {
     String url = baseUrl + "/games/" + sessionId;
-    ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, null, Map.class);
+    ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.GET, null, MAP_TYPE);
     return response.getBody();
   }
 }

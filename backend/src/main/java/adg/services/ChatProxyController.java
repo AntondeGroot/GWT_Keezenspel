@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -47,7 +46,7 @@ public class ChatProxyController {
   private void proxyStream(String sessionId, SseEmitter emitter) {
     String url = CHAT_SERVER_BASE_URL + "/chat/" + sessionId + "/stream";
     try {
-      HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+      HttpURLConnection conn = (HttpURLConnection) URI.create(url).toURL().openConnection();
       conn.setRequestProperty("Accept", "text/event-stream");
       conn.setConnectTimeout(5_000);
       conn.setReadTimeout(0);

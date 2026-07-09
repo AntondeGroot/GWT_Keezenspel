@@ -42,7 +42,7 @@ class GetLastMoveApiTest extends BaseUnitTest {
     String sessionId = ApiUtil.createStandardGame();
 
     // WHEN asking for the last move
-    ResponseEntity<Map> response = apiHelper.getLastMove(sessionId);
+    ResponseEntity<Map<String, Object>> response = apiHelper.getLastMove(sessionId);
 
     // THEN there is none
     assertEquals(
@@ -71,7 +71,7 @@ class GetLastMoveApiTest extends BaseUnitTest {
     apiHelper.makeMove(sessionId, player0Id, moveRequest);
 
     // THEN the last-move endpoint returns that move
-    ResponseEntity<Map> response = apiHelper.getLastMove(sessionId);
+    ResponseEntity<Map<String, Object>> response = apiHelper.getLastMove(sessionId);
 
     assertEquals(200, response.getStatusCode().value());
     assertNotNull(response.getBody(), "200 response should contain the last MoveResponse");

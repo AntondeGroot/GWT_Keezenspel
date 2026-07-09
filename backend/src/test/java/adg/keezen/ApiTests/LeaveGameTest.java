@@ -8,7 +8,7 @@ import adg.keezen.utils.BaseUnitTest;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -132,7 +132,7 @@ public class LeaveGameTest extends BaseUnitTest {
 
     Thread sseReader = new Thread(() -> {
       try {
-        HttpURLConnection conn = (HttpURLConnection) new URL(sseUrl).openConnection();
+        HttpURLConnection conn = (HttpURLConnection) URI.create(sseUrl).toURL().openConnection();
         conn.setRequestProperty("Accept", "text/event-stream");
         conn.connect();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
