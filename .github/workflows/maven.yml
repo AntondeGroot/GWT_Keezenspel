@@ -37,7 +37,7 @@ jobs:
       # so it survives npm ci and can be cached; keyed on the pinned generator version.
       # Cache invalidates automatically when openapitools.json (the version) changes.
       - name: Cache OpenAPI generator jar
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: frontend/.openapi-generator-cli
           key: openapi-generator-cli-${{ hashFiles('frontend/openapitools.json') }}
@@ -80,7 +80,7 @@ jobs:
       # so it survives npm ci and can be cached; keyed on the pinned generator version.
       # Cache invalidates automatically when openapitools.json (the version) changes.
       - name: Cache OpenAPI generator jar
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: frontend/.openapi-generator-cli
           key: openapi-generator-cli-${{ hashFiles('frontend/openapitools.json') }}
