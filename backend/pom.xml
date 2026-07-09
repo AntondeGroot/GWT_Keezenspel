@@ -270,7 +270,7 @@
                   <element>BUNDLE</element>
                   <limits>
                     <limit><counter>LINE</counter><value>COVEREDRATIO</value><minimum>0.86</minimum></limit>
-                    <limit><counter>BRANCH</counter><value>COVEREDRATIO</value><minimum>0.76</minimum></limit>
+                    <limit><counter>BRANCH</counter><value>COVEREDRATIO</value><minimum>0.77</minimum></limit>
                   </limits>
                 </rule>
               </rules>
@@ -303,6 +303,7 @@
             <param>adg.keezen.TradeManagerTest</param>
             <param>adg.keezen.TileReachabilityTest</param>
             <param>adg.keezen.PlayerRosterTest</param>
+            <param>adg.keezen.PawnLocationsTest</param>
           </targetTests>
           <mutators>
             <mutator>DEFAULTS</mutator>
