@@ -33,6 +33,26 @@ jobs:
           node-version: '24'
           cache: npm
           cache-dependency-path: frontend/package-lock.json
+      # The generator jar is stored outside node_modules (openapitools.json storageDir)
+      # so it survives npm ci and can be cached; keyed on the pinned generator version.
+      # Cache invalidates automatically when openapitools.json (the version) changes.
+      - name: Cache OpenAPI generator jar
+        uses: actions/cache@v4
+        with:
+          path: frontend/.openapi-generator-cli
+          key: openapi-generator-cli-${{ hashFiles('frontend/openapitools.json') }}
+      - name: Ensure OpenAPI generator jar
+        run: |
+          ver=$(node -p "require('./openapitools.json')['generator-cli'].version")
+          jar=".openapi-generator-cli/${ver}.jar"
+          if [ ! -f "$jar" ]; then
+            mkdir -p .openapi-generator-cli
+            for i in 1 2 3; do
+              curl -fsSL -o "$jar" \
+                "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/${ver}/openapi-generator-cli-${ver}.jar" && break
+              echo "download attempt $i failed; retrying..."; sleep 5
+            done
+          fi
       # postinstall generates the OpenAPI client, so npm ci produces src/app/api
       - run: npm ci
       - name: Unit tests (Vitest)
@@ -56,6 +76,27 @@ jobs:
           node-version: '24'
           cache: npm
           cache-dependency-path: frontend/package-lock.json
+      # The generator jar is stored outside node_modules (openapitools.json storageDir)
+      # so it survives npm ci and can be cached; keyed on the pinned generator version.
+      # Cache invalidates automatically when openapitools.json (the version) changes.
+      - name: Cache OpenAPI generator jar
+        uses: actions/cache@v4
+        with:
+          path: frontend/.openapi-generator-cli
+          key: openapi-generator-cli-${{ hashFiles('frontend/openapitools.json') }}
+      - name: Ensure OpenAPI generator jar
+        working-directory: frontend
+        run: |
+          ver=$(node -p "require('./openapitools.json')['generator-cli'].version")
+          jar=".openapi-generator-cli/${ver}.jar"
+          if [ ! -f "$jar" ]; then
+            mkdir -p .openapi-generator-cli
+            for i in 1 2 3; do
+              curl -fsSL -o "$jar" \
+                "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/${ver}/openapi-generator-cli-${ver}.jar" && break
+              echo "download attempt $i failed; retrying..."; sleep 5
+            done
+          fi
       # postinstall generates the OpenAPI client, so npm ci produces src/app/api
       - name: Install frontend deps
         working-directory: frontend
