@@ -1,8 +1,17 @@
 // @ts-check
+//
+// NOTE: architectural-boundary linting (eslint-plugin-boundaries) is deliberately
+// NOT used. This app is feature-co-located — a component (features/board/board.ts)
+// sits beside its pure helpers (features/board/board-geometry.ts) with no path
+// convention separating layers, so boundaries can't classify them without a brittle
+// hand-list. Its load-bearing rule (forbid component -> store) is also inappropriate
+// here: GameStore is a tiny signal holder that components idiomatically read directly.
+// The sonarjs design rules + size caps below cover the god-object risk instead.
 const eslint = require('@eslint/js');
 const { defineConfig } = require('eslint/config');
 const tseslint = require('typescript-eslint');
 const angular = require('angular-eslint');
+const sonarjs = require('eslint-plugin-sonarjs');
 
 module.exports = defineConfig([
   {
@@ -25,6 +34,7 @@ module.exports = defineConfig([
       tseslint.configs.recommended,
       tseslint.configs.stylistic,
       angular.configs.tsRecommended,
+      sonarjs.configs.recommended,
     ],
     languageOptions: {
       parserOptions: {
@@ -61,6 +71,50 @@ module.exports = defineConfig([
       '@typescript-eslint/prefer-readonly': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-deprecated': 'error',
+      // Generated client: import from the barrel (…/api), never deep service/model paths.
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/api/api/*', '**/api/model/*'],
+              message: 'Import generated client symbols from the barrel (…/api), not deep paths.',
+            },
+          ],
+        },
+      ],
+      // God-object / size caps. Files already over a cap are ratchet-pinned in a
+      // per-file override below (frozen ceiling; lower the TODO as they are slimmed).
+      'max-lines': ['error', { max: 400, skipBlankLines: true, skipComments: true }],
+      'max-lines-per-function': ['error', { max: 80, skipBlankLines: true, skipComments: true }],
+      'max-classes-per-file': ['error', 1],
+    },
+  },
+  {
+    // Specs are legitimately long (fixtures, setup) — size caps do not apply.
+    files: ['src/**/*.spec.ts'],
+    rules: {
+      'max-lines': 'off',
+      'max-lines-per-function': 'off',
+      'max-classes-per-file': 'off',
+      // sonarjs's design rules target production code; these misfire on the Angular
+      // testing idioms (e.g. HttpTestingController.expectNone is not seen as an assertion).
+      'sonarjs/assertions-in-tests': 'off',
+      'sonarjs/prefer-specific-assertions': 'off',
+      'sonarjs/no-alphabetical-sort': 'off',
+    },
+  },
+  {
+    // RATCHET: board.ts is an oversized god component. Pinned at its current counted
+    // size (frozen ceiling — can shrink, never grow). TODO: extract logic and lower
+    // these toward the global caps (400 / 80), then delete this override.
+    files: ['src/app/features/board/board.ts'],
+    rules: {
+      'max-lines': ['error', { max: 840, skipBlankLines: true, skipComments: true }],
+      'max-lines-per-function': ['error', { max: 88, skipBlankLines: true, skipComments: true }],
+      // Same ratchet: these resolve when the component is broken up (TODO above).
+      'sonarjs/cognitive-complexity': 'off',
+      'sonarjs/no-nested-functions': 'off',
     },
   },
   {

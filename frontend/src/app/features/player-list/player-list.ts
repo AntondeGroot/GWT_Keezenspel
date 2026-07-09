@@ -67,7 +67,7 @@ export class PlayerList {
     const teams = teamsOn
       ? [...new Set(chips.map((c) => c.team))]
           .filter((t): t is string => !!t)
-          .sort()
+          .sort((a, b) => a.localeCompare(b))
           .map((t) => ({ team: t, names: chips.filter((c) => c.team === t).map((c) => c.name) }))
       : [];
 

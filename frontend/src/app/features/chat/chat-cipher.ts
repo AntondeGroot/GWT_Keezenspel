@@ -14,20 +14,19 @@ function toHex(v: number): string {
   return HEX[(v >> 12) & 0xf] + HEX[(v >> 8) & 0xf] + HEX[(v >> 4) & 0xf] + HEX[v & 0xf];
 }
 
+/** Value of one hex digit char code; unknown digits count as 0 (matches the GWT port). */
+function hexDigit(c: number): number {
+  if (c >= 48 && c <= 57) return c - 48; // '0'–'9'
+  if (c >= 97 && c <= 102) return c - 97 + 10; // 'a'–'f'
+  if (c >= 65 && c <= 70) return c - 65 + 10; // 'A'–'F'
+  return 0;
+}
+
 /** Parse 4 hex digits back to a number (case-insensitive; unknown digits count as 0). */
 function fromHex(s: string): number {
   let r = 0;
   for (let i = 0; i < s.length; i++) {
-    const c = s.charCodeAt(i);
-    const d =
-      c >= 48 && c <= 57
-        ? c - 48 // '0'–'9'
-        : c >= 97 && c <= 102
-          ? c - 97 + 10 // 'a'–'f'
-          : c >= 65 && c <= 70
-            ? c - 65 + 10 // 'A'–'F'
-            : 0;
-    r = r * 16 + d;
+    r = r * 16 + hexDigit(s.charCodeAt(i));
   }
   return r;
 }
