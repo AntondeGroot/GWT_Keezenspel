@@ -114,6 +114,12 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit-junit5</artifactId>
+      <version>1.3.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -223,6 +229,50 @@
         </executions>
       </plugin>
 
+      <!-- Line/branch coverage -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.13</version>
+        <configuration>
+          <excludes>
+            <exclude>adg/Application.class</exclude>
+            <exclude>adg/testing/**</exclude>
+            <exclude>adg/services/TestResetController.class</exclude>
+            <exclude>com/adg/openapi/**</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals><goal>prepare-agent</goal></goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals><goal>report</goal></goals>
+          </execution>
+          <execution>
+            <id>check</id>
+            <goals><goal>check</goal></goals>
+            <configuration>
+              <!-- RATCHET: pinned just below current (line 86%, branch 74%) as a floor
+                   that can only rise. TODO: raise both toward the 0.90 target as tests
+                   are added (branch coverage is the gap). -->
+              <rules>
+                <rule>
+                  <element>BUNDLE</element>
+                  <limits>
+                    <limit><counter>LINE</counter><value>COVEREDRATIO</value><minimum>0.85</minimum></limit>
+                    <limit><counter>BRANCH</counter><value>COVEREDRATIO</value><minimum>0.72</minimum></limit>
+                  </limits>
+                </rule>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
       <!-- Mutation testing -->
       <plugin>
         <groupId>org.pitest</groupId>
@@ -252,7 +302,9 @@
             <outputFormat>HTML</outputFormat>
           </outputFormats>
           <timestampedReports>false</timestampedReports>
-          <mutationThreshold>60</mutationThreshold>
+          <!-- RATCHET: current score ~67%. Raised the floor 60 -> 65; TODO climb toward the
+               70-80% target as weak tests are strengthened. -->
+          <mutationThreshold>65</mutationThreshold>
           <avoidCallsTo>
             <avoidCallsTo>adg.Log</avoidCallsTo>
           </avoidCallsTo>
