@@ -120,6 +120,12 @@
       <version>1.4.2</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>5.14.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -256,7 +262,7 @@
             <id>check</id>
             <goals><goal>check</goal></goals>
             <configuration>
-              <!-- RATCHET: pinned just below current (line 86%, branch 74%) as a floor
+              <!-- RATCHET: pinned just below current (line 86%, branch 75%) as a floor
                    that can only rise. TODO: raise both toward the 0.90 target as tests
                    are added (branch coverage is the gap). -->
               <rules>
@@ -264,7 +270,7 @@
                   <element>BUNDLE</element>
                   <limits>
                     <limit><counter>LINE</counter><value>COVEREDRATIO</value><minimum>0.85</minimum></limit>
-                    <limit><counter>BRANCH</counter><value>COVEREDRATIO</value><minimum>0.72</minimum></limit>
+                    <limit><counter>BRANCH</counter><value>COVEREDRATIO</value><minimum>0.73</minimum></limit>
                   </limits>
                 </rule>
               </rules>
@@ -294,6 +300,7 @@
           <targetTests>
             <param>adg.keezen.UnitTests.*</param>
             <param>adg.keezen.logic.*</param>
+            <param>adg.keezen.TradeManagerTest</param>
           </targetTests>
           <mutators>
             <mutator>DEFAULTS</mutator>
@@ -302,9 +309,9 @@
             <outputFormat>HTML</outputFormat>
           </outputFormats>
           <timestampedReports>false</timestampedReports>
-          <!-- RATCHET: current score ~67%. Raised the floor 60 -> 65; TODO climb toward the
+          <!-- RATCHET: current score ~68%. Floor raised 60 -> 65 -> 66; TODO climb toward the
                70-80% target as weak tests are strengthened. -->
-          <mutationThreshold>65</mutationThreshold>
+          <mutationThreshold>66</mutationThreshold>
           <avoidCallsTo>
             <avoidCallsTo>adg.Log</avoidCallsTo>
           </avoidCallsTo>

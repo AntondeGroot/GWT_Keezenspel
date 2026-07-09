@@ -45,8 +45,7 @@ public class GameState {
   private volatile boolean exactMoveRequired = false;
   private volatile boolean mustPlayIfPossible = false;
   private volatile boolean teamPlay = false;
-  private volatile boolean teamCardTrade = false;
-  private volatile TradeRequest pendingTrade = null;
+  private final TradeManager tradeManager;
   private volatile long mustPlayBlockedSinceMs = 0;
   private static final long MUST_PLAY_TIMEOUT_MS = 3 * 60 * 1000L;
   private Boolean hasStarted = false;
@@ -55,6 +54,9 @@ public class GameState {
 
   public GameState(CardsDeckInterface cardsDeck) {
     this.cardsDeck = cardsDeck;
+    this.tradeManager =
+        new TradeManager(
+            cardsDeck, version, () -> hasStarted && teamPlay, this::teammateOf, this::isKingOrAce);
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -81,7 +83,7 @@ public class GameState {
     playerColors.clear();
     activePlayers.clear();
     winners.clear();
-    pendingTrade = null;
+    tradeManager.clearPending();
   }
 
   public void reset() {
@@ -90,7 +92,7 @@ public class GameState {
     resetActivePlayers();
     resetCards();
     resetTurn();
-    pendingTrade = null;
+    tradeManager.clearPending();
     version.incrementAndGet();
   }
 
@@ -587,89 +589,35 @@ public class GameState {
   // ── Team card trade (step 5) ──────────────────────────────────────────────
 
   public void setTeamCardTrade(boolean teamCardTrade) {
-    this.teamCardTrade = teamCardTrade;
+    tradeManager.setEnabled(teamCardTrade);
   }
 
   public boolean isTeamCardTrade() {
-    return teamCardTrade;
+    return tradeManager.isEnabled();
   }
 
   public TradeRequest getPendingTrade() {
-    return pendingTrade;
+    return tradeManager.getPending();
   }
 
-  /**
-   * A player offers one of their cards and asks their teammate for a King or Ace. Allowed only in
-   * a team game with the trade sub-option on, when the requester holds the offered card and no
-   * trade is already pending. Returns true if the request was recorded.
-   */
   public boolean requestTrade(String requesterId, Card offeredCard) {
-    if (!hasStarted || !teamPlay || !teamCardTrade || pendingTrade != null) {
-      return false;
-    }
-    String teammate = teammateOf(requesterId);
-    if (teammate == null || offeredCard == null || !cardsDeck.playerHasCard(requesterId, offeredCard)) {
-      return false;
-    }
-    pendingTrade = new TradeRequest(requesterId, teammate, offeredCard);
-    version.incrementAndGet();
-    return true;
+    return tradeManager.request(requesterId, offeredCard);
   }
 
-  /**
-   * The teammate accepts by handing over a King or Ace: the two cards are swapped and the trade
-   * clears. Only the addressed teammate may accept, and only with a King/Ace they actually hold.
-   */
   public boolean acceptTrade(String teammateId, Card kingOrAce) {
-    if (pendingTrade == null || !pendingTrade.getTeammateId().equals(teammateId)) {
-      return false;
-    }
-    if (kingOrAce == null || !isKingOrAce(kingOrAce) || !cardsDeck.playerHasCard(teammateId, kingOrAce)) {
-      return false;
-    }
-    String requesterId = pendingTrade.getRequesterId();
-    // The requester must still hold the card they offered — if they left or forfeited, that card
-    // was moved to the pile, and swapping it would duplicate it (and sink the teammate's card into
-    // a discarded hand). Drop the stale trade rather than corrupt the hands.
-    if (!cardsDeck.playerHasCard(requesterId, pendingTrade.getOfferedCard())) {
-      pendingTrade = null;
-      version.incrementAndGet();
-      return false;
-    }
-    cardsDeck.moveCardBetweenHands(requesterId, teammateId, pendingTrade.getOfferedCard());
-    cardsDeck.moveCardBetweenHands(teammateId, requesterId, kingOrAce);
-    pendingTrade = null;
-    version.incrementAndGet();
-    return true;
+    return tradeManager.accept(teammateId, kingOrAce);
   }
 
-  /** The teammate declines (can't or won't); the trade clears with no swap. */
   public boolean rejectTrade(String teammateId) {
-    if (pendingTrade == null || !pendingTrade.getTeammateId().equals(teammateId)) {
-      return false;
-    }
-    pendingTrade = null;
-    version.incrementAndGet();
-    return true;
+    return tradeManager.reject(teammateId);
   }
 
-  /** The requester withdraws their pending offer. */
   public boolean cancelTrade(String requesterId) {
-    if (pendingTrade == null || !pendingTrade.getRequesterId().equals(requesterId)) {
-      return false;
-    }
-    pendingTrade = null;
-    version.incrementAndGet();
-    return true;
+    return tradeManager.cancel(requesterId);
   }
 
-  /** Drop a pending trade if this player (leaving or forfeiting) is either party to it. */
   private void cancelTradeForDeparture(String playerId) {
-    if (pendingTrade != null
-        && (playerId.equals(pendingTrade.getRequesterId())
-            || playerId.equals(pendingTrade.getTeammateId()))) {
-      pendingTrade = null;
-    }
+    tradeManager.cancelForDeparture(playerId);
   }
 
   private String teammateOf(String playerId) {
