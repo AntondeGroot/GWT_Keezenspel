@@ -131,7 +131,6 @@
     </pluginManagement>
   </build>
   <modules>
-    <module>GWT_Keezenspel-shared</module>
     <module>GWT_Keezenspel-server</module>
   </modules>
 </project>
