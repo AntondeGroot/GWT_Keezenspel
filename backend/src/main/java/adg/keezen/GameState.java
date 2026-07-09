@@ -47,6 +47,7 @@ public class GameState {
   private volatile boolean teamPlay = false;
   private final TradeManager tradeManager;
   private final TileReachability tileReachability;
+  private final PlayerRoster roster;
   private volatile long mustPlayBlockedSinceMs = 0;
   private static final long MUST_PLAY_TIMEOUT_MS = 3 * 60 * 1000L;
   private Boolean hasStarted = false;
@@ -57,6 +58,7 @@ public class GameState {
   @SuppressWarnings("this-escape")
   public GameState(CardsDeckInterface cardsDeck) {
     this.cardsDeck = cardsDeck;
+    this.roster = new PlayerRoster(players, playerColors);
     this.tradeManager =
         new TradeManager(
             cardsDeck, version, () -> hasStarted && teamPlay, this::teammateOf, this::isKingOrAce);
@@ -524,9 +526,7 @@ public class GameState {
   }
 
   private List<Player> teamMembers(int teamId) {
-    return players.stream()
-        .filter(p -> Integer.valueOf(teamId).equals(p.getTeamId()))
-        .toList();
+    return roster.teamMembers(teamId);
   }
 
   private boolean hasAllPawnsOnFinish(String playerId) {
@@ -570,9 +570,7 @@ public class GameState {
   }
 
   private boolean sameTeam(String playerA, String playerB) {
-    Player a = findPlayerById(playerA);
-    Player b = findPlayerById(playerB);
-    return a != null && b != null && a.getTeamId() != null && a.getTeamId().equals(b.getTeamId());
+    return roster.sameTeam(playerA, playerB);
   }
 
   /**
@@ -625,17 +623,7 @@ public class GameState {
   }
 
   private String teammateOf(String playerId) {
-    Player player = findPlayerById(playerId);
-    Integer teamId = player == null ? null : player.getTeamId();
-    if (teamId == null) {
-      return null;
-    }
-    for (Player other : players) {
-      if (!other.getId().equals(playerId) && teamId.equals(other.getTeamId())) {
-        return other.getId();
-      }
-    }
-    return null;
+    return roster.teammateOf(playerId);
   }
 
   private boolean isKingOrAce(Card card) {
@@ -734,27 +722,11 @@ public class GameState {
   // ── Player navigation ─────────────────────────────────────────────────────
 
   public String nextPlayerId(String playerId) {
-    int playerInt = playerColors.get(playerId);
-    return nextPlayerId(playerInt);
-  }
-
-  private String nextPlayerId(int playerInt) {
-    int nextPlayerInt = (playerInt + 1) % players.size();
-    return playerColors.entrySet().stream()
-        .filter(entry -> entry.getValue().equals(nextPlayerInt))
-        .map(HashMap.Entry::getKey)
-        .findFirst()
-        .orElse("0");
+    return roster.nextPlayerId(playerId);
   }
 
   public String previousPlayerId(String playerId) {
-    int playerInt = playerColors.get(playerId);
-    int previousPlayerInt = (playerInt + players.size() - 1) % players.size();
-    return playerColors.entrySet().stream()
-        .filter(entry -> entry.getValue().equals(previousPlayerInt))
-        .map(HashMap.Entry::getKey)
-        .findFirst()
-        .orElse("0");
+    return roster.previousPlayerId(playerId);
   }
 
   // ── Pawn helpers ──────────────────────────────────────────────────────────
@@ -814,12 +786,7 @@ public class GameState {
 
   @Nullable
   private Player findPlayerById(String playerId) {
-    for (Player player : players) {
-      if (player.getId().equals(playerId)) {
-        return player;
-      }
-    }
-    return null;
+    return roster.findById(playerId);
   }
 
   public ArrayList<Player> getPlayers() {
