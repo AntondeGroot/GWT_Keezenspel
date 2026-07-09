@@ -1,10 +1,9 @@
 package adg.keezen.cards;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.Objects;
 
 @SuppressWarnings("serial")
-public class Card implements IsSerializable {
+public class Card {
   private int suit;
   private int cardValue;
   private int uniqueCardNumber;

@@ -12,7 +12,7 @@ fi
 SSH="ssh -i ~/.ssh/pi_deploy_key $TARGET"
 SCP="scp -i ~/.ssh/pi_deploy_key"
 
-echo "🔨 Building and running all tests (backend + GWT gate)..."
+echo "🔨 Building and running all backend tests..."
 mvn clean verify
 
 echo "🧬 Running mutation tests..."

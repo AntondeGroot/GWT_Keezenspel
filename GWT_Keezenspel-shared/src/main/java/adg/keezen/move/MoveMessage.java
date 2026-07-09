@@ -2,10 +2,9 @@ package adg.keezen.move;
 
 import adg.keezen.cards.Card;
 import adg.keezen.player.PawnId;
-import com.google.gwt.user.client.rpc.IsSerializable;
 
 @SuppressWarnings("serial")
-public class MoveMessage implements IsSerializable {
+public class MoveMessage {
   // serializable messages cannot contain List but must use a concrete implementation like ArrayList
   // or LinkedList
   private String playerId;

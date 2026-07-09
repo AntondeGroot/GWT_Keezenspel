@@ -2,10 +2,9 @@ package adg.keezen;
 
 import com.adg.openapi.model.Card;
 import com.adg.openapi.model.Player;
-import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.*;
 
-public class CardsDeck implements CardsDeckInterface, IsSerializable {
+public class CardsDeck implements CardsDeckInterface {
   private int roundNr;
   private ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
   private final ArrayList<Card> playedCards = new ArrayList<>();

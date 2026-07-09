@@ -1,8 +1,7 @@
 package adg.keezen.move;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 
-public enum MessageType implements IsSerializable {
+public enum MessageType {
   CHECK_MOVE,
   MAKE_MOVE
 }

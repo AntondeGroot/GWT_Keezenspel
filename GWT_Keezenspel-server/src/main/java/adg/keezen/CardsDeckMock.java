@@ -2,13 +2,12 @@ package adg.keezen;
 
 import com.adg.openapi.model.Card;
 import com.adg.openapi.model.Player;
-import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class CardsDeckMock implements CardsDeckInterface, IsSerializable {
+public class CardsDeckMock implements CardsDeckInterface {
   private int roundNr;
   private final ArrayList<Card> playedCards = new ArrayList<>();
   private final HashMap<String, PlayerHand> playerHands = new HashMap<>();
