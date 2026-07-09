@@ -262,7 +262,7 @@
             <id>check</id>
             <goals><goal>check</goal></goals>
             <configuration>
-              <!-- RATCHET: pinned just below current (line 87%, branch 76%) as a floor
+              <!-- RATCHET: pinned just below current (line 87%, branch 77%) as a floor
                    that can only rise. TODO: raise both toward the 0.90 target as tests
                    are added (branch coverage is the gap). -->
               <rules>
@@ -270,7 +270,7 @@
                   <element>BUNDLE</element>
                   <limits>
                     <limit><counter>LINE</counter><value>COVEREDRATIO</value><minimum>0.86</minimum></limit>
-                    <limit><counter>BRANCH</counter><value>COVEREDRATIO</value><minimum>0.75</minimum></limit>
+                    <limit><counter>BRANCH</counter><value>COVEREDRATIO</value><minimum>0.76</minimum></limit>
                   </limits>
                 </rule>
               </rules>
@@ -302,6 +302,7 @@
             <param>adg.keezen.logic.*</param>
             <param>adg.keezen.TradeManagerTest</param>
             <param>adg.keezen.TileReachabilityTest</param>
+            <param>adg.keezen.PlayerRosterTest</param>
           </targetTests>
           <mutators>
             <mutator>DEFAULTS</mutator>
@@ -310,9 +311,8 @@
             <outputFormat>HTML</outputFormat>
           </outputFormats>
           <timestampedReports>false</timestampedReports>
-          <!-- RATCHET: current score ~69%. Floor raised 60 -> 65 -> 66 -> 67; TODO climb toward
-               the 70-80% target as weak tests are strengthened. -->
-          <mutationThreshold>67</mutationThreshold>
+          <!-- RATCHET: current score ~70% (now IN the 70-80% target). Floor raised 60 -> 65 -> 66 -> 67 -> 68; keep climbing as weak tests are strengthened. -->
+          <mutationThreshold>68</mutationThreshold>
           <avoidCallsTo>
             <avoidCallsTo>adg.Log</avoidCallsTo>
           </avoidCallsTo>
