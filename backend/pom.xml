@@ -313,8 +313,8 @@
             <outputFormat>XML</outputFormat>
           </outputFormats>
           <timestampedReports>false</timestampedReports>
-          <!-- RATCHET: current score ~71%. Floor raised 60 -> 65 -> 66 -> 67 -> 68 -> 69; keep climbing toward 75-80 as weak tests are strengthened. -->
-          <mutationThreshold>69</mutationThreshold>
+          <!-- RATCHET: current score ~72%. Floor raised 60 ... -> 69 -> 70; keep climbing toward 75-80 as weak tests are strengthened. -->
+          <mutationThreshold>71</mutationThreshold>
           <avoidCallsTo>
             <avoidCallsTo>adg.Log</avoidCallsTo>
           </avoidCallsTo>
