@@ -5,7 +5,9 @@ import { setPawn } from './support/seed';
 
 // A player leaving mid-game removes their pawns from the server push. The board must drop those
 // pawns cleanly (they're rendered straight from `state.pawns`) without a runtime error.
-test('a player leaving mid-game removes their pawns from the board, no error', async ({ browser }) => {
+test('a player leaving mid-game removes their pawns from the board, no error', async ({
+  browser,
+}) => {
   const errors: string[] = [];
 
   const { page, sessionId } = await openBoard(browser, {

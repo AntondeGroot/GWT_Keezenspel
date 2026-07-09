@@ -35,9 +35,7 @@
   // 13 cols x 5 rows. Percent background-position picks a cell via col/(cols-1)
   // and row/(rows-1), so it scales with the card.
   background-size: 1300% 500%;
-  background-position:
-    calc(var(--card-col, 0) * 100% / 12)
-    calc(var(--card-row, 0) * 100% / 4);
+  background-position: calc(var(--card-col, 0) * 100% / 12) calc(var(--card-row, 0) * 100% / 4);
 }
 
 .back {

@@ -5,7 +5,10 @@
 }
 
 .rulesButton {
-  font: 600 13pt 'Cinzel', Georgia, serif;
+  font:
+    600 13pt 'Cinzel',
+    Georgia,
+    serif;
   color: #f4d03f;
   background: linear-gradient(145deg, #3a2000, #251400);
   border: 1px solid #c9a227;
@@ -41,8 +44,14 @@
     justify-content: center;
     padding: 7px 9px;
   }
-  .rules-btn-label { display: none; }
-  .rules-btn-icon { height: 20px; margin-right: 0; top: 0; }
+  .rules-btn-label {
+    display: none;
+  }
+  .rules-btn-icon {
+    height: 20px;
+    margin-right: 0;
+    top: 0;
+  }
 }
 
 .rules-overlay {
@@ -83,7 +92,10 @@
 
 .rules-title {
   display: block;
-  font: 700 1.6em 'Cinzel', Georgia, serif;
+  font:
+    700 1.6em 'Cinzel',
+    Georgia,
+    serif;
   color: #f4d03f;
   margin: 0 0 20px 0;
   letter-spacing: 0.05em;
@@ -95,7 +107,10 @@
 
 .rules-section-title {
   display: block;
-  font: 700 1em 'Cinzel', Georgia, serif;
+  font:
+    700 1em 'Cinzel',
+    Georgia,
+    serif;
   color: #c9a227;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -118,7 +133,9 @@
   border-radius: 5px;
   background: #fff;
   color: #111;
-  font: bold 22px 'Georgia', serif;
+  font:
+    bold 22px 'Georgia',
+    serif;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
   flex-shrink: 0;
 }

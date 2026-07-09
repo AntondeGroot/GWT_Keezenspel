@@ -1,7 +1,14 @@
 import { Component, signal, inject, computed, effect, OnInit, OnDestroy } from '@angular/core';
 import {
-  GameStatePush, MovesService, CardsService, Card as CardModel, MoveRequest,
-  MoveResponse, Pawn as ApiPawn, PositionKey, Trade,
+  GameStatePush,
+  MovesService,
+  CardsService,
+  Card as CardModel,
+  MoveRequest,
+  MoveResponse,
+  Pawn as ApiPawn,
+  PositionKey,
+  Trade,
 } from '../../api';
 import { buildBoard, fanCardBacks, Pt, BoardGeometry } from './board-geometry';
 import { resolveGameSession } from '../../session';
@@ -12,7 +19,7 @@ import { Pawn } from './pawn/pawn';
 import { Card } from './card/card';
 import { PlayerList } from '../player-list/player-list';
 import { TradePanel } from './trade-panel/trade-panel';
-import {highlightForPawn1, highlightForPawn2} from './pawn-highlight';
+import { highlightForPawn1, highlightForPawn2 } from './pawn-highlight';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
 import { teammateCaptureKeys } from './teammate-capture';
 import { pawnKey } from './pawn-key';
@@ -43,8 +50,7 @@ const HINT_KEYS: Record<number, TranslationKey> = {
   templateUrl: './board.html',
   styleUrl: './board.scss',
 })
-export class Board implements OnInit, OnDestroy{
-
+export class Board implements OnInit, OnDestroy {
   private reconnectTimer?: ReturnType<typeof setTimeout>;
   private destroyed = false;
 
@@ -91,7 +97,12 @@ export class Board implements OnInit, OnDestroy{
     // snapping to the server's already-final positions. Skipped on the first push.
     const mr = next.lastMoveResponse;
     const moveKey = mr
-      ? JSON.stringify([mr.movePawn1, mr.movePawn2, mr.movePawnKilledByPawn1, mr.movePawnKilledByPawn2])
+      ? JSON.stringify([
+          mr.movePawn1,
+          mr.movePawn2,
+          mr.movePawnKilledByPawn1,
+          mr.movePawnKilledByPawn2,
+        ])
       : '';
     if (this.prevMoveKey !== undefined && moveKey && moveKey !== this.prevMoveKey) {
       this.animateMove(mr!);
@@ -155,34 +166,41 @@ export class Board implements OnInit, OnDestroy{
   protected readonly pawns = computed(() => {
     const g = this.geometry();
     const s = this.state();
-    if(!g || !s?.pawns) return [];
+    if (!g || !s?.pawns) return [];
     const anim = this.pawnAnim();
     const playerOf = (playerId: string) => s.players!.find((p) => p.id === playerId);
     const colorOf = (playerId: string) => seatColor(playerOf(playerId)?.playerInt);
     const teamOf = (playerId: string) => playerOf(playerId)?.teamId ?? null;
-    return s.pawns.map((pawn) => {
-      const pawnId = pawnKey(pawn.pawnId);
-      // While a pawn is moving, its position (and step transition ms) comes from the
-      // animation override instead of the server's already-final tile.
-      const a = anim.get(pawnId);
-      let x: number, y: number;
-      if (a) {
-        x = a.x;
-        y = a.y;
-      } else {
-        const tile = pawn.currentTileId;
-        const pt = g.position(tile.playerId, tile.tileNr);
-        if (!pt) return null;
-        x = pt.x;
-        y = pt.y;
-      }
-      return {
-        x, y, zIndex: Math.round(y), color: colorOf(pawn.playerId),
-        teamId: teamOf(pawn.playerId), id: pawnId, moveMs: a?.ms ?? 0,
-      };
-    }).filter(x => x !== null);
-  })
-  protected readonly cell  = computed(() => this.geometry()?.cellDistance ?? 0);
+    return s.pawns
+      .map((pawn) => {
+        const pawnId = pawnKey(pawn.pawnId);
+        // While a pawn is moving, its position (and step transition ms) comes from the
+        // animation override instead of the server's already-final tile.
+        const a = anim.get(pawnId);
+        let x: number, y: number;
+        if (a) {
+          x = a.x;
+          y = a.y;
+        } else {
+          const tile = pawn.currentTileId;
+          const pt = g.position(tile.playerId, tile.tileNr);
+          if (!pt) return null;
+          x = pt.x;
+          y = pt.y;
+        }
+        return {
+          x,
+          y,
+          zIndex: Math.round(y),
+          color: colorOf(pawn.playerId),
+          teamId: teamOf(pawn.playerId),
+          id: pawnId,
+          moveMs: a?.ms ?? 0,
+        };
+      })
+      .filter((x) => x !== null);
+  });
+  protected readonly cell = computed(() => this.geometry()?.cellDistance ?? 0);
 
   // Face-down card backs for every OTHER player, fanned by their public card
   // count (nrOfCardsPerPlayer). Only counts are ever known here — never values —
@@ -212,7 +230,12 @@ export class Board implements OnInit, OnDestroy{
       .sort((a, b) => a.cw - b.cw);
 
     const backs: {
-      key: string; x: number; y: number; rot: number; delay: number; z?: number;
+      key: string;
+      x: number;
+      y: number;
+      rot: number;
+      delay: number;
+      z?: number;
     }[] = [];
     opponents.forEach(({ pid }, oi) => {
       const seat = oi + 1; // the viewer is seat 0; opponents take the next seats clockwise
@@ -246,8 +269,15 @@ export class Board implements OnInit, OnDestroy{
   // play. x/y are board-% (like the cards); the `.card` transition animates them.
   protected readonly flyers = signal<
     {
-      id: number; x: number; y: number; rot: number; scale: number;
-      suit: number; value: number; flip?: 'in' | 'out'; glow?: boolean;
+      id: number;
+      x: number;
+      y: number;
+      rot: number;
+      scale: number;
+      suit: number;
+      value: number;
+      flip?: 'in' | 'out';
+      glow?: boolean;
     }[]
   >([]);
   private flyerSeq = 0;
@@ -267,7 +297,9 @@ export class Board implements OnInit, OnDestroy{
 
   // Pawn move animation: pawnId -> its current animated pixel position + the
   // transition duration for the current step. Present only while a pawn is moving.
-  protected readonly pawnAnim = signal<Map<string, { x: number; y: number; ms: number }>>(new Map());
+  protected readonly pawnAnim = signal<Map<string, { x: number; y: number; ms: number }>>(
+    new Map(),
+  );
   private prevMoveKey: string | undefined;
 
   // One list of every card (hand + pile), each with a target position. Moving a
@@ -282,7 +314,10 @@ export class Board implements OnInit, OnDestroy{
     // Per-uuid target position: hand slot (fanned row below the board) or pile slot.
     // z follows PLAY ORDER (pile index) so the newest card is on top, regardless of
     // the DOM order (which is sorted by uuid for stable transitions).
-    const target = new Map<number, { x: number; y: number; rot: number; scale: number; z?: number }>();
+    const target = new Map<
+      number,
+      { x: number; y: number; rot: number; scale: number; z?: number }
+    >();
     handCards.forEach((c, i) =>
       target.set(c.uuid, { x: 50 + (i - (n - 1) / 2) * 18, y: 116, rot: 0, scale: 1 }),
     );
@@ -383,7 +418,8 @@ export class Board implements OnInit, OnDestroy{
           const before = prev[pid];
           if (before === undefined) continue;
           const dropped = before - n;
-          if (dropped === 1) this.flyOpponentCard(pid, before, played); // played one card
+          if (dropped === 1)
+            this.flyOpponentCard(pid, before, played); // played one card
           else if (dropped > 1) this.flyOpponentForfeit(pid, before, dropped, played); // forfeit
         }
       }
@@ -425,7 +461,10 @@ export class Board implements OnInit, OnDestroy{
             this.teamHandoff.show(this.i18n.t('tradeGotTitle'), this.i18n.t(key, mate));
           }
         } else if (iRequested) {
-          this.teamHandoff.show(this.i18n.t('tradeRejectedTitle'), this.i18n.t('tradeRejectedMessage', mate));
+          this.teamHandoff.show(
+            this.i18n.t('tradeRejectedTitle'),
+            this.i18n.t('tradeRejectedMessage', mate),
+          );
         }
       }
       this.prevMyTrade = iAmIn;
@@ -569,7 +608,9 @@ export class Board implements OnInit, OnDestroy{
     const speed = this.moveSpeed(total); // px/ms
     this.setPawnAnim(id, points[0].x, points[0].y, 0); // hold at the start now
     const walk = () =>
-      requestAnimationFrame(() => requestAnimationFrame(() => this.stepPawnPath(id, points, 1, speed)));
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => this.stepPawnPath(id, points, 1, speed)),
+      );
     if (delayMs > 0) setTimeout(walk, delayMs);
     else walk();
     return Math.round(total / speed);
@@ -625,7 +666,9 @@ export class Board implements OnInit, OnDestroy{
 
     const flyToPile = () =>
       this.flyers.update((f) =>
-        f.map((fl) => (fl.id === id ? { ...fl, x: 52.5, y: 50, rot: 0, scale: 0.6, glow: false } : fl)),
+        f.map((fl) =>
+          fl.id === id ? { ...fl, x: 52.5, y: 50, rot: 0, scale: 0.6, glow: false } : fl,
+        ),
       );
     const land = () => {
       this.flyers.update((f) => f.filter((fl) => fl.id !== id));
@@ -671,7 +714,15 @@ export class Board implements OnInit, OnDestroy{
   /** Animate the viewer's own just-played card from its (snapshotted) hand slot. It pops with a
    *  white glow before it flies (ported from the GWT own-card play). */
   private flyOwnCard(card: CardModel, from: { x: number; y: number }): void {
-    this.spawnFlyer({ x: from.x, y: from.y, rot: 0 }, 1, card.suit ?? 0, card.value ?? 1, card, undefined, true);
+    this.spawnFlyer(
+      { x: from.x, y: from.y, rot: 0 },
+      1,
+      card.suit ?? 0,
+      card.value ?? 1,
+      card,
+      undefined,
+      true,
+    );
   }
 
   /** Fly a transient face-up card from one board-% point to another (used by the trade swap). */
@@ -686,7 +737,10 @@ export class Board implements OnInit, OnDestroy{
     onLand?: () => void,
   ): void {
     const id = ++this.flyerSeq;
-    this.flyers.update((f) => [...f, { id, x: from.x, y: from.y, rot: 0, scale: fromScale, suit, value, flip }]);
+    this.flyers.update((f) => [
+      ...f,
+      { id, x: from.x, y: from.y, rot: 0, scale: fromScale, suit, value, flip },
+    ]);
     requestAnimationFrame(() =>
       requestAnimationFrame(() =>
         this.flyers.update((f) =>
@@ -738,7 +792,12 @@ export class Board implements OnInit, OnDestroy{
   }
 
   /** Forfeit: fly all of an opponent's cards from their fan to the pile, staggered. */
-  private flyOpponentForfeit(playerId: string, fanCount: number, dropped: number, played: string[]): void {
+  private flyOpponentForfeit(
+    playerId: string,
+    fanCount: number,
+    dropped: number,
+    played: string[],
+  ): void {
     const segment = this.geometry()?.deckSegment(playerId);
     if (!segment) return;
     const fan = fanCardBacks(segment, fanCount);
@@ -760,16 +819,16 @@ export class Board implements OnInit, OnDestroy{
   }
 
   private findPawn(id: string) {
-    return this.state()?.pawns?.find(
-      (p) => pawnKey(p.pawnId) === id,
-    );
+    return this.state()?.pawns?.find((p) => pawnKey(p.pawnId) === id);
   }
 
   // Reactive selectors over the selection (reading rev() makes them recompute).
   protected readonly selectedCardUuid = computed(() => (this.rev(), this.selection.getCard()?.id));
   protected readonly pawn1Id = computed(() => (this.rev(), this.selection.getPawnId1()));
   protected readonly pawn2Id = computed(() => (this.rev(), this.selection.getPawnId2()));
-  protected readonly splitVisible = computed(() => (this.rev(), this.selection.isSplitBoxesVisible()));
+  protected readonly splitVisible = computed(
+    () => (this.rev(), this.selection.isSplitBoxesVisible()),
+  );
   protected readonly stepsPawn1 = computed(() => (this.rev(), this.selection.getNrStepsPawn1()));
   protected readonly stepsPawn2 = computed(() => (this.rev(), this.selection.getNrStepsPawn2()));
   protected readonly canPlay = computed(
@@ -826,8 +885,7 @@ export class Board implements OnInit, OnDestroy{
   protected readonly teammateCaptureTiles = computed(() => {
     const s = this.state();
     if (!s?.pawns || !s.players || !this.viewerId) return new Set<string>();
-    const teamOf = (playerId: string) =>
-      s.players!.find((p) => p.id === playerId)?.teamId ?? null;
+    const teamOf = (playerId: string) => s.players!.find((p) => p.id === playerId)?.teamId ?? null;
     const occupants = s.pawns.map((p) => ({
       key: `${p.currentTileId.playerId}:${p.currentTileId.tileNr}`,
       ownerId: p.playerId,
@@ -879,9 +937,7 @@ export class Board implements OnInit, OnDestroy{
             }
           }
           // Highlight the landing tile(s) — the last tile of each pawn's path.
-          this.previewTiles.set(
-            new Set((res.tiles ?? []).map((t) => `${t.playerId}:${t.tileNr}`)),
-          );
+          this.previewTiles.set(new Set((res.tiles ?? []).map((t) => `${t.playerId}:${t.tileNr}`)));
         },
         error: () => {},
       });
@@ -977,7 +1033,10 @@ export class Board implements OnInit, OnDestroy{
           // Rejected by the rules (still a 200): explain why, and keep the
           // selection so the player can adjust it.
           this.rejection.show(
-            this.i18n.t(rejectionMessageKey(response.rejectionReason), response.rejectionDetail ?? ''),
+            this.i18n.t(
+              rejectionMessageKey(response.rejectionReason),
+              response.rejectionDetail ?? '',
+            ),
           );
         }
       },

@@ -50,7 +50,9 @@ test.describe('7-split step boxes (CardSevenSplit_IT)', () => {
 // (it only checked the step-box reset). Guards the two bugs where a played 7 lingered:
 // after the split the 7 must be gone from the hand, on the pile, and no longer selectable.
 test.describe('playing a 7-split', () => {
-  test('splits across both pawns, then the 7 leaves the hand and can’t be re-selected', async ({ browser }) => {
+  test('splits across both pawns, then the 7 leaves the hand and can’t be re-selected', async ({
+    browser,
+  }) => {
     const { page } = await openBoard(browser, {
       setup: async (api, s) => {
         await setPawn(api, s, 'player0', 0, 'player0', 1);

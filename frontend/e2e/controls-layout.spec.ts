@@ -38,64 +38,69 @@ test.describe('controls + roster placement', () => {
   for (const vp of VIEWPORTS) {
     for (const lang of LANGS) {
       for (const n of PLAYER_COUNTS) {
-      test(`${vp.name} · ${lang} · ${n} players`, async ({ browser }) => {
-        const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height } });
-        await ctx.addCookies([
-          { name: 'playerid', value: 'player0', url: 'http://localhost:4300' },
-          { name: 'language', value: lang, url: 'http://localhost:4300' },
-        ]);
-        const page = await ctx.newPage();
-        await page.goto(`/?sessionid=${sessions[n]}&playerid=player0`);
-        await page.waitForSelector('.chip', { timeout: 30000 });
-        await expect(page.locator('.chip')).toHaveCount(n); // every player is shown
+        test(`${vp.name} · ${lang} · ${n} players`, async ({ browser }) => {
+          const ctx = await browser.newContext({
+            viewport: { width: vp.width, height: vp.height },
+          });
+          await ctx.addCookies([
+            { name: 'playerid', value: 'player0', url: 'http://localhost:4300' },
+            { name: 'language', value: lang, url: 'http://localhost:4300' },
+          ]);
+          const page = await ctx.newPage();
+          await page.goto(`/?sessionid=${sessions[n]}&playerid=player0`);
+          await page.waitForSelector('.chip', { timeout: 30000 });
+          await expect(page.locator('.chip')).toHaveCount(n); // every player is shown
 
-        const g = await page.evaluate(() => {
-          const rj = (s: string) => {
-            const el = document.querySelector(s);
-            return el ? (el.getBoundingClientRect().toJSON() as DOMRect) : null;
-          };
-          return {
-            controls: rj('.controls'),
-            board: rj('.board'),
-            hint: rj('.card-hint'),
-            chips: [...document.querySelectorAll('.chip')].map(
-              (c) => c.getBoundingClientRect().toJSON() as DOMRect,
-            ),
-            vw: window.innerWidth,
-            vh: window.innerHeight,
-          };
+          const g = await page.evaluate(() => {
+            const rj = (s: string) => {
+              const el = document.querySelector(s);
+              return el ? (el.getBoundingClientRect().toJSON() as DOMRect) : null;
+            };
+            return {
+              controls: rj('.controls'),
+              board: rj('.board'),
+              hint: rj('.card-hint'),
+              chips: [...document.querySelectorAll('.chip')].map(
+                (c) => c.getBoundingClientRect().toJSON() as DOMRect,
+              ),
+              vw: window.innerWidth,
+              vh: window.innerHeight,
+            };
+          });
+
+          const T = 1;
+          // Controls fully within the viewport.
+          expect(g.controls).not.toBeNull();
+          expect(g.controls!.top).toBeGreaterThanOrEqual(-T);
+          expect(g.controls!.left).toBeGreaterThanOrEqual(-T);
+          expect(g.controls!.right).toBeLessThanOrEqual(g.vw + T);
+          expect(g.controls!.bottom).toBeLessThanOrEqual(g.vh + T);
+
+          // Every chip fully on screen (the 8-player overflow guard).
+          for (const c of g.chips) {
+            expect(c.top, `chip above the viewport`).toBeGreaterThanOrEqual(-T);
+            expect(c.bottom, `chip below the viewport (${c.bottom} > ${g.vh})`).toBeLessThanOrEqual(
+              g.vh + T,
+            );
+            expect(c.left).toBeGreaterThanOrEqual(-T);
+            expect(c.right).toBeLessThanOrEqual(g.vw + T);
+          }
+
+          if (vp.name === 'desktop') {
+            // Right gutter, clear of the board.
+            expect(
+              g.controls!.left,
+              'controls should sit right of the board',
+            ).toBeGreaterThanOrEqual(g.board!.right - T);
+          } else {
+            // Below the card hint, clear of the board.
+            expect(g.controls!.top, 'controls should sit below the hint').toBeGreaterThanOrEqual(
+              g.hint!.bottom - T,
+            );
+          }
+
+          await ctx.close();
         });
-
-        const T = 1;
-        // Controls fully within the viewport.
-        expect(g.controls).not.toBeNull();
-        expect(g.controls!.top).toBeGreaterThanOrEqual(-T);
-        expect(g.controls!.left).toBeGreaterThanOrEqual(-T);
-        expect(g.controls!.right).toBeLessThanOrEqual(g.vw + T);
-        expect(g.controls!.bottom).toBeLessThanOrEqual(g.vh + T);
-
-        // Every chip fully on screen (the 8-player overflow guard).
-        for (const c of g.chips) {
-          expect(c.top, `chip above the viewport`).toBeGreaterThanOrEqual(-T);
-          expect(c.bottom, `chip below the viewport (${c.bottom} > ${g.vh})`).toBeLessThanOrEqual(g.vh + T);
-          expect(c.left).toBeGreaterThanOrEqual(-T);
-          expect(c.right).toBeLessThanOrEqual(g.vw + T);
-        }
-
-        if (vp.name === 'desktop') {
-          // Right gutter, clear of the board.
-          expect(g.controls!.left, 'controls should sit right of the board').toBeGreaterThanOrEqual(
-            g.board!.right - T,
-          );
-        } else {
-          // Below the card hint, clear of the board.
-          expect(g.controls!.top, 'controls should sit below the hint').toBeGreaterThanOrEqual(
-            g.hint!.bottom - T,
-          );
-        }
-
-        await ctx.close();
-      });
       }
     }
   }
@@ -130,11 +135,17 @@ test.describe('controls + roster placement', () => {
             return el ? (el.getBoundingClientRect().toJSON() as DOMRect) : null;
           };
           const rects = (s: string) =>
-            [...document.querySelectorAll(s)].map((e) => e.getBoundingClientRect().toJSON() as DOMRect);
+            [...document.querySelectorAll(s)].map(
+              (e) => e.getBoundingClientRect().toJSON() as DOMRect,
+            );
           return {
             box: rj('.button-container'),
             controls: rj('.controls'),
-            splitParts: [rj('.pawn-steps')!, ...rects('.pawn-step-btn'), ...rects('.pawn-steps__input')],
+            splitParts: [
+              rj('.pawn-steps')!,
+              ...rects('.pawn-step-btn'),
+              ...rects('.pawn-steps__input'),
+            ],
             chips: rects('.chip'),
             vw: window.innerWidth,
             vh: window.innerHeight,

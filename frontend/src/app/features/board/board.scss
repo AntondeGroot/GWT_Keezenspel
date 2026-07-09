@@ -275,7 +275,10 @@
 .send-button,
 .forfeit-button,
 .ask-trade-button {
-  font: 600 15pt 'Cinzel', Georgia, serif;
+  font:
+    600 15pt 'Cinzel',
+    Georgia,
+    serif;
   letter-spacing: 1px;
   border-radius: 8px;
   padding: 8px 14px;
@@ -356,7 +359,10 @@
   }
 
   &__label {
-    font: 600 13pt 'Lato', 'Helvetica Neue', sans-serif;
+    font:
+      600 13pt 'Lato',
+      'Helvetica Neue',
+      sans-serif;
     white-space: nowrap; // never wrap onto two lines
     min-width: 3.8em; // keep the two rows aligned across languages
   }
@@ -368,7 +374,10 @@
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.92);
     color: #2a1800;
-    font: 12pt 'Lato', 'Helvetica Neue', sans-serif;
+    font:
+      12pt 'Lato',
+      'Helvetica Neue',
+      sans-serif;
 
     // Hide the native number spinners — we use the ± buttons instead.
     -moz-appearance: textfield;
@@ -566,9 +575,15 @@
 // onto a second (overflowing) row. Placed last so it overrides the base button
 // rules above (notably the `font` shorthand, which would otherwise reset the size).
 @media (max-width: 699px) {
-  .play { --board-w: min(600px, calc(96vw / 1.24), calc((100dvh - 348px) / 1.42)); }
+  .play {
+    --board-w: min(600px, calc(96vw / 1.24), calc((100dvh - 348px) / 1.42));
+  }
 
-  .button-container { padding: 8px; gap: 6px; max-width: 148px; }
+  .button-container {
+    padding: 8px;
+    gap: 6px;
+    max-width: 148px;
+  }
   .send-button,
   .forfeit-button,
   .ask-trade-button {
@@ -581,9 +596,24 @@
 
   // Compact the 7-split step boxes so they fit within the capped button width
   // instead of overflowing it.
-  .pawn-steps { padding: 5px; gap: 5px; }
-  .pawn-steps__row { gap: 4px; }
-  .pawn-steps__label { font-size: 10.5pt; min-width: 0; }
-  .pawn-steps__input { width: 26px; font-size: 11pt; }
-  .pawn-step-btn { width: 26px; height: 26px; font-size: 12pt; }
+  .pawn-steps {
+    padding: 5px;
+    gap: 5px;
+  }
+  .pawn-steps__row {
+    gap: 4px;
+  }
+  .pawn-steps__label {
+    font-size: 10.5pt;
+    min-width: 0;
+  }
+  .pawn-steps__input {
+    width: 26px;
+    font-size: 11pt;
+  }
+  .pawn-step-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 12pt;
+  }
 }

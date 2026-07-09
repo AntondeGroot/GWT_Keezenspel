@@ -3,35 +3,47 @@
     <div class="stage">
       <div class="board" [style.--cell]="cell() / 6">
         @for (t of tiles(); track t.playerId + ':' + t.tileNr) {
-          <div class="tile"
-               [class.tile-highlight-pulse]="isPreview(t.playerId, t.tileNr) && !isTeammateCapture(t.playerId, t.tileNr)"
-               [class.tile-capture-warning]="isTeammateCapture(t.playerId, t.tileNr)"
-               [style.left.%]="t.x / 6"
-               [style.top.%]="t.y / 6"
-               [style.--tile-color]="t.color"></div>
+          <div
+            class="tile"
+            [class.tile-highlight-pulse]="
+              isPreview(t.playerId, t.tileNr) && !isTeammateCapture(t.playerId, t.tileNr)
+            "
+            [class.tile-capture-warning]="isTeammateCapture(t.playerId, t.tileNr)"
+            [style.left.%]="t.x / 6"
+            [style.top.%]="t.y / 6"
+            [style.--tile-color]="t.color"
+          ></div>
         }
-        @for (p of pawns(); track p.id){
-          <app-pawn class="pawn"
-                    animate.leave="pawn-leaving"
-                    [attr.data-testid]="'pawn-' + p.id"
-                    [color]="p.color"
-                    [teamId]="p.teamId"
-                    (click)="selectPawn(p.id)"
-                    [highlight]="p.id === pawn1Id() ? highlightForPawn1(p.color)
-                             : p.id === pawn2Id() ? highlightForPawn2(p.color)
-                             : undefined"
-                    [style.left.%]="p.x / 6"
-                    [style.top.%]="p.y / 6"
-                    [style.--move-ms]="p.moveMs + 'ms'"
-                    [style.z-index]="p.zIndex" />
+        @for (p of pawns(); track p.id) {
+          <app-pawn
+            class="pawn"
+            animate.leave="pawn-leaving"
+            [attr.data-testid]="'pawn-' + p.id"
+            [color]="p.color"
+            [teamId]="p.teamId"
+            (click)="selectPawn(p.id)"
+            [highlight]="
+              p.id === pawn1Id()
+                ? highlightForPawn1(p.color)
+                : p.id === pawn2Id()
+                  ? highlightForPawn2(p.color)
+                  : undefined
+            "
+            [style.left.%]="p.x / 6"
+            [style.top.%]="p.y / 6"
+            [style.--move-ms]="p.moveMs + 'ms'"
+            [style.z-index]="p.zIndex"
+          />
         }
         @for (b of cardBacks(); track b.key) {
-          <div class="card-back"
-               [style.left.%]="b.x / 6"
-               [style.top.%]="b.y / 6"
-               [style.--rot.deg]="b.rot"
-               [style.z-index]="b.z"
-               [style.transition-delay.ms]="b.delay"></div>
+          <div
+            class="card-back"
+            [style.left.%]="b.x / 6"
+            [style.top.%]="b.y / 6"
+            [style.--rot.deg]="b.rot"
+            [style.z-index]="b.z"
+            [style.transition-delay.ms]="b.delay"
+          ></div>
         }
       </div>
 
@@ -40,7 +52,8 @@
            the reserved space (.stage padding). -->
       <div class="card-layer">
         @for (c of cards(); track c.uuid) {
-          <app-card class="card"
+          <app-card
+            class="card"
             [attr.data-testid]="'card-' + c.value"
             [suit]="c.suit"
             [value]="c.value"
@@ -58,11 +71,13 @@
             [class.trade-hidden]="c.hidden"
             (click)="selectCard(c.uuid)"
             (mouseenter)="hoverCard(c.value)"
-            (mouseleave)="hoverCard(null)" />
+            (mouseleave)="hoverCard(null)"
+          />
         }
 
         @for (f of flyers(); track f.id) {
-          <app-card class="card flyer"
+          <app-card
+            class="card flyer"
             [class.flip-in]="f.flip === 'in'"
             [class.flip-out]="f.flip === 'out'"
             [class.popped]="f.glow"
@@ -71,7 +86,8 @@
             [style.left.%]="f.x"
             [style.top.%]="f.y"
             [style.--rot.deg]="f.rot"
-            [style.--card-scale]="f.scale" />
+            [style.--card-scale]="f.scale"
+          />
         }
       </div>
     </div>
@@ -85,29 +101,51 @@
          row directly below the hint. -->
     <div class="controls">
       <div class="button-container">
-        <button class="send-button" [disabled]="!canPlay()" (click)="playCard()">{{ i18n.t('playCard') }}</button>
-        <button class="forfeit-button" [disabled]="!canForfeit()" (click)="forfeit()">{{ i18n.t('forfeit') }}</button>
+        <button class="send-button" [disabled]="!canPlay()" (click)="playCard()">
+          {{ i18n.t('playCard') }}
+        </button>
+        <button class="forfeit-button" [disabled]="!canForfeit()" (click)="forfeit()">
+          {{ i18n.t('forfeit') }}
+        </button>
         @if (canAskTrade()) {
-          <button class="ask-trade-button" (click)="askForTrade()">{{ i18n.t('tradeAskButton') }}</button>
+          <button class="ask-trade-button" (click)="askForTrade()">
+            {{ i18n.t('tradeAskButton') }}
+          </button>
         }
 
         <!-- 7-split: divide the 7 across the two selected pawns (sum stays 7). -->
         @if (splitVisible()) {
           <div class="pawn-steps">
             <div class="pawn-steps__row">
-              <label class="pawn-steps__label" [style.color]="pawn1Highlight()">{{ i18n.t('pawn1') }}</label>
+              <label class="pawn-steps__label" [style.color]="pawn1Highlight()">{{
+                i18n.t('pawn1')
+              }}</label>
               <button type="button" class="pawn-step-btn" (click)="stepPawn1(-1)">−</button>
-              <input class="pawn-steps__input" type="number" min="0" max="7"
-                     [style.border-color]="pawn1Highlight()"
-                     [value]="stepsPawn1()" (input)="onStepsPawn1($any($event.target).value)" />
+              <input
+                class="pawn-steps__input"
+                type="number"
+                min="0"
+                max="7"
+                [style.border-color]="pawn1Highlight()"
+                [value]="stepsPawn1()"
+                (input)="onStepsPawn1($any($event.target).value)"
+              />
               <button type="button" class="pawn-step-btn" (click)="stepPawn1(1)">+</button>
             </div>
             <div class="pawn-steps__row">
-              <label class="pawn-steps__label" [style.color]="pawn2Highlight()">{{ i18n.t('pawn2') }}</label>
+              <label class="pawn-steps__label" [style.color]="pawn2Highlight()">{{
+                i18n.t('pawn2')
+              }}</label>
               <button type="button" class="pawn-step-btn" (click)="stepPawn2(-1)">−</button>
-              <input class="pawn-steps__input" type="number" min="0" max="7"
-                     [style.border-color]="pawn2Highlight()"
-                     [value]="stepsPawn2()" (input)="onStepsPawn2($any($event.target).value)" />
+              <input
+                class="pawn-steps__input"
+                type="number"
+                min="0"
+                max="7"
+                [style.border-color]="pawn2Highlight()"
+                [value]="stepsPawn2()"
+                (input)="onStepsPawn2($any($event.target).value)"
+              />
               <button type="button" class="pawn-step-btn" (click)="stepPawn2(1)">+</button>
             </div>
           </div>
@@ -126,5 +164,6 @@
     [offering]="offering()"
     [otherName]="tradeOtherName()"
     (closed)="offering.set(false)"
-    (cancelledByMe)="onTradeCancelled()" />
+    (cancelledByMe)="onTradeCancelled()"
+  />
 }

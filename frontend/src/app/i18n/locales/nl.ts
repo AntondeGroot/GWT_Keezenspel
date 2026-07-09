@@ -51,7 +51,8 @@ export const nl: Dictionary = {
   moveRejectedPawnClosedInFinish: 'Die pion zit klem op de finish en kan niet bewegen.',
   moveRejectedSplitNeedsTwoOwnPawns: 'Voor een 7-splitsing heb je twee eigen pionnen nodig.',
   moveRejectedSplitStepsNotSeven: 'De twee delen van de 7 moeten samen 7 stappen zijn.',
-  moveRejectedMustFinishOwnPawnsFirst: 'Breng eerst al je eigen pionnen thuis voordat je die van je teamgenoot speelt.',
+  moveRejectedMustFinishOwnPawnsFirst:
+    'Breng eerst al je eigen pionnen thuis voordat je die van je teamgenoot speelt.',
   teamHandoffTitle: 'Je pionnen zijn thuis!',
   teamHandoffMessage: 'Je kunt nu de pionnen van je teamgenoot spelen.',
   tradeAskButton: 'Vraag om een Heer of Aas',
