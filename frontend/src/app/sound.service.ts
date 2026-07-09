@@ -61,7 +61,9 @@ export class SoundService {
     const run = () => {
       el.currentTime = 0;
       el.volume = (BASE_VOLUME[name] ?? 1) * master;
-      void el.play().catch(() => {}); // autoplay may be blocked until the first interaction
+      void el.play().catch(() => {
+        /* autoplay may be blocked until the first interaction */
+      });
     };
     if (delayMs > 0) setTimeout(run, delayMs);
     else run();

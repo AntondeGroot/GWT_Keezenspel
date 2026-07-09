@@ -5,8 +5,13 @@
 </button>
 
 @if (open()) {
-  <div class="rules-overlay" (click)="open.set(false)">
-    <div class="rules-content" (click)="$event.stopPropagation()">
+  <div
+    class="rules-overlay"
+    tabindex="0"
+    (click)="$event.target === $event.currentTarget && open.set(false)"
+    (keydown.escape)="open.set(false)"
+  >
+    <div class="rules-content">
       <span class="rules-title">{{ i18n.t('rulesTitle') }}</span>
 
       @for (section of sections; track section.titleKey) {

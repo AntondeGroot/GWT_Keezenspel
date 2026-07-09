@@ -117,15 +117,19 @@
         @if (splitVisible()) {
           <div class="pawn-steps">
             <div class="pawn-steps__row">
-              <label class="pawn-steps__label" [style.color]="pawn1Highlight()">{{
-                i18n.t('pawn1')
-              }}</label>
+              <label
+                class="pawn-steps__label"
+                for="pawn-steps-1"
+                [style.color]="pawn1Highlight()"
+                >{{ i18n.t('pawn1') }}</label
+              >
               <button type="button" class="pawn-step-btn" (click)="stepPawn1(-1)">−</button>
               <input
                 class="pawn-steps__input"
                 type="number"
                 min="0"
                 max="7"
+                id="pawn-steps-1"
                 [style.border-color]="pawn1Highlight()"
                 [value]="stepsPawn1()"
                 (input)="onStepsPawn1($any($event.target).value)"
@@ -133,15 +137,19 @@
               <button type="button" class="pawn-step-btn" (click)="stepPawn1(1)">+</button>
             </div>
             <div class="pawn-steps__row">
-              <label class="pawn-steps__label" [style.color]="pawn2Highlight()">{{
-                i18n.t('pawn2')
-              }}</label>
+              <label
+                class="pawn-steps__label"
+                for="pawn-steps-2"
+                [style.color]="pawn2Highlight()"
+                >{{ i18n.t('pawn2') }}</label
+              >
               <button type="button" class="pawn-step-btn" (click)="stepPawn2(-1)">−</button>
               <input
                 class="pawn-steps__input"
                 type="number"
                 min="0"
                 max="7"
+                id="pawn-steps-2"
                 [style.border-color]="pawn2Highlight()"
                 [value]="stepsPawn2()"
                 (input)="onStepsPawn2($any($event.target).value)"

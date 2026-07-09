@@ -1,7 +1,12 @@
 @switch (mode()) {
   @case ('offer') {
-    <div class="trade-overlay" (click)="dismiss()">
-      <div class="trade-dialog" (click)="$event.stopPropagation()">
+    <div
+      class="trade-overlay"
+      tabindex="0"
+      (click)="$event.target === $event.currentTarget && dismiss()"
+      (keydown.escape)="dismiss()"
+    >
+      <div class="trade-dialog">
         <div class="trade-title">{{ i18n.t('tradeOfferTitle') }}</div>
         <div class="trade-sub">{{ i18n.t('tradeOfferSub') }}</div>
         <div class="trade-hand">

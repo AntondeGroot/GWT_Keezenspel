@@ -25,11 +25,11 @@ describe('Board', () => {
   it('clears the pile on a new round so a redealt card is not filtered out of the hand', () => {
     const c = component as unknown as {
       handleGameState: (push: unknown) => void;
-      pile: { set: (v: Array<{ uuid: number; suit: number; value: number }>) => void };
-      cards: () => Array<{ uuid: number; inPile: boolean }>;
+      pile: { set: (v: { uuid: number; suit: number; value: number }[]) => void };
+      cards: () => { uuid: number; inPile: boolean }[];
     };
     const card = (uuid: number, suit: number, value: number) => ({ uuid, suit, value });
-    const push = (cards: Array<{ uuid: number; suit: number; value: number }>) => ({
+    const push = (cards: { uuid: number; suit: number; value: number }[]) => ({
       playerCards: cards,
       players: [],
       pawns: [],

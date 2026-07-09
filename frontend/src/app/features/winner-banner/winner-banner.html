@@ -2,7 +2,10 @@
   <div
     class="winner-banner"
     role="status"
+    tabindex="0"
     (click)="dismiss()"
+    (keydown.escape)="dismiss()"
+    (keydown.enter)="dismiss()"
     [style.--player-color]="w.color"
     data-testid="winner-banner"
   >

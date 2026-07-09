@@ -1,5 +1,12 @@
 @if (handoff.notice(); as notice) {
-  <div class="team-handoff-toast" (click)="handoff.close()" role="status">
+  <div
+    class="team-handoff-toast"
+    role="status"
+    tabindex="0"
+    (click)="handoff.close()"
+    (keydown.escape)="handoff.close()"
+    (keydown.enter)="handoff.close()"
+  >
     <div class="team-handoff-title">{{ notice.title }}</div>
     <div class="team-handoff-text">{{ notice.message }}</div>
   </div>
