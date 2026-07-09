@@ -46,17 +46,21 @@ public class GameState {
   private volatile boolean mustPlayIfPossible = false;
   private volatile boolean teamPlay = false;
   private final TradeManager tradeManager;
+  private final TileReachability tileReachability;
   private volatile long mustPlayBlockedSinceMs = 0;
   private static final long MUST_PLAY_TIMEOUT_MS = 3 * 60 * 1000L;
   private Boolean hasStarted = false;
   private final AtomicLong version =
       new AtomicLong(0); // to make it compatible with javascript as it doesn't do int64 well!
 
+  // Collaborators only capture the this::getPawn reference; it is not invoked during construction.
+  @SuppressWarnings("this-escape")
   public GameState(CardsDeckInterface cardsDeck) {
     this.cardsDeck = cardsDeck;
     this.tradeManager =
         new TradeManager(
             cardsDeck, version, () -> hasStarted && teamPlay, this::teammateOf, this::isKingOrAce);
+    this.tileReachability = new TileReachability(this::getPawn);
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -645,128 +649,31 @@ public class GameState {
   }
 
   public boolean isPawnLooselyClosedIn(Pawn pawn, PositionKey tileId) {
-    int tileNr = tileId.getTileNr();
-    String playerId = pawn.getPlayerId();
-
-    if (tileNr <= 16) {
-      return false;
-    }
-
-    for (int i = tileId.getTileNr(); i > 16; i--) {
-      if (!canMoveToTile(pawn, new PositionKey(playerId, i - 1))) {
-        return true;
-      }
-    }
-
-    return false;
+    return tileReachability.isPawnLooselyClosedIn(pawn, tileId);
   }
 
   public boolean isPawnTightlyClosedIn(Pawn pawn, PositionKey tileId) {
-    String playerId = pawn.getPlayerId();
-
-    if (tileId.getTileNr() == 19 && !canMoveToTile(pawn, new PositionKey(playerId, 18))) {
-      return true;
-    }
-    if (tileId.getTileNr() == 18
-        && !canMoveToTile(pawn, new PositionKey(playerId, 19))
-        && !canMoveToTile(pawn, new PositionKey(playerId, 17))) {
-      return true;
-    }
-    if (tileId.getTileNr() == 17
-        && !canMoveToTile(pawn, new PositionKey(playerId, 18))
-        && !canMoveToTile(pawn, new PositionKey(playerId, 16))) {
-      return true;
-    }
-
-    return false;
+    return tileReachability.isPawnTightlyClosedIn(pawn, tileId);
   }
 
-  private boolean isPawnClosedInFromBehind(Pawn pawn, PositionKey tileId) {
-    int tileNr = tileId.getTileNr();
-    while (tileNr > 15) {
-      if (!canMoveToTile(pawn, new PositionKey(pawn.getPlayerId(), tileNr - 1))) {
-        return true;
-      }
-      tileNr--;
-    }
-    return false;
-  }
-
-  /**
-   * @param selectedPawn
-   * @param nextTileId @Return True if it ends on own position @Return False it it ends on own other
-   *     pawn of same player @Return False if it ends on blockaded starting tile
-   */
   public boolean canMoveToTile(Pawn selectedPawn, PositionKey nextTileId) {
-    if (nextTileId.getTileNr() > 19) {
-      return false;
-    }
-    Pawn pawn = getPawn(nextTileId);
-    if (pawn != null) {
-      Log.info("found pawn on start tile: " + pawn);
-      if (pawn.getPawnId().equals(selectedPawn.getPawnId())) {
-        return true;
-      }
-      if (Objects.equals(pawn.getPlayerId(), selectedPawn.getPlayerId())) {
-        return false;
-      }
-      if (Objects.equals(pawn.getPlayerId(), nextTileId.getPlayerId())
-          && nextTileId.getTileNr() == 0) {
-        return false;
-      }
-    }
-    return true;
+    return tileReachability.canMoveToTile(selectedPawn, nextTileId);
   }
 
   public boolean cannotMoveToTileBecauseSamePlayer(Pawn selectedPawn, PositionKey nextTileId) {
-    Pawn pawn = getPawn(nextTileId);
-    if (pawn != null) {
-      if (Objects.equals(pawn.getPlayerId(), selectedPawn.getPlayerId())
-          && !pawn.getPawnId().equals(selectedPawn.getPawnId())) {
-        return true;
-      }
-    }
-    return false;
+    return tileReachability.cannotMoveToTileBecauseSamePlayer(selectedPawn, nextTileId);
   }
 
   public boolean canPassStartTile(Pawn selectedPawn, PositionKey tileId) {
-    Pawn pawnOnTile = getPawn(tileId);
-    if (pawnOnTile == null) {
-      return true;
-    }
-    if (selectedPawn.getPawnId().equals(pawnOnTile.getPawnId())) {
-      return true;
-    }
-    if (Objects.equals(pawnOnTile.getPlayerId(), tileId.getPlayerId())) {
-      return false;
-    }
-    return true;
+    return tileReachability.canPassStartTile(selectedPawn, tileId);
   }
 
   public boolean tileIsABlockade(PositionKey selectedStartTile) {
-    Pawn pawnOnStart = getPawn(selectedStartTile);
-    if (pawnOnStart == null) {
-      return false;
-    }
-    return Objects.equals(pawnOnStart.getPawnId().getPlayerId(), selectedStartTile.getPlayerId());
+    return tileReachability.tileIsABlockade(selectedStartTile);
   }
 
   public int checkHighestTileNrYouCanMoveTo(Pawn pawn, PositionKey tileId, int nrSteps) {
-    int direction = 1;
-    int tileNrToCheck = tileId.getTileNr();
-
-    if (nrSteps < 0) {
-      direction = -1;
-      nrSteps = -nrSteps;
-    }
-
-    for (int i = 0; i < nrSteps; i++) {
-      tileNrToCheck = tileNrToCheck + direction;
-      if (!canMoveToTile(pawn, new PositionKey(pawn.getPlayerId(), tileNrToCheck))) {
-        return tileNrToCheck - 1;
-      }
-    }
-    return tileNrToCheck;
+    return tileReachability.checkHighestTileNrYouCanMoveTo(pawn, tileId, nrSteps);
   }
 
   public ArrayList<PositionKey> pingpongMove(Pawn pawn, PositionKey tileId, int nrSteps) {
