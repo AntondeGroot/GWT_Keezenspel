@@ -1,8 +1,6 @@
 .DS_Store
-/GWT_Keezenspel-server/target/
-/GWT_Keezenspel-shared/target/
-/GWT_Keezenspel-client/target/
+/backend/target/
 /target/
 /.idea/
 target/
-/GWT_Keezenspel-server/screenshots/
+/backend/screenshots/
