@@ -73,7 +73,7 @@ jobs:
           # Spring profile enables TestResetController (/test/**), gated off in production.
           # -Denv=dev skips the env-prod GWT-app unpack (the browser loads the
           # Angular app from ng serve, not the backend's static resources).
-          ( cd .. && nohup mvn -B -Denv=dev -pl GWT_Keezenspel-server -am spring-boot:run \
+          ( cd .. && nohup mvn -B -Denv=dev -pl backend -am spring-boot:run \
               -Dspring-boot.run.arguments="--server.port=4200 --spring.profiles.active=test --spring.devtools.restart.enabled=false" \
               > "$RUNNER_TEMP/backend.log" 2>&1 & )
           echo "Waiting for backend on :4200 ..."
@@ -106,7 +106,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Test server
-        run: mvn -B -Denv=dev -pl GWT_Keezenspel-server -am test
+        run: mvn -B -Denv=dev -pl backend -am test
 
   # ── Mutation tests (server) ──────────────────────────────────────────
   mutation:
@@ -125,10 +125,10 @@ jobs:
       - name: Build (deps into local repo)
         run: mvn -B -Denv=dev -DskipTests install
       - name: PIT mutation coverage
-        run: mvn -B -Denv=dev -pl GWT_Keezenspel-server pitest:mutationCoverage
+        run: mvn -B -Denv=dev -pl backend pitest:mutationCoverage
       - name: Upload mutation report
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: pit-report
-          path: GWT_Keezenspel-server/target/pit-reports/
+          path: backend/target/pit-reports/

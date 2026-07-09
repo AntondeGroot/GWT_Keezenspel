@@ -16,7 +16,7 @@ echo "🔨 Building and running all backend tests..."
 mvn clean verify
 
 echo "🧬 Running mutation tests..."
-mvn -pl GWT_Keezenspel-server pitest:mutationCoverage
+mvn -pl backend pitest:mutationCoverage
 
 # The Angular app is now what we deploy (see env-angular). ng build hashes asset
 # filenames, so the old GWT ?v= cache-stamping is no longer needed. Served under /keezen:
@@ -30,7 +30,7 @@ echo "🅰️  Testing + building the Angular app..."
 ( cd frontend && npm ci && CI=1 npx ng test --watch=false && npm run build -- --base-href=/keezen/ )
 
 echo "📦 Packaging the server to serve the Angular app (env-angular; no GWT unpack)..."
-mvn -pl GWT_Keezenspel-server -am -Penv-angular -DskipTests clean package
+mvn -pl backend -am -Penv-angular -DskipTests clean package
 
 # Angular E2E (Playwright) gate. Playwright serves the UI itself (ng serve on :4300) but
 # needs a backend with the API + /test seeding hooks on :4200 — so run the jar we just
@@ -38,7 +38,7 @@ mvn -pl GWT_Keezenspel-server -am -Penv-angular -DskipTests clean package
 # (set -e) before anything is uploaded. (`mvn clean verify` above already needs :4200 free,
 # so it is free here too.)
 echo "🎭 Running Angular E2E (Playwright)..."
-E2E_JAR=GWT_Keezenspel-server/target/GWT_Keezenspel-exec.jar
+E2E_JAR=backend/target/tock-exec.jar
 java -jar "$E2E_JAR" --server.port=4200 --spring.profiles.active=test > /tmp/keezen-e2e-backend.log 2>&1 &
 E2E_BACKEND_PID=$!
 trap '[ -n "${E2E_BACKEND_PID:-}" ] && kill "$E2E_BACKEND_PID" 2>/dev/null' EXIT
@@ -50,7 +50,7 @@ curl -sf http://localhost:4200/game-options >/dev/null 2>&1 || {
 kill "$E2E_BACKEND_PID" 2>/dev/null; E2E_BACKEND_PID=""; trap - EXIT
 
 echo "📦 Uploading..."
-$SCP GWT_Keezenspel-server/target/GWT_Keezenspel-exec.jar $TARGET:/home/ubuntu/keezen.jar
+$SCP backend/target/tock-exec.jar $TARGET:/home/ubuntu/keezen.jar
 
 echo "📁 Installing..."
 $SSH "sudo mkdir -p /opt/keezen && sudo mv /home/ubuntu/keezen.jar /opt/keezen/keezen.jar"
