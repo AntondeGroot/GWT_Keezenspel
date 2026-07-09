@@ -8,7 +8,7 @@ server:
 
 spring:
   application:
-    name: GWT_Keezenspel
+    name: tock
   config:
     import:
       - "optional:file:/opt/keezen/application-override.yaml"
