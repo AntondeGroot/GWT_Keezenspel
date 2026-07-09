@@ -32,6 +32,9 @@ yarn-error.log
 # Generated API client (regenerated from ../keezenspel_openapi.yml; do not commit)
 /src/app/api
 
+# OpenAPI generator jar cache (downloaded on demand; cached in CI)
+/.openapi-generator-cli
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/
