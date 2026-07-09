@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
+// Reads loose JSON (Map<String,Object>) response bodies; nested value casts are unchecked.
+@SuppressWarnings("unchecked")
 class ApiPublicCardInfoTest extends BaseUnitTest {
 
   private final ApiCallsHelper apiHelper = new ApiCallsHelper();
