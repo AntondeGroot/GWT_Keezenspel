@@ -48,6 +48,7 @@ public class GameState {
   private final TradeManager tradeManager;
   private final TileReachability tileReachability;
   private final PlayerRoster roster;
+  private final PawnLocations pawnLocations;
   private volatile long mustPlayBlockedSinceMs = 0;
   private static final long MUST_PLAY_TIMEOUT_MS = 3 * 60 * 1000L;
   private Boolean hasStarted = false;
@@ -59,6 +60,7 @@ public class GameState {
   public GameState(CardsDeckInterface cardsDeck) {
     this.cardsDeck = cardsDeck;
     this.roster = new PlayerRoster(players, playerColors);
+    this.pawnLocations = new PawnLocations(() -> pawns);
     this.tradeManager =
         new TradeManager(
             cardsDeck, version, () -> hasStarted && teamPlay, this::teammateOf, this::isKingOrAce);
@@ -731,51 +733,21 @@ public class GameState {
 
   // ── Pawn helpers ──────────────────────────────────────────────────────────
 
+  /** Public for testing: set a pawn's location without triggering any validation. */
   public void movePawn(Pawn selectedPawn) {
-    // set a pawn's location without triggering any validation
-    // public for testing purposes
-    for (Pawn pawn : pawns) {
-      if (pawn.getPawnId().equals(selectedPawn.getPawnId())) { // equals only looks at pawnId
-        pawn.setCurrentTileId(selectedPawn.getCurrentTileId());
-        break;
-      }
-    }
+    pawnLocations.moveTo(selectedPawn);
   }
 
   public Pawn getPawn(Pawn selectedPawn) {
-    for (Pawn pawn : pawns) {
-      if (pawn.getPawnId().equals(selectedPawn.getPawnId())) {
-        return pawn;
-      }
-    }
-    return null;
+    return pawnLocations.withId(selectedPawn.getPawnId());
   }
 
   public Pawn getPawn(PawnId selectedPawnId) {
-    for (Pawn pawn : pawns) {
-      if (pawn.getPawnId().equals(selectedPawnId)) {
-        return pawn;
-      }
-    }
-    return null;
+    return pawnLocations.withId(selectedPawnId);
   }
 
   public Pawn getPawn(PositionKey selectedTileId) {
-    for (Pawn pawn : pawns) {
-      if (pawn.getCurrentTileId().equals(selectedTileId)) {
-        return pawn;
-      }
-    }
-    return null;
-  }
-
-  public PositionKey getPawnTileId(PawnId pawnId) {
-    for (Pawn pawn : pawns) {
-      if (pawn.getPawnId().equals(pawnId)) {
-        return pawn.getCurrentTileId();
-      }
-    }
-    return null;
+    return pawnLocations.atTile(selectedTileId);
   }
 
   public ArrayList<Pawn> getPawns() {
