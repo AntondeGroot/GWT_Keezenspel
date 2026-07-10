@@ -76,6 +76,33 @@ class SevenSplitRecommenderTest {
   }
 
   @Test
+  void whenBothPawnsReachFinish_theDeeperReachingPawnGetsItsSteps() {
+    // Both pawns are on player 0's approach (section 7). pawn1 at (7,10) can only reach finish tile
+    // 17; pawn2 at (7,13) can reach the deepest tile 19 in 6 steps. The deeper pawn (pawn2) wins the
+    // allocation, order unchanged.
+    Card card = givePlayerSeven(cardsDeck, 0);
+    Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("0", 1), new PositionKey("7", 10));
+    Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("0", 2), new PositionKey("7", 13));
+
+    int[] rec = SevenSplitRecommender.recommend(gameState, baseRequest(pawn1, pawn2, card));
+
+    assertArrayEquals(new int[] {1, 6}, rec); // pawn2 takes 6 (→19); pawn1 the remaining 1
+  }
+
+  @Test
+  void whenBothPawnsReachFinish_pawn1DeeperKeepsItsAllocation() {
+    // Mirror of the above: pawn1 at (7,13) reaches the deepest tile 19; pawn2 at (7,10) only reaches
+    // 17. The deeper pawn (pawn1) keeps its 6-step allocation; pawn2 takes the remaining 1.
+    Card card = givePlayerSeven(cardsDeck, 0);
+    Pawn pawn1 = placePawnOnBoard(gameState, new PawnId("0", 1), new PositionKey("7", 13));
+    Pawn pawn2 = placePawnOnBoard(gameState, new PawnId("0", 2), new PositionKey("7", 10));
+
+    int[] rec = SevenSplitRecommender.recommend(gameState, baseRequest(pawn1, pawn2, card));
+
+    assertArrayEquals(new int[] {6, 1}, rec); // pawn1 takes 6 (→19); pawn2 the remaining 1
+  }
+
+  @Test
   void noRecommendationWhenNeitherPawnCanReachTheFinish() {
     // Both pawns are far from the finish; no allocation lands a pawn in the finish.
     Card card = givePlayerSeven(cardsDeck, 0);
