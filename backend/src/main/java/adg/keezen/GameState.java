@@ -48,6 +48,7 @@ public class GameState {
   private final TileReachability tileReachability;
   private final PlayerRoster roster;
   private final PawnLocations pawnLocations;
+  private final WinnerDetection winnerDetection;
   private volatile long mustPlayBlockedSinceMs = 0;
   private static final long MUST_PLAY_TIMEOUT_MS = 3 * 60 * 1000L;
   private Boolean hasStarted = false;
@@ -64,6 +65,9 @@ public class GameState {
         new TradeManager(
             cardsDeck, version, () -> hasStarted && teamPlay, this::teammateOf, this::isKingOrAce);
     this.tileReachability = new TileReachability(this::getPawn);
+    this.winnerDetection =
+        new WinnerDetection(
+            players, leavers, roster, pawnLocations, cardsDeck, version, () -> teamPlay);
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -474,77 +478,11 @@ public class GameState {
   // ── Winner tracking ───────────────────────────────────────────────────────
 
   public void checkForWinners(ArrayList<String> winners) {
-    if (teamPlay) {
-      checkForTeamWinners(winners);
-      return;
-    }
-    for (Player player : players) {
-      if (!winners.contains(player.getId()) && hasAllPawnsOnFinish(player.getId())) {
-        recordWinner(player, winners);
-      }
-    }
-  }
-
-  /**
-   * In team play a team places only when <em>both</em> members have all their pawns home — so a
-   * player who finishes their own pawns first gets no place yet, stays active, and keeps taking
-   * turns (to play their teammate's pawns) until the pair is done. Both members share the place.
-   */
-  private void checkForTeamWinners(ArrayList<String> winners) {
-    for (Player player : players) {
-      Integer team = player.getTeamId();
-      if (team == null) {
-        continue;
-      }
-      List<Player> members = teamMembers(team);
-      if (members.stream().anyMatch(m -> winners.contains(m.getId()))) {
-        continue; // team already placed
-      }
-      // A departed teammate is out of the game: their pawns are gone and don't need to come home.
-      // The team places once every member STILL PRESENT has all pawns on the finish — so a lone
-      // survivor wins on their own four. A fully-abandoned team can't win, and a leaver earns no
-      // place (only present members are recorded).
-      List<Player> present = members.stream()
-          .filter(m -> !leavers.contains(m.getId()))
-          .toList();
-      if (!present.isEmpty() && present.stream().allMatch(m -> hasAllPawnsOnFinish(m.getId()))) {
-        int place = distinctTeamsPlaced(winners) + 1;
-        for (Player member : present) {
-          recordWinner(member, place, winners);
-        }
-      }
-    }
-  }
-
-  /** How many distinct teams are already in the winners list — the next team places behind them. */
-  private int distinctTeamsPlaced(ArrayList<String> winners) {
-    return (int) winners.stream()
-        .map(this::findPlayerById)
-        .filter(p -> p != null && p.getTeamId() != null)
-        .map(Player::getTeamId)
-        .distinct()
-        .count();
-  }
-
-  private List<Player> teamMembers(int teamId) {
-    return roster.teamMembers(teamId);
+    winnerDetection.check(winners);
   }
 
   private boolean hasAllPawnsOnFinish(String playerId) {
     return pawnLocations.allPawnsOnFinish(playerId);
-  }
-
-  private void recordWinner(Player player, ArrayList<String> winners) {
-    recordWinner(player, winners.size() + 1, winners);
-  }
-
-  private void recordWinner(Player player, int place, ArrayList<String> winners) {
-    player.setPlace(place);
-    winners.add(player.getId());
-    cardsDeck.forfeitCardsForPlayer(player.getId());
-    player.setIsPlaying(false);
-    player.setIsActive(false);
-    version.incrementAndGet();
   }
 
   /**
