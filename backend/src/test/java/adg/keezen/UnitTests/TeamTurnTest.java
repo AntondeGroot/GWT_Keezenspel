@@ -82,6 +82,14 @@ class TeamTurnTest {
   }
 
   @Test
+  void nullPawn_isTreatedDefensively() {
+    GameState gs = teamGame();
+    // No pawn selected: the move gate has nothing to disallow, but you cannot control a null pawn.
+    assertTrue(gs.isTeamMoveAllowed("0", null), "no pawn → nothing to gate");
+    assertFalse(gs.mayControlPawn("0", null), "no pawn → nothing to control");
+  }
+
+  @Test
   void mayControlPawn_teamsOff_onlyYourOwn() {
     GameState gs = new GameSession().getGameState();
     for (int i = 0; i < 4; i++) {
