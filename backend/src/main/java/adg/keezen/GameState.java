@@ -189,6 +189,11 @@ public class GameState {
 
   private void initializeCards() {
     cardsDeck.addPlayers(players);
+    dealRoundCards();
+  }
+
+  /** Deal this round's hands — the deck only reshuffles on the first round of the game. */
+  private void dealRoundCards() {
     cardsDeck.shuffleIfFirstRound();
     cardsDeck.dealCards();
   }
@@ -210,9 +215,7 @@ public class GameState {
 
   private void resetCards() {
     cardsDeck.reset();
-    cardsDeck.addPlayers(players);
-    cardsDeck.shuffleIfFirstRound();
-    cardsDeck.dealCards();
+    initializeCards();
   }
 
   private void resetTurn() {
@@ -298,8 +301,7 @@ public class GameState {
 
   private void startNewRound() {
     resetActivePlayers();
-    cardsDeck.shuffleIfFirstRound();
-    cardsDeck.dealCards();
+    dealRoundCards();
     nextRoundPlayer();
   }
 
