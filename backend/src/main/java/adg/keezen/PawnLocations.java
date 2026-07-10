@@ -1,5 +1,7 @@
 package adg.keezen;
 
+import static adg.util.BoardLogic.isPawnOnFinish;
+
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PawnId;
 import com.adg.openapi.model.PositionKey;
@@ -13,6 +15,8 @@ import java.util.function.Supplier;
  * methods.
  */
 class PawnLocations {
+
+  private static final int PAWNS_PER_PLAYER = 4;
 
   private final Supplier<List<Pawn>> pawns;
 
@@ -38,6 +42,14 @@ class PawnLocations {
       }
     }
     return null;
+  }
+
+  /** True when all of this player's pawns sit on the finish lane (i.e. the player is home). */
+  boolean allPawnsOnFinish(String playerId) {
+    return pawns.get().stream()
+        .filter(pawn -> playerId.equals(pawn.getPlayerId()))
+        .filter(pawn -> isPawnOnFinish(pawn))
+        .count() == PAWNS_PER_PLAYER;
   }
 
   /** Set a pawn's location without any validation (matched by pawn id). */

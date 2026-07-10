@@ -1,6 +1,5 @@
 package adg.keezen;
 
-import static adg.util.BoardLogic.isPawnOnFinish;
 import static adg.util.CardValueCheck.isAce;
 import static adg.util.CardValueCheck.isKing;
 import static adg.util.PlayerStatus.hasFinished;
@@ -532,11 +531,7 @@ public class GameState {
   }
 
   private boolean hasAllPawnsOnFinish(String playerId) {
-    long finishedCount = pawns.stream()
-        .filter(p -> playerId.equals(p.getPlayerId()))
-        .filter(p -> isPawnOnFinish(p))
-        .count();
-    return finishedCount == 4;
+    return pawnLocations.allPawnsOnFinish(playerId);
   }
 
   private void recordWinner(Player player, ArrayList<String> winners) {
