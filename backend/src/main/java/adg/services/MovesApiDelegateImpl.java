@@ -75,10 +75,7 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
 
   @Override
   public ResponseEntity<MoveResponse> getLastMove(String sessionId) {
-    GameSession session = GameRegistry.getGame(sessionId);
-    if (session == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    GameSession session = Games.require(sessionId);
     MoveResponse last = session.getLastMoveResponse();
     if (last == null) {
       return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -88,11 +85,7 @@ public class MovesApiDelegateImpl implements MovesApiDelegate {
 
   private ResponseEntity<MoveResponse> dispatchMove(
       String sessionId, String playerId, MoveRequest moveRequest) {
-    GameSession gameSession = GameRegistry.getGame(sessionId);
-    if (gameSession == null) {
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
+    GameSession gameSession = Games.require(sessionId);
     GameState gameState = gameSession.getGameState();
 
     if (moveRequest.getTempMessageType() == MAKE_MOVE

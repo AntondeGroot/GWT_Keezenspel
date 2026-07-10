@@ -1,11 +1,9 @@
 package adg.services;
 
-import adg.keezen.GameRegistry;
 import adg.keezen.GameSession;
 import adg.keezen.GameState;
 import com.adg.openapi.api.TradeApiDelegate;
 import com.adg.openapi.model.TradeAction;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -26,10 +24,7 @@ public class TradeApiDelegateImpl implements TradeApiDelegate {
 
   @Override
   public ResponseEntity<Void> teamTrade(String sessionId, TradeAction action) {
-    GameSession session = GameRegistry.getGame(sessionId);
-    if (session == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    GameSession session = Games.require(sessionId);
     if (action == null || action.getAction() == null || action.getPlayerId() == null) {
       return ResponseEntity.badRequest().build();
     }
