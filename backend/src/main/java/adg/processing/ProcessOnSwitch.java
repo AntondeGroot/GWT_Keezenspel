@@ -1,5 +1,6 @@
 package adg.processing;
 
+import static adg.processing.MoveResponses.reject;
 import static adg.util.BoardLogic.isPawnOnFinish;
 import static adg.util.BoardLogic.isPawnOnNest;
 import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
@@ -48,9 +49,7 @@ public class ProcessOnSwitch {
   private static boolean selectionIsValid(
       Pawn pawn1, Pawn pawn2, Card card, MoveResponse response) {
     if (pawn1 == null || card == null || pawn2 == null) {
-      response.setResult(INVALID_SELECTION);
-      response.setRejectionReason(MoveRejectionReason.INVALID_SELECTION);
-      return false;
+      return reject(response, INVALID_SELECTION, MoveRejectionReason.INVALID_SELECTION);
     }
     return true;
   }
@@ -60,9 +59,7 @@ public class ProcessOnSwitch {
     if (Objects.equals(
         moveMessage.getPawn1Id().getPlayerId(),
         moveMessage.getPawn2Id().getPlayerId())) {
-      response.setResult(CANNOT_MAKE_MOVE);
-      response.setRejectionReason(MoveRejectionReason.CANNOT_SWITCH_OWN_PAWNS);
-      return false;
+      return reject(response, CANNOT_MAKE_MOVE, MoveRejectionReason.CANNOT_SWITCH_OWN_PAWNS);
     }
     return true;
   }
@@ -71,9 +68,7 @@ public class ProcessOnSwitch {
       GameState gs, String playerId, Pawn pawn1, Pawn pawn2, MoveResponse response) {
     // You must control one of the two pawns — your own, or a teammate's once your own are home.
     if (!gs.mayControlPawn(playerId, pawn1) && !gs.mayControlPawn(playerId, pawn2)) {
-      response.setResult(CANNOT_MAKE_MOVE);
-      response.setRejectionReason(MoveRejectionReason.NOT_YOUR_PAWN);
-      return false;
+      return reject(response, CANNOT_MAKE_MOVE, MoveRejectionReason.NOT_YOUR_PAWN);
     }
     return true;
   }
@@ -81,9 +76,7 @@ public class ProcessOnSwitch {
   private static boolean playerHasCard(
       GameState gs, String playerId, Card card, MoveResponse response) {
     if (!gs.playerHasCard(playerId, card)) {
-      response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
-      response.setRejectionReason(MoveRejectionReason.DONT_HAVE_CARD);
-      return false;
+      return reject(response, PLAYER_DOES_NOT_HAVE_CARD, MoveRejectionReason.DONT_HAVE_CARD);
     }
     return true;
   }
@@ -91,9 +84,7 @@ public class ProcessOnSwitch {
   private static boolean pawnsAreOnBoard(Pawn pawn1, Pawn pawn2, MoveResponse response) {
     if (isPawnOnNest(pawn1) || isPawnOnNest(pawn2)
         || isPawnOnFinish(pawn1) || isPawnOnFinish(pawn2)) {
-      response.setResult(CANNOT_MAKE_MOVE);
-      response.setRejectionReason(MoveRejectionReason.PAWN_NOT_ON_BOARD);
-      return false;
+      return reject(response, CANNOT_MAKE_MOVE, MoveRejectionReason.PAWN_NOT_ON_BOARD);
     }
     return true;
   }
@@ -101,9 +92,7 @@ public class ProcessOnSwitch {
   private static boolean pawn2IsNotOnOwnStart(Pawn pawn2, MoveResponse response) {
     PositionKey tile2 = pawn2.getCurrentTileId();
     if (tile2.getPlayerId().equals(pawn2.getPlayerId()) && tile2.getTileNr() == 0) {
-      response.setResult(CANNOT_MAKE_MOVE);
-      response.setRejectionReason(MoveRejectionReason.CANNOT_SWITCH_OPPONENT_ON_OWN_START);
-      return false;
+      return reject(response, CANNOT_MAKE_MOVE, MoveRejectionReason.CANNOT_SWITCH_OPPONENT_ON_OWN_START);
     }
     return true;
   }

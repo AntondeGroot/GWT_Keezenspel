@@ -1,5 +1,6 @@
 package adg.processing;
 
+import static adg.processing.MoveResponses.reject;
 import static adg.util.CardValueCheck.isAce;
 import static adg.util.CardValueCheck.isKing;
 import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
@@ -41,9 +42,7 @@ public class ProcessOnBoard {
 
   private static boolean selectionIsValid(Pawn pawn1, Card card, MoveResponse response) {
     if (pawn1 == null || card == null) {
-      response.setResult(INVALID_SELECTION);
-      response.setRejectionReason(MoveRejectionReason.INVALID_SELECTION);
-      return false;
+      return reject(response, INVALID_SELECTION, MoveRejectionReason.INVALID_SELECTION);
     }
     return true;
   }
@@ -51,27 +50,21 @@ public class ProcessOnBoard {
   private static boolean playerHasCard(
       GameState gs, String playerId, Card card, MoveResponse response) {
     if (!gs.playerHasCard(playerId, card)) {
-      response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
-      response.setRejectionReason(MoveRejectionReason.DONT_HAVE_CARD);
-      return false;
+      return reject(response, PLAYER_DOES_NOT_HAVE_CARD, MoveRejectionReason.DONT_HAVE_CARD);
     }
     return true;
   }
 
   private static boolean cardIsAceOrKing(Card card, MoveResponse response) {
     if (!(isAce(card) || isKing(card))) {
-      response.setResult(CANNOT_MAKE_MOVE);
-      response.setRejectionReason(MoveRejectionReason.WRONG_CARD_FOR_MOVE);
-      return false;
+      return reject(response, CANNOT_MAKE_MOVE, MoveRejectionReason.WRONG_CARD_FOR_MOVE);
     }
     return true;
   }
 
   private static boolean pawnIsOnNest(PositionKey currentTileId, MoveResponse response) {
     if (currentTileId.getTileNr() >= 0) {
-      response.setResult(CANNOT_MAKE_MOVE);
-      response.setRejectionReason(MoveRejectionReason.PAWN_NOT_ON_NEST);
-      return false;
+      return reject(response, CANNOT_MAKE_MOVE, MoveRejectionReason.PAWN_NOT_ON_NEST);
     }
     return true;
   }
@@ -79,9 +72,7 @@ public class ProcessOnBoard {
   private static boolean targetTileIsFree(
       GameState gs, Pawn pawn1, PositionKey targetTileId, MoveResponse response) {
     if (!gs.canMoveToTile(pawn1, targetTileId)) {
-      response.setResult(CANNOT_MAKE_MOVE);
-      response.setRejectionReason(MoveRejectionReason.START_TILE_OCCUPIED);
-      return false;
+      return reject(response, CANNOT_MAKE_MOVE, MoveRejectionReason.START_TILE_OCCUPIED);
     }
     return true;
   }
