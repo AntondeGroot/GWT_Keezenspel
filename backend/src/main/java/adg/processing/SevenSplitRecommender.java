@@ -13,6 +13,7 @@ import com.adg.openapi.model.PawnId;
 import com.adg.openapi.model.PositionKey;
 import com.adg.openapi.model.TempMessageType;
 import java.util.List;
+import java.util.function.ToIntFunction;
 
 /**
  * Suggests how to split a 7 between two selected pawns so that a pawn advances as far as possible
@@ -86,24 +87,31 @@ public final class SevenSplitRecommender {
 
   /** Chooses pawn1's step count: finish first (deepest), then blockade (furthest), else none. */
   private static Integer chooseStepsForPawn1(Analysis a1, Analysis a2) {
-    boolean finish1 = a1.kind() == Kind.FINISH;
-    boolean finish2 = a2.kind() == Kind.FINISH;
-    if (finish1 || finish2) {
-      if (finish1 && (!finish2 || a1.landingTileNr() >= a2.landingTileNr())) {
-        return a1.bestSteps();
-      }
-      return 7 - a2.bestSteps();
+    // Finish takes priority: the pawn reaching deepest into the finish (by landing tile) wins.
+    Integer finish = pickForWall(a1, a2, Kind.FINISH, Analysis::landingTileNr);
+    if (finish != null) {
+      return finish;
     }
+    // Otherwise a blockade: the pawn that advances furthest against it (by step count) wins.
+    return pickForWall(a1, a2, Kind.BLOCKADE, Analysis::bestSteps);
+  }
 
-    boolean blocked1 = a1.kind() == Kind.BLOCKADE;
-    boolean blocked2 = a2.kind() == Kind.BLOCKADE;
-    if (blocked1 || blocked2) {
-      if (blocked1 && (!blocked2 || a1.bestSteps() >= a2.bestSteps())) {
-        return a1.bestSteps();
-      }
-      return 7 - a2.bestSteps();
+  /**
+   * If either pawn hits a wall of this {@code kind}, return pawn1's step allocation — favouring the
+   * pawn with the higher {@code metric}, ties going to pawn1. Returns {@code null} when neither pawn
+   * hits this kind of wall, so the caller can fall through to the next priority.
+   */
+  private static Integer pickForWall(
+      Analysis a1, Analysis a2, Kind kind, ToIntFunction<Analysis> metric) {
+    boolean hit1 = a1.kind() == kind;
+    boolean hit2 = a2.kind() == kind;
+    if (!hit1 && !hit2) {
+      return null;
     }
-    return null;
+    if (hit1 && (!hit2 || metric.applyAsInt(a1) >= metric.applyAsInt(a2))) {
+      return a1.bestSteps();
+    }
+    return 7 - a2.bestSteps();
   }
 
   /** The step count whose landing is furthest forward, and how that landing is classified. */
