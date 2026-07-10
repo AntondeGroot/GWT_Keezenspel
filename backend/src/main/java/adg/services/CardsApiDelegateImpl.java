@@ -1,7 +1,6 @@
 package adg.services;
 
 import adg.keezen.CardsDeckInterface;
-import adg.keezen.GameRegistry;
 import adg.keezen.GameSession;
 import adg.keezen.GameState;
 import adg.processing.MoveAvailabilityChecker;
@@ -28,10 +27,7 @@ public class CardsApiDelegateImpl implements CardsApiDelegate {
     }
 
     // Get the session
-    GameSession session = GameRegistry.getGame(gameId);
-    if (session == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of());
-    }
+    GameSession session = Games.require(gameId);
 
     // Get the deck
     CardsDeckInterface cardsDeck = session.getCardsDeck();
@@ -47,11 +43,7 @@ public class CardsApiDelegateImpl implements CardsApiDelegate {
   @Override
   public ResponseEntity<Void> playerForfeits(String sessionId, String playerId) {
 
-    GameSession session = GameRegistry.getGame(sessionId);
-    if (session == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-    }
-
+    GameSession session = Games.require(sessionId);
     GameState gameState = session.getGameState();
 
     if (!gameState.hasStarted() || !gameState.getPlayerIdTurn().equals(playerId)) {
@@ -82,10 +74,7 @@ public class CardsApiDelegateImpl implements CardsApiDelegate {
     }
 
     // 2️⃣ Get the game session
-    GameSession session = GameRegistry.getGame(sessionId);
-    if (session == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    GameSession session = Games.require(sessionId);
 
     // 3️⃣ Get the deck
     CardsDeckInterface cardsDeck = session.getCardsDeck();

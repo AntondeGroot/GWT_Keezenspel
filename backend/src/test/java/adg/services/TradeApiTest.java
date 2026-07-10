@@ -3,6 +3,7 @@ package adg.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import adg.keezen.GameRegistry;
@@ -80,8 +81,9 @@ class TradeApiTest {
   }
 
   @Test
-  void unknownSession_returns404() {
-    var response = delegate.teamTrade("nope", action(TradeAction.ActionEnum.REQUEST, "0", OFFERED));
-    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+  void unknownSession_throwsNotFound() {
+    // GameNotFoundException is @ResponseStatus(NOT_FOUND); Spring renders it as a 404 over HTTP.
+    assertThrows(GameNotFoundException.class,
+        () -> delegate.teamTrade("nope", action(TradeAction.ActionEnum.REQUEST, "0", OFFERED)));
   }
 }

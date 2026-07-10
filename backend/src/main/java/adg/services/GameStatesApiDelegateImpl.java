@@ -1,6 +1,5 @@
 package adg.services;
 
-import adg.keezen.GameRegistry;
 import adg.keezen.GameSession;
 import adg.keezen.GameState;
 import com.adg.openapi.api.GamestatesApiDelegate;
@@ -15,11 +14,7 @@ public class GameStatesApiDelegateImpl implements GamestatesApiDelegate {
   public ResponseEntity<com.adg.openapi.model.GameState> getGameStateForGame(
       String sessionId, Long stateVersion) {
 
-    GameSession session = GameRegistry.getGame(sessionId);
-    if (session == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-    }
-
+    GameSession session = Games.require(sessionId);
     GameState gameState = session.getGameState();
     if (stateVersion != null && stateVersion.equals(Long.valueOf(gameState.getVersion()))) {
       return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
