@@ -243,25 +243,15 @@ public class GameState {
     leavers.add(playerId);
     removePawnsForPlayer(playerId);
     deactivateAndStopPlayingPlayer(playerId);
-    if (allActivePlayersExhausted()) {
-      startNewRound();
-    } else {
-      activePlayers.remove(playerId);
-      if (playerId.equals(playerIdTurn)) {
-        nextActivePlayer();
-      }
-    }
+    // Only hand off the turn if the player who left was actually on it.
+    removeFromRoundAndAdvance(playerId, playerId.equals(playerIdTurn));
     version.incrementAndGet();
   }
 
   public void forfeitPlayer(String playerId) {
     deactivatePlayerById(playerId);
-    if (allActivePlayersExhausted()) {
-      startNewRound();
-    } else {
-      activePlayers.remove(playerId);
-      nextActivePlayer();
-    }
+    // A forfeiting player is always the one on turn, so the turn always moves on.
+    removeFromRoundAndAdvance(playerId, true);
     version.incrementAndGet();
   }
 
@@ -273,6 +263,22 @@ public class GameState {
   }
 
   // ── Player management helpers ─────────────────────────────────────────────
+
+  /**
+   * Drop the player from the round: if that leaves no one active, start a fresh round; otherwise
+   * remove them from the active list and, when {@code advanceTurn}, pass the turn to the next
+   * active player.
+   */
+  private void removeFromRoundAndAdvance(String playerId, boolean advanceTurn) {
+    if (allActivePlayersExhausted()) {
+      startNewRound();
+    } else {
+      activePlayers.remove(playerId);
+      if (advanceTurn) {
+        nextActivePlayer();
+      }
+    }
+  }
 
   private void deactivatePlayerById(String playerId) {
     Player player = findPlayerById(playerId);
