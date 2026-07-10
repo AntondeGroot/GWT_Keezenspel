@@ -175,4 +175,61 @@ class PawnAndCardSelectionValidationTest {
     // jack requires a second pawn to switch with
     assertFalse(PawnAndCardSelectionValidation.validate(pawnOnBoard("p1", 5), null, card(11)).isValid());
   }
+
+  // ── boundary cases: pin the exact tile thresholds (nest = -1, board = 0..15) ──
+
+  @Test
+  void pawn1OnStartTile0_kingCard_isInvalid_notOnBoard() {
+    // tile 0 is on the board, not the nest, so King is not an "onto the board" move
+    assertFalse(PawnAndCardSelectionValidation.validate(pawnOnBoard("p1", 0), null, card(13)).isValid());
+  }
+
+  @Test
+  void split_pawn1OnStartTile0_isSplit() {
+    SelectionValidation r =
+        PawnAndCardSelectionValidation.validate(pawnOnBoard("p1", 0), pawnOnBoard("p1", 5), card(7));
+    assertEquals(MoveType.SPLIT, r.getMoveType());
+  }
+
+  @Test
+  void split_pawn2OnStartTile0_isSplit() {
+    SelectionValidation r =
+        PawnAndCardSelectionValidation.validate(pawnOnBoard("p1", 5), pawnOnBoard("p1", 0), card(7));
+    assertEquals(MoveType.SPLIT, r.getMoveType());
+  }
+
+  @Test
+  void switch_pawn1OnStartTile0_isSwitch() {
+    SelectionValidation r =
+        PawnAndCardSelectionValidation.validate(pawnOnBoard("p1", 0), pawnOnBoard("p2", 5), card(11));
+    assertEquals(MoveType.SWITCH, r.getMoveType());
+  }
+
+  @Test
+  void switch_pawn1OnLastBoardTile15_isSwitch() {
+    SelectionValidation r =
+        PawnAndCardSelectionValidation.validate(pawnOnBoard("p1", 15), pawnOnBoard("p2", 5), card(11));
+    assertEquals(MoveType.SWITCH, r.getMoveType());
+  }
+
+  @Test
+  void switch_pawn2OnStartTile0_isSwitch() {
+    SelectionValidation r =
+        PawnAndCardSelectionValidation.validate(pawnOnBoard("p1", 5), pawnOnBoard("p2", 0), card(11));
+    assertEquals(MoveType.SWITCH, r.getMoveType());
+  }
+
+  @Test
+  void switch_pawn2OnLastBoardTile15_isSwitch() {
+    SelectionValidation r =
+        PawnAndCardSelectionValidation.validate(pawnOnBoard("p1", 5), pawnOnBoard("p2", 15), card(11));
+    assertEquals(MoveType.SWITCH, r.getMoveType());
+  }
+
+  @Test
+  void move_pawn1OnStartTile0_isMove() {
+    SelectionValidation r =
+        PawnAndCardSelectionValidation.validate(pawnOnBoard("p1", 0), null, card(5));
+    assertEquals(MoveType.MOVE, r.getMoveType());
+  }
 }
