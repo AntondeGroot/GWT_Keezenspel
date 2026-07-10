@@ -85,7 +85,7 @@ public class GameState {
     activateAllPlayers();
     initializePawns();
     initializeCards();
-    initializeTurn();
+    resetTurnToFirstPlayer();
   }
 
   public void stop() {
@@ -103,7 +103,7 @@ public class GameState {
     resetPawnPositions();
     resetActivePlayers();
     resetCards();
-    resetTurn();
+    resetTurnToFirstPlayer();
     tradeManager.clearPending();
     version.incrementAndGet();
   }
@@ -161,12 +161,6 @@ public class GameState {
     Collections.shuffle(players);
   }
 
-  private void initializeTurn() {
-    playerIdTurn = players.getFirst().getId();
-    playerIdStartingRound = playerIdTurn;
-    players.getFirst().setIsPlaying(true);
-  }
-
   private void activateAllPlayers() {
     for (Player p : players) {
       p.setIsActive(true);
@@ -218,12 +212,17 @@ public class GameState {
     initializeCards();
   }
 
-  private void resetTurn() {
-    if (!players.isEmpty()) {
-      playerIdTurn = players.getFirst().getId();
-      playerIdStartingRound = playerIdTurn;
-      setPlayingPlayer(playerIdTurn);
+  /**
+   * Open a round with the first seat: point the turn (and the round's starting player) at them and
+   * make them the sole player to move. Used both when the game starts and on a mid-game reset.
+   */
+  private void resetTurnToFirstPlayer() {
+    if (players.isEmpty()) {
+      return;
     }
+    playerIdTurn = players.getFirst().getId();
+    playerIdStartingRound = playerIdTurn;
+    setPlayingPlayer(playerIdTurn);
   }
 
   // ── Player management ─────────────────────────────────────────────────────
