@@ -7,11 +7,9 @@ import adg.keezen.GameState;
 import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
-import com.adg.openapi.model.MoveType;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PawnId;
 import com.adg.openapi.model.PositionKey;
-import com.adg.openapi.model.TempMessageType;
 import java.util.List;
 import java.util.function.ToIntFunction;
 
@@ -202,19 +200,9 @@ public final class SevenSplitRecommender {
     return order * TILES_PER_SECTION + tileNr;
   }
 
-  /** Non-mutating CHECK of a single pawn moving {@code steps} (no temp moves on the shared state). */
   private static MoveResponse checkSingleMove(
       GameState gs, MoveRequest base, PawnId pawnId, int cardId, int steps) {
-    MoveRequest req = new MoveRequest();
-    req.setPlayerId(base.getPlayerId());
-    req.setCardId(cardId);
-    req.setPawn1Id(pawnId);
-    req.setStepsPawn1(steps);
-    req.setMoveType(MoveType.MOVE);
-    req.setTempMessageType(TempMessageType.CHECK_MOVE);
-    MoveResponse resp = new MoveResponse();
-    gs.processOnMove(req, resp);
-    return resp;
+    return MoveChecks.checkMove(gs, base.getPlayerId(), cardId, pawnId, steps);
   }
 
   private static PositionKey lastTile(List<PositionKey> move) {
