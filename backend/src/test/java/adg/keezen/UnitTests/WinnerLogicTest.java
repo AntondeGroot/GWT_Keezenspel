@@ -247,6 +247,46 @@ class WinnerLogicTest {
   }
 
   @Test
+  void teamPlay_firstTeamPlacesFirst_secondTeamPlacesSecond_bothMembersShareThePlace() {
+    // 4-player team game; teams pair opposite seats: {0,2} and {1,3}. Team {0,2} brings all eight
+    // of their pawns home first and takes place 1; then team {1,3} finishes and takes place 2.
+    GameState gs = new GameSession().getGameState();
+    gs.setTeamPlay(true);
+    for (int i = 0; i < 4; i++) {
+      gs.addPlayer(new Player(String.valueOf(i), String.valueOf(i)));
+    }
+    gs.start(false);
+    assertTrue(gs.isTeamPlay(), "4 players must form teams");
+
+    ArrayList<String> w = new ArrayList<>();
+
+    // Team {0,2} finishes: both members must be fully home before the team places.
+    place4PawnsOnFinish(gs, "0");
+    place4PawnsOnFinish(gs, "2");
+    gs.checkForWinners(w);
+    assertTrue(w.contains("0") && w.contains("2"), "team {0,2} places once both members are home");
+    assertFalse(w.contains("1") || w.contains("3"), "team {1,3} has not finished yet");
+
+    // Team {1,3} finishes second and must place behind team {0,2}, not tie at place 1.
+    place4PawnsOnFinish(gs, "1");
+    place4PawnsOnFinish(gs, "3");
+    gs.checkForWinners(w);
+
+    assertEquals(1, placeOf(gs, "0"), "team {0,2} member 0 → place 1");
+    assertEquals(1, placeOf(gs, "2"), "team {0,2} member 2 → place 1");
+    assertEquals(2, placeOf(gs, "1"), "team {1,3} member 1 → place 2 (behind the first team)");
+    assertEquals(2, placeOf(gs, "3"), "team {1,3} member 3 → place 2 (behind the first team)");
+
+    Player firstWinner = gs.getPlayers().stream().filter(p -> p.getId().equals("0")).findFirst().get();
+    assertFalse(Boolean.TRUE.equals(firstWinner.getIsPlaying()), "a placed winner stops playing");
+    assertFalse(Boolean.TRUE.equals(firstWinner.getIsActive()), "a placed winner is no longer active");
+  }
+
+  private static int placeOf(GameState gs, String playerId) {
+    return gs.getPlayers().stream().filter(p -> p.getId().equals(playerId)).findFirst().get().getPlace();
+  }
+
+  @Test
   void testPlayer2Wins_Player0Wins_ThenPlayer1Wins() {
     // GIVEN
     place4PawnsOnFinish(gameState, "2");
