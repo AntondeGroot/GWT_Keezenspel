@@ -51,17 +51,16 @@ public class CardsDeckMock implements CardsDeckInterface {
     // the cards are not random so you do not need to shuffle them
   }
 
-  public boolean playerPlaysCard(String playerId, Card card) {
-    // todo: this is both playerPlaysCard and playerHasCardsLeft, also change the mocked cardsdeck
-    if (card != null) {
-      // playerHands.get(playerId).getHand().remove(card); DO NOT REMOVE CARD FROM PLAYER HAND FOR
-      // THE MOCKED DECK
-      playedCards.add(card);
-      if (playerHands.get(playerId).getHand().isEmpty()) {
-        return true;
-      }
+  public void playCard(String playerId, Card card) {
+    if (card == null) {
+      return;
     }
-    return false;
+    // Deliberately does NOT remove the card from the mocked hand — tests replay the same setup.
+    playedCards.add(card);
+  }
+
+  public boolean playerHasCardsLeft(String playerId) {
+    return !playerHands.get(playerId).getHand().isEmpty();
   }
 
   public void giveCardToPlayerForTesting(String playerId, Card card) {

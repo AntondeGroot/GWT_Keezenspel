@@ -5,6 +5,14 @@ import com.adg.openapi.model.Player;
 import java.util.*;
 
 public class CardsDeck implements CardsDeckInterface {
+
+  private static final int CARD_VALUES_PER_SUIT = 13; // Ace (1) .. King (13)
+  private static final int SUITS = 4;
+  private static final int FIRST_CARD_UUID = 100; // non-zero sentinel: a filled uuid is never 0/null
+  private static final int CARDS_DEALT_FIRST_ROUND = 5;
+  private static final int CARDS_DEALT_LATER_ROUNDS = 4;
+  private static final int ROUNDS_BEFORE_RESHUFFLE = 3;
+
   private int roundNr;
   private ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
   private final ArrayList<Card> playedCards = new ArrayList<>();
@@ -43,8 +51,6 @@ public class CardsDeck implements CardsDeckInterface {
   public void forfeitCardsForPlayer(String playerId) {
     playedCards.addAll(playerHands.get(playerId).getHand());
     playerHands.get(playerId).dropCards();
-    //        players.get(playerId).getHand().clear(); todo: method is different, does it work
-    // correctly?
   }
 
   public void shuffleIfFirstRound() {
@@ -54,13 +60,11 @@ public class CardsDeck implements CardsDeckInterface {
 
     ArrayList<Card> cards = new ArrayList<>();
     activePlayers = gameState.getActivePlayers();
-    // create cards
-    int uniqueCardNr =
-        100; // just any non-zero number so that you can be sure that a value was filled in in the
-             // client and not null or something like that
+    // One full suit of values per player (suits cycle 0..3 when there are more than four players).
+    int uniqueCardNr = FIRST_CARD_UUID;
     for (int suit = 0; suit < activePlayers.size(); suit++) {
-      for (int cardValue = 1; cardValue < 14; cardValue++) {
-        cards.add(new Card().suit(suit % 4).value(cardValue).uuid(uniqueCardNr++));
+      for (int cardValue = 1; cardValue <= CARD_VALUES_PER_SUIT; cardValue++) {
+        cards.add(new Card().suit(suit % SUITS).value(cardValue).uuid(uniqueCardNr++));
       }
     }
 
@@ -69,16 +73,16 @@ public class CardsDeck implements CardsDeckInterface {
     cardsDeque = new ArrayDeque<>(cards);
   }
 
-  public boolean playerPlaysCard(String playerId, Card card) {
-    // todo: this is both playerPlaysCard and playerHasCardsLeft, also change the mocked cardsdeck
-    if (card != null) {
-      playerHands.get(playerId).getHand().remove(card);
-      playedCards.add(card);
-      if (playerHands.get(playerId).getHand().isEmpty()) {
-        return true;
-      }
+  public void playCard(String playerId, Card card) {
+    if (card == null) {
+      return;
     }
-    return false;
+    playerHands.get(playerId).getHand().remove(card);
+    playedCards.add(card);
+  }
+
+  public boolean playerHasCardsLeft(String playerId) {
+    return !playerHands.get(playerId).getHand().isEmpty();
   }
 
   public void giveCardToPlayerForTesting(String playerId, Card card) {
@@ -99,27 +103,34 @@ public class CardsDeck implements CardsDeckInterface {
     if (roundNr == 0) {
       // new round so reset played cards stack
       playedCards.clear();
-      nrCards = 5;
+      nrCards = CARDS_DEALT_FIRST_ROUND;
     } else {
-      nrCards = 4;
+      nrCards = CARDS_DEALT_LATER_ROUNDS;
     }
 
-    // todo: is this reset necessary?
+    // Hands should already be empty here (a fresh round is only dealt once every player is
+    // inactive, and every path to inactive — forfeit, leave, win — drops that player's cards), but
+    // clear them anyway so a deal always yields exactly nrCards regardless of any stray card.
     for (PlayerHand hand : playerHands.values()) {
       hand.dropCards();
     }
 
     for (int j = 0; j < nrCards; j++) {
       for (Player player : gameState.getPlayers()) {
-        // todo: winning players should not be active!
-        Integer place = player.getPlace();
-        if (Boolean.TRUE.equals(player.getIsActive()) && place != null && place < 0) {
+        if (shouldReceiveCards(player)) {
           setPlayerCard(player.getId(), cardsDeque.pop());
         }
       }
     }
 
-    roundNr = (roundNr + 1) % 3;
+    roundNr = (roundNr + 1) % ROUNDS_BEFORE_RESHUFFLE;
+  }
+
+  /** A player is dealt in while active and not yet placed (place &lt; 0 means no medal yet). */
+  private static boolean shouldReceiveCards(Player player) {
+    Boolean active = player.getIsActive();
+    Integer place = player.getPlace();
+    return active != null && active && place != null && place < 0;
   }
 
   public boolean playerHasCard(String playerId, Card card) {

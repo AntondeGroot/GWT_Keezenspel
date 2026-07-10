@@ -332,7 +332,8 @@ public class GameState {
    * advanced; the second processOnMove call with goToNextPlayer=true will advance it.
    */
   public void finishTurn(String playerId, Card card, boolean goToNextPlayer) {
-    boolean noCardsLeft = cardsDeck.playerPlaysCard(playerId, card);
+    cardsDeck.playCard(playerId, card);
+    boolean noCardsLeft = !cardsDeck.playerHasCardsLeft(playerId);
     if (goToNextPlayer) {
       advanceTurnAfterPlay(playerId, noCardsLeft);
       version.incrementAndGet();

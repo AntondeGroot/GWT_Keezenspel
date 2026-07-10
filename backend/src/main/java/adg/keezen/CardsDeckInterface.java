@@ -17,7 +17,9 @@ public interface CardsDeckInterface {
 
   void shuffleIfFirstRound();
 
-  boolean playerPlaysCard(String playerId, Card card);
+  void playCard(String playerId, Card card);
+
+  boolean playerHasCardsLeft(String playerId);
 
   void giveCardToPlayerForTesting(String playerId, Card card);
 
