@@ -20,6 +20,15 @@ import java.util.LinkedList;
 
 public class ProcessOnMove {
 
+  // ── Board geometry ────────────────────────────────────────────────────────
+
+  private static final int START_TILE = 0; // first board tile of a section
+  private static final int LAST_TILE = 15; // last board tile of a section (before the finish)
+  private static final int SECTION_SIZE = 16; // a section spans tiles 0..15
+
+  /** A section turns at these "corner" tiles; the animation bends there. */
+  private static final int[] SECTION_CORNERS = {1, 7, 13};
+
   // ── Entry points ──────────────────────────────────────────────────────────
 
   public static void process(GameState gs, MoveRequest moveMessage, MoveResponse response) {
@@ -85,8 +94,8 @@ public class ProcessOnMove {
 
     if (isForwardCrossSection())  { routeForwardCrossSection(); return; }
     if (isNormalRouteInSection()) { routeNormalInSection();     return; }
-    if (next < 0)                 { routeBackward();            return; }
-    if (next == 0)                { routeBackwardToStartTile(); return; }
+    if (next < START_TILE)                 { routeBackward();            return; }
+    if (next == START_TILE)                { routeBackwardToStartTile(); return; }
     if (isPawnOnFinish(pawn1))    { routeAlreadyOnFinish();     return; }
     if (isEnteringFinish())       { routeEnteringFinish(); }
   }
@@ -139,17 +148,17 @@ public class ProcessOnMove {
   }
 
   private boolean isForwardCrossSection() {
-    return next > 15
+    return next > LAST_TILE
         && !gs.isPawnOnLastSection(playerId, playerIdOfTile)
         && !isPawnOnFinish(pawn1);
   }
 
   private boolean isNormalRouteInSection() {
-    return next > 0 && next <= 15 && !isPawnOnFinish(pawn1);
+    return next > START_TILE && next <= LAST_TILE && !isPawnOnFinish(pawn1);
   }
 
   private boolean isEnteringFinish() {
-    return next > 15 && gs.isPawnOnLastSection(playerId, playerIdOfTile);
+    return next > LAST_TILE && gs.isPawnOnLastSection(playerId, playerIdOfTile);
   }
 
   // ── Route: forward cross-section ─────────────────────────────────────────
@@ -157,7 +166,7 @@ public class ProcessOnMove {
   private void routeForwardCrossSection() {
     Log.info("GameState: OnMove: normal route between 0,15 but could move to next section");
     addLandmarksToSectionEnd();
-    PositionKey nextSectionStart = new PositionKey(gs.nextPlayerId(playerIdOfTile), 0);
+    PositionKey nextSectionStart = new PositionKey(gs.nextPlayerId(playerIdOfTile), START_TILE);
     if (gs.canPassStartTile(pawn1, nextSectionStart)) {
       enterNextSection();
     } else {
@@ -168,15 +177,15 @@ public class ProcessOnMove {
 
   private void addLandmarksToSectionEnd() {
     int from = currentTileId.getTileNr();
-    addCornerWaypointsBetween(from, 15);
-    if (from < 15) moves.add(new PositionKey(playerIdOfTile, 15));
+    addCornerWaypointsBetween(playerIdOfTile, from, LAST_TILE);
+    if (from < LAST_TILE) moves.add(new PositionKey(playerIdOfTile, LAST_TILE));
   }
 
   private void enterNextSection() {
     Log.info("GameState: OnMove: normal route can move to the next section");
-    next = next % 16;
+    next = next % SECTION_SIZE;
     playerIdOfTile = gs.nextPlayerId(playerIdOfTile);
-    addCornerWaypointsBetween(0, next);
+    addCornerWaypointsBetween(playerIdOfTile, START_TILE, next);
   }
 
   private boolean reverseBackInCurrentSection() {
@@ -185,9 +194,9 @@ public class ProcessOnMove {
       reject(CANNOT_MAKE_MOVE, MoveRejectionReason.CANNOT_PASS_START_TILE);
       return false;
     }
-    next = 15 - next % 15;
-    moves.add(new PositionKey(playerIdOfTile, 15));
-    addCornerWaypointsBetween(15, next);
+    next = LAST_TILE - next % LAST_TILE;
+    moves.add(new PositionKey(playerIdOfTile, LAST_TILE));
+    addCornerWaypointsBetween(playerIdOfTile, LAST_TILE, next);
     return true;
   }
 
@@ -199,27 +208,24 @@ public class ProcessOnMove {
     finalizeMoveToPosition(new PositionKey(playerIdOfTile, next));
   }
 
-  /** A section turns at these "corner" tiles; the animation bends there. */
-  private static final int[] SECTION_CORNERS = {1, 7, 13};
-
   /**
-   * Add a waypoint at each section corner the pawn passes as it travels from {@code fromTile} to
-   * {@code toTile} (in that travel order), so the animation bends at each corner it crosses.
+   * Add a waypoint (in {@code sectionId}) at each section corner the pawn passes as it travels from
+   * {@code fromTile} to {@code toTile} (in that travel order), so the animation bends at each corner.
    */
-  private void addCornerWaypointsBetween(int fromTile, int toTile) {
+  private void addCornerWaypointsBetween(String sectionId, int fromTile, int toTile) {
     boolean forward = toTile > fromTile;
     int low = Math.min(fromTile, toTile);
     int high = Math.max(fromTile, toTile);
     for (int i = 0; i < SECTION_CORNERS.length; i++) {
       int corner = SECTION_CORNERS[forward ? i : SECTION_CORNERS.length - 1 - i];
       if (corner > low && corner < high) {
-        moves.add(new PositionKey(playerIdOfTile, corner));
+        moves.add(new PositionKey(sectionId, corner));
       }
     }
   }
 
   private void addWaypointsWithinSection() {
-    addCornerWaypointsBetween(currentTileId.getTileNr(), next);
+    addCornerWaypointsBetween(playerIdOfTile, currentTileId.getTileNr(), next);
   }
 
   // ── Route: backward past section ─────────────────────────────────────────
@@ -227,7 +233,7 @@ public class ProcessOnMove {
   private void routeBackward() {
     Log.info("GameState: OnMove: pawn goes backwards");
     if (currentTileId.getTileNr() > 1) moves.add(new PositionKey(playerIdOfTile, 1));
-    PositionKey ownStartTile = new PositionKey(playerIdOfTile, 0);
+    PositionKey ownStartTile = new PositionKey(playerIdOfTile, START_TILE);
     if (gs.canPassStartTile(pawn1, ownStartTile)) {
       crossIntoPreviousSection();
     } else {
@@ -237,7 +243,7 @@ public class ProcessOnMove {
   }
 
   private void crossIntoPreviousSection() {
-    next = 16 + next;
+    next = SECTION_SIZE + next;
     playerIdOfTile = gs.previousPlayerId(playerIdOfTile);
     if (next < 13) moves.add(new PositionKey(playerIdOfTile, 13));
   }
@@ -257,7 +263,7 @@ public class ProcessOnMove {
   private void routeBackwardToStartTile() {
     Log.info("GameState: OnMove: pawn ends exactly on start tile");
     if (currentTileId.getTileNr() > 1) moves.add(new PositionKey(playerIdOfTile, 1));
-    PositionKey startTile = new PositionKey(playerIdOfTile, 0);
+    PositionKey startTile = new PositionKey(playerIdOfTile, START_TILE);
     if (gs.canMoveToTile(pawn1, startTile)) {
       landOnTile(startTile);
     } else if (startTileIsBlockedByOwnPawn(startTile)) {
@@ -342,9 +348,10 @@ public class ProcessOnMove {
   }
 
   private void addFinishReverseWaypoints(PositionKey targetTile) {
-    if (targetTile.getTileNr() < 15) moves.add(new PositionKey(targetTile.getPlayerId(), 15));
-    if (targetTile.getTileNr() < 13) moves.add(new PositionKey(targetTile.getPlayerId(), 13));
-    if (targetTile.getTileNr() < 7)  moves.add(new PositionKey(targetTile.getPlayerId(), 7));
+    if (targetTile.getTileNr() < LAST_TILE) {
+      moves.add(new PositionKey(targetTile.getPlayerId(), LAST_TILE));
+    }
+    addCornerWaypointsBetween(targetTile.getPlayerId(), LAST_TILE, targetTile.getTileNr());
   }
 
   // ── Route: entering finish from last section ──────────────────────────────
@@ -357,9 +364,9 @@ public class ProcessOnMove {
     // that reach into the finish lane. Using currentTileId directly would cause
     // checkHighestTileNrYouCanMoveTo to check main-board tiles of the player's own
     // section, which can incorrectly truncate the look-ahead if own pawns sit there.
-    int stepsIntoFinish = next - 15;
+    int stepsIntoFinish = next - LAST_TILE;
     int highestReachable = gs.checkHighestTileNrYouCanMoveTo(
-        pawn1, new PositionKey(gs.nextPlayerId(playerIdOfTile), 15), stepsIntoFinish);
+        pawn1, new PositionKey(gs.nextPlayerId(playerIdOfTile), LAST_TILE), stepsIntoFinish);
     if (highestReachable > targetTileId.getTileNr()) {
       if (!addEnteringFinishOvershootWaypoints(targetTileId, highestReachable)) return;
     }
@@ -380,14 +387,13 @@ public class ProcessOnMove {
           highestReachable - currentTileId.getTileNr());
       return false;
     }
-    if (highestReachable > 15) {
+    if (highestReachable > LAST_TILE) {
       moves.add(new PositionKey(gs.nextPlayerId(playerIdOfTile), highestReachable));
-      if (targetTileId.getTileNr() < 15) {
-        moves.add(new PositionKey(targetTileId.getPlayerId(), 15));
+      if (targetTileId.getTileNr() < LAST_TILE) {
+        moves.add(new PositionKey(targetTileId.getPlayerId(), LAST_TILE));
       }
     }
-    if (targetTileId.getTileNr() < 13) moves.add(new PositionKey(targetTileId.getPlayerId(), 13));
-    if (targetTileId.getTileNr() < 7)  moves.add(new PositionKey(targetTileId.getPlayerId(), 7));
+    addCornerWaypointsBetween(targetTileId.getPlayerId(), LAST_TILE, targetTileId.getTileNr());
     return true;
   }
 
