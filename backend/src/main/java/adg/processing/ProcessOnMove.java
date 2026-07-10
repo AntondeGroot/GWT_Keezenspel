@@ -67,13 +67,11 @@ public class ProcessOnMove {
   // ── Rejection helpers ─────────────────────────────────────────────────────
 
   private void reject(MoveResult result, MoveRejectionReason reason) {
-    response.setResult(result);
-    response.setRejectionReason(reason);
+    MoveResponses.reject(response, result, reason);
   }
 
   private void reject(MoveResult result, MoveRejectionReason reason, int detail) {
-    reject(result, reason);
-    response.setRejectionDetail(detail);
+    MoveResponses.reject(response, result, reason, detail);
   }
 
   // ── Execution ─────────────────────────────────────────────────────────────
