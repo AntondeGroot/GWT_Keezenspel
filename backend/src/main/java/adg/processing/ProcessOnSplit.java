@@ -1,6 +1,7 @@
 package adg.processing;
 
 import static adg.processing.MoveResponses.reject;
+import static adg.processing.MoveResponses.requireCardHeld;
 import static adg.util.CardValueCheck.isSeven;
 import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
 import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
@@ -62,7 +63,9 @@ public class ProcessOnSplit {
 
     if (!pawnsAreSamePlayer()) return;
     if (!cardIsSeven()) return;
-    if (!playerHoldsCard()) return;
+    // The single-move path guards this in GameState.processMove; the split path must too, so a
+    // played 7 can't be re-used even for a CHECK preview.
+    if (!requireCardHeld(gs, playerId, card, response)) return;
     if (!stepsAddUpToSeven()) return;
 
     buildSplitMoveRequests();
@@ -95,18 +98,6 @@ public class ProcessOnSplit {
   private boolean cardIsSeven() {
     if (!isSeven(card)) {
       return reject(response, PLAYER_DOES_NOT_HAVE_CARD, MoveRejectionReason.WRONG_CARD_FOR_MOVE);
-    }
-    return true;
-  }
-
-  /**
-   * Reject a split whose 7 the player no longer holds (e.g. already played and now on the
-   * pile). The single-move path guards this in GameState.processMove; the split path must
-   * too, so a played card can't be re-used even for a CHECK preview.
-   */
-  private boolean playerHoldsCard() {
-    if (!gs.playerHasCard(playerId, card)) {
-      return reject(response, PLAYER_DOES_NOT_HAVE_CARD, MoveRejectionReason.DONT_HAVE_CARD);
     }
     return true;
   }

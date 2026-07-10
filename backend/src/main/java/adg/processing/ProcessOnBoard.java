@@ -1,11 +1,11 @@
 package adg.processing;
 
 import static adg.processing.MoveResponses.reject;
+import static adg.processing.MoveResponses.requireCardHeld;
 import static adg.util.CardValueCheck.isAce;
 import static adg.util.CardValueCheck.isKing;
 import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
 import static com.adg.openapi.model.MoveResult.INVALID_SELECTION;
-import static com.adg.openapi.model.MoveResult.PLAYER_DOES_NOT_HAVE_CARD;
 import static com.adg.openapi.model.MoveType.ON_BOARD;
 
 import adg.keezen.GameState;
@@ -26,7 +26,7 @@ public class ProcessOnBoard {
     response.setMoveType(ON_BOARD);
 
     if (!selectionIsValid(pawn1, card, response)) return;
-    if (!playerHasCard(gs, playerId, card, response)) return;
+    if (!requireCardHeld(gs, playerId, card, response)) return;
     if (!cardIsAceOrKing(card, response)) return;
 
     PositionKey currentTileId = gs.getPawn(pawn1).getCurrentTileId();
@@ -43,14 +43,6 @@ public class ProcessOnBoard {
   private static boolean selectionIsValid(Pawn pawn1, Card card, MoveResponse response) {
     if (pawn1 == null || card == null) {
       return reject(response, INVALID_SELECTION, MoveRejectionReason.INVALID_SELECTION);
-    }
-    return true;
-  }
-
-  private static boolean playerHasCard(
-      GameState gs, String playerId, Card card, MoveResponse response) {
-    if (!gs.playerHasCard(playerId, card)) {
-      return reject(response, PLAYER_DOES_NOT_HAVE_CARD, MoveRejectionReason.DONT_HAVE_CARD);
     }
     return true;
   }

@@ -17,6 +17,7 @@ import adg.util.PlayerStatus;
 import com.adg.openapi.model.Card;
 import com.adg.openapi.model.MoveRequest;
 import com.adg.openapi.model.MoveResponse;
+import com.adg.openapi.model.MoveResult;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PawnId;
 import com.adg.openapi.model.Player;
@@ -414,27 +415,13 @@ public class GameState {
       boolean goToNextPlayer) {
 
     String playerId = moveMessage.getPlayerId();
-    Integer cardId = moveMessage.getCardId();
-    if (cardId == null) {
-      clearResponse(response);
-      response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
-      return;
-    }
-    Card card = getCard(cardId, playerId);
+    Card card = playableCard(moveMessage);
     if (card == null) {
-      clearResponse(response);
-      response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
+      rejectMove(response, PLAYER_DOES_NOT_HAVE_CARD);
       return;
     }
-
     if (cannotMoveToTileBecauseSamePlayer(pawn0, targetTileId)) {
-      clearResponse(response);
-      response.setResult(CANNOT_MAKE_MOVE);
-      return;
-    }
-    if (!cardsDeck.playerHasCard(playerId, card)) {
-      clearResponse(response);
-      response.setResult(PLAYER_DOES_NOT_HAVE_CARD);
+      rejectMove(response, CANNOT_MAKE_MOVE);
       return;
     }
 
@@ -452,6 +439,21 @@ public class GameState {
   }
 
   // ── Move helpers ──────────────────────────────────────────────────────────
+
+  /** Reject a move: wipe any partially-built move data and report why it can't be made. */
+  private void rejectMove(MoveResponse response, MoveResult result) {
+    clearResponse(response);
+    response.setResult(result);
+  }
+
+  /** The card the player is trying to play, or null if none was given or they don't hold it. */
+  private Card playableCard(MoveRequest moveMessage) {
+    Integer cardId = moveMessage.getCardId();
+    if (cardId == null) {
+      return null;
+    }
+    return getCard(cardId, moveMessage.getPlayerId());
+  }
 
   private void handleKillIfPresent(
       Pawn pawn0, PositionKey targetTileId, MoveRequest moveMessage, MoveResponse response) {

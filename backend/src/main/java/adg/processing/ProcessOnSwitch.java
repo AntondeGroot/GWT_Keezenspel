@@ -1,12 +1,12 @@
 package adg.processing;
 
 import static adg.processing.MoveResponses.reject;
+import static adg.processing.MoveResponses.requireCardHeld;
 import static adg.util.BoardLogic.isPawnOnFinish;
 import static adg.util.BoardLogic.isPawnOnNest;
 import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
 import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
 import static com.adg.openapi.model.MoveResult.INVALID_SELECTION;
-import static com.adg.openapi.model.MoveResult.PLAYER_DOES_NOT_HAVE_CARD;
 import static com.adg.openapi.model.MoveType.SWITCH;
 
 import adg.keezen.GameState;
@@ -31,7 +31,7 @@ public class ProcessOnSwitch {
     if (!selectionIsValid(pawn1t, pawn2t, card, moveResponse)) return;
     if (!pawnsAreDifferentPlayers(moveMessage, moveResponse)) return;
     if (!activePlayerOwnsAPawn(gs, playerId, pawn1t, pawn2t, moveResponse)) return;
-    if (!playerHasCard(gs, playerId, card, moveResponse)) return;
+    if (!requireCardHeld(gs, playerId, card, moveResponse)) return;
 
     Pawn pawn1 = gs.getPawn(pawn1t);
     Pawn pawn2 = gs.getPawn(pawn2t);
@@ -69,14 +69,6 @@ public class ProcessOnSwitch {
     // You must control one of the two pawns — your own, or a teammate's once your own are home.
     if (!gs.mayControlPawn(playerId, pawn1) && !gs.mayControlPawn(playerId, pawn2)) {
       return reject(response, CANNOT_MAKE_MOVE, MoveRejectionReason.NOT_YOUR_PAWN);
-    }
-    return true;
-  }
-
-  private static boolean playerHasCard(
-      GameState gs, String playerId, Card card, MoveResponse response) {
-    if (!gs.playerHasCard(playerId, card)) {
-      return reject(response, PLAYER_DOES_NOT_HAVE_CARD, MoveRejectionReason.DONT_HAVE_CARD);
     }
     return true;
   }
