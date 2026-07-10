@@ -497,17 +497,19 @@ public class GameState {
       return true;
     }
     String owner = pawn.getPlayerId();
-    if (owner.equals(moverId)) {
-      return true; // your own pawn
-    }
-    if (!sameTeam(moverId, owner)) {
-      return false; // never an opponent's pawn
-    }
-    return hasAllPawnsOnFinish(moverId); // a teammate's pawn, only after your own are home
+    return owner.equals(moverId) || mayControlTeammatePawn(moverId, owner);
   }
 
   private boolean sameTeam(String playerA, String playerB) {
     return roster.sameTeam(playerA, playerB);
+  }
+
+  /**
+   * The shared team-control rule: a teammate's pawn may be played only once all your own pawns are
+   * home. An opponent is never the same team, so this is also false for their pawns.
+   */
+  private boolean mayControlTeammatePawn(String moverId, String ownerId) {
+    return sameTeam(moverId, ownerId) && hasAllPawnsOnFinish(moverId);
   }
 
   /**
@@ -519,10 +521,8 @@ public class GameState {
     if (pawn == null) {
       return false;
     }
-    if (pawn.getPlayerId().equals(moverId)) {
-      return true;
-    }
-    return teamPlay && sameTeam(moverId, pawn.getPlayerId()) && hasAllPawnsOnFinish(moverId);
+    String owner = pawn.getPlayerId();
+    return owner.equals(moverId) || (teamPlay && mayControlTeammatePawn(moverId, owner));
   }
 
   // ── Team card trade (step 5) ──────────────────────────────────────────────
