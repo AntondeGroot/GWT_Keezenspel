@@ -106,12 +106,18 @@ public class MoveAvailabilityChecker {
     }
   }
 
-  private static boolean tryOnBoard(GameState gs, String playerId, Card card, Pawn pawn) {
+  /** A CHECK_MOVE request for playing {@code card} with {@code pawn1}; callers add move-type fields. */
+  private static MoveRequest checkRequest(String playerId, Card card, Pawn pawn1) {
     MoveRequest req = new MoveRequest();
     req.setPlayerId(playerId);
     req.setCardId(card.getUuid());
-    req.setPawn1Id(pawn.getPawnId());
+    req.setPawn1Id(pawn1.getPawnId());
     req.setTempMessageType(CHECK_MOVE);
+    return req;
+  }
+
+  private static boolean tryOnBoard(GameState gs, String playerId, Card card, Pawn pawn) {
+    MoveRequest req = checkRequest(playerId, card, pawn);
     MoveResponse resp = new MoveResponse();
     gs.processOnBoard(req, resp);
     return CAN_MAKE_MOVE.equals(resp.getResult());
@@ -123,13 +129,9 @@ public class MoveAvailabilityChecker {
 
   private static boolean trySwitch(
       GameState gs, String playerId, Card card, Pawn own, Pawn opp) {
-    MoveRequest req = new MoveRequest();
-    req.setPlayerId(playerId);
-    req.setCardId(card.getUuid());
-    req.setPawn1Id(own.getPawnId());
+    MoveRequest req = checkRequest(playerId, card, own);
     req.setPawn2Id(opp.getPawnId());
     req.setMoveType(SWITCH);
-    req.setTempMessageType(CHECK_MOVE);
     MoveResponse resp = new MoveResponse();
     gs.processOnSwitch(req, resp);
     return CAN_MAKE_MOVE.equals(resp.getResult());
@@ -167,13 +169,9 @@ public class MoveAvailabilityChecker {
 
   private static MoveResponse checkMoveResponse(
       GameState gs, String playerId, Card card, Pawn pawn, int steps) {
-    MoveRequest req = new MoveRequest();
-    req.setPlayerId(playerId);
-    req.setCardId(card.getUuid());
-    req.setPawn1Id(pawn.getPawnId());
+    MoveRequest req = checkRequest(playerId, card, pawn);
     req.setStepsPawn1(steps);
     req.setMoveType(MOVE);
-    req.setTempMessageType(CHECK_MOVE);
     MoveResponse resp = new MoveResponse();
     gs.processOnMove(req, resp);
     return resp;
