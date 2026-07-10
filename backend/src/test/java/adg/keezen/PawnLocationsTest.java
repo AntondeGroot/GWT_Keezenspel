@@ -1,8 +1,10 @@
 package adg.keezen;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PawnId;
@@ -72,5 +74,44 @@ class PawnLocationsTest {
     Pawn ghost = new Pawn("0", new PawnId("0", 9), new PositionKey("0", -1), new PositionKey("0", 8));
     locations.moveTo(ghost); // must not throw
     assertEquals(5, onBoard.getCurrentTileId().getTileNr()); // unchanged
+  }
+
+  // ── allPawnsOnFinish ──────────────────────────────────────────────────────────
+  @Test
+  void allPawnsOnFinish_trueWhenAllFourAreOnTheFinish() {
+    add("0", 0, 16);
+    add("0", 1, 17);
+    add("0", 2, 18);
+    add("0", 3, 19);
+    assertTrue(locations.allPawnsOnFinish("0"));
+  }
+
+  @Test
+  void allPawnsOnFinish_falseWhenOnlyThreeAreHome() {
+    add("0", 0, 16);
+    add("0", 1, 17);
+    add("0", 2, 18);
+    add("0", 3, 10); // still on the board
+    assertFalse(locations.allPawnsOnFinish("0"));
+  }
+
+  @Test
+  void allPawnsOnFinish_tile16CountsButTile15DoesNot() {
+    add("0", 0, 16);
+    add("0", 1, 16);
+    add("0", 2, 16);
+    add("0", 3, 15); // one tile short of the finish
+    assertFalse(locations.allPawnsOnFinish("0"));
+  }
+
+  @Test
+  void allPawnsOnFinish_countsOnlyTheGivenPlayersPawns() {
+    add("0", 0, 16);
+    add("0", 1, 17);
+    add("0", 2, 18);
+    add("0", 3, 19);
+    add("1", 0, 5); // another player's pawn on the board must not matter
+    assertTrue(locations.allPawnsOnFinish("0"));
+    assertFalse(locations.allPawnsOnFinish("1"));
   }
 }
