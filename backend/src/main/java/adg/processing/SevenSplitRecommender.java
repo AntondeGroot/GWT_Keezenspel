@@ -191,7 +191,7 @@ public final class SevenSplitRecommender {
     int tileNr = tile.getTileNr();
     if (tile.getPlayerId().equals(playerId) && tileNr >= FINISH_FIRST_TILE) {
       // finish tiles continue straight after the last board section
-      return numPlayers(gs, playerId) * TILES_PER_SECTION + (tileNr - FINISH_FIRST_TILE);
+      return gs.getNrPlayers() * TILES_PER_SECTION + (tileNr - FINISH_FIRST_TILE);
     }
     int order = 0;
     String section = playerId;
@@ -200,16 +200,6 @@ public final class SevenSplitRecommender {
       order++;
     }
     return order * TILES_PER_SECTION + tileNr;
-  }
-
-  private static int numPlayers(GameState gs, String playerId) {
-    int count = 0;
-    String section = playerId;
-    do {
-      section = gs.nextPlayerId(section);
-      count++;
-    } while (!section.equals(playerId) && count <= 16);
-    return count;
   }
 
   /** Non-mutating CHECK of a single pawn moving {@code steps} (no temp moves on the shared state). */
