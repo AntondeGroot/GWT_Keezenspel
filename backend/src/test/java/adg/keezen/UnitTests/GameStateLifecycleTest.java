@@ -74,6 +74,25 @@ class GameStateLifecycleTest {
   }
 
   @Test
+  void startAndReset_putTheFirstSeatOnTurnAsTheSolePlayerToMove() {
+    // setUp already started the game — verify start() left the first seat on turn and playing.
+    assertFirstSeatIsSolePlayerToMove();
+
+    gameState.reset();
+    assertFirstSeatIsSolePlayerToMove();
+  }
+
+  private void assertFirstSeatIsSolePlayerToMove() {
+    String first = gameState.getPlayers().getFirst().getId();
+    assertEquals(first, gameState.getPlayerIdTurn(), "first seat holds the turn");
+    assertTrue(Boolean.TRUE.equals(gameState.getPlayers().getFirst().getIsPlaying()),
+        "first seat is the player to move");
+    assertTrue(gameState.getPlayers().stream().skip(1)
+            .noneMatch(p -> Boolean.TRUE.equals(p.getIsPlaying())),
+        "no other seat is marked as playing");
+  }
+
+  @Test
   void resetReturnsPawnsToTheirNestAndBumpsTheVersion() {
     gameState.start();
     Pawn onBoard = gameState.getPawns().getFirst();
