@@ -15,9 +15,7 @@ public class CardsDeck implements CardsDeckInterface {
 
   private int roundNr;
   private ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
-  private final ArrayList<Card> playedCards = new ArrayList<>();
-  private final HashMap<String, PlayerHand> playerHands = new HashMap<>();
-  private ArrayList<String> activePlayers = new ArrayList<>();
+  private final PlayerHands hands = new PlayerHands();
   private GameState gameState;
 
   public CardsDeck() {}
@@ -27,35 +25,19 @@ public class CardsDeck implements CardsDeckInterface {
   }
 
   public void addPlayers(ArrayList<Player> players) {
-    for (Player p : players) {
-      playerHands.put(p.getId(), new PlayerHand());
-    }
+    hands.addPlayers(players);
   }
 
   public HashMap<String, Integer> getNrOfCardsPerPlayer() {
-    HashMap<String, Integer> nrOfCards = new HashMap<>();
-    for (Map.Entry<String, PlayerHand> p : playerHands.entrySet()) {
-      nrOfCards.put(p.getKey(), p.getValue().getHand().size());
-    }
-    return nrOfCards;
-  }
-
-  /** This player's cards — the live hand list (callers guard the unknown-id case). */
-  private ArrayList<Card> handOf(String playerId) {
-    return playerHands.get(playerId).getHand();
+    return hands.nrOfCardsPerPlayer();
   }
 
   public ArrayList<Card> getCardsForPlayer(String playerUUID) {
-    if (playerHands.containsKey(playerUUID)) {
-      return handOf(playerUUID);
-    } else {
-      return new ArrayList<>();
-    }
+    return hands.cardsOf(playerUUID);
   }
 
   public void forfeitCardsForPlayer(String playerId) {
-    playedCards.addAll(handOf(playerId));
-    playerHands.get(playerId).dropCards();
+    hands.forfeit(playerId);
   }
 
   public void shuffleIfFirstRound() {
@@ -64,16 +46,15 @@ public class CardsDeck implements CardsDeckInterface {
     }
 
     ArrayList<Card> cards = new ArrayList<>();
-    activePlayers = gameState.getActivePlayers();
     // One full suit of values per player (suits cycle 0..3 when there are more than four players).
     int uniqueCardNr = FIRST_CARD_UUID;
-    for (int suit = 0; suit < activePlayers.size(); suit++) {
+    int nrPlayers = gameState.getActivePlayers().size();
+    for (int suit = 0; suit < nrPlayers; suit++) {
       for (int cardValue = 1; cardValue <= CARD_VALUES_PER_SUIT; cardValue++) {
         cards.add(new Card().suit(suit % SUITS).value(cardValue).uuid(uniqueCardNr++));
       }
     }
 
-    // shuffle the cards
     Collections.shuffle(cards);
     cardsDeque = new ArrayDeque<>(cards);
   }
@@ -82,48 +63,38 @@ public class CardsDeck implements CardsDeckInterface {
     if (card == null) {
       return;
     }
-    handOf(playerId).remove(card);
-    playedCards.add(card);
+    hands.playFromHand(playerId, card);
   }
 
   public boolean playerHasCardsLeft(String playerId) {
-    return !handOf(playerId).isEmpty();
+    return hands.hasCardsLeft(playerId);
   }
 
   public void giveCardToPlayerForTesting(String playerId, Card card) {
     // this way you can replace one card by another, play a card in a Test, and then know based on
     // the game whether the player should have 5 or 4 cards in their hand left.
-    if (!handOf(playerId).isEmpty()) {
-      handOf(playerId).removeFirst();
-    }
-    handOf(playerId).addFirst(card);
+    hands.replaceFirstCard(playerId, card);
   }
 
   public void setPlayerCard(String playerId, Card card) {
-    handOf(playerId).add(card);
+    hands.giveCard(playerId, card);
   }
 
   public void dealCards() {
-    int nrCards;
+    int nrCards = roundNr == 0 ? CARDS_DEALT_FIRST_ROUND : CARDS_DEALT_LATER_ROUNDS;
     if (roundNr == 0) {
-      // new round so reset played cards stack
-      playedCards.clear();
-      nrCards = CARDS_DEALT_FIRST_ROUND;
-    } else {
-      nrCards = CARDS_DEALT_LATER_ROUNDS;
+      hands.clearPile(); // new round → reset the played-cards pile
     }
 
     // Hands should already be empty here (a fresh round is only dealt once every player is
     // inactive, and every path to inactive — forfeit, leave, win — drops that player's cards), but
     // clear them anyway so a deal always yields exactly nrCards regardless of any stray card.
-    for (PlayerHand hand : playerHands.values()) {
-      hand.dropCards();
-    }
+    hands.dropAllHands();
 
     for (int j = 0; j < nrCards; j++) {
       for (Player player : gameState.getPlayers()) {
-        if (shouldReceiveCards(player)) {
-          setPlayerCard(player.getId(), cardsDeque.pop());
+        if (PlayerHands.isDealtIn(player)) {
+          hands.giveCard(player.getId(), cardsDeque.pop());
         }
       }
     }
@@ -131,20 +102,12 @@ public class CardsDeck implements CardsDeckInterface {
     roundNr = (roundNr + 1) % ROUNDS_BEFORE_RESHUFFLE;
   }
 
-  /** A player is dealt in while active and not yet placed (place &lt; 0 means no medal yet). */
-  private static boolean shouldReceiveCards(Player player) {
-    Boolean active = player.getIsActive();
-    Integer place = player.getPlace();
-    return active != null && active && place != null && place < 0;
-  }
-
   public boolean playerHasCard(String playerId, Card card) {
-    return handOf(playerId).contains(card);
+    return hands.hasCard(playerId, card);
   }
 
   public void moveCardBetweenHands(String fromPlayerId, String toPlayerId, Card card) {
-    handOf(fromPlayerId).remove(card);
-    handOf(toPlayerId).add(card);
+    hands.moveCard(fromPlayerId, toPlayerId, card);
   }
 
   public boolean playerDoesNotHaveCard(String playerId, Card card) {
@@ -154,11 +117,10 @@ public class CardsDeck implements CardsDeckInterface {
   public void reset() {
     roundNr = 0;
     cardsDeque.clear();
-    playerHands.clear();
-    playedCards.clear();
+    hands.reset();
   }
 
   public ArrayList<Card> getPlayedCards() {
-    return new ArrayList<>(playedCards);
+    return hands.playedCards();
   }
 }
