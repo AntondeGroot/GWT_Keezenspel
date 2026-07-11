@@ -4,6 +4,9 @@ import com.adg.openapi.model.MoveResponse;
 import java.util.UUID;
 
 public class GameSession {
+
+  private static final int DEFAULT_MAX_PLAYERS = 8;
+
   private final GameState gameState;
   private final CardsDeckInterface cardsDeck;
   private final String sessionId;
@@ -11,51 +14,37 @@ public class GameSession {
   private final int maxPlayers;
   private MoveResponse lastMoveResponse;
 
-  public GameSession(String sessionId, String roomName, Integer maxPlayers) {
+  /** Primary constructor: every other one delegates here after picking its defaults/deck. */
+  private GameSession(
+      String sessionId, String roomName, int maxPlayers, CardsDeckInterface cardsDeck) {
     this.sessionId = sessionId;
-    this.cardsDeck = new CardsDeck();
-    this.gameState = new GameState(cardsDeck);
-    this.cardsDeck.setGameState(this.gameState);
     this.roomName = roomName;
     this.maxPlayers = maxPlayers;
+    this.cardsDeck = cardsDeck;
+    this.gameState = new GameState(cardsDeck);
+    this.cardsDeck.setGameState(this.gameState);
+  }
+
+  public GameSession(String sessionId, String roomName, Integer maxPlayers) {
+    this(sessionId, roomName, maxPlayers, new CardsDeck());
   }
 
   public GameSession() {
-    this.sessionId = UUID.randomUUID().toString();
-    this.cardsDeck = new CardsDeck();
-    this.gameState = new GameState(cardsDeck);
-    this.cardsDeck.setGameState(this.gameState);
-    this.roomName = "";
-    this.maxPlayers = 3;
+    this(UUID.randomUUID().toString(), "", DEFAULT_MAX_PLAYERS, new CardsDeck());
   }
 
+  /** For testing: a real deck under a caller-chosen session id. */
   public GameSession(String sessionId) {
-    // for testing purposes
-    this.sessionId = sessionId;
-    this.cardsDeck = new CardsDeck();
-    this.gameState = new GameState(cardsDeck);
-    this.cardsDeck.setGameState(this.gameState);
-    this.roomName = "";
-    this.maxPlayers = 3;
+    this(sessionId, "", DEFAULT_MAX_PLAYERS, new CardsDeck());
   }
 
   public GameSession(CardsDeckInterface cardsDeck) {
-    this.sessionId = UUID.randomUUID().toString();
-    this.cardsDeck = cardsDeck;
-    this.gameState = new GameState(cardsDeck);
-    this.cardsDeck.setGameState(this.gameState);
-    this.roomName = "";
-    this.maxPlayers = 3;
+    this(UUID.randomUUID().toString(), "", DEFAULT_MAX_PLAYERS, cardsDeck);
   }
 
   public GameSession(CardsDeckInterface cardsDeck, int animationSpeed) {
-    this.sessionId = UUID.randomUUID().toString();
-    this.cardsDeck = cardsDeck;
-    this.gameState = new GameState(cardsDeck);
+    this(UUID.randomUUID().toString(), "", DEFAULT_MAX_PLAYERS, cardsDeck);
     this.gameState.setAnimationSpeed(animationSpeed);
-    this.cardsDeck.setGameState(this.gameState);
-    this.roomName = "";
-    this.maxPlayers = 3;
   }
 
   public GameState getGameState() {
