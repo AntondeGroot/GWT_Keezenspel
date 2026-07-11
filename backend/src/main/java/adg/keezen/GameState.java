@@ -26,6 +26,7 @@ import com.adg.openapi.model.TempMessageType;
 import jakarta.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class GameState {
@@ -280,11 +281,16 @@ public class GameState {
     }
   }
 
-  private void deactivatePlayerById(String playerId) {
+  /** Apply an action to the player with this id, if they're still in the game. */
+  private void withPlayer(String playerId, Consumer<Player> action) {
     Player player = findPlayerById(playerId);
     if (player != null) {
-      PlayerStatus.setInactive(player);
+      action.accept(player);
     }
+  }
+
+  private void deactivatePlayerById(String playerId) {
+    withPlayer(playerId, PlayerStatus::setInactive);
   }
 
   /** A departed player is out of the game — take their pawns off the board entirely. */
@@ -293,11 +299,10 @@ public class GameState {
   }
 
   private void deactivateAndStopPlayingPlayer(String playerId) {
-    Player player = findPlayerById(playerId);
-    if (player != null) {
+    withPlayer(playerId, player -> {
       PlayerStatus.setInactive(player);
       player.setIsPlaying(false);
-    }
+    });
   }
 
   private boolean allActivePlayersExhausted() {
