@@ -361,9 +361,14 @@ public class GameState {
     }
     checkForWinners(winners);
     removeWinnerFromActivePlayerList();
-    if (activePlayers.isEmpty() && winners.size() < players.size()) {
+    if (roundIsOverButGameContinues()) {
       startNewRound();
     }
+  }
+
+  /** The round ran out of players to play, but not everyone has finished — so deal a fresh round. */
+  private boolean roundIsOverButGameContinues() {
+    return activePlayers.isEmpty() && winners.size() < players.size();
   }
 
   private void nextRoundPlayer() {
