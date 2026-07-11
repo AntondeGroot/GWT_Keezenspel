@@ -40,16 +40,21 @@ public class CardsDeck implements CardsDeckInterface {
     return nrOfCards;
   }
 
+  /** This player's cards — the live hand list (callers guard the unknown-id case). */
+  private ArrayList<Card> handOf(String playerId) {
+    return playerHands.get(playerId).getHand();
+  }
+
   public ArrayList<Card> getCardsForPlayer(String playerUUID) {
     if (playerHands.containsKey(playerUUID)) {
-      return playerHands.get(playerUUID).getHand();
+      return handOf(playerUUID);
     } else {
       return new ArrayList<>();
     }
   }
 
   public void forfeitCardsForPlayer(String playerId) {
-    playedCards.addAll(playerHands.get(playerId).getHand());
+    playedCards.addAll(handOf(playerId));
     playerHands.get(playerId).dropCards();
   }
 
@@ -77,25 +82,25 @@ public class CardsDeck implements CardsDeckInterface {
     if (card == null) {
       return;
     }
-    playerHands.get(playerId).getHand().remove(card);
+    handOf(playerId).remove(card);
     playedCards.add(card);
   }
 
   public boolean playerHasCardsLeft(String playerId) {
-    return !playerHands.get(playerId).getHand().isEmpty();
+    return !handOf(playerId).isEmpty();
   }
 
   public void giveCardToPlayerForTesting(String playerId, Card card) {
     // this way you can replace one card by another, play a card in a Test, and then know based on
     // the game whether the player should have 5 or 4 cards in their hand left.
-    if (!playerHands.get(playerId).getHand().isEmpty()) {
-      playerHands.get(playerId).getHand().removeFirst();
+    if (!handOf(playerId).isEmpty()) {
+      handOf(playerId).removeFirst();
     }
-    playerHands.get(playerId).getHand().add(0, card);
+    handOf(playerId).addFirst(card);
   }
 
   public void setPlayerCard(String playerId, Card card) {
-    playerHands.get(playerId).addCard(card);
+    handOf(playerId).add(card);
   }
 
   public void dealCards() {
@@ -134,12 +139,12 @@ public class CardsDeck implements CardsDeckInterface {
   }
 
   public boolean playerHasCard(String playerId, Card card) {
-    return playerHands.get(playerId).hasCard(card);
+    return handOf(playerId).contains(card);
   }
 
   public void moveCardBetweenHands(String fromPlayerId, String toPlayerId, Card card) {
-    playerHands.get(fromPlayerId).getHand().remove(card);
-    playerHands.get(toPlayerId).addCard(card);
+    handOf(fromPlayerId).remove(card);
+    handOf(toPlayerId).add(card);
   }
 
   public boolean playerDoesNotHaveCard(String playerId, Card card) {
