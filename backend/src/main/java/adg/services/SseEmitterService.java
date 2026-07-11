@@ -132,18 +132,35 @@ public class SseEmitterService {
   public GameStatePush buildPush(GameSession session, String playerId, boolean omitLastMove) {
     GameState gs = session.getGameState();
     GameStatePush push = new GameStatePush();
+    addCoreState(push, gs, session, omitLastMove);
+    addPublicCardData(push, session);
+    addPrivateHandAndForfeit(push, gs, session, playerId);
+    addPendingTrade(push, gs);
+    return push;
+  }
+
+  private void addCoreState(
+      GameStatePush push, GameState gs, GameSession session, boolean omitLastMove) {
     push.setCurrentPlayerId(gs.getPlayerIdTurn());
     push.setPawns(gs.getPawns());
     push.setPlayers(gs.getPlayers());
     push.setWinners(gs.getWinners());
     push.setVersion(gs.getVersion());
     push.setLastMoveResponse(omitLastMove ? null : session.getLastMoveResponse());
+  }
 
-    // Public card data
+  private void addPublicCardData(GameStatePush push, GameSession session) {
     push.setPlayedCards(PublicCards.playedIds(session.getCardsDeck()));
     push.setNrOfCardsPerPlayer(session.getCardsDeck().getNrOfCardsPerPlayer());
+  }
 
-    // Private card data for this player only
+  /**
+   * This player's private hand and whether they may forfeit. With "must play if possible" on, the
+   * player on turn can't forfeit while a legal move exists — and the moment they're first blocked
+   * is recorded here (it starts the safety timeout that eventually lets them forfeit anyway).
+   */
+  private void addPrivateHandAndForfeit(
+      GameStatePush push, GameState gs, GameSession session, String playerId) {
     List<Card> hand = session.getCardsDeck().getCardsForPlayer(playerId);
     List<Card> safeHand = hand != null ? hand : List.of();
     push.setPlayerCards(safeHand);
@@ -155,7 +172,9 @@ public class SseEmitterService {
     if (playerId.equals(gs.getPlayerIdTurn()) && !canForfeit) {
       gs.recordMustPlayBlocked();
     }
+  }
 
+  private void addPendingTrade(GameStatePush push, GameState gs) {
     push.setTeamCardTrade(gs.isTeamCardTrade());
 
     // A pending team card-trade is public (both the requester and their teammate act on it).
@@ -166,7 +185,5 @@ public class SseEmitterService {
           .teammateId(pending.getTeammateId())
           .offeredCard(pending.getOfferedCard()));
     }
-
-    return push;
   }
 }
