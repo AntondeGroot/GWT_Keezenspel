@@ -18,9 +18,8 @@ export const nb: Dictionary = {
   hintFour:
     'Fire: flytt 4 steg bakover.\nTips: bruk dette i startruten din for å ta snarveien over hele brettet.',
   hintSeven:
-    'Sju: gjør totalt 7 steg med én eller to brikker.\n Velg først kortet, deretter eventuelt en annen brikke. Merk: brikke 1 beveger seg alltid først.',
-  hintJack:
-    'Knekt: bytt brikken din med en fiendtlig brikke.\nDu kan bare velge en egnet fiende etter at du har valgt dette kortet.',
+    'Sju: gjør totalt 7 steg med én eller to brikker.\nMerk: brikke 1 beveger seg alltid først.',
+  hintJack: 'Knekt: bytt brikken din med en fiendtlig brikke.',
   hintQueen: 'Dame: flytt 12 steg fremover.',
   hintKing: 'Konge: plasser en brikke på brettet.',
   rulesButton: 'Spilleregler',

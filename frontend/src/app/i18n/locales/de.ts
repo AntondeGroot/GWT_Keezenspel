@@ -18,9 +18,8 @@ export const de: Dictionary = {
   hintFour:
     'Vier: Bewege 4 Schritte rückwärts.\nTipp: Nutze dies auf deinem Startfeld, um das ganze Brett abzukürzen.',
   hintSeven:
-    'Sieben: Mache insgesamt 7 Schritte mit einer oder zwei Figuren.\n Wähle erst die Karte, dann optional eine zweite Figur. Hinweis: Figur 1 bewegt sich immer zuerst.',
-  hintJack:
-    'Bube: Tausche deine Figur mit einer feindlichen Figur.\nEinen geeigneten Gegner kannst du erst nach dem Wählen dieser Karte auswählen.',
+    'Sieben: Mache insgesamt 7 Schritte mit einer oder zwei Figuren.\nHinweis: Figur 1 bewegt sich immer zuerst.',
+  hintJack: 'Bube: Tausche deine Figur mit einer feindlichen Figur.',
   hintQueen: 'Dame: Bewege 12 Schritte vorwärts.',
   hintKing: 'König: Setze eine Figur aufs Spielfeld.',
   rulesButton: 'Spielregeln',

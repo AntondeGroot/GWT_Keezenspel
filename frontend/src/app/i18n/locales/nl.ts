@@ -18,9 +18,8 @@ export const nl: Dictionary = {
   hintFour:
     'Vier: beweeg 4 stappen achteruit.\nTip: je kunt dit gebruiken op je startveld om een heel bord af te snijden.',
   hintSeven:
-    'Zeven: maak in totaal 7 stappen met één of twee pionnen.\n Selecteer eerst de kaart en kies daarna eventueel een tweede pion. Let op: pion 1 beweegt altijd als eerste.',
-  hintJack:
-    'Boer: ruil jouw pion met een vijandige pion.\nJe kunt pas een geschikte vijand selecteren wanneer je deze kaart hebt geselecteerd.',
+    'Zeven: maak in totaal 7 stappen met één of twee pionnen.\nLet op: pion 1 beweegt altijd als eerste.',
+  hintJack: 'Boer: ruil jouw pion met een vijandige pion.',
   hintQueen: 'Vrouw: beweeg 12 stappen vooruit.',
   hintKing: 'Koning: zet een pion op het bord.',
   rulesButton: 'Spelregels',
