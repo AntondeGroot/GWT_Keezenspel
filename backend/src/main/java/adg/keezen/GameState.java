@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class GameState {
+public final class GameState {
 
   private ArrayList<Pawn> pawns = new ArrayList<>();
   private final ArrayList<Player> players = new ArrayList<>();
@@ -63,7 +63,7 @@ public class GameState {
     this.tradeManager =
         new TradeManager(
             cardsDeck, version, () -> hasStarted && teamPlay, this::teammateOf, this::isKingOrAce);
-    this.tileReachability = new TileReachability(this::getPawn);
+    this.tileReachability = new TileReachability(this::getPawn, roster::previousPlayerId);
     this.winnerDetection =
         new WinnerDetection(
             players, leavers, roster, pawnLocations, cardsDeck, version, () -> teamPlay);
@@ -559,58 +559,11 @@ public class GameState {
   }
 
   public ArrayList<PositionKey> pingpongMove(Pawn pawn, PositionKey tileId, int nrSteps) {
-    // it is already guaranteed that a pawn is loosely closed in on the finish tiles
-    ArrayList<PositionKey> moves = new ArrayList<>();
-    int direction = 1;
-    int tileNrToCheck = tileId.getTileNr();
-    moves.add(tileId);
-    if (nrSteps < 0) {
-      direction = -1;
-      nrSteps = Math.abs(nrSteps);
-    }
-
-    for (int i = 0; i < nrSteps; i++) {
-      tileNrToCheck = tileNrToCheck + direction;
-      if (!canMoveToTile(pawn, new PositionKey(pawn.getPlayerId(), tileNrToCheck))) {
-        moves.add(new PositionKey(pawn.getPlayerId(), tileNrToCheck - direction));
-        direction = -direction;
-        tileNrToCheck = tileNrToCheck + 2 * direction;
-      }
-    }
-    moves.add(new PositionKey(pawn.getPlayerId(), tileNrToCheck));
-
-    // an extra check to see if the first two moves are identical. this can happen when you do -4
-    // steps and are closed in from behind or try to move forward but are blocked that way.
-    if (moves.size() >= 2 && moves.get(0).equals(moves.get(1))) {
-      moves.removeFirst();
-    }
-    return moves;
+    return tileReachability.pingpongMove(pawn, tileId, nrSteps);
   }
 
   public PositionKey moveAndCheckEveryTile(Pawn pawn, PositionKey tileId, int nrSteps) {
-    int direction = 1;
-    int tileNrToCheck = tileId.getTileNr();
-
-    if (nrSteps < 0) {
-      direction = -1;
-      nrSteps = -nrSteps;
-    }
-
-    for (int i = 0; i < nrSteps; i++) {
-      tileNrToCheck = tileNrToCheck + direction;
-      if (tileNrToCheck > 15) { // only check tiles when they are on the finish
-        if (!canMoveToTile(pawn, new PositionKey(pawn.getPlayerId(), tileNrToCheck))) {
-          direction = -direction;
-          tileNrToCheck = tileNrToCheck + 2 * direction;
-        }
-      }
-    }
-
-    if (tileNrToCheck <= 15) { // when back on the last section, change the playerId of the section
-      return new PositionKey(previousPlayerId(pawn.getPlayerId()), tileNrToCheck);
-    }
-
-    return new PositionKey(pawn.getPlayerId(), tileNrToCheck);
+    return tileReachability.moveAndCheckEveryTile(pawn, tileId, nrSteps);
   }
 
   // ── Player navigation ─────────────────────────────────────────────────────
