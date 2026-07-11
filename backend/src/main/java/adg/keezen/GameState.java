@@ -2,8 +2,6 @@ package adg.keezen;
 
 import static adg.util.CardValueCheck.isAce;
 import static adg.util.CardValueCheck.isKing;
-import static adg.util.PlayerStatus.hasFinished;
-import static adg.util.PlayerStatus.setActive;
 import static com.adg.openapi.model.MoveResult.CANNOT_MAKE_MOVE;
 import static com.adg.openapi.model.MoveResult.CAN_MAKE_MOVE;
 import static com.adg.openapi.model.MoveResult.PLAYER_DOES_NOT_HAVE_CARD;
@@ -32,12 +30,9 @@ import java.util.stream.Collectors;
 public class GameState {
 
   private ArrayList<Pawn> pawns = new ArrayList<>();
-  private String playerIdTurn;
-  private String playerIdStartingRound;
   private final ArrayList<Player> players = new ArrayList<>();
   private final HashMap<String, Integer> playerColors =
       new HashMap<>(); // to map a player UUID to an int for player Colors
-  private final ArrayList<String> activePlayers = new ArrayList<>();
   private final ArrayList<String> winners = new ArrayList<>();
   private final HashSet<String> leavers = new HashSet<>();
   private static final int MAX_PLAYERS = 8;
@@ -51,6 +46,7 @@ public class GameState {
   private final PlayerRoster roster;
   private final PawnLocations pawnLocations;
   private final WinnerDetection winnerDetection;
+  private final TurnOrder turnOrder;
   private volatile long mustPlayBlockedSinceMs = 0;
   private static final long MUST_PLAY_TIMEOUT_MS = 3 * 60 * 1000L;
   private Boolean hasStarted = false;
@@ -70,6 +66,8 @@ public class GameState {
     this.winnerDetection =
         new WinnerDetection(
             players, leavers, roster, pawnLocations, cardsDeck, version, () -> teamPlay);
+    this.turnOrder =
+        new TurnOrder(players, winners, leavers, roster, this::clearMustPlayBlocked);
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -86,7 +84,7 @@ public class GameState {
     activateAllPlayers();
     initializePawns();
     initializeCards();
-    resetTurnToFirstPlayer();
+    turnOrder.resetToFirstPlayer();
   }
 
   public void stop() {
@@ -94,7 +92,7 @@ public class GameState {
     pawns.clear();
     players.clear();
     playerColors.clear();
-    activePlayers.clear();
+    turnOrder.clearActive();
     winners.clear();
     tradeManager.clearPending();
   }
@@ -104,18 +102,16 @@ public class GameState {
     resetPawnPositions();
     resetActivePlayers();
     resetCards();
-    resetTurnToFirstPlayer();
+    turnOrder.resetToFirstPlayer();
     tradeManager.clearPending();
     version.incrementAndGet();
   }
 
   public void tearDown() {
     pawns = new ArrayList<>();
-    playerIdTurn = "0";
     players.clear();
-    activePlayers.clear();
     winners.clear();
-    playerIdStartingRound = "0";
+    turnOrder.tearDownTo("0");
   }
 
   // ── Start helpers ─────────────────────────────────────────────────────────
@@ -172,7 +168,7 @@ public class GameState {
     pawns = new ArrayList<>();
     int playerInt = 0;
     for (Player player : players) {
-      activePlayers.add(player.getId());
+      turnOrder.addActive(player.getId());
       playerColors.put(player.getId(), playerInt);
       for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
         PositionKey nestPosition = new PositionKey(player.getId(), -1 - pawnNr);
@@ -213,19 +209,6 @@ public class GameState {
     initializeCards();
   }
 
-  /**
-   * Open a round with the first seat: point the turn (and the round's starting player) at them and
-   * make them the sole player to move. Used both when the game starts and on a mid-game reset.
-   */
-  private void resetTurnToFirstPlayer() {
-    if (players.isEmpty()) {
-      return;
-    }
-    playerIdTurn = players.getFirst().getId();
-    playerIdStartingRound = playerIdTurn;
-    setPlayingPlayer(playerIdTurn);
-  }
-
   // ── Player management ─────────────────────────────────────────────────────
 
   public void addPlayer(Player player) {
@@ -245,7 +228,7 @@ public class GameState {
     removePawnsForPlayer(playerId);
     deactivateAndStopPlayingPlayer(playerId);
     // Only hand off the turn if the player who left was actually on it.
-    removeFromRoundAndAdvance(playerId, playerId.equals(playerIdTurn));
+    removeFromRoundAndAdvance(playerId, playerId.equals(turnOrder.getPlayerIdTurn()));
     version.incrementAndGet();
   }
 
@@ -271,12 +254,12 @@ public class GameState {
    * active player.
    */
   private void removeFromRoundAndAdvance(String playerId, boolean advanceTurn) {
-    if (allActivePlayersExhausted()) {
+    if (turnOrder.allActivePlayersExhausted()) {
       startNewRound();
     } else {
-      activePlayers.remove(playerId);
+      turnOrder.removeActive(playerId);
       if (advanceTurn) {
-        nextActivePlayer();
+        turnOrder.nextActivePlayer();
       }
     }
   }
@@ -305,24 +288,14 @@ public class GameState {
     });
   }
 
-  private boolean allActivePlayersExhausted() {
-    return players.stream().noneMatch(Player::getIsActive);
-  }
-
   private void startNewRound() {
-    resetActivePlayers();
+    turnOrder.resetActivePlayers();
     dealRoundCards();
-    nextRoundPlayer();
+    turnOrder.nextRoundPlayer();
   }
 
   public void resetActivePlayers() {
-    activePlayers.clear();
-    for (Player player : players) {
-      if (!hasFinished(player) && !leavers.contains(player.getId())) {
-        setActive(player);
-        activePlayers.add(player.getId());
-      }
-    }
+    turnOrder.resetActivePlayers();
   }
 
   public boolean allPlayersHaveLeft() {
@@ -346,9 +319,7 @@ public class GameState {
   }
 
   public void removeWinnerFromActivePlayerList() {
-    for (String winnerId : winners) {
-      activePlayers.remove(winnerId);
-    }
+    turnOrder.removeWinnersFromActive();
   }
 
   // ── Turn management helpers ───────────────────────────────────────────────
@@ -357,44 +328,12 @@ public class GameState {
     if (noCardsLeft) {
       forfeitPlayer(playerId);
     } else {
-      nextActivePlayer();
+      turnOrder.nextActivePlayer();
     }
     checkForWinners(winners);
-    removeWinnerFromActivePlayerList();
-    if (roundIsOverButGameContinues()) {
+    turnOrder.removeWinnersFromActive();
+    if (turnOrder.roundIsOverButGameContinues()) {
       startNewRound();
-    }
-  }
-
-  /** The round ran out of players to play, but not everyone has finished — so deal a fresh round. */
-  private boolean roundIsOverButGameContinues() {
-    return activePlayers.isEmpty() && winners.size() < players.size();
-  }
-
-  private void nextRoundPlayer() {
-    playerIdTurn = nextPlayerId(playerIdStartingRound);
-    playerIdStartingRound = playerIdTurn;
-    if (!activePlayers.isEmpty() && !activePlayers.contains(playerIdTurn)) {
-      nextRoundPlayer();
-    }
-    // todo: check if all players have finished
-    setPlayingPlayer(playerIdTurn);
-  }
-
-  private void nextActivePlayer() {
-    playerIdTurn = nextPlayerId(playerIdTurn);
-    if (!activePlayers.isEmpty() && !activePlayers.contains(playerIdTurn)) {
-      nextActivePlayer();
-    } else if (activePlayers.contains(playerIdTurn)) {
-      setPlayingPlayer(playerIdTurn);
-    }
-    // If activePlayers is empty, no one is set as playing (game is between rounds or over)
-  }
-
-  private void setPlayingPlayer(String playerId) {
-    clearMustPlayBlocked();
-    for (Player player : players) {
-      player.setIsPlaying(player.getId().equals(playerId));
     }
   }
 
@@ -778,14 +717,14 @@ public class GameState {
   }
 
   public String getPlayerIdTurn() {
-    return playerIdTurn;
+    return turnOrder.getPlayerIdTurn();
   }
 
   /**
    * for testing purposes
    */
   public void setPlayerIdTurn(String playerId) {
-    playerIdTurn = playerId;
+    turnOrder.setPlayerIdTurn(playerId);
   }
 
   public void setAnimationSpeed(int speed) {
