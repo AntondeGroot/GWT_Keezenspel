@@ -4,13 +4,15 @@ import com.adg.openapi.model.Card;
 import com.adg.openapi.model.Player;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 public class CardsDeckMock implements CardsDeckInterface {
+
+  private static final int CARD_VALUES_PER_SUIT = 13; // Ace (1) .. King (13)
+  private static final int ROUNDS_BEFORE_RESHUFFLE = 3;
+
   private int roundNr;
-  private final ArrayList<Card> playedCards = new ArrayList<>();
-  private final HashMap<String, PlayerHand> playerHands = new HashMap<>();
+  private final PlayerHands hands = new PlayerHands();
   private GameState gameState;
   private final ArrayList<Card> allCardsFromAceToKing = all13Cards();
 
@@ -21,30 +23,19 @@ public class CardsDeckMock implements CardsDeckInterface {
   }
 
   public void addPlayers(ArrayList<Player> players) {
-    for (Player p : players) {
-      playerHands.put(p.getId(), new PlayerHand());
-    }
+    hands.addPlayers(players);
   }
 
   public HashMap<String, Integer> getNrOfCardsPerPlayer() {
-    HashMap<String, Integer> nrOfCards = new HashMap<>();
-    for (Map.Entry<String, PlayerHand> p : playerHands.entrySet()) {
-      nrOfCards.put(p.getKey(), p.getValue().getHand().size());
-    }
-    return nrOfCards;
+    return hands.nrOfCardsPerPlayer();
   }
 
   public ArrayList<Card> getCardsForPlayer(String playerUUID) {
-    if (playerHands.containsKey(playerUUID)) {
-      return playerHands.get(playerUUID).getHand();
-    } else {
-      return new ArrayList<>();
-    }
+    return hands.cardsOf(playerUUID);
   }
 
   public void forfeitCardsForPlayer(String playerId) {
-    playedCards.addAll(playerHands.get(playerId).getHand());
-    playerHands.get(playerId).dropCards();
+    hands.forfeit(playerId);
   }
 
   public void shuffleIfFirstRound() {
@@ -56,65 +47,55 @@ public class CardsDeckMock implements CardsDeckInterface {
       return;
     }
     // Deliberately does NOT remove the card from the mocked hand — tests replay the same setup.
-    playedCards.add(card);
+    hands.discard(card);
   }
 
   public boolean playerHasCardsLeft(String playerId) {
-    return !playerHands.get(playerId).getHand().isEmpty();
+    return hands.hasCardsLeft(playerId);
   }
 
   public void giveCardToPlayerForTesting(String playerId, Card card) {
-    playerHands.get(playerId).getHand().removeFirst();
-    playerHands.get(playerId).getHand().add(0, card);
+    hands.replaceFirstCard(playerId, card);
   }
 
   public void setPlayerCard(String playerId, Card card) {
-    playerHands.get(playerId).addCard(card);
+    hands.giveCard(playerId, card);
   }
 
   public void dealCards() {
-    playedCards.clear();
-
-    // todo: is this reset necessary?
-    for (PlayerHand hand : playerHands.values()) {
-      hand.dropCards();
-    }
-
+    hands.clearPile();
+    hands.dropAllHands();
     for (Player player : gameState.getPlayers()) {
-      Integer place = player.getPlace();
-      if (Boolean.TRUE.equals(player.getIsActive()) && place != null && place < 0) {
+      if (PlayerHands.isDealtIn(player)) {
         for (Card card : allCardsFromAceToKing) {
-          setPlayerCard(player.getId(), card);
+          hands.giveCard(player.getId(), card);
         }
       }
     }
-
-    roundNr = (roundNr + 1) % 3;
+    roundNr = (roundNr + 1) % ROUNDS_BEFORE_RESHUFFLE;
   }
 
   public boolean playerHasCard(String playerId, Card card) {
-    return playerHands.get(playerId).hasCard(card);
+    return hands.hasCard(playerId, card);
   }
 
   public void moveCardBetweenHands(String fromPlayerId, String toPlayerId, Card card) {
-    playerHands.get(fromPlayerId).getHand().remove(card);
-    playerHands.get(toPlayerId).addCard(card);
+    hands.moveCard(fromPlayerId, toPlayerId, card);
   }
 
   public void reset() {
     roundNr = 0;
-    playerHands.clear();
-    playedCards.clear();
+    hands.reset();
   }
 
   public ArrayList<Card> getPlayedCards() {
-    return new ArrayList<>(playedCards);
+    return hands.playedCards();
   }
 
   private ArrayList<Card> all13Cards() {
     ArrayList<Card> all13Cards = new ArrayList<>();
     Random random = new Random();
-    for (int cardValue = 1; cardValue <= 13; cardValue++) {
+    for (int cardValue = 1; cardValue <= CARD_VALUES_PER_SUIT; cardValue++) {
       all13Cards.add(new Card().suit(0).value(cardValue).uuid(random.nextInt()));
     }
     return all13Cards;

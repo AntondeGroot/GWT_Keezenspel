@@ -304,6 +304,7 @@
             <param>adg.keezen.TileReachabilityTest</param>
             <param>adg.keezen.PlayerRosterTest</param>
             <param>adg.keezen.PawnLocationsTest</param>
+            <param>adg.keezen.PlayerHandsTest</param>
           </targetTests>
           <mutators>
             <mutator>DEFAULTS</mutator>
