@@ -18,9 +18,8 @@ export const fr: Dictionary = {
   hintFour:
     'Quatre : reculez de 4 cases.\nConseil : utilisez cela sur votre case de départ pour couper tout le plateau.',
   hintSeven:
-    "Sept : faites 7 pas au total avec un ou deux pions.\n Sélectionnez d'abord la carte, puis choisissez éventuellement un deuxième pion. Note : le pion 1 avance toujours en premier.",
-  hintJack:
-    "Valet : échangez votre pion avec un pion ennemi.\nVous ne pouvez choisir un ennemi approprié qu'après avoir sélectionné cette carte.",
+    'Sept : faites 7 pas au total avec un ou deux pions.\nNote : le pion 1 avance toujours en premier.',
+  hintJack: 'Valet : échangez votre pion avec un pion ennemi.',
   hintQueen: 'Dame : avancez de 12 cases.',
   hintKing: 'Roi : placez un pion sur le plateau.',
   rulesButton: 'Règles du jeu',

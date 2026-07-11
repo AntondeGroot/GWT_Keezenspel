@@ -188,6 +188,22 @@ export class PawnAndCardSelection {
       }
     }
 
+    // An opponent's pawn is only ever the target of a Jack switch. If the player clicks one while
+    // an own pawn is selected under a non-Jack card (e.g. a plain number picked for their own move),
+    // read it as switch intent: swap in a Jack from hand so the Jack + opponent pawn get selected.
+    if (
+      this.pawn1 != null &&
+      !this.isControllable(pawn) &&
+      !samePawn(pawn, this.pawn2) &&
+      (this.card == null || this.card.value !== 11)
+    ) {
+      const jack = this.hand.find((c) => c.value === 11) ?? null;
+      if (jack != null) {
+        this.card = jack;
+        this.cardWasAutoSelected = true;
+      }
+    }
+
     if (this.card == null) this.autoSelectCardFor(pawn);
 
     if (this.card == null) {

@@ -124,6 +124,37 @@ describe('PawnAndCardSelection', () => {
     expect(sel.getPawnId1()).toBe(ownPawnOnBoard2.id);
     expect(sel.getPawnId2()).toBeNull();
   });
+
+  it('ownPawn_plainCard_thenClickOpponent_withJackInHand_inferSwitch', () => {
+    const two = card(2);
+    sel.setPlayerId('1');
+    sel.setHand([two, jackCard]);
+    sel.addPawn(ownPawnOnBoard); // own board pawn = pawn1
+    sel.setCard(two); // a plain number selected for a normal move
+    expect(sel.getMoveType()).toBe('move');
+
+    // Clicking an opponent's board pawn now reads as switch intent: the Jack is auto-selected.
+    sel.addPawn(otherPawn);
+
+    expect(sel.getCard()).toBe(jackCard);
+    expect(sel.getPawnId1()).toBe(ownPawnOnBoard.id);
+    expect(sel.getPawnId2()).toBe(otherPawn.id);
+    expect(sel.getMoveType()).toBe('switch');
+  });
+
+  it('ownPawn_plainCard_thenClickOpponent_withoutJackInHand_doesNothing', () => {
+    const two = card(2);
+    sel.setPlayerId('1');
+    sel.setHand([two]); // no Jack to switch with
+    sel.addPawn(ownPawnOnBoard);
+    sel.setCard(two);
+
+    sel.addPawn(otherPawn);
+
+    expect(sel.getCard()).toBe(two); // plain card kept
+    expect(sel.getPawnId2()).toBeNull(); // no switch inferred
+    expect(sel.getMoveType()).toBe('move');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -712,10 +743,12 @@ describe('PawnAndCardSelection - AutoSelect', () => {
   });
 
   it('manualCardPick_IsNotOverriddenByAutoSelect', () => {
-    sel.setHand([five, jack]);
+    // A manual pick stays put when a second OWN pawn is clicked (no auto-Seven override).
+    // (Clicking an opponent's pawn is the deliberate exception — it infers a Jack switch.)
+    sel.setHand([five, seven]);
     sel.setCard(five);
     sel.addPawn(ownPawnOnBoard);
-    sel.addPawn(otherPawnOnBoard);
+    sel.addPawn(ownPawnOnBoard2);
     expect(sel.getCard()).toBe(five);
     expect(sel.getPawnId2()).toBeNull();
   });

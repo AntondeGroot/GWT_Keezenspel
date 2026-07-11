@@ -19,9 +19,8 @@ export const en: Dictionary = {
   hintFour:
     'Four: move 4 steps backward.\nTip: you can use this on your start tile to cut across the entire board.',
   hintSeven:
-    'Seven: make a total of 7 steps with one or two pawns.\n First select the card, then optionally choose a second pawn. Note: pawn 1 always moves first.',
-  hintJack:
-    'Jack: swap your pawn with an enemy pawn.\nYou can only select a suitable enemy after selecting this card.',
+    'Seven: make a total of 7 steps with one or two pawns.\nNote: pawn 1 always moves first.',
+  hintJack: 'Jack: swap your pawn with an enemy pawn.',
   hintQueen: 'Queen: move 12 steps forward.',
   hintKing: 'King: place a pawn on the board.',
   rulesButton: 'Game Rules',
