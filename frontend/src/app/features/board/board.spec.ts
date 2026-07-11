@@ -25,8 +25,10 @@ describe('Board', () => {
   it('clears the pile on a new round so a redealt card is not filtered out of the hand', () => {
     const c = component as unknown as {
       handleGameState: (push: unknown) => void;
-      pile: { set: (v: { uuid: number; suit: number; value: number }[]) => void };
-      cards: () => { uuid: number; inPile: boolean }[];
+      cardTable: {
+        pile: { set: (v: { uuid: number; suit: number; value: number }[]) => void };
+        cards: () => { uuid: number; inPile: boolean }[];
+      };
     };
     const card = (uuid: number, suit: number, value: number) => ({ uuid, suit, value });
     const push = (cards: { uuid: number; suit: number; value: number }[]) => ({
@@ -38,17 +40,17 @@ describe('Board', () => {
 
     // Round 1: three cards dealt, then played one by one (each lands in the pile as it flies).
     c.handleGameState(push([card(1, 0, 5), card(2, 0, 6), card(3, 0, 7)]));
-    c.pile.set([card(1, 0, 5)]);
+    c.cardTable.pile.set([card(1, 0, 5)]);
     c.handleGameState(push([card(2, 0, 6), card(3, 0, 7)]));
-    c.pile.set([card(1, 0, 5), card(2, 0, 6)]);
+    c.cardTable.pile.set([card(1, 0, 5), card(2, 0, 6)]);
     c.handleGameState(push([card(3, 0, 7)]));
-    c.pile.set([card(1, 0, 5), card(2, 0, 6), card(3, 0, 7)]);
+    c.cardTable.pile.set([card(1, 0, 5), card(2, 0, 6), card(3, 0, 7)]);
     c.handleGameState(push([])); // hand empty — round over
 
     // New round: the deck reuses uuids, so cards 1 and 2 return in a fresh hand.
     c.handleGameState(push([card(1, 1, 9), card(2, 1, 10)]));
 
-    const shown = c
+    const shown = c.cardTable
       .cards()
       .filter((x) => !x.inPile)
       .map((x) => x.uuid)

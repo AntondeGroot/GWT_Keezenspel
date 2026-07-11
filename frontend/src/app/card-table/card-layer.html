@@ -1,0 +1,60 @@
+<!-- Cards live in their own layer, overlaid on the play area so the pile lines up with the centre
+     and the hand sits below. Same DOM element per uuid (stable track), so moving a card between
+     hand / pile / deck animates it (a FLIP). Flyers are transient cards mid-flight. -->
+<div
+  class="card-layer"
+  [style.--ct-fly-ms]="options().flyMs + 'ms'"
+  [style.--ct-pop-ms]="options().popMs + 'ms'"
+  [style.--ct-deal-flip-ms]="options().dealFlipMs + 'ms'"
+  [style.--ct-deck-scale]="options().deckScale"
+>
+  @for (b of backs(); track b.key) {
+    <div
+      class="card-back"
+      [style.left.%]="b.x"
+      [style.top.%]="b.y"
+      [style.--rot.deg]="b.rot"
+      [style.z-index]="b.z"
+      [style.transition-delay.ms]="b.dealDelay"
+    ></div>
+  }
+
+  @for (c of cards(); track c.uuid) {
+    <app-card
+      class="card"
+      [attr.data-testid]="'card-' + c.value"
+      [suit]="c.suit"
+      [value]="c.value"
+      [style.left.%]="c.x"
+      [style.top.%]="c.y"
+      [style.--rot.deg]="c.rot"
+      [style.--card-scale]="c.scale"
+      [style.z-index]="c.z"
+      [style.transition-delay.ms]="c.dealDelay"
+      [style.--deal-delay]="c.dealDelay"
+      [class.selected]="selectedUuid() === c.uuid"
+      [class.special]="!c.inPile && isSpecial()(c.value)"
+      [class.played]="c.inPile"
+      [class.dealing]="c.dealing"
+      [class.trade-hidden]="c.hidden"
+      (click)="cardClick.emit(c.uuid)"
+      (mouseenter)="cardHover.emit(c.value)"
+      (mouseleave)="cardHover.emit(null)"
+    />
+  }
+
+  @for (f of flyers(); track f.id) {
+    <app-card
+      class="card flyer"
+      [class.flip-in]="f.flip === 'in'"
+      [class.flip-out]="f.flip === 'out'"
+      [class.popped]="f.glow"
+      [suit]="f.suit"
+      [value]="f.value"
+      [style.left.%]="f.x"
+      [style.top.%]="f.y"
+      [style.--rot.deg]="f.rot"
+      [style.--card-scale]="f.scale"
+    />
+  }
+</div>
