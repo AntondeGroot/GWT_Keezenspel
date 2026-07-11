@@ -47,14 +47,6 @@ class TurnOrder {
     playerIdTurn = playerId;
   }
 
-  ArrayList<String> getActivePlayers() {
-    return activePlayers;
-  }
-
-  void addActive(String playerId) {
-    activePlayers.add(playerId);
-  }
-
   void removeActive(String playerId) {
     activePlayers.remove(playerId);
   }
