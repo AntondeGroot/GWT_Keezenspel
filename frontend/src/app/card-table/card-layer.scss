@@ -1,0 +1,187 @@
+// The host is transparent so the .card-layer positions exactly where the component is placed
+// (as a direct child of the game's stage), keeping the card % coordinates aligned to that box.
+:host {
+  display: contents;
+}
+
+// Cards layer: overlaid on the play area (so % positions line up with the board), but the cards
+// themselves are not children of the board. Hand cards spill below into the reserved area
+// (overflow is visible). --hand-top is supplied by the host game (the vertical offset of the box).
+.card-layer {
+  position: absolute;
+  top: var(--hand-top);
+  left: 0;
+  width: 100%;
+  aspect-ratio: 1;
+  pointer-events: none; // clicks fall through; cards re-enable below
+}
+
+// A face-down card in another player's fanned hand. Positioned in the layer's %-space (the game
+// supplies the fan geometry). Only counts are known, so there is no face to render.
+.card-back {
+  position: absolute;
+  width: 5%; // 30/600 of the board
+  aspect-ratio: 30 / 47;
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  box-sizing: border-box;
+  background: linear-gradient(145deg, #a52222, #7a1414);
+  border: 2px solid #fff;
+  border-radius: 8%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  // Smoothly fan out on a deal (and re-fan when a player plays).
+  transition:
+    left 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+
+  // Classic inner frame — decorative only.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 14%;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 6%;
+  }
+}
+
+.card {
+  position: absolute;
+  width: 16.667%; // 100/600 of the board → scales with it (height from aspect-ratio)
+  pointer-events: auto; // the .card-layer disables events; cards opt back in
+  // left/top are the card's CENTRE; --rot rotates, --card-scale shrinks pile cards
+  // (hand = 1, pile ≈ 0.6). The transition animates the fly: position + shrink.
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(var(--card-scale, 1));
+  // ease-out so the card decelerates into the pile (a "thrown" feel). Duration = the engine's
+  // flyMs, published as --ct-fly-ms by <app-card-layer>, so TS and CSS stay in sync.
+  transition:
+    left var(--ct-fly-ms, 500ms) cubic-bezier(0.22, 1, 0.36, 1),
+    top var(--ct-fly-ms, 500ms) cubic-bezier(0.22, 1, 0.36, 1),
+    transform var(--ct-fly-ms, 500ms) cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+  z-index: 50;
+}
+
+// The "played!" beat: the viewer's own card swells with a white glow (fast) before it flies. The
+// quick transition (--ct-pop-ms = the engine's popMs) is scoped here so the pop is snappy, while
+// the fly keeps the .card flyMs ease.
+.card.popped {
+  z-index: 60;
+  transition:
+    transform var(--ct-pop-ms, 180ms) ease-out,
+    box-shadow var(--ct-pop-ms, 180ms) ease;
+  box-shadow:
+    0 0 15px 4px rgba(255, 255, 255, 0.85),
+    4px 5px 14px rgba(0, 0, 0, 0.5);
+}
+
+.card:hover {
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) translateY(-8px) scale(1.03);
+}
+
+// Played cards (on the pile) are inert: no clicks, no hover/selected growth —
+// they keep their pile transform (position + rotation + 0.6 scale).
+.card.played {
+  pointer-events: none;
+  cursor: default;
+
+  &:hover {
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(var(--card-scale, 1));
+  }
+}
+
+// A card flying from an opponent's hand to the pile — inert, on top during flight.
+.card.flyer {
+  z-index: 150;
+  pointer-events: none;
+}
+
+// A hand card masked while its swap flyer animates in (the trade). The flyer lands on the
+// real card's slot, then this clears and the card appears.
+.card.trade-hidden {
+  opacity: 0;
+}
+
+// Selected card: lifted with a gold ring + glow.
+.card.selected {
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) translateY(-20px) scale(1.05);
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.5),
+    0 0 0 3px #f4d03f,
+    0 0 12px rgba(244, 208, 63, 0.7);
+  z-index: 60;
+}
+
+// Special cards (Ace/Four/Seven/Jack/Queen/King): a gold ring so the player
+// notices the cards that do something. Ported from the GWT .specialCard. The
+// pulsing glow only plays while the card is a resting hand card (not selected,
+// played, or flying) so it never fights the .selected box-shadow.
+.card.special {
+  outline: 2px solid rgba(212, 175, 55, 0.9);
+  outline-offset: 1px;
+  border-radius: 5px;
+}
+
+// Resting special: a soft gold glow pulse — only while unselected, so it never fights the
+// selection ring's box-shadow.
+.card.special:not(.selected):not(.played):not(.flyer) {
+  animation: golden-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes golden-pulse {
+  0%,
+  100% {
+    box-shadow:
+      4px 5px 14px rgba(0, 0, 0, 0.55),
+      1px 1px 4px rgba(0, 0, 0, 0.3),
+      0 0 4px 2px rgba(212, 175, 55, 0.5);
+  }
+  50% {
+    box-shadow:
+      4px 5px 14px rgba(0, 0, 0, 0.55),
+      1px 1px 4px rgba(0, 0, 0, 0.3),
+      0 0 9px 5px rgba(212, 175, 55, 0.9);
+  }
+}
+
+// Every hand special card — resting OR selected — catches the light: a soft diagonal gleam sweeps
+// across its face. `overflow: hidden` clips the gleam to the card, while the lift + selection ring
+// sit outside it, so a selected special card stays lifted/ringed AND shiny.
+.card.special:not(.played):not(.flyer) {
+  overflow: hidden;
+}
+.card.special:not(.played):not(.flyer)::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -75%;
+  width: 45%;
+  height: 200%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: translateX(0) rotate(20deg);
+  // 2.5s cycle, cross window 36% → the band takes ~0.9s to sweep across, then rests ~1.6s.
+  animation: card-sheen 2.5s ease-in-out infinite;
+}
+@keyframes card-sheen {
+  0% {
+    transform: translateX(0) rotate(20deg);
+  }
+  36%,
+  100% {
+    transform: translateX(400%) rotate(20deg);
+  }
+}
+
+// A SELECTED special card uses the normal selected look (lift + gold ring + glow); drop the flat
+// .special outline so it doesn't double up with the selection ring.
+.card.selected.special {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card.special:not(.played):not(.flyer)::after {
+    animation: none;
+    opacity: 0;
+  }
+}

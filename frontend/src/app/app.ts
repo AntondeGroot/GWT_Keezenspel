@@ -34,9 +34,9 @@ export class App {
     // SCSS background images can't read <base href> (CSS url() resolves against the
     // stylesheet, not the base href), so publish the mount-prefixed URLs as CSS vars the
     // stylesheets consume — keeps them working under a /keezen deploy and at the root.
+    // (The card sprite is a bundler-resolved component asset, so it doesn't need this.)
     const b = basePath();
     const root = document.documentElement.style;
-    root.setProperty('--card-deck-image', `url('${b}/card-deck.png')`);
     root.setProperty('--globe-language-image', `url('${b}/globe-language.svg')`);
 
     // Keep the browser tab title in sync with the localized game name; t() reads

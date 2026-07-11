@@ -16,7 +16,10 @@ import { basePath } from '../../base-path';
 import { seatColor } from '../../player-colors';
 import { SoundService } from '../../sound.service';
 import { Pawn } from './pawn/pawn';
-import { Card } from './card/card';
+import { CardLayer } from '../../card-table/card-layer';
+import { CardTable } from '../../card-table/card-table';
+import { DefaultCardPositioner } from '../../card-table/default-positioner';
+import { CardBackVM } from '../../card-table/card-table.types';
 import { PlayerList } from '../player-list/player-list';
 import { TradePanel } from './trade-panel/trade-panel';
 import { highlightForPawn1, highlightForPawn2 } from './pawn-highlight';
@@ -33,8 +36,6 @@ import { localRejectionKey, rejectionMessageKey } from './rejection-message';
 // Cards that do something special (Ace, Four, Seven, Jack, Queen, King): they get
 // a gold highlight in the hand and a hint/suggestion when hovered or selected.
 const SPECIAL_CARD_VALUES = new Set([1, 4, 7, 11, 12, 13]);
-// How long the viewer's own card swells + glows before it flies to the pile.
-const POP_MS = 180;
 const HINT_KEYS: Record<number, TranslationKey> = {
   1: 'hintAce',
   4: 'hintFour',
@@ -46,7 +47,7 @@ const HINT_KEYS: Record<number, TranslationKey> = {
 
 @Component({
   selector: 'app-board',
-  imports: [Pawn, Card, PlayerList, TradePanel],
+  imports: [Pawn, CardLayer, PlayerList, TradePanel],
   templateUrl: './board.html',
   styleUrl: './board.scss',
 })
@@ -122,9 +123,9 @@ export class Board implements OnInit, OnDestroy {
       // lingers in the (never-otherwise-cleared) pile is filtered out of the hand and silently
       // vanishes. Gate on the hand actually growing so a net-neutral trade (1 out, 1 in) doesn't
       // wipe the current round's pile.
-      if (cards.length > prev.size) this.pile.set([]);
+      if (cards.length > prev.size) this.cardTable.clearPile();
       const fresh = cards.filter((c) => !prev.has(c.uuid)).map((c) => c.uuid);
-      if (fresh.length > 0) this.animateDeal(fresh);
+      if (fresh.length > 0) this.cardTable.dealIn(fresh);
     }
     this.prevHandUuids = new Set(cards.map((c) => c.uuid));
     this.gameStore.players.set(next.players ?? []);
@@ -211,8 +212,8 @@ export class Board implements OnInit, OnDestroy {
     if (!g || !counts) return [];
     // During a deal-in the backs start stacked at the deck (board centre) and fan
     // out to their slots, staggered — the same FLIP as the viewer's own cards.
-    const dealing = this.dealtIndex().size > 0;
-    const atDeck = this.atDeck();
+    const dealing = this.cardTable.dealing();
+    const atDeck = this.cardTable.stacked();
 
     // Deal clockwise: order opponents by their angle around the board centre,
     // clockwise from the viewer (screen coords: clockwise = increasing atan2).
@@ -229,27 +230,21 @@ export class Board implements OnInit, OnDestroy {
       })
       .sort((a, b) => a.cw - b.cw);
 
-    const backs: {
-      key: string;
-      x: number;
-      y: number;
-      rot: number;
-      delay: number;
-      z?: number;
-    }[] = [];
+    // Positions are in the card-layer's %-space (board px / 6), like the hand + pile.
+    const backs: CardBackVM[] = [];
     opponents.forEach(({ pid }, oi) => {
       const seat = oi + 1; // the viewer is seat 0; opponents take the next seats clockwise
       fanCardBacks(g.deckSegment(pid)!, counts[pid]).forEach((c, i) => {
         // Round-robin: i = round (card index), seat = offset within the round.
-        const delay = dealing ? i * 700 + seat * 350 : 0;
+        const dealDelay = dealing ? i * 700 + seat * 350 : 0;
         backs.push({
           key: `${pid}:${i}`,
-          x: atDeck ? 315 : c.x, // deck centre while dealing
-          y: atDeck ? 300 : c.y,
+          x: (atDeck ? 315 : c.x) / 6, // deck centre while dealing
+          y: (atDeck ? 300 : c.y) / 6,
           rot: atDeck ? 0 : c.rotDeg,
-          delay,
+          dealDelay,
           // Sooner-flying backs sit on top of the deck stack (taken off the top).
-          z: dealing ? 400 - Math.round(delay / 20) : undefined,
+          z: dealing ? 400 - Math.round(dealDelay / 20) : undefined,
         });
       });
     });
@@ -259,40 +254,15 @@ export class Board implements OnInit, OnDestroy {
 
   protected readonly hand = computed(() => this.state()?.playerCards ?? []);
 
-  // Cards the viewer has played, kept client-side so the same element can fly to
-  // the pile (the server's playedCards is just strings, no uuid to track).
-  // Opponents' played cards are appended here too (synthetic negative uuids) so
-  // they persist on the pile after their fly-in.
-  protected readonly pile = signal<CardModel[]>([]);
+  // The reusable card table: owns the pile, the flyer layer and the deal-in FLIP, and computes
+  // each card's on-table position (hand fan / pile / deck). Keezen uses the default layout; the
+  // board drives it (dealIn / flyToPile / clearPile) from its GameStatePush diffing below.
+  private readonly positioner = new DefaultCardPositioner();
+  protected readonly cardTable = new CardTable(() => this.hand(), this.positioner);
+  // Which card values get the gold "special" highlight (Ace/Four/Seven/Jack/Queen/King).
+  protected readonly isSpecial = (value: number): boolean => SPECIAL_CARD_VALUES.has(value);
 
-  // Transient face-up cards flying from an opponent's fan to the pile as they
-  // play. x/y are board-% (like the cards); the `.card` transition animates them.
-  protected readonly flyers = signal<
-    {
-      id: number;
-      x: number;
-      y: number;
-      rot: number;
-      scale: number;
-      suit: number;
-      value: number;
-      flip?: 'in' | 'out';
-      glow?: boolean;
-    }[]
-  >([]);
-  private flyerSeq = 0;
   private prevCounts: Record<string, number> | undefined;
-  private syntheticUuid = -1;
-  // Hand cards hidden while a flyer animates them in (the trade swap), so the real card
-  // doesn't pop into its slot until the flyer lands on it.
-  private readonly hiddenCardUuids = signal<Set<number>>(new Set());
-
-  // Deal-in animation: while a deal is in flight, `dealtIndex` maps each freshly
-  // dealt card uuid to its stagger order; `atDeck` is true for the first frame so
-  // the cards render stacked at the deck (board centre) before fanning to their
-  // slots. Reading both in the `cards` computed drives the FLIP.
-  private readonly dealtIndex = signal<Map<number, number>>(new Map());
-  private readonly atDeck = signal(false);
   private prevHandUuids: Set<number> | undefined;
 
   // Pawn move animation: pawnId -> its current animated pixel position + the
@@ -301,73 +271,6 @@ export class Board implements OnInit, OnDestroy {
     new Map(),
   );
   private prevMoveKey: string | undefined;
-
-  // One list of every card (hand + pile), each with a target position. Moving a
-  // card from a hand slot to the pile target makes the same element animate there.
-  protected readonly cards = computed(() => {
-    const pile = this.pile();
-    const hiddenSet = this.hiddenCardUuids();
-    const pileUuids = new Set(pile.map((c) => c.uuid));
-    const handCards = this.hand().filter((c) => !pileUuids.has(c.uuid));
-    const n = handCards.length;
-
-    // Per-uuid target position: hand slot (fanned row below the board) or pile slot.
-    // z follows PLAY ORDER (pile index) so the newest card is on top, regardless of
-    // the DOM order (which is sorted by uuid for stable transitions).
-    const target = new Map<
-      number,
-      { x: number; y: number; rot: number; scale: number; z?: number }
-    >();
-    handCards.forEach((c, i) =>
-      target.set(c.uuid, { x: 50 + (i - (n - 1) / 2) * 18, y: 116, rot: 0, scale: 1 }),
-    );
-    pile.forEach((c, i) => {
-      const angle = ((90 + i * 45) * Math.PI) / 180; // each card +45° around the circle
-      target.set(c.uuid, {
-        x: (315 + 10 * Math.cos(angle)) / 6, // GWT: pile centre 315, radius 10 → board %
-        y: (300 + 10 * Math.sin(angle)) / 6, // centre 300
-        rot: 0,
-        scale: 0.6, // pile cards ~60px vs 100px hand
-        z: 100 + i, // newest played card stacks on top
-      });
-    });
-
-    // Stable DOM order (by uuid) so playing a card never reorders the list — only
-    // its target changes, so the same element transitions cleanly every time.
-    // Deal-in FLIP: a freshly dealt card renders at the deck (board centre) for the
-    // first frame, then transitions to its slot with a per-card stagger delay.
-    const dealt = this.dealtIndex();
-    const atDeck = this.atDeck();
-    return [...handCards, ...pile]
-      .sort((a, b) => a.uuid - b.uuid)
-      .map((c) => {
-        const t = target.get(c.uuid)!;
-        const dealOrder = dealt.get(c.uuid);
-        const dealing = dealOrder !== undefined;
-        const useDeck = dealing && atDeck;
-        // Round-robin deal: delay by ROUND (the card's index in the hand). The
-        // viewer is seat 0, so no per-seat offset. 700ms between rounds (slow).
-        const dealDelay = dealing ? (dealOrder ?? 0) * 700 : 0;
-        return {
-          uuid: c.uuid,
-          suit: c.suit,
-          value: c.value,
-          inPile: pileUuids.has(c.uuid), // played cards are inert (no click / hover)
-          // Only hand cards are highlighted; a played/pile card is not "special" anymore.
-          special: !pileUuids.has(c.uuid) && SPECIAL_CARD_VALUES.has(c.value),
-          x: useDeck ? 52.5 : t.x,
-          y: useDeck ? 50 : t.y,
-          rot: t.rot,
-          scale: useDeck ? 0.3 : t.scale, // deck-sized (≈ the 5% backs) then grows to hand size
-          // While dealing, the sooner a card flies (lower delay) the higher it sits,
-          // so it's taken off the TOP of the deck stack.
-          z: dealing ? 400 - Math.round(dealDelay / 20) : t.z,
-          dealDelay,
-          dealing, // true while this card is dealing in (drives the flip)
-          hidden: hiddenSet.has(c.uuid), // masked while a swap flyer animates it in
-        };
-      });
-  });
 
   // --- Selection: delegated to the ported PawnAndCardSelection state machine ---
   private readonly selection = new PawnAndCardSelection();
@@ -396,7 +299,7 @@ export class Board implements OnInit, OnDestroy {
       // Exclude cards already on the pile so a played card can never be (auto-)selected —
       // the display hand does the same (see `handCards`). Guards against a played card
       // lingering in the server's playerCards for a beat after it flew to the pile.
-      const pileUuids = new Set(this.pile().map((c) => c.uuid));
+      const pileUuids = new Set(this.cardTable.pile().map((c) => c.uuid));
       this.selection.setHand(
         (s?.playerCards ?? [])
           .filter((c) => !pileUuids.has(c.uuid))
@@ -554,18 +457,6 @@ export class Board implements OnInit, OnDestroy {
     return own.length > 0 && own.every((p) => (p.currentTileId?.tileNr ?? -1) >= 16);
   });
 
-  /** Kick off the deal-in FLIP for the given freshly-dealt card uuids. */
-  private animateDeal(uuids: number[]): void {
-    const order = new Map<number, number>();
-    uuids.forEach((u, i) => order.set(u, i));
-    this.dealtIndex.set(order);
-    this.atDeck.set(true); // first frame: stacked at the deck
-    // Release next frame so they transition out to their slots (staggered by delay).
-    requestAnimationFrame(() => requestAnimationFrame(() => this.atDeck.set(false)));
-    // Clear once the last card has finished (last round's delay + the transition).
-    setTimeout(() => this.dealtIndex.set(new Map()), uuids.length * 700 + 2000);
-  }
-
   // --- Pawn move animation (ported from PawnAnimation) ---------------------
 
   /** Walk each of a move's pawns along its path; killed pawns go home after the killer. */
@@ -645,52 +536,6 @@ export class Board implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Spawn a card flying from `from` to the pile centre, then drop the flyer and
-   * leave `landCard` on the pile. Shared by opponents' plays and the viewer's own.
-   */
-  private spawnFlyer(
-    from: { x: number; y: number; rot: number },
-    startScale: number,
-    suit: number,
-    value: number,
-    landCard: CardModel,
-    flip?: 'in' | 'out',
-    pop?: boolean,
-  ): void {
-    const id = ++this.flyerSeq;
-    this.flyers.update((f) => [
-      ...f,
-      { id, x: from.x, y: from.y, rot: from.rot, scale: startScale, suit, value, flip, glow: pop },
-    ]);
-
-    const flyToPile = () =>
-      this.flyers.update((f) =>
-        f.map((fl) =>
-          fl.id === id ? { ...fl, x: 52.5, y: 50, rot: 0, scale: 0.6, glow: false } : fl,
-        ),
-      );
-    const land = () => {
-      this.flyers.update((f) => f.filter((fl) => fl.id !== id));
-      this.pile.update((p) => [...p, landCard]);
-    };
-
-    if (pop) {
-      // Swell the card + glow (a "played!" beat), hold POP_MS, then fly to the pile.
-      requestAnimationFrame(() =>
-        requestAnimationFrame(() =>
-          this.flyers.update((f) => f.map((fl) => (fl.id === id ? { ...fl, scale: 1.2 } : fl))),
-        ),
-      );
-      setTimeout(flyToPile, POP_MS);
-      setTimeout(land, POP_MS + 600);
-    } else {
-      // Next frame, fly straight to the pile centre at pile size.
-      requestAnimationFrame(() => requestAnimationFrame(flyToPile));
-      setTimeout(land, 600);
-    }
-  }
-
   /** Animate an opponent's just-played card from its fan slot to the pile. */
   private flyOpponentCard(playerId: string, fanCount: number, played: string[]): void {
     const segment = this.geometry()?.deckSegment(playerId);
@@ -699,59 +544,11 @@ export class Board implements OnInit, OnDestroy {
     const [suit, value] = last.split('_').map(Number);
     const slot = fanCardBacks(segment, fanCount).at(-1); // the outermost card leaves
     if (!slot) return;
-    // Back-sized start (0.3 of a full card ≈ a 30px back); synthetic pile card. It leaves the fan
-    // face-down (as the opponent held it) and turns over mid-flight to reveal at the pile.
-    this.spawnFlyer(
-      { x: slot.x / 6, y: slot.y / 6, rot: slot.rotDeg },
-      0.3,
-      suit,
-      value,
-      { uuid: this.syntheticUuid--, suit, value } as CardModel,
-      'in',
+    // Back-sized start; leaves the fan face-down and turns over mid-flight to reveal at the pile.
+    this.cardTable.flyToPile(
+      { suit, value, x: slot.x / 6, y: slot.y / 6, rot: slot.rotDeg },
+      { startScale: 0.3, flip: 'in' },
     );
-  }
-
-  /** Animate the viewer's own just-played card from its (snapshotted) hand slot. It pops with a
-   *  white glow before it flies (ported from the GWT own-card play). */
-  private flyOwnCard(card: CardModel, from: { x: number; y: number }): void {
-    this.spawnFlyer(
-      { x: from.x, y: from.y, rot: 0 },
-      1,
-      card.suit ?? 0,
-      card.value ?? 1,
-      card,
-      undefined,
-      true,
-    );
-  }
-
-  /** Fly a transient face-up card from one board-% point to another (used by the trade swap). */
-  private flyTransient(
-    from: { x: number; y: number },
-    to: { x: number; y: number },
-    fromScale: number,
-    toScale: number,
-    suit: number,
-    value: number,
-    flip?: 'in' | 'out',
-    onLand?: () => void,
-  ): void {
-    const id = ++this.flyerSeq;
-    this.flyers.update((f) => [
-      ...f,
-      { id, x: from.x, y: from.y, rot: 0, scale: fromScale, suit, value, flip },
-    ]);
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() =>
-        this.flyers.update((f) =>
-          f.map((fl) => (fl.id === id ? { ...fl, x: to.x, y: to.y, scale: toScale } : fl)),
-        ),
-      ),
-    );
-    setTimeout(() => {
-      this.flyers.update((f) => f.filter((fl) => fl.id !== id));
-      onLand?.();
-    }, 600);
   }
 
   /**
@@ -763,32 +560,19 @@ export class Board implements OnInit, OnDestroy {
     const g = this.geometry();
     if (!g) return;
     const seg = g.deckSegment(otherId);
-    const other = seg
-      ? { x: (seg[0].x + seg[1].x) / 12, y: (seg[0].y + seg[1].y) / 12 } // midpoint (/2) in board-% (/6)
-      : { x: 52.5, y: 50 };
+    const partner = seg
+      ? { x: (seg[0].x + seg[1].x) / 12, y: (seg[0].y + seg[1].y) / 12 } // fan midpoint in board-% (/6)
+      : this.positioner.pileCenter();
     const hand = this.hand();
     const i = hand.findIndex((c) => c.uuid === received.uuid);
-    const n = hand.length;
-    const slot = { x: 50 + (i - (n - 1) / 2) * 18, y: 116 };
+    const slot = this.positioner.handSlot(i, hand.length);
+    const handAnchor = this.positioner.handSlot(0, 1); // fan centre — where the given card starts
 
-    // The card you gave leaves your hand, turns face-down, and shrinks into your teammate's
-    // fan — landing the same size/style as their other card backs.
-    this.flyTransient({ x: 50, y: 116 }, other, 1, 0.3, given.suit ?? 0, given.value ?? 1, 'out');
-
-    // The received King/Ace flies out of the teammate's fan as a back and turns over as it grows
-    // into your hand. Keep the real card hidden while it flies, then reveal it a frame BEFORE the
-    // flyer is removed (they overlap on the same slot) so there's no one-frame gap / flicker.
-    this.hiddenCardUuids.update((s) => new Set(s).add(received.uuid));
-    setTimeout(
-      () =>
-        this.hiddenCardUuids.update((s) => {
-          const next = new Set(s);
-          next.delete(received.uuid);
-          return next;
-        }),
-      560,
+    this.cardTable.tradeSwap(
+      partner,
+      { suit: given.suit, value: given.value, from: handAnchor },
+      { uuid: received.uuid, suit: received.suit, value: received.value, to: slot },
     );
-    this.flyTransient(other, slot, 0.3, 1, received.suit ?? 0, received.value ?? 1, 'in');
   }
 
   /** Forfeit: fly all of an opponent's cards from their fan to the pile, staggered. */
@@ -808,11 +592,7 @@ export class Board implements OnInit, OnDestroy {
       if (!slot) return;
       setTimeout(
         () =>
-          this.spawnFlyer({ x: slot.x / 6, y: slot.y / 6, rot: slot.rotDeg }, 0.3, suit, value, {
-            uuid: this.syntheticUuid--,
-            suit,
-            value,
-          } as CardModel),
+          this.cardTable.flyToPile({ suit, value, x: slot.x / 6, y: slot.y / 6, rot: slot.rotDeg }),
         i * 120, // small stagger between cards
       );
     });
@@ -1022,14 +802,15 @@ export class Board implements OnInit, OnDestroy {
     // Snapshot the played card's current hand slot BEFORE sending: the server push
     // will have removed it from the hand by the time the move is confirmed, so on
     // success we fly a clone from here (ported from the GWT captureCardStartPos).
-    const start = card ? this.cards().find((c) => c.uuid === card.uuid) : undefined;
+    const start = card ? this.cardTable.cards().find((c) => c.uuid === card.uuid) : undefined;
     this.touch();
     this.movesService.makeMove(this.sessionId, this.viewerId, move).subscribe({
       next: (response) => {
         if (response.result === 'CAN_MAKE_MOVE') {
           this.selection.reset(); // accepted → clear the selection
-          if (card && start) this.flyOwnCard(card, { x: start.x, y: start.y });
-          else if (card) this.pile.update((p) => [...p, card]);
+          // Fly the captured card (its id + face + hand slot) to the pile, popping as it goes.
+          if (start) this.cardTable.flyToPile(start, { pop: true });
+          else if (card) this.cardTable.pile.update((p) => [...p, card]);
           this.touch();
         } else {
           // Rejected by the rules (still a 200): explain why, and keep the
@@ -1055,7 +836,7 @@ export class Board implements OnInit, OnDestroy {
     this.sound.play('buttonClick');
     // Snapshot my hand-card positions BEFORE the server push clears them, then fly
     // each to the pile, staggered (same as an opponent's forfeit).
-    const myCards = this.cards().filter((c) => !c.inPile);
+    const myCards = this.cardTable.cards().filter((c) => !c.inPile);
     this.cardsService.playerForfeits(this.sessionId, this.viewerId).subscribe({
       error: () => {
         /* fire-and-forget: errors are non-critical here */
@@ -1064,16 +845,6 @@ export class Board implements OnInit, OnDestroy {
     this.selection.reset();
     this.previewTiles.set(new Set());
     this.touch();
-    myCards.forEach((c, i) =>
-      setTimeout(
-        () =>
-          this.spawnFlyer({ x: c.x, y: c.y, rot: 0 }, 1, c.suit, c.value, {
-            uuid: this.syntheticUuid--,
-            suit: c.suit,
-            value: c.value,
-          } as CardModel),
-        i * 120,
-      ),
-    );
+    myCards.forEach((c, i) => setTimeout(() => this.cardTable.flyToPile(c), i * 120));
   }
 }

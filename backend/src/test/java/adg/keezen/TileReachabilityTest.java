@@ -8,6 +8,7 @@ import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PawnId;
 import com.adg.openapi.model.PositionKey;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ class TileReachabilityTest {
   @BeforeEach
   void setUp() {
     board.clear();
-    rules = new TileReachability(board::get);
+    rules = new TileReachability(board::get, pid -> pid);
   }
 
   private static Pawn pawn(String playerId, int pawnNr) {
@@ -209,5 +210,37 @@ class TileReachabilityTest {
   @Test
   void movesBackwardForNegativeSteps() {
     assertEquals(7, rules.checkHighestTileNrYouCanMoveTo(SELF, new PositionKey("0", 10), -3));
+  }
+
+  // ── finish-lane bounce (pingpongMove / moveAndCheckEveryTile) ────────────────
+  private static PositionKey tile(int nr) {
+    return new PositionKey("0", nr);
+  }
+
+  @Test
+  void moveAndCheckEveryTile_overshootingTheFinishEndBouncesBack() {
+    // From tile 18, +3 would reach 21; it bounces off the finish end (past 19): 18→19→(bounce)→17.
+    assertEquals(tile(17), rules.moveAndCheckEveryTile(SELF, tile(18), 3));
+  }
+
+  @Test
+  void moveAndCheckEveryTile_onlyBouncesInsideTheFinish_notOnBoardTiles() {
+    // A blocked BOARD tile (15) must not cause a bounce — only finish tiles (16-19) do. So a pawn
+    // on 13 moving +3 passes straight through the occupied 15 and lands on 16.
+    place(pawn("0", 2), tile(15));
+    assertEquals(tile(16), rules.moveAndCheckEveryTile(SELF, tile(13), 3));
+  }
+
+  @Test
+  void pingpongMove_zeroSteps_returnsJustTheCurrentTileWithoutDuplicate() {
+    List<PositionKey> path = rules.pingpongMove(SELF, tile(17), 0);
+    assertEquals(List.of(tile(17)), path);
+  }
+
+  @Test
+  void pingpongMove_overshootingTheFinishEndBounces() {
+    // From 18, +3 climbs to 19, bounces off the end, and comes back to 17.
+    List<PositionKey> path = rules.pingpongMove(SELF, tile(18), 3);
+    assertEquals(List.of(18, 19, 17), path.stream().map(PositionKey::getTileNr).toList());
   }
 }

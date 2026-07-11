@@ -3,6 +3,7 @@ package adg.keezen;
 import adg.Log;
 import com.adg.openapi.model.Pawn;
 import com.adg.openapi.model.PositionKey;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -15,9 +16,12 @@ import java.util.function.Function;
 class TileReachability {
 
   private final Function<PositionKey, Pawn> pawnAt;
+  private final Function<String, String> previousPlayerId;
 
-  TileReachability(Function<PositionKey, Pawn> pawnAt) {
+  TileReachability(
+      Function<PositionKey, Pawn> pawnAt, Function<String, String> previousPlayerId) {
     this.pawnAt = pawnAt;
+    this.previousPlayerId = previousPlayerId;
   }
 
   /**
@@ -131,5 +135,62 @@ class TileReachability {
       }
     }
     return tileNrToCheck;
+  }
+
+  /** The bouncing ("ping-pong") path when a pawn overshoots a wall inside the finish lane. */
+  ArrayList<PositionKey> pingpongMove(Pawn pawn, PositionKey tileId, int nrSteps) {
+    // it is already guaranteed that a pawn is loosely closed in on the finish tiles
+    ArrayList<PositionKey> moves = new ArrayList<>();
+    int direction = 1;
+    int tileNrToCheck = tileId.getTileNr();
+    moves.add(tileId);
+    if (nrSteps < 0) {
+      direction = -1;
+      nrSteps = Math.abs(nrSteps);
+    }
+
+    for (int i = 0; i < nrSteps; i++) {
+      tileNrToCheck = tileNrToCheck + direction;
+      if (!canMoveToTile(pawn, new PositionKey(pawn.getPlayerId(), tileNrToCheck))) {
+        moves.add(new PositionKey(pawn.getPlayerId(), tileNrToCheck - direction));
+        direction = -direction;
+        tileNrToCheck = tileNrToCheck + 2 * direction;
+      }
+    }
+    moves.add(new PositionKey(pawn.getPlayerId(), tileNrToCheck));
+
+    // an extra check to see if the first two moves are identical. this can happen when you do -4
+    // steps and are closed in from behind or try to move forward but are blocked that way.
+    if (moves.size() >= 2 && moves.get(0).equals(moves.get(1))) {
+      moves.removeFirst();
+    }
+    return moves;
+  }
+
+  /** The final tile a pawn lands on, bouncing off walls only once it's inside the finish lane. */
+  PositionKey moveAndCheckEveryTile(Pawn pawn, PositionKey tileId, int nrSteps) {
+    int direction = 1;
+    int tileNrToCheck = tileId.getTileNr();
+
+    if (nrSteps < 0) {
+      direction = -1;
+      nrSteps = -nrSteps;
+    }
+
+    for (int i = 0; i < nrSteps; i++) {
+      tileNrToCheck = tileNrToCheck + direction;
+      if (tileNrToCheck > 15) { // only check tiles when they are on the finish
+        if (!canMoveToTile(pawn, new PositionKey(pawn.getPlayerId(), tileNrToCheck))) {
+          direction = -direction;
+          tileNrToCheck = tileNrToCheck + 2 * direction;
+        }
+      }
+    }
+
+    if (tileNrToCheck <= 15) { // when back on the last section, change the playerId of the section
+      return new PositionKey(previousPlayerId.apply(pawn.getPlayerId()), tileNrToCheck);
+    }
+
+    return new PositionKey(pawn.getPlayerId(), tileNrToCheck);
   }
 }
