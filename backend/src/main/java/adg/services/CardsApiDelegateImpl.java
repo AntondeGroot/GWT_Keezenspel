@@ -83,10 +83,7 @@ public class CardsApiDelegateImpl implements CardsApiDelegate {
     }
 
     // 4️⃣ Collect played cards as card IDs ("suit_value") for client-side resource lookup
-    List<String> playedCardIds =
-        cardsDeck.getPlayedCards().stream()
-            .map(card -> card.getSuit() + "_" + card.getValue())
-            .toList();
+    List<String> playedCardIds = PublicCards.playedIds(cardsDeck);
 
     // 5️⃣ Collect number of cards per player
     var nrOfCardsPerPlayer = cardsDeck.getNrOfCardsPerPlayer(); // Map<String, Integer>
