@@ -182,22 +182,28 @@
 // Sized as a fraction of the board so it scales; carries NO card value.
 // Button container — ported from the GWT .buttonContainer/.sendButton/.forfeitButton.
 // A dark gold-bordered panel beside the board with the play (send) + forfeit buttons.
-// Actions + roster. Mobile: a centered row directly below the hint. Desktop: a
-// column pinned in the right gutter (which has plenty of room), roster enlarged.
+// Actions + roster. Mobile: two anchored halves on one row — the buttons keep their
+// width on the left, the roster fills the rest and runs out toward the right edge (so
+// player names get as much room as the screen allows). Desktop: a column pinned in the
+// right gutter (which has plenty of room), roster enlarged.
 .controls {
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 14px;
+  display: grid;
+  // buttons take their content width; the roster (minmax(0,…) so it may shrink, not
+  // overflow) fills from there out to the right padding below.
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  column-gap: 12px;
   width: 100%;
   box-sizing: border-box; // keep the padded row within the viewport
   margin-top: 8px;
-  padding: 0 6px 8px;
+  // Symmetric 20px insets: the buttons clear the left edge and the roster stops ~20px
+  // from the right edge, so neither is pressed against the screen.
+  padding: 0 20px 8px;
 }
 
 @media (min-width: 700px) {
   .controls {
+    display: flex;
     position: fixed;
     top: 50%;
     right: clamp(16px, 4vw, 72px);
