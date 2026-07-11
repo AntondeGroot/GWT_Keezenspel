@@ -93,6 +93,27 @@ class GameStateLifecycleTest {
   }
 
   @Test
+  void advancingTheTurn_marksTheNewCurrentPlayerAsTheSolePlayerToMove() {
+    // setUp started a 4-player game; player on turn forfeits, handing the turn to the next player.
+    String first = gameState.getPlayerIdTurn();
+    gameState.processOnForfeit(first);
+
+    String next = gameState.getPlayerIdTurn();
+    assertNotEquals(first, next, "the turn moved on");
+    assertTrue(isPlaying(next), "the new current player is marked as playing");
+    assertFalse(isPlaying(first), "the player who just forfeited is no longer playing");
+  }
+
+  private boolean isPlaying(String playerId) {
+    Boolean playing = gameState.getPlayers().stream()
+        .filter(p -> p.getId().equals(playerId))
+        .findFirst()
+        .orElseThrow()
+        .getIsPlaying();
+    return playing != null && playing;
+  }
+
+  @Test
   void resetReturnsPawnsToTheirNestAndBumpsTheVersion() {
     gameState.start();
     Pawn onBoard = gameState.getPawns().getFirst();

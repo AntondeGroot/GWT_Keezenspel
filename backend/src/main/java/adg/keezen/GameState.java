@@ -36,6 +36,7 @@ public class GameState {
   private final ArrayList<String> winners = new ArrayList<>();
   private final HashSet<String> leavers = new HashSet<>();
   private static final int MAX_PLAYERS = 8;
+  private static final int PAWNS_PER_PLAYER = 4;
   private final CardsDeckInterface cardsDeck;
   private volatile int animationSpeed;
   private volatile boolean exactMoveRequired = false;
@@ -82,6 +83,7 @@ public class GameState {
     assignPlayerInts();
     assignTeams();
     activateAllPlayers();
+    turnOrder.resetActivePlayers();
     initializePawns();
     initializeCards();
     turnOrder.resetToFirstPlayer();
@@ -117,11 +119,13 @@ public class GameState {
   // ── Start helpers ─────────────────────────────────────────────────────────
 
   private void assignPlayerInts() {
-    // playerInts determine the order in which the players play and
-    // which colors they have, this should be assinged after shuffling.
-    int i = 0;
+    // playerInts determine the order in which the players play and which colors they have; the
+    // playerColors map holds the same seat index (the roster reads it for turn order). After shuffle.
+    int seat = 0;
     for (Player player : players) {
-      player.setPlayerInt(i++);
+      player.setPlayerInt(seat);
+      playerColors.put(player.getId(), seat);
+      seat++;
     }
   }
 
@@ -166,15 +170,11 @@ public class GameState {
 
   private void initializePawns() {
     pawns = new ArrayList<>();
-    int playerInt = 0;
     for (Player player : players) {
-      turnOrder.addActive(player.getId());
-      playerColors.put(player.getId(), playerInt);
-      for (int pawnNr = 0; pawnNr < 4; pawnNr++) {
+      for (int pawnNr = 0; pawnNr < PAWNS_PER_PLAYER; pawnNr++) {
         PositionKey nestPosition = new PositionKey(player.getId(), -1 - pawnNr);
         pawns.add(new Pawn(player.getId(), new PawnId(player.getId(), pawnNr), nestPosition, nestPosition));
       }
-      playerInt++;
     }
   }
 
