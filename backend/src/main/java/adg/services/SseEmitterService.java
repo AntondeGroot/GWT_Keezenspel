@@ -15,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -141,10 +140,7 @@ public class SseEmitterService {
     push.setLastMoveResponse(omitLastMove ? null : session.getLastMoveResponse());
 
     // Public card data
-    List<String> playedCardIds = session.getCardsDeck().getPlayedCards().stream()
-        .map(c -> c.getSuit() + "_" + c.getValue())
-        .collect(Collectors.toList());
-    push.setPlayedCards(playedCardIds);
+    push.setPlayedCards(PublicCards.playedIds(session.getCardsDeck()));
     push.setNrOfCardsPerPlayer(session.getCardsDeck().getNrOfCardsPerPlayer());
 
     // Private card data for this player only
