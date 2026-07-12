@@ -68,8 +68,8 @@
         <button class="forfeit-button" [disabled]="!canForfeit()" (click)="forfeit()">
           {{ i18n.t('forfeit') }}
         </button>
-        @if (canAskTrade()) {
-          <button class="ask-trade-button" (click)="askForTrade()">
+        @if (teamTrade.canAsk()) {
+          <button class="ask-trade-button" (click)="teamTrade.ask()">
             {{ i18n.t('tradeAskButton') }}
           </button>
         }
@@ -127,12 +127,12 @@
 
   <app-trade-panel
     [hand]="hand()"
-    [trade]="trade()"
+    [trade]="teamTrade.pending()"
     [viewerId]="viewerId ?? ''"
     [sessionId]="sessionId ?? ''"
-    [offering]="offering()"
-    [otherName]="tradeOtherName()"
-    (closed)="offering.set(false)"
-    (cancelledByMe)="onTradeCancelled()"
+    [offering]="teamTrade.offering()"
+    [otherName]="teamTrade.otherName()"
+    (closed)="teamTrade.stopOffering()"
+    (cancelledByMe)="teamTrade.cancelledByMe()"
   />
 }
