@@ -29,24 +29,12 @@ import { PawnAnimator } from './pawn-animator';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
 import { teammateCaptureKeys } from './teammate-capture';
 import { pawnKey } from './pawn-key';
+import { hintKeyFor, isSpecialCard } from './special-cards';
 import { Translations } from '../../i18n/translations.service';
-import { TranslationKey } from '../../i18n/keys';
 import { GameStore } from '../../game-store';
 import { MoveRejection } from './move-rejected/move-rejection.service';
 import { TeamHandoff } from './team-handoff/team-handoff.service';
 import { localRejectionKey, rejectionMessageKey } from './rejection-message';
-
-// Cards that do something special (Ace, Four, Seven, Jack, Queen, King): they get
-// a gold highlight in the hand and a hint/suggestion when hovered or selected.
-const SPECIAL_CARD_VALUES = new Set([1, 4, 7, 11, 12, 13]);
-const HINT_KEYS: Record<number, TranslationKey> = {
-  1: 'hintAce',
-  4: 'hintFour',
-  7: 'hintSeven',
-  11: 'hintJack',
-  12: 'hintQueen',
-  13: 'hintKing',
-};
 
 @Component({
   selector: 'app-board',
@@ -181,7 +169,7 @@ export class Board implements OnInit, OnDestroy {
     this.positioner,
   );
   // Which card values get the gold "special" highlight (Ace/Four/Seven/Jack/Queen/King).
-  protected readonly isSpecial = (value: number): boolean => SPECIAL_CARD_VALUES.has(value);
+  protected readonly isSpecial = isSpecialCard;
 
   private prevCounts: Record<string, number> | undefined;
   private prevHandUuids: Set<number> | undefined;
@@ -411,7 +399,7 @@ export class Board implements OnInit, OnDestroy {
   protected readonly hint = computed(() => {
     this.rev();
     const value = this.hoveredCardValue() ?? this.selection.getCard()?.value ?? null;
-    const key = value == null ? undefined : HINT_KEYS[value];
+    const key = hintKeyFor(value);
     return key ? this.i18n.t(key) : '';
   });
 
