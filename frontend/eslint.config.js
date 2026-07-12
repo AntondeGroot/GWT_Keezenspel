@@ -105,16 +105,14 @@ module.exports = defineConfig([
     },
   },
   {
-    // RATCHET: board.ts is an oversized god component. Pinned at its current counted
-    // size (frozen ceiling — can shrink, never grow). TODO: extract logic and lower
-    // these toward the global caps (400 / 80), then delete this override.
+    // RATCHET: board.ts is still over the 400-line file cap (447 counted) after a long series of
+    // extractions. Pinned at its current size (frozen ceiling — can shrink, never grow). Everything
+    // else now meets the global caps: per-function size (80), cognitive complexity (15), and nested
+    // functions all pass, so those pins are gone. TODO: extract ~47 more lines to reach 400, then
+    // delete this override entirely.
     files: ['src/app/features/board/board.ts'],
     rules: {
-      'max-lines': ['error', { max: 840, skipBlankLines: true, skipComments: true }],
-      'max-lines-per-function': ['error', { max: 88, skipBlankLines: true, skipComments: true }],
-      // Same ratchet: these resolve when the component is broken up (TODO above).
-      'sonarjs/cognitive-complexity': 'off',
-      'sonarjs/no-nested-functions': 'off',
+      'max-lines': ['error', { max: 447, skipBlankLines: true, skipComments: true }],
     },
   },
   {

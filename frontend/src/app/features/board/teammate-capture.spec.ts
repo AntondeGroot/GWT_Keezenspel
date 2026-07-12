@@ -1,4 +1,5 @@
-import { teammateCaptureKeys } from './teammate-capture';
+import { Pawn as ApiPawn, Player } from '../../api';
+import { teammateCaptureKeys, teammateCaptureTiles } from './teammate-capture';
 
 // 4-player team game: seats 0 & 2 = team 0, seats 1 & 3 = team 1.
 const TEAMS: Record<string, number> = { '0': 0, '2': 0, '1': 1, '3': 1 };
@@ -47,5 +48,29 @@ describe('teammateCaptureKeys', () => {
       'track:11',
       'track:5',
     ]);
+  });
+});
+
+describe('teammateCaptureTiles (board projection)', () => {
+  const players: Player[] = [
+    { id: '0', name: 'A', teamId: 0 },
+    { id: '1', name: 'B', teamId: 1 },
+    { id: '2', name: 'C', teamId: 0 },
+  ];
+  const pawnAt = (ownerId: string, tilePlayerId: string, tileNr: number): ApiPawn => ({
+    playerId: ownerId,
+    pawnId: { playerId: ownerId, pawnNr: 0 },
+    currentTileId: { playerId: tilePlayerId, tileNr },
+    nestTileId: { playerId: ownerId, tileNr: -1 },
+  });
+
+  it('flags previewed tiles landing on a teammate, not opponents', () => {
+    const preview = new Set(['track:5', 'track:8']);
+    const pawns = [pawnAt('2', 'track', 5), pawnAt('1', 'track', 8)];
+    expect([...teammateCaptureTiles(preview, pawns, players, '0')]).toEqual(['track:5']);
+  });
+
+  it('is empty without a viewer', () => {
+    expect(teammateCaptureTiles(new Set(['track:5']), [], players, null).size).toBe(0);
   });
 });

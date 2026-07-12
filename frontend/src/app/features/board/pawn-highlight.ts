@@ -1,3 +1,6 @@
+import { Player } from '../../api';
+import { seatColor } from '../../player-colors';
+
 /**
  * Selection-highlight colours for a pawn — a faithful port of the GWT
  * PawnHighlightColors. Pawn 1 prefers red, pawn 2 prefers green; either falls
@@ -40,4 +43,19 @@ export function highlightForPawn1(pawnColor: string | undefined): string {
 
 export function highlightForPawn2(pawnColor: string | undefined): string {
   return clashes(pawnColor, GREEN) ? BLUE : GREEN;
+}
+
+/**
+ * The step-box (label + border) colour for the selected pawn `pawnId` ("playerId:pawnNr"), matching
+ * that pawn's board highlight — which itself depends on the pawn's own seat colour. `which` picks
+ * pawn 1's (red-ish) or pawn 2's (green-ish) highlight. Undefined when no pawn is selected.
+ */
+export function stepBoxColor(
+  pawnId: string | null | undefined,
+  players: Player[],
+  which: 1 | 2,
+): string | undefined {
+  if (!pawnId) return undefined;
+  const pawnColor = seatColor(players.find((p) => p.id === pawnId.split(':')[0])?.playerInt);
+  return which === 1 ? highlightForPawn1(pawnColor) : highlightForPawn2(pawnColor);
 }
