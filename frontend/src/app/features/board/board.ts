@@ -23,6 +23,7 @@ import { CardBackVM } from '../../card-table/card-table.types';
 import { PlayerList } from '../player-list/player-list';
 import { TradePanel } from './trade-panel/trade-panel';
 import { highlightForPawn1, highlightForPawn2 } from './pawn-highlight';
+import { GameStateStream } from './game-state-stream';
 import { PawnAnimator } from './pawn-animator';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
 import { teammateCaptureKeys } from './teammate-capture';
@@ -53,44 +54,25 @@ const HINT_KEYS: Record<number, TranslationKey> = {
   styleUrl: './board.scss',
 })
 export class Board implements OnInit, OnDestroy {
-  private reconnectTimer?: ReturnType<typeof setTimeout>;
-  private destroyed = false;
+  private stream?: GameStateStream;
 
   ngOnInit(): void {
-    if (this.sessionId) this.connectStream();
+    if (!this.sessionId) return;
+    this.stream = new GameStateStream(
+      this.streamUrl,
+      (push) => this.handleGameState(push),
+      // Each (re)connect gets a fresh baseline snapshot — clear the animation baselines so it
+      // isn't mistaken for a new move/deal.
+      () => {
+        this.prevMoveKey = undefined;
+        this.prevHandUuids = undefined;
+      },
+    );
+    this.stream.start();
   }
 
   ngOnDestroy(): void {
-    this.destroyed = true;
-    clearTimeout(this.reconnectTimer);
-    this.eventSource?.close();
-  }
-
-  /**
-   * Open the game-state SSE stream. The server sends a fresh personalized snapshot on every
-   * (re)subscribe, so if the browser gives up on the stream (readyState CLOSED) we re-establish
-   * it after a short backoff — otherwise a dropped stream leaves a STALE board that then rejects
-   * your moves as "not your turn" (ported from the GWT presenter's onError resync).
-   */
-  private connectStream(): void {
-    if (!this.sessionId || this.destroyed) return;
-    this.eventSource?.close();
-    // The reconnect snapshot is a fresh baseline, not a new move/deal — don't animate it.
-    this.prevMoveKey = undefined;
-    this.prevHandUuids = undefined;
-
-    const es = new EventSource(this.streamUrl);
-    this.eventSource = es;
-    es.addEventListener('gamestate', (event: MessageEvent) =>
-      this.handleGameState(JSON.parse(event.data) as GameStatePush),
-    );
-    es.onerror = () => {
-      // CONNECTING → the browser is auto-retrying, leave it. CLOSED → it gave up, so re-open.
-      if (es.readyState === EventSource.CLOSED) {
-        clearTimeout(this.reconnectTimer);
-        this.reconnectTimer = setTimeout(() => this.connectStream(), 2000);
-      }
-    };
+    this.stream?.stop();
   }
 
   private handleGameState(next: GameStatePush): void {
@@ -251,7 +233,6 @@ export class Board implements OnInit, OnDestroy {
     });
     return backs;
   });
-  private eventSource?: EventSource;
 
   protected readonly hand = computed(() => this.state()?.playerCards ?? []);
 
