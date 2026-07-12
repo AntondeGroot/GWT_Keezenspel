@@ -1,3 +1,5 @@
+import { Pawn as ApiPawn, Player } from '../../api';
+
 /**
  * Team play, step 3: which previewed landing tiles would capture a *teammate's* pawn.
  *
@@ -24,4 +26,24 @@ export function teammateCaptureKeys(
     }
   }
   return out;
+}
+
+/**
+ * The board's teammate-capture projection: from the previewed tiles + the current pawns/players,
+ * the tiles the viewer's move would land on a teammate. Empty without a viewer. The mover is the
+ * viewer (you only ever preview your own move).
+ */
+export function teammateCaptureTiles(
+  previewTiles: Set<string>,
+  pawns: ApiPawn[],
+  players: Player[],
+  viewerId: string | null | undefined,
+): Set<string> {
+  if (!viewerId) return new Set<string>();
+  const teamOf = (playerId: string) => players.find((p) => p.id === playerId)?.teamId ?? null;
+  const occupants = pawns.map((p) => ({
+    key: `${p.currentTileId.playerId}:${p.currentTileId.tileNr}`,
+    ownerId: p.playerId,
+  }));
+  return teammateCaptureKeys(previewTiles, occupants, teamOf, viewerId);
 }

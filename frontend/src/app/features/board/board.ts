@@ -12,7 +12,6 @@ import {
 import { buildBoard, Pt, BoardGeometry } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { basePath } from '../../base-path';
-import { seatColor } from '../../player-colors';
 import { SoundService } from '../../sound.service';
 import { Pawn } from './pawn/pawn';
 import { CardLayer } from '../../card-table/card-layer';
@@ -20,14 +19,14 @@ import { CardTable } from '../../card-table/card-table';
 import { DefaultCardPositioner } from '../../card-table/default-positioner';
 import { PlayerList } from '../player-list/player-list';
 import { TradePanel } from './trade-panel/trade-panel';
-import { highlightForPawn1, highlightForPawn2 } from './pawn-highlight';
+import { highlightForPawn1, highlightForPawn2, stepBoxColor } from './pawn-highlight';
 import { BoardCardFly } from './board-card-fly';
 import { projectCardBacks, projectPawns, projectTiles } from './board-view';
 import { TeamTradeController } from './team-trade-controller';
 import { GameStateStream } from './game-state-stream';
 import { PawnAnimator } from './pawn-animator';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
-import { teammateCaptureKeys } from './teammate-capture';
+import { teammateCaptureTiles } from './teammate-capture';
 import { pawnKey } from './pawn-key';
 import { hintKeyFor, isSpecialCard } from './special-cards';
 import { Translations } from '../../i18n/translations.service';
@@ -415,19 +414,16 @@ export class Board implements OnInit, OnDestroy {
     return this.previewTiles().has(`${playerId}:${tileNr}`);
   }
 
-  // Of those, the ones that would land on a teammate's pawn (team play only) — the board
-  // warns on these in red instead of the usual gold. The mover is the viewer (you only ever
-  // preview your own move); step 4 (playing a teammate's pawns) will generalise the mover.
-  protected readonly teammateCaptureTiles = computed(() => {
-    const s = this.state();
-    if (!s?.pawns || !s.players || !this.viewerId) return new Set<string>();
-    const teamOf = (playerId: string) => s.players!.find((p) => p.id === playerId)?.teamId ?? null;
-    const occupants = s.pawns.map((p) => ({
-      key: `${p.currentTileId.playerId}:${p.currentTileId.tileNr}`,
-      ownerId: p.playerId,
-    }));
-    return teammateCaptureKeys(this.previewTiles(), occupants, teamOf, this.viewerId);
-  });
+  // Of those, the ones that would land on a teammate's pawn (team play only) — the board warns on
+  // these in red instead of the usual gold.
+  protected readonly teammateCaptureTiles = computed(() =>
+    teammateCaptureTiles(
+      this.previewTiles(),
+      this.state()?.pawns ?? [],
+      this.state()?.players ?? [],
+      this.viewerId,
+    ),
+  );
   protected isTeammateCapture(playerId: string, tileNr: number): boolean {
     return this.teammateCaptureTiles().has(`${playerId}:${tileNr}`);
   }
@@ -509,20 +505,14 @@ export class Board implements OnInit, OnDestroy {
     this.onStepsPawn2(String(this.stepsPawn2() + delta));
   }
 
-  private playerColor(playerId: string): string {
-    return seatColor(this.state()?.players?.find((p) => p.id === playerId)?.playerInt);
-  }
-
   // Step-box label + input-border colours match each pawn's board highlight colour
   // (which depends on the pawn's own colour), like the GWT updateStepBoxColors.
-  protected readonly pawn1Highlight = computed(() => {
-    const id = this.pawn1Id();
-    return id ? highlightForPawn1(this.playerColor(id.split(':')[0])) : undefined;
-  });
-  protected readonly pawn2Highlight = computed(() => {
-    const id = this.pawn2Id();
-    return id ? highlightForPawn2(this.playerColor(id.split(':')[0])) : undefined;
-  });
+  protected readonly pawn1Highlight = computed(() =>
+    stepBoxColor(this.pawn1Id(), this.state()?.players ?? [], 1),
+  );
+  protected readonly pawn2Highlight = computed(() =>
+    stepBoxColor(this.pawn2Id(), this.state()?.players ?? [], 2),
+  );
 
   protected readonly highlightForPawn1 = highlightForPawn1;
   protected readonly highlightForPawn2 = highlightForPawn2;

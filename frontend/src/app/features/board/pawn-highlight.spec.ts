@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { Player } from '../../api';
+import { seatColor } from '../../player-colors';
 import {
   BLUE,
   GREEN,
@@ -7,6 +9,7 @@ import {
   computeHue,
   highlightForPawn1 as forPawn1,
   highlightForPawn2 as forPawn2,
+  stepBoxColor,
 } from './pawn-highlight';
 
 // Port of the GWT client's PawnHighlightColorsTest (JUnit -> Vitest).
@@ -130,5 +133,23 @@ describe('PawnHighlightColors - forPawn2', () => {
   it('forPawn2_darkBluePlayerColor_returnsGreen', () => {
     // #0000A5 (player 1, dark blue) ~ hue 240, no clash with GREEN -> GREEN
     expect(forPawn2('#0000A5')).toBe(GREEN);
+  });
+});
+
+describe('stepBoxColor', () => {
+  const players: Player[] = [{ id: '0', name: 'P0', playerInt: 0 }];
+
+  it('is undefined when no pawn is selected', () => {
+    expect(stepBoxColor(undefined, players, 1)).toBeUndefined();
+  });
+
+  it('matches the pawn’s pawn-1 / pawn-2 highlight for its seat colour', () => {
+    const seat = seatColor(0); // the pawn's own colour
+    expect(stepBoxColor('0:2', players, 1)).toBe(forPawn1(seat));
+    expect(stepBoxColor('0:2', players, 2)).toBe(forPawn2(seat));
+  });
+
+  it('falls back to the no-colour highlight for an unknown player', () => {
+    expect(stepBoxColor('x:1', players, 1)).toBe(forPawn1(seatColor(undefined)));
   });
 });
