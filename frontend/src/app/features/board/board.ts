@@ -10,7 +10,7 @@ import {
   PositionKey,
   Trade,
 } from '../../api';
-import { buildBoard, fanCardBacks, Pt, BoardGeometry } from './board-geometry';
+import { buildBoard, Pt, BoardGeometry } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { basePath } from '../../base-path';
 import { seatColor } from '../../player-colors';
@@ -22,6 +22,7 @@ import { DefaultCardPositioner } from '../../card-table/default-positioner';
 import { PlayerList } from '../player-list/player-list';
 import { TradePanel } from './trade-panel/trade-panel';
 import { highlightForPawn1, highlightForPawn2 } from './pawn-highlight';
+import { BoardCardFly } from './board-card-fly';
 import { projectCardBacks, projectPawns, projectTiles } from './board-view';
 import { GameStateStream } from './game-state-stream';
 import { PawnAnimator } from './pawn-animator';
@@ -172,6 +173,13 @@ export class Board implements OnInit, OnDestroy {
   // board drives it (dealIn / flyToPile / clearPile) from its GameStatePush diffing below.
   private readonly positioner = new DefaultCardPositioner();
   protected readonly cardTable = new CardTable(() => this.hand(), this.positioner);
+  // Bridges Keezen board geometry to the card-table for opponents' plays/forfeits and team trades.
+  private readonly cardFly = new BoardCardFly(
+    () => this.geometry(),
+    () => this.hand(),
+    this.cardTable,
+    this.positioner,
+  );
   // Which card values get the gold "special" highlight (Ace/Four/Seven/Jack/Queen/King).
   protected readonly isSpecial = (value: number): boolean => SPECIAL_CARD_VALUES.has(value);
 
@@ -193,114 +201,131 @@ export class Board implements OnInit, OnDestroy {
   }
 
   constructor() {
-    // Feed the selection the current player, pawns (with live positions) and hand
-    // from every server push, so it can validate moves and auto-select cards.
-    effect(() => {
-      const s = this.state();
-      if (this.viewerId) this.selection.setPlayerId(this.viewerId);
-      // In team play you may also move your teammate's pawns once all your own are home.
-      this.selection.setControllablePlayerIds(this.controllablePlayerIds());
-      this.selection.updatePawns(
-        (s?.pawns ?? []).map((p) => ({
-          id: pawnKey(p.pawnId),
-          playerId: p.pawnId.playerId,
-          tileNr: p.currentTileId.tileNr,
-        })),
-      );
-      // Exclude cards already on the pile so a played card can never be (auto-)selected —
-      // the display hand does the same (see `handCards`). Guards against a played card
-      // lingering in the server's playerCards for a beat after it flew to the pile.
-      const pileUuids = new Set(this.cardTable.pile().map((c) => c.uuid));
-      this.selection.setHand(
-        (s?.playerCards ?? [])
-          .filter((c) => !pileUuids.has(c.uuid))
-          .map((c) => ({ id: c.uuid, value: c.value })),
-      );
-      this.touch();
-    });
+    // Reactions to each server push. Each effect dynamically tracks whatever signals its
+    // method reads, so the split is purely for readability.
+    effect(() => this.syncSelection());
+    effect(() => this.flyOpponentPlays());
+    effect(() => this.announceTeamHandoff());
+    effect(() => this.reactToTradeOutcome());
+    effect(() => this.playTransitionSounds());
+  }
 
-    // Detect when another player plays a single card (count −1) and fly it from
-    // their fan to the pile. A forfeit drops the count by more than one, so it is
-    // deliberately not animated.
-    effect(() => {
-      const counts = this.state()?.nrOfCardsPerPlayer;
-      const played = this.state()?.playedCards ?? [];
-      const prev = this.prevCounts;
-      if (counts && prev) {
-        for (const [pid, n] of Object.entries(counts)) {
-          if (pid === this.viewerId) continue;
-          if (!(pid in prev)) continue;
-          const before = prev[pid];
-          const dropped = before - n;
-          if (dropped === 1)
-            this.flyOpponentCard(pid, before, played); // played one card
-          else if (dropped > 1) this.flyOpponentForfeit(pid, before, dropped, played); // forfeit
+  /**
+   * Feed the selection state machine the current player, pawns (with live positions) and hand
+   * from every server push, so it can validate moves and auto-select cards.
+   */
+  private syncSelection(): void {
+    const s = this.state();
+    if (this.viewerId) this.selection.setPlayerId(this.viewerId);
+    // In team play you may also move your teammate's pawns once all your own are home.
+    this.selection.setControllablePlayerIds(this.controllablePlayerIds());
+    this.selection.updatePawns(
+      (s?.pawns ?? []).map((p) => ({
+        id: pawnKey(p.pawnId),
+        playerId: p.pawnId.playerId,
+        tileNr: p.currentTileId.tileNr,
+      })),
+    );
+    // Exclude cards already on the pile so a played card can never be (auto-)selected —
+    // the display hand does the same (see `handCards`). Guards against a played card
+    // lingering in the server's playerCards for a beat after it flew to the pile.
+    const pileUuids = new Set(this.cardTable.pile().map((c) => c.uuid));
+    this.selection.setHand(
+      (s?.playerCards ?? [])
+        .filter((c) => !pileUuids.has(c.uuid))
+        .map((c) => ({ id: c.uuid, value: c.value })),
+    );
+    this.touch();
+  }
+
+  /**
+   * Detect when another player plays a single card (count −1) and fly it from their fan to the
+   * pile. A forfeit drops the count by more than one, so it is deliberately not animated the same.
+   */
+  private flyOpponentPlays(): void {
+    const counts = this.state()?.nrOfCardsPerPlayer;
+    const played = this.state()?.playedCards ?? [];
+    const prev = this.prevCounts;
+    if (counts && prev) {
+      for (const [pid, n] of Object.entries(counts)) {
+        if (pid === this.viewerId) continue;
+        if (!(pid in prev)) continue;
+        const before = prev[pid];
+        const dropped = before - n;
+        if (dropped === 1)
+          this.cardFly.opponentPlayed(pid, before, played); // played one card
+        else if (dropped > 1) this.cardFly.opponentForfeit(pid, before, dropped, played); // forfeit
+      }
+    }
+    this.prevCounts = counts ? { ...counts } : undefined;
+  }
+
+  /**
+   * Announce the hand-off once: the moment your own pawns are all home in a team game, you may
+   * start playing your teammate's pawns. Fires on the transition.
+   */
+  private announceTeamHandoff(): void {
+    const allHome = this.viewerOwnPawnsAllHome();
+    if (allHome && !this.prevOwnPawnsHome) {
+      this.teamHandoff.show(this.i18n.t('teamHandoffTitle'), this.i18n.t('teamHandoffMessage'));
+    }
+    this.prevOwnPawnsHome = allHome;
+  }
+
+  /**
+   * Team trade outcome (requester side): when your outgoing offer resolves, tell you whether your
+   * teammate gave you a card. An accept removes your offered card from your hand; a reject leaves
+   * it. Suppress the message when you cancelled it yourself.
+   */
+  private reactToTradeOutcome(): void {
+    const t = this.state()?.trade ?? null;
+    const hand = this.hand();
+    const me = this.viewerId;
+    const iAmIn = t && (t.requesterId === me || t.teammateId === me) ? t : null;
+    const wasIn = this.prevMyTrade;
+    const prevHand = this.prevHandForTrade;
+    if (wasIn && !iAmIn) {
+      const iRequested = wasIn.requesterId === me;
+      const received = hand.find((c) => !prevHand.some((p) => p.uuid === c.uuid));
+      const given = prevHand.find((c) => !hand.some((h) => h.uuid === c.uuid));
+      const mate = this.state()?.players?.find((p) => p.id === wasIn.teammateId)?.name ?? '';
+      if (this.suppressTradeOutcome) {
+        this.suppressTradeOutcome = false; // you cancelled — no banner, no swap
+      } else if (received && given) {
+        // Accepted: animate the swap for both teammates; name the card only for the requester.
+        this.cardFly.tradeSwap(iRequested ? wasIn.teammateId : wasIn.requesterId, received, given);
+        if (iRequested) {
+          const key = received.value === 1 ? 'tradeGotAceMessage' : 'tradeGotKingMessage';
+          this.teamHandoff.show(this.i18n.t('tradeGotTitle'), this.i18n.t(key, mate));
         }
+      } else if (iRequested) {
+        this.teamHandoff.show(
+          this.i18n.t('tradeRejectedTitle'),
+          this.i18n.t('tradeRejectedMessage', mate),
+        );
       }
-      this.prevCounts = counts ? { ...counts } : undefined;
-    });
+    }
+    this.prevMyTrade = iAmIn;
+    this.prevHandForTrade = hand;
+  }
 
-    // Announce the hand-off once: the moment your own pawns are all home in a team game, you may
-    // start playing your teammate's pawns. Fires on the transition, like the card-fly effect above.
-    effect(() => {
-      const allHome = this.viewerOwnPawnsAllHome();
-      if (allHome && !this.prevOwnPawnsHome) {
-        this.teamHandoff.show(this.i18n.t('teamHandoffTitle'), this.i18n.t('teamHandoffMessage'));
-      }
-      this.prevOwnPawnsHome = allHome;
-    });
+  /**
+   * Sound effects (ported from the GWT AudioPlayer): a soft click when the turn passes to a new
+   * player, and a fanfare when a player finishes (gains a place). Fires on the transition.
+   */
+  private playTransitionSounds(): void {
+    const s = this.state();
+    const cur = s?.currentPlayerId;
+    if (cur && this.prevCurrentPlayerId !== undefined && cur !== this.prevCurrentPlayerId) {
+      this.sound.play('turnChange');
+    }
+    if (cur) this.prevCurrentPlayerId = cur;
 
-    // Team trade outcome (requester side): when your outgoing offer resolves, tell you whether
-    // your teammate gave you a card. An accept removes your offered card from your hand; a reject
-    // leaves it. Suppress the message when you cancelled it yourself.
-    effect(() => {
-      const t = this.state()?.trade ?? null;
-      const hand = this.hand();
-      const me = this.viewerId;
-      const iAmIn = t && (t.requesterId === me || t.teammateId === me) ? t : null;
-      const wasIn = this.prevMyTrade;
-      const prevHand = this.prevHandForTrade;
-      if (wasIn && !iAmIn) {
-        const iRequested = wasIn.requesterId === me;
-        const received = hand.find((c) => !prevHand.some((p) => p.uuid === c.uuid));
-        const given = prevHand.find((c) => !hand.some((h) => h.uuid === c.uuid));
-        const mate = this.state()?.players?.find((p) => p.id === wasIn.teammateId)?.name ?? '';
-        if (this.suppressTradeOutcome) {
-          this.suppressTradeOutcome = false; // you cancelled — no banner, no swap
-        } else if (received && given) {
-          // Accepted: animate the swap for both teammates; name the card only for the requester.
-          this.animateTradeSwap(iRequested ? wasIn.teammateId : wasIn.requesterId, received, given);
-          if (iRequested) {
-            const key = received.value === 1 ? 'tradeGotAceMessage' : 'tradeGotKingMessage';
-            this.teamHandoff.show(this.i18n.t('tradeGotTitle'), this.i18n.t(key, mate));
-          }
-        } else if (iRequested) {
-          this.teamHandoff.show(
-            this.i18n.t('tradeRejectedTitle'),
-            this.i18n.t('tradeRejectedMessage', mate),
-          );
-        }
-      }
-      this.prevMyTrade = iAmIn;
-      this.prevHandForTrade = hand;
-    });
-
-    // Sound effects (ported from the GWT AudioPlayer): a soft click when the turn passes to a
-    // new player, and a fanfare when a player finishes (gains a place). Fires on the transition.
-    effect(() => {
-      const s = this.state();
-      const cur = s?.currentPlayerId;
-      if (cur && this.prevCurrentPlayerId !== undefined && cur !== this.prevCurrentPlayerId) {
-        this.sound.play('turnChange');
-      }
-      if (cur) this.prevCurrentPlayerId = cur;
-
-      const medals = (s?.players ?? []).filter((p) => (p.place ?? -1) > -1).length;
-      if (this.prevMedalCount >= 0 && medals > this.prevMedalCount) {
-        this.sound.play('medalAwarded');
-      }
-      this.prevMedalCount = medals;
-    });
+    const medals = (s?.players ?? []).filter((p) => (p.place ?? -1) > -1).length;
+    if (this.prevMedalCount >= 0 && medals > this.prevMedalCount) {
+      this.sound.play('medalAwarded');
+    }
+    this.prevMedalCount = medals;
   }
 
   private prevCurrentPlayerId: string | undefined;
@@ -398,68 +423,6 @@ export class Board implements OnInit, OnDestroy {
       if (p) points.push(p);
     }
     return this.pawnAnimator.walk(pawnKey(pawn.pawnId), points, delayMs);
-  }
-
-  /** Animate an opponent's just-played card from its fan slot to the pile. */
-  private flyOpponentCard(playerId: string, fanCount: number, played: string[]): void {
-    const segment = this.geometry()?.deckSegment(playerId);
-    const last = played[played.length - 1];
-    if (!segment || !last) return;
-    const [suit, value] = last.split('_').map(Number);
-    const slot = fanCardBacks(segment, fanCount).at(-1); // the outermost card leaves
-    if (!slot) return;
-    // Back-sized start; leaves the fan face-down and turns over mid-flight to reveal at the pile.
-    this.cardTable.flyToPile(
-      { suit, value, x: slot.x / 6, y: slot.y / 6, rot: slot.rotDeg },
-      { startScale: 0.3, flip: 'in' },
-    );
-  }
-
-  /**
-   * Animate a completed card trade for a participant: the card you gave flies out to your
-   * teammate's fan, and the King/Ace you received flies in from it to its slot in your hand.
-   * Only the two teammates run this (their hands changed); opponents see nothing.
-   */
-  private animateTradeSwap(otherId: string, received: CardModel, given: CardModel): void {
-    const g = this.geometry();
-    if (!g) return;
-    const seg = g.deckSegment(otherId);
-    const partner = seg
-      ? { x: (seg[0].x + seg[1].x) / 12, y: (seg[0].y + seg[1].y) / 12 } // fan midpoint in board-% (/6)
-      : this.positioner.pileCenter();
-    const hand = this.hand();
-    const i = hand.findIndex((c) => c.uuid === received.uuid);
-    const slot = this.positioner.handSlot(i, hand.length);
-    const handAnchor = this.positioner.handSlot(0, 1); // fan centre — where the given card starts
-
-    this.cardTable.tradeSwap(
-      partner,
-      { suit: given.suit, value: given.value, from: handAnchor },
-      { uuid: received.uuid, suit: received.suit, value: received.value, to: slot },
-    );
-  }
-
-  /** Forfeit: fly all of an opponent's cards from their fan to the pile, staggered. */
-  private flyOpponentForfeit(
-    playerId: string,
-    fanCount: number,
-    dropped: number,
-    played: string[],
-  ): void {
-    const segment = this.geometry()?.deckSegment(playerId);
-    if (!segment) return;
-    const fan = fanCardBacks(segment, fanCount);
-    const forfeited = played.slice(played.length - dropped); // the discarded cards (public)
-    forfeited.forEach((str, i) => {
-      const [suit, value] = str.split('_').map(Number);
-      const slot = fan[i] ?? fan.at(-1);
-      if (!slot) return;
-      setTimeout(
-        () =>
-          this.cardTable.flyToPile({ suit, value, x: slot.x / 6, y: slot.y / 6, rot: slot.rotDeg }),
-        i * 120, // small stagger between cards
-      );
-    });
   }
 
   private findPawn(id: string) {
