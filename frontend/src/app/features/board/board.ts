@@ -23,6 +23,7 @@ import { CardBackVM } from '../../card-table/card-table.types';
 import { PlayerList } from '../player-list/player-list';
 import { TradePanel } from './trade-panel/trade-panel';
 import { highlightForPawn1, highlightForPawn2 } from './pawn-highlight';
+import { PawnAnimator } from './pawn-animator';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
 import { teammateCaptureKeys } from './teammate-capture';
 import { pawnKey } from './pawn-key';
@@ -168,7 +169,7 @@ export class Board implements OnInit, OnDestroy {
     const g = this.geometry();
     const s = this.state();
     if (!g || !s?.pawns) return [];
-    const anim = this.pawnAnim();
+    const anim = this.pawnAnimator.positions();
     const playerOf = (playerId: string) => s.players!.find((p) => p.id === playerId);
     const colorOf = (playerId: string) => seatColor(playerOf(playerId)?.playerInt);
     const teamOf = (playerId: string) => playerOf(playerId)?.teamId ?? null;
@@ -265,11 +266,9 @@ export class Board implements OnInit, OnDestroy {
   private prevCounts: Record<string, number> | undefined;
   private prevHandUuids: Set<number> | undefined;
 
-  // Pawn move animation: pawnId -> its current animated pixel position + the
-  // transition duration for the current step. Present only while a pawn is moving.
-  protected readonly pawnAnim = signal<Map<string, { x: number; y: number; ms: number }>>(
-    new Map(),
-  );
+  // Pawn move animation: a small engine that walks pawns along pixel waypoints and exposes their
+  // live positions; the `pawns` computed reads those to place a pawn mid-move (see below).
+  private readonly pawnAnimator = new PawnAnimator();
   private prevMoveKey: string | undefined;
 
   // --- Selection: delegated to the ported PawnAndCardSelection state machine ---
@@ -457,83 +456,36 @@ export class Board implements OnInit, OnDestroy {
     return own.length > 0 && own.every((p) => (p.currentTileId?.tileNr ?? -1) >= 16);
   });
 
-  // --- Pawn move animation (ported from PawnAnimation) ---------------------
+  // --- Pawn move animation (drives the reusable PawnAnimator engine) -------
 
   /** Walk each of a move's pawns along its path; killed pawns go home after the killer. */
   private animateMove(mr: MoveResponse): void {
     const g = this.geometry();
     if (!g) return;
     if (mr.moveType === 'onBoard') this.sound.play('pawnOnBoard');
-    const d1 = this.animatePawnPath(g, mr.pawn1, mr.movePawn1, 0);
-    const d2 = this.animatePawnPath(g, mr.pawn2, mr.movePawn2, 0);
-    this.animatePawnPath(g, mr.pawnKilledByPawn1, mr.movePawnKilledByPawn1, d1);
-    this.animatePawnPath(g, mr.pawnKilledByPawn2, mr.movePawnKilledByPawn2, d2);
+    const d1 = this.walkPawn(g, mr.pawn1, mr.movePawn1, 0);
+    const d2 = this.walkPawn(g, mr.pawn2, mr.movePawn2, 0);
+    this.walkPawn(g, mr.pawnKilledByPawn1, mr.movePawnKilledByPawn1, d1);
+    this.walkPawn(g, mr.pawnKilledByPawn2, mr.movePawnKilledByPawn2, d2);
     // A captured pawn "dies" as it's flung home — play the kill sound as that begins.
     if (mr.pawnKilledByPawn1) this.sound.play('pawnKilled', d1);
     if (mr.pawnKilledByPawn2) this.sound.play('pawnKilled', d2);
   }
 
-  /**
-   * Hold a pawn at its path start (so the server's final tile doesn't snap), then
-   * walk its waypoints after `delayMs`. Returns the total animation time in ms.
-   */
-  private animatePawnPath(
+  /** Convert a pawn's tile path to pixel waypoints (board geometry) and hand it to the animator. */
+  private walkPawn(
     g: BoardGeometry,
     pawn: ApiPawn | undefined,
     move: PositionKey[] | undefined,
     delayMs: number,
   ): number {
-    if (!pawn || !move || move.length < 2) return 0;
-    const id = pawnKey(pawn.pawnId);
+    if (!pawn || !move) return 0;
     const points: Pt[] = [];
     for (const t of move) {
       const p = g.position(t.playerId, t.tileNr);
       if (p) points.push(p);
     }
-    if (points.length < 2) return 0;
-
-    let total = 0;
-    for (let i = 1; i < points.length; i++) {
-      total += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
-    }
-    const speed = this.moveSpeed(total); // px/ms
-    this.setPawnAnim(id, points[0].x, points[0].y, 0); // hold at the start now
-    const walk = () =>
-      requestAnimationFrame(() =>
-        requestAnimationFrame(() => this.stepPawnPath(id, points, 1, speed)),
-      );
-    if (delayMs > 0) setTimeout(walk, delayMs);
-    else walk();
-    return Math.round(total / speed);
-  }
-
-  private stepPawnPath(id: string, points: Pt[], i: number, speed: number): void {
-    if (i >= points.length) {
-      this.clearPawnAnim(id); // done — settle onto the server's final tile
-      return;
-    }
-    const d = Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
-    const ms = Math.max(16, Math.round(d / speed));
-    this.setPawnAnim(id, points[i].x, points[i].y, ms);
-    setTimeout(() => this.stepPawnPath(id, points, i + 1, speed), ms);
-  }
-
-  /** px/ms — faster over longer paths (ported from calculateSpeed). */
-  private moveSpeed(distance: number): number {
-    if (distance > 400) return 0.16;
-    if (distance > 200) return 0.12;
-    return 0.1;
-  }
-
-  private setPawnAnim(id: string, x: number, y: number, ms: number): void {
-    this.pawnAnim.update((m) => new Map(m).set(id, { x, y, ms }));
-  }
-  private clearPawnAnim(id: string): void {
-    this.pawnAnim.update((m) => {
-      const n = new Map(m);
-      n.delete(id);
-      return n;
-    });
+    return this.pawnAnimator.walk(pawnKey(pawn.pawnId), points, delayMs);
   }
 
   /** Animate an opponent's just-played card from its fan slot to the pile. */
