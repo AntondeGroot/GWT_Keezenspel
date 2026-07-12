@@ -8,7 +8,6 @@ import {
   MoveResponse,
   Pawn as ApiPawn,
   PositionKey,
-  Trade,
 } from '../../api';
 import { buildBoard, Pt, BoardGeometry } from './board-geometry';
 import { resolveGameSession } from '../../session';
@@ -24,6 +23,7 @@ import { TradePanel } from './trade-panel/trade-panel';
 import { highlightForPawn1, highlightForPawn2 } from './pawn-highlight';
 import { BoardCardFly } from './board-card-fly';
 import { projectCardBacks, projectPawns, projectTiles } from './board-view';
+import { TeamTradeController } from './team-trade-controller';
 import { GameStateStream } from './game-state-stream';
 import { PawnAnimator } from './pawn-animator';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
@@ -206,7 +206,7 @@ export class Board implements OnInit, OnDestroy {
     effect(() => this.syncSelection());
     effect(() => this.flyOpponentPlays());
     effect(() => this.announceTeamHandoff());
-    effect(() => this.reactToTradeOutcome());
+    effect(() => this.teamTrade.reactToOutcome());
     effect(() => this.playTransitionSounds());
   }
 
@@ -273,43 +273,6 @@ export class Board implements OnInit, OnDestroy {
   }
 
   /**
-   * Team trade outcome (requester side): when your outgoing offer resolves, tell you whether your
-   * teammate gave you a card. An accept removes your offered card from your hand; a reject leaves
-   * it. Suppress the message when you cancelled it yourself.
-   */
-  private reactToTradeOutcome(): void {
-    const t = this.state()?.trade ?? null;
-    const hand = this.hand();
-    const me = this.viewerId;
-    const iAmIn = t && (t.requesterId === me || t.teammateId === me) ? t : null;
-    const wasIn = this.prevMyTrade;
-    const prevHand = this.prevHandForTrade;
-    if (wasIn && !iAmIn) {
-      const iRequested = wasIn.requesterId === me;
-      const received = hand.find((c) => !prevHand.some((p) => p.uuid === c.uuid));
-      const given = prevHand.find((c) => !hand.some((h) => h.uuid === c.uuid));
-      const mate = this.state()?.players?.find((p) => p.id === wasIn.teammateId)?.name ?? '';
-      if (this.suppressTradeOutcome) {
-        this.suppressTradeOutcome = false; // you cancelled — no banner, no swap
-      } else if (received && given) {
-        // Accepted: animate the swap for both teammates; name the card only for the requester.
-        this.cardFly.tradeSwap(iRequested ? wasIn.teammateId : wasIn.requesterId, received, given);
-        if (iRequested) {
-          const key = received.value === 1 ? 'tradeGotAceMessage' : 'tradeGotKingMessage';
-          this.teamHandoff.show(this.i18n.t('tradeGotTitle'), this.i18n.t(key, mate));
-        }
-      } else if (iRequested) {
-        this.teamHandoff.show(
-          this.i18n.t('tradeRejectedTitle'),
-          this.i18n.t('tradeRejectedMessage', mate),
-        );
-      }
-    }
-    this.prevMyTrade = iAmIn;
-    this.prevHandForTrade = hand;
-  }
-
-  /**
    * Sound effects (ported from the GWT AudioPlayer): a soft click when the turn passes to a new
    * player, and a fanfare when a player finishes (gains a place). Fires on the transition.
    */
@@ -332,38 +295,16 @@ export class Board implements OnInit, OnDestroy {
   private prevMedalCount = -1;
 
   private prevOwnPawnsHome = false;
-  private prevMyTrade: Trade | null = null;
-  private prevHandForTrade: CardModel[] = [];
-  private suppressTradeOutcome = false;
 
-  // ── Team card trade (step 5) ──────────────────────────────────────────────
-  protected readonly offering = signal(false);
-  protected readonly trade = computed<Trade | null>(() => this.state()?.trade ?? null);
-
-  /** Show the "Ask for a King/Ace" button: team game, trade sub-option on, no trade pending yet,
-   *  and you have cards to offer. */
-  protected readonly canAskTrade = computed(() => {
-    const s = this.state();
-    if (!s?.teamCardTrade || s.trade || !this.viewerId) return false;
-    const inTeam = s.players?.find((p) => p.id === this.viewerId)?.teamId != null;
-    return inTeam && this.hand().length > 0;
-  });
-
-  /** The other party's name — the teammate (when you're the requester) or the requester. */
-  protected readonly tradeOtherName = computed(() => {
-    const t = this.trade();
-    const s = this.state();
-    if (!t || !s?.players) return '';
-    const otherId = t.requesterId === this.viewerId ? t.teammateId : t.requesterId;
-    return s.players.find((p) => p.id === otherId)?.name ?? '';
-  });
-
-  protected askForTrade(): void {
-    this.offering.set(true);
-  }
-  protected onTradeCancelled(): void {
-    this.suppressTradeOutcome = true;
-  }
+  // ── Team card trade (step 5) — its own controller (state, view state, outcome reaction). ──
+  protected readonly teamTrade = new TeamTradeController(
+    () => this.state(),
+    () => this.hand(),
+    this.viewerId,
+    (otherId, received, given) => this.cardFly.tradeSwap(otherId, received, given),
+    (title, message) => this.teamHandoff.show(title, message),
+    (key, ...args) => this.i18n.t(key, ...args),
+  );
 
   // The players whose pawns the viewer may move: themselves, plus their teammate once all the
   // viewer's own pawns are home (team play phase-2). Fed to the selection so a teammate's pawns
