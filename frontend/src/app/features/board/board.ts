@@ -506,50 +506,58 @@ export class Board implements OnInit, OnDestroy {
   // Preview the current selection: ask the server which tile(s) it would land on
   // and pulse them. When a 7-split first forms, adopt the recommended allocation
   // once, then re-check to preview it. Mirrors the GWT presenter's checkMove().
-  private checkMove(): void {
+  /**
+   * Assemble the current (card + pawn) selection into a MoveRequest, or undefined if it isn't yet
+   * a complete, resolvable move. Shared by the live preview (checkMove) and the actual play.
+   */
+  private buildMoveRequest(
+    tempMessageType: MoveRequest['tempMessageType'],
+  ): MoveRequest | undefined {
     const card = this.selection.getCard();
     const pawn1 = this.selection.getPawn1();
-    if (!card || !pawn1 || !this.sessionId || !this.viewerId) {
+    if (!card || !pawn1 || !this.viewerId) return undefined;
+    const apiPawn1 = this.findPawn(pawn1.id);
+    if (!apiPawn1) return undefined;
+    const apiPawn2 = this.selection.getPawn2()?.id;
+    return {
+      playerId: this.viewerId,
+      cardId: card.id,
+      pawn1Id: apiPawn1.pawnId,
+      pawn2Id: apiPawn2 ? this.findPawn(apiPawn2)?.pawnId : undefined,
+      stepsPawn1: this.selection.getNrStepsPawn1(),
+      stepsPawn2: this.selection.getNrStepsPawn2(),
+      tempMessageType,
+    };
+  }
+
+  private checkMove(): void {
+    const move = this.buildMoveRequest('CHECK_MOVE');
+    if (!move || !this.sessionId || !this.viewerId) {
       this.previewTiles.set(new Set());
       return;
     }
-    const apiPawn1 = this.findPawn(pawn1.id);
-    if (!apiPawn1) return;
-    const pawn2 = this.selection.getPawn2();
-    const apiPawn2 = pawn2 ? this.findPawn(pawn2.id) : undefined;
-
-    this.movesService
-      .checkMove(this.sessionId, this.viewerId, {
-        playerId: this.viewerId,
-        cardId: card.id,
-        pawn1Id: apiPawn1.pawnId,
-        pawn2Id: apiPawn2?.pawnId,
-        stepsPawn1: this.selection.getNrStepsPawn1(),
-        stepsPawn2: this.selection.getNrStepsPawn2(),
-        tempMessageType: 'CHECK_MOVE',
-      })
-      .subscribe({
-        next: (res) => {
-          // First time a 7-split forms: adopt the recommended split, then re-check.
-          if (this.selection.isSplitDefaultPending()) {
-            this.selection.clearSplitDefaultPending();
-            const s1 = res.recommendedStepsPawn1 ?? -1;
-            const s2 = res.recommendedStepsPawn2 ?? -1;
-            if (s1 >= 0 && s2 >= 0) {
-              this.selection.setNrStepsPawn1(s1);
-              this.selection.setNrStepsPawn2(s2);
-              this.touch();
-              this.checkMove();
-              return;
-            }
+    this.movesService.checkMove(this.sessionId, this.viewerId, move).subscribe({
+      next: (res) => {
+        // First time a 7-split forms: adopt the recommended split, then re-check.
+        if (this.selection.isSplitDefaultPending()) {
+          this.selection.clearSplitDefaultPending();
+          const s1 = res.recommendedStepsPawn1 ?? -1;
+          const s2 = res.recommendedStepsPawn2 ?? -1;
+          if (s1 >= 0 && s2 >= 0) {
+            this.selection.setNrStepsPawn1(s1);
+            this.selection.setNrStepsPawn2(s2);
+            this.touch();
+            this.checkMove();
+            return;
           }
-          // Highlight the landing tile(s) — the last tile of each pawn's path.
-          this.previewTiles.set(new Set((res.tiles ?? []).map((t) => `${t.playerId}:${t.tileNr}`)));
-        },
-        error: () => {
-          /* fire-and-forget: errors are non-critical here */
-        },
-      });
+        }
+        // Highlight the landing tile(s) — the last tile of each pawn's path.
+        this.previewTiles.set(new Set((res.tiles ?? []).map((t) => `${t.playerId}:${t.tileNr}`)));
+      },
+      error: () => {
+        /* fire-and-forget: errors are non-critical here */
+      },
+    });
   }
 
   // The 7-split step inputs (shown when splitVisible()).
@@ -606,21 +614,10 @@ export class Board implements OnInit, OnDestroy {
       return;
     }
 
-    const apiPawn1 = this.findPawn(pawn1.id);
-    if (!apiPawn1) return;
-    const pawn2 = this.selection.getPawn2();
-    const apiPawn2 = pawn2 ? this.findPawn(pawn2.id) : undefined;
+    const move = this.buildMoveRequest('MAKE_MOVE');
+    if (!move) return;
     const handCard = this.hand().find((c) => c.uuid === card.id);
-
-    this.send(handCard, {
-      playerId: this.viewerId,
-      cardId: card.id,
-      pawn1Id: apiPawn1.pawnId,
-      pawn2Id: apiPawn2?.pawnId,
-      stepsPawn1: this.selection.getNrStepsPawn1(),
-      stepsPawn2: this.selection.getNrStepsPawn2(),
-      tempMessageType: 'MAKE_MOVE',
-    });
+    this.send(handCard, move);
   }
 
   private send(card: CardModel | undefined, move: MoveRequest): void {
