@@ -19,10 +19,10 @@ import { Pawn } from './pawn/pawn';
 import { CardLayer } from '../../card-table/card-layer';
 import { CardTable } from '../../card-table/card-table';
 import { DefaultCardPositioner } from '../../card-table/default-positioner';
-import { CardBackVM } from '../../card-table/card-table.types';
 import { PlayerList } from '../player-list/player-list';
 import { TradePanel } from './trade-panel/trade-panel';
 import { highlightForPawn1, highlightForPawn2 } from './pawn-highlight';
+import { projectCardBacks, projectPawns, projectTiles } from './board-view';
 import { GameStateStream } from './game-state-stream';
 import { PawnAnimator } from './pawn-animator';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
@@ -139,99 +139,30 @@ export class Board implements OnInit, OnDestroy {
   protected readonly tiles = computed(() => {
     const g = this.geometry();
     const s = this.state();
-    if (!g || !s?.players) return [];
-    const colorOf = (playerId: string) =>
-      seatColor(s.players!.find((p) => p.id === playerId)?.playerInt);
-    return g.tiles.map((t) => ({
-      ...t,
-      color: t.tileNr <= 0 || t.tileNr >= 16 ? colorOf(t.playerId) : '#f2f2f2',
-    }));
+    return g && s?.players ? projectTiles(g, s.players) : [];
   });
   protected readonly pawns = computed(() => {
     const g = this.geometry();
     const s = this.state();
-    if (!g || !s?.pawns) return [];
-    const anim = this.pawnAnimator.positions();
-    const playerOf = (playerId: string) => s.players!.find((p) => p.id === playerId);
-    const colorOf = (playerId: string) => seatColor(playerOf(playerId)?.playerInt);
-    const teamOf = (playerId: string) => playerOf(playerId)?.teamId ?? null;
-    return s.pawns
-      .map((pawn) => {
-        const pawnId = pawnKey(pawn.pawnId);
-        // While a pawn is moving, its position (and step transition ms) comes from the
-        // animation override instead of the server's already-final tile.
-        const a = anim.get(pawnId);
-        let x: number, y: number;
-        if (a) {
-          x = a.x;
-          y = a.y;
-        } else {
-          const tile = pawn.currentTileId;
-          const pt = g.position(tile.playerId, tile.tileNr);
-          if (!pt) return null;
-          x = pt.x;
-          y = pt.y;
-        }
-        return {
-          x,
-          y,
-          zIndex: Math.round(y),
-          color: colorOf(pawn.playerId),
-          teamId: teamOf(pawn.playerId),
-          id: pawnId,
-          moveMs: a?.ms ?? 0,
-        };
-      })
-      .filter((x) => x !== null);
+    return g && s?.pawns
+      ? projectPawns(g, s.pawns, s.players ?? [], this.pawnAnimator.positions())
+      : [];
   });
   protected readonly cell = computed(() => this.geometry()?.cellDistance ?? 0);
 
-  // Face-down card backs for every OTHER player, fanned by their public card
-  // count (nrOfCardsPerPlayer). Only counts are ever known here — never values —
-  // so there is nothing to peek at in the DOM.
+  // Face-down card backs for every OTHER player, fanned by their public card count.
   protected readonly cardBacks = computed(() => {
     const g = this.geometry();
     const counts = this.state()?.nrOfCardsPerPlayer;
-    if (!g || !counts) return [];
-    // During a deal-in the backs start stacked at the deck (board centre) and fan
-    // out to their slots, staggered — the same FLIP as the viewer's own cards.
-    const dealing = this.cardTable.dealing();
-    const atDeck = this.cardTable.stacked();
-
-    // Deal clockwise: order opponents by their angle around the board centre,
-    // clockwise from the viewer (screen coords: clockwise = increasing atan2).
-    const mid = (seg: [Pt, Pt]) => ({ x: (seg[0].x + seg[1].x) / 2, y: (seg[0].y + seg[1].y) / 2 });
-    const vSeg = this.viewerId ? g.deckSegment(this.viewerId) : undefined;
-    const vm = vSeg ? mid(vSeg) : { x: 300, y: 600 };
-    const viewerAngle = Math.atan2(vm.y - 300, vm.x - 300);
-    const opponents = Object.keys(counts)
-      .filter((pid) => pid !== this.viewerId && g.deckSegment(pid))
-      .map((pid) => {
-        const m = mid(g.deckSegment(pid)!);
-        const cw = (Math.atan2(m.y - 300, m.x - 300) - viewerAngle + 2 * Math.PI) % (2 * Math.PI);
-        return { pid, cw };
-      })
-      .sort((a, b) => a.cw - b.cw);
-
-    // Positions are in the card-layer's %-space (board px / 6), like the hand + pile.
-    const backs: CardBackVM[] = [];
-    opponents.forEach(({ pid }, oi) => {
-      const seat = oi + 1; // the viewer is seat 0; opponents take the next seats clockwise
-      fanCardBacks(g.deckSegment(pid)!, counts[pid]).forEach((c, i) => {
-        // Round-robin: i = round (card index), seat = offset within the round.
-        const dealDelay = dealing ? i * 700 + seat * 350 : 0;
-        backs.push({
-          key: `${pid}:${i}`,
-          x: (atDeck ? 315 : c.x) / 6, // deck centre while dealing
-          y: (atDeck ? 300 : c.y) / 6,
-          rot: atDeck ? 0 : c.rotDeg,
-          dealDelay,
-          // Sooner-flying backs sit on top of the deck stack (taken off the top).
-          z: dealing ? 400 - Math.round(dealDelay / 20) : undefined,
-        });
-      });
-    });
-    return backs;
+    return g && counts
+      ? projectCardBacks(
+          g,
+          counts,
+          this.viewerId,
+          this.cardTable.dealing(),
+          this.cardTable.stacked(),
+        )
+      : [];
   });
 
   protected readonly hand = computed(() => this.state()?.playerCards ?? []);
