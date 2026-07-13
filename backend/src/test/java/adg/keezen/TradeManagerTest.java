@@ -33,12 +33,13 @@ class TradeManagerTest {
 
   private TradeManager build(boolean teamGameStarted) {
     BooleanSupplier started = () -> teamGameStarted;
-    // "R" (requester) is partnered with "T" (teammate); anyone else has no teammate.
+    // "R" (requester) and "T" (teammate) are partners (symmetric, like the real roster); anyone
+    // else has no teammate.
     return new TradeManager(
         deck,
         version,
         started,
-        id -> "R".equals(id) ? "T" : null,
+        id -> "R".equals(id) ? "T" : "T".equals(id) ? "R" : null,
         card -> card.getValue() == 13 || card.getValue() == 1);
   }
 
@@ -48,6 +49,9 @@ class TradeManagerTest {
     version = new AtomicLong(0);
     trade = build(true);
     trade.setEnabled(true);
+    // Default: the requester still has a full hand and hasn't played this round (mock defaults to
+    // false for both, so only the positive one needs stubbing) — i.e. the trade window is open.
+    when(deck.playerHasCardsLeft("R")).thenReturn(true);
   }
 
   /** Stub the deck and record a pending R→T offer of OFFERED, returning after asserting success. */
@@ -73,7 +77,7 @@ class TradeManagerTest {
     trade.setEnabled(true);
     when(deck.playerHasCard("R", OFFERED)).thenReturn(true);
     assertFalse(trade.request("R", OFFERED));
-    assertNull(trade.getPending());
+    assertNull(trade.getPendingFor("R"));
     assertEquals(0, version.get());
   }
 
@@ -81,7 +85,7 @@ class TradeManagerTest {
   void requestRejectedWhenTradingDisabled() {
     trade.setEnabled(false);
     assertFalse(trade.request("R", OFFERED));
-    assertNull(trade.getPending());
+    assertNull(trade.getPendingFor("R"));
   }
 
   @Test
@@ -95,29 +99,75 @@ class TradeManagerTest {
   void requestRejectedWhenPlayerHasNoTeammate() {
     when(deck.playerHasCard("X", OFFERED)).thenReturn(true);
     assertFalse(trade.request("X", OFFERED)); // "X" resolves to no teammate
-    assertNull(trade.getPending());
+    assertNull(trade.getPendingFor("R"));
   }
 
   @Test
   void requestRejectedWhenOfferedCardIsNull() {
     assertFalse(trade.request("R", null));
-    assertNull(trade.getPending());
+    assertNull(trade.getPendingFor("R"));
   }
 
   @Test
   void requestRejectedWhenRequesterDoesNotHoldOfferedCard() {
     when(deck.playerHasCard("R", OFFERED)).thenReturn(false);
     assertFalse(trade.request("R", OFFERED));
-    assertNull(trade.getPending());
+    assertNull(trade.getPendingFor("R"));
   }
 
   @Test
   void requestRecordsPendingOfferAndBumpsVersion() {
     givenPendingOffer();
-    TradeRequest pending = trade.getPending();
+    TradeRequest pending = trade.getPendingFor("R");
     assertEquals("R", pending.getRequesterId());
     assertEquals("T", pending.getTeammateId());
     assertSame(OFFERED, pending.getOfferedCard());
+  }
+
+  @Test
+  void requestRejectedAfterRequesterHasPlayedThisRound() {
+    // The trade window closes on your first play of the round.
+    when(deck.hasPlayedSinceDeal("R")).thenReturn(true);
+    when(deck.playerHasCard("R", OFFERED)).thenReturn(true);
+    assertFalse(trade.request("R", OFFERED));
+    assertNull(trade.getPendingFor("R"));
+    assertEquals(0, version.get());
+  }
+
+  @Test
+  void requestRejectedWhenRequesterHasNoCardsLeft() {
+    when(deck.playerHasCardsLeft("R")).thenReturn(false);
+    when(deck.playerHasCard("R", OFFERED)).thenReturn(true);
+    assertFalse(trade.request("R", OFFERED));
+    assertNull(trade.getPendingFor("R"));
+  }
+
+  // ── canRequest (drives the "ask" button; independent of the offered card) ───
+  @Test
+  void canRequestTrueWhenWindowOpen() {
+    assertTrue(trade.canRequest("R"));
+  }
+
+  @Test
+  void canRequestFalseAfterPlayingThisRound() {
+    when(deck.hasPlayedSinceDeal("R")).thenReturn(true);
+    assertFalse(trade.canRequest("R"));
+  }
+
+  @Test
+  void canRequestFalseWhenDisabledPendingNoTeammateOrNoCards() {
+    trade.setEnabled(false);
+    assertFalse(trade.canRequest("R"));
+    trade.setEnabled(true);
+
+    assertFalse(trade.canRequest("X")); // no teammate
+
+    when(deck.playerHasCardsLeft("R")).thenReturn(false);
+    assertFalse(trade.canRequest("R")); // no cards
+    when(deck.playerHasCardsLeft("R")).thenReturn(true);
+
+    givenPendingOffer();
+    assertFalse(trade.canRequest("R")); // a trade is already pending
   }
 
   // ── accept ────────────────────────────────────────────────────────────────
@@ -130,7 +180,7 @@ class TradeManagerTest {
   void acceptRejectedWhenNotTheAddressedTeammate() {
     givenPendingOffer();
     assertFalse(trade.accept("someone-else", KING));
-    assertEquals("T", trade.getPending().getTeammateId()); // still pending
+    assertEquals("T", trade.getPendingFor("R").getTeammateId()); // still pending
   }
 
   @Test
@@ -159,7 +209,7 @@ class TradeManagerTest {
     when(deck.playerHasCard("T", KING)).thenReturn(true);
     when(deck.playerHasCard("R", OFFERED)).thenReturn(false); // requester left/forfeited
     assertFalse(trade.accept("T", KING));
-    assertNull(trade.getPending()); // stale trade dropped
+    assertNull(trade.getPendingFor("R")); // stale trade dropped
     assertEquals(2, version.get()); // dropped bumps version
     verify(deck, never()).moveCardBetweenHands(org.mockito.ArgumentMatchers.anyString(),
         org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any());
@@ -173,7 +223,7 @@ class TradeManagerTest {
     assertTrue(trade.accept("T", ACE));
     verify(deck).moveCardBetweenHands("R", "T", OFFERED);
     verify(deck).moveCardBetweenHands("T", "R", ACE);
-    assertNull(trade.getPending());
+    assertNull(trade.getPendingFor("R"));
     assertEquals(2, version.get());
   }
 
@@ -187,14 +237,14 @@ class TradeManagerTest {
   void rejectRejectedWhenNotTheAddressedTeammate() {
     givenPendingOffer();
     assertFalse(trade.reject("someone-else"));
-    assertEquals("T", trade.getPending().getTeammateId());
+    assertEquals("T", trade.getPendingFor("R").getTeammateId());
   }
 
   @Test
   void rejectClearsPendingTrade() {
     givenPendingOffer();
     assertTrue(trade.reject("T"));
-    assertNull(trade.getPending());
+    assertNull(trade.getPendingFor("R"));
     assertEquals(2, version.get());
   }
 
@@ -208,14 +258,14 @@ class TradeManagerTest {
   void cancelRejectedWhenNotTheRequester() {
     givenPendingOffer();
     assertFalse(trade.cancel("T")); // the teammate can't cancel
-    assertEquals("R", trade.getPending().getRequesterId());
+    assertEquals("R", trade.getPendingFor("R").getRequesterId());
   }
 
   @Test
   void cancelClearsPendingTrade() {
     givenPendingOffer();
     assertTrue(trade.cancel("R"));
-    assertNull(trade.getPending());
+    assertNull(trade.getPendingFor("R"));
     assertEquals(2, version.get());
   }
 
@@ -223,28 +273,28 @@ class TradeManagerTest {
   @Test
   void departureIsNoOpWhenNoPendingTrade() {
     trade.cancelForDeparture("R"); // must not throw
-    assertNull(trade.getPending());
+    assertNull(trade.getPendingFor("R"));
   }
 
   @Test
   void departureOfRequesterDropsTrade() {
     givenPendingOffer();
     trade.cancelForDeparture("R");
-    assertNull(trade.getPending());
+    assertNull(trade.getPendingFor("R"));
   }
 
   @Test
   void departureOfTeammateDropsTrade() {
     givenPendingOffer();
     trade.cancelForDeparture("T");
-    assertNull(trade.getPending());
+    assertNull(trade.getPendingFor("R"));
   }
 
   @Test
   void departureOfUninvolvedPlayerKeepsTrade() {
     givenPendingOffer();
     trade.cancelForDeparture("someone-else");
-    assertEquals("R", trade.getPending().getRequesterId());
+    assertEquals("R", trade.getPendingFor("R").getRequesterId());
   }
 
   // ── clearPending ────────────────────────────────────────────────────────────
@@ -252,6 +302,6 @@ class TradeManagerTest {
   void clearPendingRemovesPendingTrade() {
     givenPendingOffer();
     trade.clearPending();
-    assertNull(trade.getPending());
+    assertNull(trade.getPendingFor("R"));
   }
 }

@@ -38,30 +38,17 @@ describe('TeamTradeController', () => {
     ctl = build('me');
   });
 
-  describe('canAsk', () => {
-    it('is true in a team trade game with cards and no pending trade', () => {
-      state.set({ teamCardTrade: true, players: players() } as GameStatePush);
-      hand.set([card(1, 5)]);
+  // The whole rule (team game, trade option, no pending trade, teammate + cards, and — the key
+  // fix — hasn't played a card this round) lives in the backend; the button just mirrors its flag.
+  describe('canAsk mirrors the backend canRequestTrade flag', () => {
+    it('is true only when the backend says the player may request a trade', () => {
+      state.set({ canRequestTrade: true } as GameStatePush);
       expect(ctl.canAsk()).toBe(true);
-    });
 
-    it('is false without the trade option, mid-trade, off-team, or with no cards', () => {
-      hand.set([card(1, 5)]);
-      state.set({ players: players() } as GameStatePush); // no teamCardTrade
+      state.set({ canRequestTrade: false } as GameStatePush);
       expect(ctl.canAsk()).toBe(false);
 
-      state.set({
-        teamCardTrade: true,
-        trade: { requesterId: 'x' },
-        players: players(),
-      } as GameStatePush);
-      expect(ctl.canAsk()).toBe(false);
-
-      state.set({ teamCardTrade: true, players: [{ id: 'me' }] } as GameStatePush); // no teamId
-      expect(ctl.canAsk()).toBe(false);
-
-      state.set({ teamCardTrade: true, players: players() } as GameStatePush);
-      hand.set([]);
+      state.set(undefined);
       expect(ctl.canAsk()).toBe(false);
     });
   });

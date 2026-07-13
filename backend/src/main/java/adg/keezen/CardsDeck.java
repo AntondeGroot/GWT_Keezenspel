@@ -16,6 +16,10 @@ public class CardsDeck implements CardsDeckInterface {
   private int roundNr;
   private ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
   private final PlayerHands hands = new PlayerHands();
+  // Players who have played at least one card since the current round was dealt. The team card
+  // trade (asking a teammate for a King/Ace) is only allowed until you play your first card, so
+  // this resets on every deal and grows as players play.
+  private final Set<String> playedSinceDeal = new HashSet<>();
   private GameState gameState;
 
   public CardsDeck() {}
@@ -64,6 +68,11 @@ public class CardsDeck implements CardsDeckInterface {
       return;
     }
     hands.playFromHand(playerId, card);
+    playedSinceDeal.add(playerId); // closes this player's trade window for the round
+  }
+
+  public boolean hasPlayedSinceDeal(String playerId) {
+    return playedSinceDeal.contains(playerId);
   }
 
   public boolean playerHasCardsLeft(String playerId) {
@@ -82,6 +91,7 @@ public class CardsDeck implements CardsDeckInterface {
 
   public void dealCards() {
     int nrCards = roundNr == 0 ? CARDS_DEALT_FIRST_ROUND : CARDS_DEALT_LATER_ROUNDS;
+    playedSinceDeal.clear(); // fresh hands → everyone may trade again this round
     if (roundNr == 0) {
       hands.clearPile(); // new round → reset the played-cards pile
     }
@@ -118,6 +128,7 @@ public class CardsDeck implements CardsDeckInterface {
     roundNr = 0;
     cardsDeque.clear();
     hands.reset();
+    playedSinceDeal.clear();
   }
 
   public ArrayList<Card> getPlayedCards() {

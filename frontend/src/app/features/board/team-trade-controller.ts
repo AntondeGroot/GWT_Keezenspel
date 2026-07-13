@@ -33,14 +33,11 @@ export class TeamTradeController {
   /** The pending trade on the table, if any. */
   readonly pending = computed<Trade | null>(() => this.state()?.trade ?? null);
 
-  /** Show the "Ask for a King/Ace" button: team game, trade sub-option on, no trade pending yet,
-   *  and you have cards to offer. */
-  readonly canAsk = computed(() => {
-    const s = this.state();
-    if (!s?.teamCardTrade || s.trade || !this.viewerId) return false;
-    const inTeam = s.players?.find((p) => p.id === this.viewerId)?.teamId != null;
-    return inTeam && this.hand().length > 0;
-  });
+  /** Show the "Ask for a King/Ace" button. The backend is the single source of truth: it's true
+   *  only in a team trade game, no trade pending, you have a teammate + cards, and you haven't yet
+   *  played a card this round (the trade window closes on your first play; it reopens on the next
+   *  deal). Gated per player, so you may still ask even if your teammate no longer can. */
+  readonly canAsk = computed(() => this.state()?.canRequestTrade ?? false);
 
   /** The other party's name — the teammate (when you're the requester) or the requester. */
   readonly otherName = computed(() => {

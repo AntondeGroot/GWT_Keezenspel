@@ -211,4 +211,17 @@ class CardsDeckTest {
     gameState.tearDown();
     cardsDeck.reset();
   }
+
+  @Test
+  void playingClosesTheTradeWindow_andANewDealReopensIt() {
+    createGame_With_NPlayers(gameState, 4);
+    assertFalse(cardsDeck.hasPlayedSinceDeal("0"), "fresh deal → trade window open");
+
+    Card first = cardsDeck.getCardsForPlayer("0").get(0);
+    cardsDeck.playCard("0", first);
+    assertTrue(cardsDeck.hasPlayedSinceDeal("0"), "played a card → trade window closed");
+
+    cardsDeck.dealCards();
+    assertFalse(cardsDeck.hasPlayedSinceDeal("0"), "new deal → trade window reopened");
+  }
 }
