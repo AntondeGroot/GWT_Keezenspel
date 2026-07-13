@@ -31,6 +31,10 @@ public class GameStatePush {
   // Whether this player is allowed to forfeit their turn right now
   private boolean canForfeit = true;
 
+  // Whether this player may open a team card trade right now (team game, trade option on, no trade
+  // pending, has a teammate + cards, and hasn't yet played a card this round)
+  private boolean canRequestTrade = false;
+
   // Whether the King/Ace team trade sub-option is enabled
   private boolean teamCardTrade = false;
 
@@ -66,6 +70,9 @@ public class GameStatePush {
 
   public boolean isCanForfeit() { return canForfeit; }
   public void setCanForfeit(boolean v) { canForfeit = v; }
+
+  public boolean isCanRequestTrade() { return canRequestTrade; }
+  public void setCanRequestTrade(boolean v) { canRequestTrade = v; }
 
   public boolean isTeamCardTrade() { return teamCardTrade; }
   public void setTeamCardTrade(boolean v) { teamCardTrade = v; }

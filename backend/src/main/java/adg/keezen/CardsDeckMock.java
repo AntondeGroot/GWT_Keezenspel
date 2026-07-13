@@ -4,7 +4,9 @@ import com.adg.openapi.model.Card;
 import com.adg.openapi.model.Player;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 public class CardsDeckMock implements CardsDeckInterface {
 
@@ -13,6 +15,7 @@ public class CardsDeckMock implements CardsDeckInterface {
 
   private int roundNr;
   private final PlayerHands hands = new PlayerHands();
+  private final Set<String> playedSinceDeal = new HashSet<>();
   private GameState gameState;
   private final ArrayList<Card> allCardsFromAceToKing = all13Cards();
 
@@ -48,10 +51,15 @@ public class CardsDeckMock implements CardsDeckInterface {
     }
     // Deliberately does NOT remove the card from the mocked hand — tests replay the same setup.
     hands.discard(card);
+    playedSinceDeal.add(playerId);
   }
 
   public boolean playerHasCardsLeft(String playerId) {
     return hands.hasCardsLeft(playerId);
+  }
+
+  public boolean hasPlayedSinceDeal(String playerId) {
+    return playedSinceDeal.contains(playerId);
   }
 
   public void giveCardToPlayerForTesting(String playerId, Card card) {
@@ -63,6 +71,7 @@ public class CardsDeckMock implements CardsDeckInterface {
   }
 
   public void dealCards() {
+    playedSinceDeal.clear();
     hands.clearPile();
     hands.dropAllHands();
     for (Player player : gameState.getPlayers()) {
@@ -86,6 +95,7 @@ public class CardsDeckMock implements CardsDeckInterface {
   public void reset() {
     roundNr = 0;
     hands.reset();
+    playedSinceDeal.clear();
   }
 
   public ArrayList<Card> getPlayedCards() {

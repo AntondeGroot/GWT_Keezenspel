@@ -56,6 +56,11 @@ class TradeApiTest {
     assertNotNull(push.getTrade(), "the teammate's snapshot shows the pending trade");
     assertEquals("0", push.getTrade().getRequesterId());
     assertEquals("2", push.getTrade().getTeammateId());
+
+    // The other team (players 1 & 3) neither sees this trade nor is blocked from opening their own.
+    var otherTeamPush = new SseEmitterService().buildPush(session, "1", false);
+    assertNull(otherTeamPush.getTrade(), "the other team does not see team A's trade");
+    assertTrue(otherTeamPush.isCanRequestTrade(), "the other team is not blocked from trading");
     GameRegistry.removeGame("trade-req");
   }
 
@@ -67,7 +72,7 @@ class TradeApiTest {
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertTrue(session.getCardsDeck().playerHasCard("0", KING), "requester got the King");
     assertTrue(session.getCardsDeck().playerHasCard("2", OFFERED), "teammate got the offered card");
-    assertNull(session.getGameState().getPendingTrade(), "trade cleared");
+    assertNull(session.getGameState().getPendingTradeFor("0"), "trade cleared");
     GameRegistry.removeGame("trade-acc");
   }
 

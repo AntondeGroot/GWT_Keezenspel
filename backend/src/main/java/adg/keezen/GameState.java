@@ -492,12 +492,18 @@ public final class GameState {
     return tradeManager.isEnabled();
   }
 
-  public TradeRequest getPendingTrade() {
-    return tradeManager.getPending();
+  /** The pending team card-trade for this player's team, if any (each team trades independently). */
+  public TradeRequest getPendingTradeFor(String playerId) {
+    return tradeManager.getPendingFor(playerId);
   }
 
   public boolean requestTrade(String requesterId, Card offeredCard) {
     return tradeManager.request(requesterId, offeredCard);
+  }
+
+  /** Whether this player may open a team card trade right now (drives the "ask" button). */
+  public boolean canRequestTrade(String playerId) {
+    return tradeManager.canRequest(playerId);
   }
 
   public boolean acceptTrade(String teammateId, Card kingOrAce) {

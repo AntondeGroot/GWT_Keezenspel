@@ -21,6 +21,10 @@ public interface CardsDeckInterface {
 
   boolean playerHasCardsLeft(String playerId);
 
+  /** Whether the player has played a card since the current round was dealt (closes their trade
+   *  window — a team card trade is only allowed before you play your first card of the round). */
+  boolean hasPlayedSinceDeal(String playerId);
+
   void giveCardToPlayerForTesting(String playerId, Card card);
 
   void setPlayerCard(String playerId, Card card);

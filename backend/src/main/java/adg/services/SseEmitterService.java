@@ -135,7 +135,7 @@ public class SseEmitterService {
     addCoreState(push, gs, session, omitLastMove);
     addPublicCardData(push, session);
     addPrivateHandAndForfeit(push, gs, session, playerId);
-    addPendingTrade(push, gs);
+    addPendingTrade(push, gs, playerId);
     return push;
   }
 
@@ -169,16 +169,20 @@ public class SseEmitterService {
         || !MoveAvailabilityChecker.hasAvailableMove(gs, playerId, safeHand);
     push.setCanForfeit(canForfeit);
 
+    // The team card trade is only offerable before you play your first card of the round.
+    push.setCanRequestTrade(gs.canRequestTrade(playerId));
+
     if (playerId.equals(gs.getPlayerIdTurn()) && !canForfeit) {
       gs.recordMustPlayBlocked();
     }
   }
 
-  private void addPendingTrade(GameStatePush push, GameState gs) {
+  private void addPendingTrade(GameStatePush push, GameState gs, String playerId) {
     push.setTeamCardTrade(gs.isTeamCardTrade());
 
-    // A pending team card-trade is public (both the requester and their teammate act on it).
-    TradeRequest pending = gs.getPendingTrade();
+    // Only the viewer's own team's pending trade (both teammates act on it); other teams' trades
+    // are invisible here, so one team asking never shows up for — or blocks — another.
+    TradeRequest pending = gs.getPendingTradeFor(playerId);
     if (pending != null) {
       push.setTrade(new Trade()
           .requesterId(pending.getRequesterId())
