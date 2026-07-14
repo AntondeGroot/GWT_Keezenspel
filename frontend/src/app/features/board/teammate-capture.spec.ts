@@ -13,28 +13,23 @@ describe('teammateCaptureKeys', () => {
     expect([...teammateCaptureKeys(preview, occupants, teamOf, '0')]).toEqual(['track:5']);
   });
 
-  it('does not flag capturing an opponent', () => {
+  // Cases that flag nothing: the mover previews landing on 'track:5' (team 0 = player 0).
+  it.each([
+    { why: 'capturing an opponent', occupants: [{ key: 'track:5', ownerId: '1' }], team: teamOf },
+    { why: 'the mover’s own pawn', occupants: [{ key: 'track:5', ownerId: '0' }], team: teamOf },
+    {
+      why: 'a teammate not on a previewed tile',
+      occupants: [{ key: 'track:9', ownerId: '2' }],
+      team: teamOf,
+    },
+    {
+      why: 'the mover has no team (teams off)',
+      occupants: [{ key: 'track:5', ownerId: '2' }],
+      team: () => null,
+    },
+  ])('does not flag $why', ({ occupants, team }) => {
     const preview = new Set(['track:5']);
-    const occupants = [{ key: 'track:5', ownerId: '1' }]; // player 1 is team 1 — opponent
-    expect(teammateCaptureKeys(preview, occupants, teamOf, '0').size).toBe(0);
-  });
-
-  it('ignores the mover’s own pawn', () => {
-    const preview = new Set(['track:5']);
-    const occupants = [{ key: 'track:5', ownerId: '0' }]; // the mover
-    expect(teammateCaptureKeys(preview, occupants, teamOf, '0').size).toBe(0);
-  });
-
-  it('ignores teammate pawns not on a previewed tile', () => {
-    const preview = new Set(['track:5']);
-    const occupants = [{ key: 'track:9', ownerId: '2' }]; // teammate, but elsewhere
-    expect(teammateCaptureKeys(preview, occupants, teamOf, '0').size).toBe(0);
-  });
-
-  it('returns empty when the mover has no team (teams off)', () => {
-    const preview = new Set(['track:5']);
-    const occupants = [{ key: 'track:5', ownerId: '2' }];
-    expect(teammateCaptureKeys(preview, occupants, () => null, '0').size).toBe(0);
+    expect(teammateCaptureKeys(preview, occupants, team, '0').size).toBe(0);
   });
 
   it('flags multiple teammate tiles and leaves opponents alone', () => {
