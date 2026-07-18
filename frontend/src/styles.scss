@@ -3,9 +3,13 @@
 html,
 body {
   margin: 0;
-  height: 100vh; // fallback for browsers without dvh
-  height: 100dvh; // the *visible* viewport — excludes mobile browser chrome (address bar / nav bar)
-  overflow: hidden; // clip to the viewport — no scrollbar (matches the original)
+  min-height: 100vh; // fallback for browsers without dvh
+  min-height: 100dvh; // AT LEAST the *visible* viewport (excludes mobile browser chrome)...
+  // ...but grow with the content: tall states (e.g. the 7-split pawn selectors in the mobile
+  // in-flow controls) are reachable by scrolling instead of being clipped as they were under the
+  // old `overflow: hidden`. Normal gameplay fits within the viewport, so no scrollbar shows; one
+  // only appears on the rare occasions content actually overflows (e.g. selecting a 7).
+  overflow-x: hidden; // never scroll sideways
   background: radial-gradient(ellipse at center, #1a3a1a 0%, #0d1f0d 100%);
   font-family: 'Lato', 'Helvetica Neue', sans-serif;
   user-select: none;

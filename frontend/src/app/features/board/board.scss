@@ -398,6 +398,10 @@
 @media (max-width: 699px) {
   .play {
     --board-w: min(600px, calc(96vw / 1.24), calc((100dvh - 348px) / 1.42));
+    // The footer is fixed over the bottom ~48px of the viewport. When a tall state (7-split)
+    // overflows and the page scrolls, reserve that height plus the safe-area inset so the last
+    // controls row clears the footer instead of hiding behind it.
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
   }
 
   .button-container {
