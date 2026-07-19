@@ -5,11 +5,8 @@ import {
   CardsService,
   Card as CardModel,
   MoveRequest,
-  MoveResponse,
-  Pawn as ApiPawn,
-  PositionKey,
 } from '../../api';
-import { buildBoard, Pt, BoardGeometry } from './board-geometry';
+import { buildBoard } from './board-geometry';
 import { resolveGameSession } from '../../session';
 import { basePath } from '../../base-path';
 import { SoundService } from '../../sound.service';
@@ -24,6 +21,8 @@ import { BoardCardFly } from './board-card-fly';
 import { projectCardBacks, projectPawns, projectTiles } from './board-view';
 import { TeamTradeController } from './team-trade-controller';
 import { GameStateStream } from './game-state-stream';
+import { HandReconciler } from './card-reconcile';
+import { animateMove } from './animate-move';
 import { PawnAnimator } from './pawn-animator';
 import { PawnAndCardSelection } from './pawn-and-card-selection';
 import { teammateCaptureTiles } from './teammate-capture';
@@ -50,10 +49,14 @@ export class Board implements OnInit, OnDestroy {
       this.streamUrl,
       (push) => this.handleGameState(push),
       // Each (re)connect gets a fresh baseline snapshot — clear the animation baselines so it
-      // isn't mistaken for a new move/deal.
+      // isn't mistaken for a new move/deal, and reset the local discard pile / just-played set so
+      // a pile left over from before a drop can't shadow the fresh authoritative hand (the card
+      // desync bug). `resyncing` is cleared too so a manual re-pull can heal a short push.
       () => {
         this.prevMoveKey = undefined;
         this.prevHandUuids = undefined;
+        this.cardTable.clearPile();
+        this.reconciler.reset();
       },
     );
     this.stream.start();
@@ -77,7 +80,7 @@ export class Board implements OnInit, OnDestroy {
         ])
       : '';
     if (this.prevMoveKey !== undefined && moveKey && moveKey !== this.prevMoveKey) {
-      this.animateMove(mr!);
+      animateMove(mr!, this.geometry(), this.pawnAnimator, this.sound);
     }
     this.prevMoveKey = moveKey;
 
@@ -94,7 +97,10 @@ export class Board implements OnInit, OnDestroy {
       // lingers in the (never-otherwise-cleared) pile is filtered out of the hand and silently
       // vanishes. Gate on the hand actually growing so a net-neutral trade (1 out, 1 in) doesn't
       // wipe the current round's pile.
-      if (cards.length > prev.size) this.cardTable.clearPile();
+      if (cards.length > prev.size) {
+        this.cardTable.clearPile();
+        this.reconciler.reset(); // last round's plays don't protect this round's (reused) uuids
+      }
       const fresh = cards.filter((c) => !prev.has(c.uuid)).map((c) => c.uuid);
       if (fresh.length > 0) this.cardTable.dealIn(fresh);
     }
@@ -102,6 +108,15 @@ export class Board implements OnInit, OnDestroy {
     this.gameStore.players.set(next.players ?? []);
     this.gameStore.winners.set(next.winners ?? []);
     this.state.set(next);
+    // Heal any hand/pile desync (stale pile shadowing a held card) and re-pull if the push's hand
+    // arrived shorter than the server's card count for the viewer. See HandReconciler.
+    const viewer = this.viewerId;
+    this.reconciler.reconcile(
+      next.playerCards ?? [],
+      this.cardTable.pile,
+      viewer ? next.nrOfCardsPerPlayer?.[viewer] : undefined,
+      () => this.stream?.start(),
+    );
   }
   private readonly movesService = inject(MovesService);
   private readonly cardsService = inject(CardsService);
@@ -172,6 +187,9 @@ export class Board implements OnInit, OnDestroy {
 
   private prevCounts: Record<string, number> | undefined;
   private prevHandUuids: Set<number> | undefined;
+  // Reconciles the displayed hand with the server after each push (heals stale-pile shadowing and
+  // short pushes); owns the just-played set + resync guard.
+  private readonly reconciler = new HandReconciler();
 
   // Pawn move animation: a small engine that walks pawns along pixel waypoints and exposes their
   // live positions; the `pawns` computed reads those to place a pawn mid-move (see below).
@@ -324,35 +342,6 @@ export class Board implements OnInit, OnDestroy {
   // --- Pawn move animation (drives the reusable PawnAnimator engine) -------
 
   /** Walk each of a move's pawns along its path; killed pawns go home after the killer. */
-  private animateMove(mr: MoveResponse): void {
-    const g = this.geometry();
-    if (!g) return;
-    if (mr.moveType === 'onBoard') this.sound.play('pawnOnBoard');
-    const d1 = this.walkPawn(g, mr.pawn1, mr.movePawn1, 0);
-    const d2 = this.walkPawn(g, mr.pawn2, mr.movePawn2, 0);
-    this.walkPawn(g, mr.pawnKilledByPawn1, mr.movePawnKilledByPawn1, d1);
-    this.walkPawn(g, mr.pawnKilledByPawn2, mr.movePawnKilledByPawn2, d2);
-    // A captured pawn "dies" as it's flung home — play the kill sound as that begins.
-    if (mr.pawnKilledByPawn1) this.sound.play('pawnKilled', d1);
-    if (mr.pawnKilledByPawn2) this.sound.play('pawnKilled', d2);
-  }
-
-  /** Convert a pawn's tile path to pixel waypoints (board geometry) and hand it to the animator. */
-  private walkPawn(
-    g: BoardGeometry,
-    pawn: ApiPawn | undefined,
-    move: PositionKey[] | undefined,
-    delayMs: number,
-  ): number {
-    if (!pawn || !move) return 0;
-    const points: Pt[] = [];
-    for (const t of move) {
-      const p = g.position(t.playerId, t.tileNr);
-      if (p) points.push(p);
-    }
-    return this.pawnAnimator.walk(pawnKey(pawn.pawnId), points, delayMs);
-  }
-
   private findPawn(id: string) {
     return this.state()?.pawns?.find((p) => pawnKey(p.pawnId) === id);
   }
@@ -554,6 +543,8 @@ export class Board implements OnInit, OnDestroy {
           // Fly the captured card (its id + face + hand slot) to the pile, popping as it goes.
           if (start) this.cardTable.flyToPile(start, { pop: true });
           else if (card) this.cardTable.pile.update((p) => [...p, card]);
+          // Protect this card from the hand reconciler until the server drops it from playerCards.
+          if (card) this.reconciler.markPlayed(card.uuid);
           this.touch();
         } else {
           // Rejected by the rules (still a 200): explain why, and keep the
@@ -587,6 +578,8 @@ export class Board implements OnInit, OnDestroy {
     });
     this.selection.reset();
     this.previewTiles.set(new Set());
+    // Protect the forfeited cards from the hand reconciler until the server drops them.
+    myCards.forEach((c) => this.reconciler.markPlayed(c.uuid));
     this.touch();
     myCards.forEach((c, i) => setTimeout(() => this.cardTable.flyToPile(c), i * 120));
   }
