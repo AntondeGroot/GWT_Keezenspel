@@ -14,6 +14,10 @@ public class CardsDeck implements CardsDeckInterface {
   private static final int ROUNDS_BEFORE_RESHUFFLE = 3;
 
   private int roundNr;
+  // Monotonic across reshuffles, so a card uuid is NEVER reused within a session. The client
+  // identifies cards by uuid (and derives its hand by subtracting the discard pile); a reused uuid
+  // would let a stale discard shadow a freshly dealt card, hiding it from the hand.
+  private int uniqueCardNr = FIRST_CARD_UUID;
   private ArrayDeque<Card> cardsDeque = new ArrayDeque<>();
   private final PlayerHands hands = new PlayerHands();
   // Players who have played at least one card since the current round was dealt. The team card
@@ -51,7 +55,8 @@ public class CardsDeck implements CardsDeckInterface {
 
     ArrayList<Card> cards = new ArrayList<>();
     // One full suit of values per player (suits cycle 0..3 when there are more than four players).
-    int uniqueCardNr = FIRST_CARD_UUID;
+    // uuids continue from the running counter (not reset to FIRST_CARD_UUID) so they stay unique
+    // across every reshuffle in this session.
     int nrPlayers = gameState.getActivePlayers().size();
     for (int suit = 0; suit < nrPlayers; suit++) {
       for (int cardValue = 1; cardValue <= CARD_VALUES_PER_SUIT; cardValue++) {
