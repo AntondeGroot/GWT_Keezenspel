@@ -1,4 +1,14 @@
 # Fast gate on every commit: lint + formatting (whole frontend).
-cd frontend
-npm run lint
-npm run format:check
+cd frontend || exit 1
+
+npm run lint || exit 1
+
+if ! npm run format:check; then
+  echo ""
+  echo "✖ Prettier found unformatted files. Fix them by running:"
+  echo ""
+  echo "    cd frontend && npm run format"
+  echo ""
+  echo "  (npm run prettier does the same thing.) Then git add your changes and commit again."
+  exit 1
+fi

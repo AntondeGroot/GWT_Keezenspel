@@ -9,6 +9,7 @@
     "test": "ng test",
     "test:coverage": "ng test --no-watch --coverage",
     "e2e": "playwright test",
+    "prettier": "prettier --write .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "generate:api": "openapi-generator-cli generate -i ../keezenspel_openapi.yml -g typescript-angular -o src/app/api --additional-properties=ngVersion=22.0.0,fileNaming=kebab-case",
