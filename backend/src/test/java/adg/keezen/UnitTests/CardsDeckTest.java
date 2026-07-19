@@ -86,6 +86,30 @@ class CardsDeckTest {
   }
 
   @Test
+  void cardUuids_AreNotReused_AcrossReshuffles() {
+    // The client identifies cards by uuid and derives its hand by subtracting the discard pile, so a
+    // reused uuid would let a stale discard shadow a freshly dealt card (hiding it). Uuids must stay
+    // unique for the whole session, across every reshuffle.
+    createGame_With_NPlayers(gameState, 1); // deals round 0 (5 cards) from the shuffled deck
+
+    Set<Integer> dealtBeforeReshuffle = new HashSet<>();
+    // Rounds 0, 1, 2 (5 + 4 + 4) consume the whole one-player deck of 13 cards.
+    for (int round = 0; round < 3; round++) {
+      cardsDeck.getCardsForPlayer("0").forEach(c -> dealtBeforeReshuffle.add(c.getUuid()));
+      cardsDeck.forfeitCardsForPlayer("0");
+      cardsDeck.shuffleIfFirstRound(); // no-op mid-cycle; reshuffles once roundNr wraps to 0
+      cardsDeck.dealCards();
+    }
+
+    // The last dealCards reshuffled and dealt a fresh deck — none of its uuids may collide.
+    for (Card card : cardsDeck.getCardsForPlayer("0")) {
+      assertFalse(
+          dealtBeforeReshuffle.contains(card.getUuid()),
+          "card uuid " + card.getUuid() + " was reused after a reshuffle");
+    }
+  }
+
+  @Test
   void twoPlayersDoNotHaveTheSameCard() {
     // GIVEN WHEN
     createGame_With_NPlayers(gameState, 2);
